@@ -1,6 +1,7 @@
 import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
-import { HeroFramePlaceholder } from '@/components/HeroFramePlaceholder'
+import { HeroScrollFrames } from '@/components/HeroScrollFrames'
+// import { HeroFramePlaceholder } from '@/components/HeroFramePlaceholder' // Kept for reference if needed
 import { LinktreeCards } from '@/components/LinktreeCards'
 import { ProductsShowcase } from '@/components/ProductsShowcase'
 import { SocialProof } from '@/components/SocialProof'
@@ -13,7 +14,7 @@ export default function Home() {
       <GSAPRegistry />
       <Navbar />
 
-      <HeroFramePlaceholder />
+      <HeroScrollFrames />
       <LinktreeCards />
       <div id="products">
         <ProductsShowcase />

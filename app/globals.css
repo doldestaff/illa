@@ -49,6 +49,13 @@
 :root {
   --background: #ffffff;
   --foreground: #0B0B0D;
+  --header-h: 80px;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --header-h: 64px;
+  }
 }
 
 body {

@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "node scripts/generate-hero-manifest.mjs && next dev",
     "build": "next build",
+    "prebuild": "node scripts/generate-hero-manifest.mjs",
     "start": "next start",
     "lint": "eslint"
   },
