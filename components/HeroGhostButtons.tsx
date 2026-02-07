@@ -2,7 +2,6 @@
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { MessageCircle, MapPin, Info, Phone, ShoppingBag, Store } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
 
 interface HeroGhostButtonsProps {
     progress: number // 0 to 1
@@ -69,58 +68,41 @@ export function HeroGhostButtons({ progress, isMobile }: HeroGhostButtonsProps) 
         )
     }
 
-    // --- MOBILE LOGIC (Scroll Carousel) ---
-
-    // Config values
-    // Increased width estimation to be safe for "PEDIR NO WHATSAPP"
-    const ITEM_WIDTH = 340
-    const SPACING = 24
-    const TOTAL_WIDTH = (ITEM_WIDTH + SPACING) * buttons.length
-
-    // Scroll Travel Logic
-    // Start: 100vw (First item just entering from right)
-    // End: -TOTAL_WIDTH (Last item fully exited to left)
-    // We add a buffer to ensuring it clears completely.
-
+    // --- MOBILE LOGIC (Stacked Fade Sequence) ---
     return (
-        <div className="absolute bottom-[25vh] left-0 right-0 z-20 flex justify-center pointer-events-none overflow-hidden h-40 items-center">
-            {/* Track */}
-            <div
-                className="flex items-center gap-6 relative pointer-events-auto transition-transform duration-75 ease-linear will-change-transform"
-                style={{
-                    // Move from 100vw to -TOTAL_WIDTH roughly
-                    // The 'window.innerWidth' addition helps bridge the gap
-                    // Formula: Start at 100vw, End at -(TOTAL_WIDTH - ScreenWidth)
-                    // Let's use a simpler linear map provided we have window width available/css calc
-                    transform: `translateX(calc(100vw - ${progress * (TOTAL_WIDTH + window.innerWidth)}px))`
-                }}
-            >
+        <div className="absolute bottom-[20vh] left-0 right-0 z-20 flex justify-center pointer-events-none h-32 items-center">
+            <div className="relative w-full max-w-xs h-full flex items-center justify-center">
                 {buttons.map((btn, i) => {
-                    // Calculate "Active Index"
-                    // We map the progress to which item index is currently near the center.
-                    // spread the active index over the range 0 to N+1
-                    const activeIndex = progress * (buttons.length + 2) - 1
+                    // Logic:
+                    // We distribute the buttons across the 0..1 progress range.
+                    // But we want to ensure the first one is visible at 0, and the last one at 1.
 
-                    const dist = Math.abs(i - activeIndex)
-                    const isCenter = dist < 0.6
+                    const step = 1 / (buttons.length - 1)
+                    const myTarget = i * step
 
-                    // Scale Logic:
-                    // Base size 1.0 -> Active 1.5
-                    const scale = Math.max(1.0, 1.5 - (dist * 0.7))
+                    // Distance from current progress
+                    const dist = Math.abs(progress - myTarget)
 
-                    // Opacity Logic:
-                    // Base opacity 0.6 -> Active 1.0
-                    // Fade out at edges: approximate by distance from center
-                    // We relax the fade out distance since items are wider
-                    let opacity = Math.max(0.6, 1 - (dist * 0.35))
+                    // Range of visibility: +/- step * 0.8 (slightly overlap)
+                    const visibleRange = step * 1.2
 
-                    // Edge Fade: if dist gets very large, fade out
-                    if (dist > 2.5) {
-                        opacity = Math.max(0, 0.6 - ((dist - 2.5) * 1.0))
+                    // Opacity calculation
+                    let opacity = 0
+                    if (dist < visibleRange) {
+                        opacity = 1 - (dist / visibleRange)
+                        // Smooth ease in/out
+                        opacity = Math.pow(opacity, 2)
                     }
 
-                    // Boost center opacity
-                    if (isCenter) opacity = 1
+                    // Scale effect: 0.8 -> 1.1 -> 0.8
+                    const scale = 0.9 + (opacity * 0.15)
+
+                    // Slide effect: slight vertical movement
+                    // Enter from bottom, Exit to top
+                    const yOffset = (progress - myTarget) * -100
+
+                    // Only render if impactful
+                    if (opacity < 0.01) return null
 
                     return (
                         <a
@@ -129,24 +111,25 @@ export function HeroGhostButtons({ progress, isMobile }: HeroGhostButtonsProps) 
                             target="_blank"
                             rel="noreferrer"
                             className="
-                                flex items-center gap-3 
-                                px-8 py-5
-                                bg-white/10 backdrop-blur-3xl 
-                                border border-white/30 rounded-3xl 
-                                text-white text-lg font-bold tracking-wide whitespace-nowrap
-                                transition-all duration-300
-                                shadow-2xl shadow-black/20
+                                absolute
+                                flex items-center justify-center gap-3 
+                                w-[85vw] max-w-[320px] py-4
+                                bg-white/10 backdrop-blur-2xl 
+                                border border-white/30 rounded-2xl 
+                                text-white text-lg font-bold tracking-wide
+                                shadow-xl shadow-black/20
+                                cursor-pointer pointer-events-auto
+                                transition-transform duration-75 ease-linear will-change-transform
                             "
                             style={{
-                                transform: `scale(${scale})`,
                                 opacity: opacity,
-                                border: isCenter ? '3px solid rgba(255,255,255,0.95)' : '1px solid rgba(255,255,255,0.3)',
-                                background: isCenter ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.08)',
-                                boxShadow: isCenter ? '0 20px 40px rgba(0,0,0,0.4)' : 'none',
-                                filter: isCenter ? 'brightness(1.1)' : 'none'
+                                transform: `translateY(${yOffset}px) scale(${scale})`,
+                                zIndex: Math.round(opacity * 100),
+                                border: `1px solid rgba(255,255,255, ${0.3 + opacity * 0.7})`,
+                                filter: `brightness(${1 + opacity * 0.2})`
                             }}
                         >
-                            <btn.icon size={28} />
+                            <btn.icon size={24} />
                             <span className="drop-shadow-md">{btn.label}</span>
                         </a>
                     )
