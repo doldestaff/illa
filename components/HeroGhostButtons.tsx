@@ -72,23 +72,15 @@ export function HeroGhostButtons({ progress, isMobile }: HeroGhostButtonsProps) 
     // --- MOBILE LOGIC (Scroll Carousel) ---
 
     // Config values
-    const ITEM_WIDTH = 280 // Width of a button
+    // Increased width estimation to be safe for "PEDIR NO WHATSAPP"
+    const ITEM_WIDTH = 340
     const SPACING = 24
     const TOTAL_WIDTH = (ITEM_WIDTH + SPACING) * buttons.length
 
     // Scroll Travel Logic
-    // Start: 90vw (Just entering from right)
-    // End: -TOTAL_WIDTH + 10vw (Fully exited to left)
-    const startX = 90 // vw
-    // We calculate the end X in pixels roughly:
-    // We want the last item to clear the screen.
-    // Let's use a cleaner interpolation.
-
-    // We need a way to determine per-button visibility based on its position.
-    // Since we don't have the exact DOM rects during render easily without refs,
-    // we will approximate based on 'progress'.
-
-    // Total travel distance in 'units' corresponding to TOTAL_WIDTH + ScreenWidth
+    // Start: 100vw (First item just entering from right)
+    // End: -TOTAL_WIDTH (Last item fully exited to left)
+    // We add a buffer to ensuring it clears completely.
 
     return (
         <div className="absolute bottom-[25vh] left-0 right-0 z-20 flex justify-center pointer-events-none overflow-hidden h-40 items-center">
@@ -96,16 +88,19 @@ export function HeroGhostButtons({ progress, isMobile }: HeroGhostButtonsProps) 
             <div
                 className="flex items-center gap-6 relative pointer-events-auto transition-transform duration-75 ease-linear will-change-transform"
                 style={{
-                    // Move from right (100vw) to left (past all items)
+                    // Move from 100vw to -TOTAL_WIDTH roughly
+                    // The 'window.innerWidth' addition helps bridge the gap
+                    // Formula: Start at 100vw, End at -(TOTAL_WIDTH - ScreenWidth)
+                    // Let's use a simpler linear map provided we have window width available/css calc
                     transform: `translateX(calc(100vw - ${progress * (TOTAL_WIDTH + window.innerWidth)}px))`
                 }}
             >
                 {buttons.map((btn, i) => {
                     // Calculate "Active Index"
                     // We map the progress to which item index is currently near the center.
-                    // Range 0 -> 1 covers indices 0 -> N.
+                    // spread the active index over the range 0 to N+1
+                    const activeIndex = progress * (buttons.length + 2) - 1
 
-                    const activeIndex = progress * (buttons.length + 1.5) - 0.75
                     const dist = Math.abs(i - activeIndex)
                     const isCenter = dist < 0.6
 
@@ -114,14 +109,14 @@ export function HeroGhostButtons({ progress, isMobile }: HeroGhostButtonsProps) 
                     const scale = Math.max(1.0, 1.5 - (dist * 0.7))
 
                     // Opacity Logic:
-                    // Base opacity 0.6 (increased) -> Active 1.0
+                    // Base opacity 0.6 -> Active 1.0
                     // Fade out at edges: approximate by distance from center
-                    // If distance is large (> 2.5), opacity drops to 0 (fade out)
-                    let opacity = Math.max(0.6, 1 - (dist * 0.4))
+                    // We relax the fade out distance since items are wider
+                    let opacity = Math.max(0.6, 1 - (dist * 0.35))
 
-                    // Edge Fade: if dist > 2.2, sharp drop
-                    if (dist > 2.2) {
-                        opacity = Math.max(0, 0.6 - ((dist - 2.2) * 1.5))
+                    // Edge Fade: if dist gets very large, fade out
+                    if (dist > 2.5) {
+                        opacity = Math.max(0, 0.6 - ((dist - 2.5) * 1.0))
                     }
 
                     // Boost center opacity
