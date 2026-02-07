@@ -32,9 +32,9 @@ export function Navbar() {
                         paddingBottom: '1.5rem'
                     }}
                 >
-                    {/* Brand */}
                     <Link href="/" className="flex items-center gap-3 group relative z-50">
-                        <div className="relative w-[100px] h-[30px] md:w-[200px] md:h-[60px] transition-transform group-hover:scale-105 filter drop-shadow-md">
+                        {/* Increased size by 150% as requested */}
+                        <div className="relative w-[150px] h-[45px] md:w-[300px] md:h-[90px] transition-transform group-hover:scale-105 filter drop-shadow-md">
                             <Image
                                 src="/brand/logo.png"
                                 alt="Illa Sorvetes"
