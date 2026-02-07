@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { Loader2, AlertTriangle } from 'lucide-react'
+import { HeroGhostButtons } from './HeroGhostButtons'
 
 interface Manifest {
     frameCount: number
@@ -17,6 +18,7 @@ export function HeroScrollFrames() {
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [debugInfo, setDebugInfo] = useState<string>('Init...')
+    const [showButtons, setShowButtons] = useState(false)
 
     // Config
     const SCROLL_HEIGHT = '500vh'
@@ -160,7 +162,16 @@ export function HeroScrollFrames() {
                 Math.max(0, Math.round(progress * (manifest.frameCount - 1)))
             )
 
+
             drawFrame(frameIndex)
+
+            // Ghost Buttons Trigger (> 10%)
+            const shouldShow = progress > 0.1
+            setShowButtons(prev => {
+                if (prev !== shouldShow) return shouldShow
+                return prev
+            })
+
             rafId = requestAnimationFrame(renderLoop)
         }
 
@@ -203,6 +214,9 @@ export function HeroScrollFrames() {
                         <p className="text-xs mt-2 opacity-50 font-mono">{debugInfo}</p>
                     </div>
                 )}
+
+                {/* Ghost Buttons Overlay */}
+                <HeroGhostButtons visible={showButtons} />
             </div>
         </section>
     )
