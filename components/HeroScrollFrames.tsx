@@ -140,20 +140,49 @@ export function HeroScrollFrames() {
         const canvas = canvasRef.current
         let rafId: number
 
-        const resizeCanvas = () => {
+        // Cache scroll dimensions to avoid jitter on mobile address bar resize
+        let cachedScrollDist = 0
+        let cachedWindowH = 0
+
+        const updateDimensions = () => {
             canvas.width = window.innerWidth
             canvas.height = window.innerHeight
+
+            // On mobile, height changes when scrollbar/address bar moves.
+            // We should use the container height + static logic if possible, 
+            // but simply caching it on explicit resize (width change) helps.
+            // For now, let's trust the resize event but maybe debounce or check width?
+            // Actually, simply recalculating these here is better than in renderLoop.
+
+            cachedWindowH = window.innerHeight
+            cachedScrollDist = section.offsetHeight - cachedWindowH
+
             requestAnimationFrame(() => drawFrame(0))
         }
-        window.addEventListener('resize', resizeCanvas)
-        resizeCanvas()
+
+        // Only resize if width changes (to ignore vertical address bar shifts on mobile)
+        let lastWidth = window.innerWidth
+        const handleResize = () => {
+            if (window.innerWidth !== lastWidth) {
+                lastWidth = window.innerWidth
+                updateDimensions()
+            }
+        }
+
+        window.addEventListener('resize', handleResize)
+        updateDimensions() // Init
 
         const renderLoop = () => {
             const rect = section.getBoundingClientRect()
-            const scrollDistance = section.offsetHeight - window.innerHeight
+
+            // Use cached values if available, else fallback
+            const dist = cachedScrollDist || (section.offsetHeight - window.innerHeight)
+
+            // Calculate progress based on Top position relative to cached start
+            // rect.top is 0 when at start. -dist when at end.
             const scrolled = rect.top * -1
 
-            let progress = scrolled / scrollDistance
+            let progress = scrolled / dist
             progress = Math.max(0, Math.min(1, progress))
 
             // clamp frame index
@@ -184,7 +213,7 @@ export function HeroScrollFrames() {
 
         return () => {
             cancelAnimationFrame(rafId)
-            window.removeEventListener('resize', resizeCanvas)
+            window.removeEventListener('resize', handleResize)
         }
     }, [manifest, images])
 
