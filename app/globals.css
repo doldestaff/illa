@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+@theme {
+  --color-illa-pink: #E5017D;
+  --color-illa-yellow: #FFED00;
+  --color-dark: #0B0B0D;
+  --color-soft-gray: #E8E8EC;
+  --color-white: #FFFFFF;
+
+  --font-sans: var(--font-open-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-script: var(--font-pacifico), cursive;
+
+  --animate-float: float 6s ease-in-out infinite;
+
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+}
+
+/* Custom Utilities */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .glass-dark {
+    background: rgba(11, 11, 13, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #0B0B0D;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  background-image: url('/brand/pattern.png');
+  background-repeat: repeat;
+  background-size: 150px;
+  background-blend-mode: overlay;
+}
