@@ -18,16 +18,11 @@ export function Navbar() {
     }, [])
 
     return (
-        <nav
-            className={cn(
-                'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
-                scrolled ? 'py-3 glass' : 'py-6 bg-transparent'
-            )}
-        >
-            <div className="container mx-auto px-4 flex items-center justify-between">
+        <nav className="fixed top-0 left-0 right-0 z-50 pointer-events-none">
+            <div className="container mx-auto px-4 py-6 flex items-center justify-between pointer-events-auto">
                 {/* Brand */}
                 <Link href="/" className="flex items-center gap-3 group">
-                    <div className="relative w-[120px] h-[34px] md:w-[140px] md:h-[40px] transition-transform group-hover:scale-105">
+                    <div className="relative w-[120px] h-[34px] md:w-[140px] md:h-[40px] transition-transform group-hover:scale-105 filter drop-shadow-md">
                         <Image
                             src="/brand/logo.png"
                             alt="Illa Sorvetes"
@@ -38,20 +33,20 @@ export function Navbar() {
                     </div>
                 </Link>
 
-                {/* Desktop Links */}
-                <div className="hidden md:flex items-center gap-8">
-                    <Link href="#products" className="text-dark hover:text-illa-pink font-medium transition-colors">
+                {/* Desktop Links - Floating Pills */}
+                <div className="hidden md:flex items-center gap-4">
+                    <Link href="#products" className="bg-white/90 backdrop-blur-md px-5 py-2 rounded-full text-dark font-semibold hover:bg-white hover:text-illa-pink transition-all shadow-sm hover:shadow-md">
                         Produtos
                     </Link>
-                    <Link href="#about" className="text-dark hover:text-illa-pink font-medium transition-colors">
+                    <Link href="#about" className="bg-white/90 backdrop-blur-md px-5 py-2 rounded-full text-dark font-semibold hover:bg-white hover:text-illa-pink transition-all shadow-sm hover:shadow-md">
                         Sobre Nós
                     </Link>
-                    <Link href="#locations" className="text-dark hover:text-illa-pink font-medium transition-colors">
+                    <Link href="#locations" className="bg-white/90 backdrop-blur-md px-5 py-2 rounded-full text-dark font-semibold hover:bg-white hover:text-illa-pink transition-all shadow-sm hover:shadow-md">
                         Lojas
                     </Link>
                     <Link
                         href="/pedido"
-                        className="bg-illa-pink text-white px-6 py-2 rounded-full font-bold hover:bg-pink-600 transition-colors shadow-lg hover:shadow-xl flex items-center gap-2"
+                        className="bg-illa-pink text-white px-6 py-2 rounded-full font-bold hover:bg-pink-600 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 hover:-translate-y-0.5"
                     >
                         <ShoppingBag size={18} />
                         Pedir Agora
@@ -59,8 +54,8 @@ export function Navbar() {
                 </div>
 
                 {/* Mobile Menu Toggle */}
-                <button className="md:hidden text-dark p-2">
-                    <Menu size={28} />
+                <button className="md:hidden bg-white/90 backdrop-blur-md p-3 rounded-full text-dark shadow-sm hover:shadow-md">
+                    <Menu size={24} />
                 </button>
             </div>
         </nav>

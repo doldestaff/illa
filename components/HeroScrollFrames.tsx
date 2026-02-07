@@ -78,22 +78,15 @@ export function HeroScrollFrames() {
 
         let rafId: number
         const section = containerRef.current
-        const headerHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 80
 
         const handleScroll = () => {
             const rect = section.getBoundingClientRect()
-            const startY = rect.top - headerHeight
-            const endY = rect.bottom - window.innerHeight
 
-            // Calculate progress: 0 (start of section) to 1 (end of section)
-            // We want the animation to happen while the section is "passing through"
-            // Adjust math based on desired feel. 
-            // Simple sticky logic:
-            // Section Height = 260vh. Sticky part = 100vh - header.
-            // Scrollable area = Section Height - Sticky Height.
-
-            const scrollDistance = section.offsetHeight - (window.innerHeight - headerHeight)
-            const scrolled = (rect.top - headerHeight) * -1
+            // Calculate progress based on full section height relative to viewport
+            // We want the scroll to "feel" like it's pinned until the end
+            // Total Scrollable Distance = Section Height - Viewport Height
+            const scrollDistance = section.offsetHeight - window.innerHeight
+            const scrolled = rect.top * -1
 
             let progress = scrolled / scrollDistance
             progress = Math.max(0, Math.min(1, progress))
@@ -124,14 +117,10 @@ export function HeroScrollFrames() {
         <section
             ref={containerRef}
             className="relative w-full"
-            style={{ height: '260vh' }}
+            style={{ height: '350vh' }} // Increased height for longer scroll feel
         >
             <div
-                className="sticky w-full overflow-hidden"
-                style={{
-                    top: 'var(--header-h)',
-                    height: 'calc(100vh - var(--header-h))'
-                }}
+                className="sticky top-0 w-full h-[100vh] overflow-hidden"
             >
                 <img
                     ref={imgRef}
