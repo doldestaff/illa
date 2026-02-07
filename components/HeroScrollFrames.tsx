@@ -234,7 +234,7 @@ export function HeroScrollFrames() {
             className="relative w-full z-10"
             style={{ height: SCROLL_HEIGHT }}
         >
-            <div className="sticky top-0 w-full h-[100dvh] overflow-hidden bg-gray-900">
+            <div className="sticky top-0 w-full h-screen overflow-hidden bg-illa-pink">
                 <canvas
                     ref={canvasRef}
                     className="w-full h-full block"
