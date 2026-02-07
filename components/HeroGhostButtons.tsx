@@ -71,19 +71,21 @@ export function HeroGhostButtons({ progress, isMobile }: HeroGhostButtonsProps) 
     // --- MOBILE LOGIC (Stacked Fade Sequence) ---
     return (
         <div className="absolute bottom-[20vh] left-0 right-0 z-20 flex justify-center pointer-events-none h-32 items-center">
-            <div className="relative w-full max-w-xs h-full flex items-center justify-center">
+            {/* 
+                Use relative container 
+                Buttons are absolute and centered within this container
+            */}
+            <div className="relative w-full h-full">
                 {buttons.map((btn, i) => {
                     // Logic:
                     // We distribute the buttons across the 0..1 progress range.
-                    // But we want to ensure the first one is visible at 0, and the last one at 1.
-
                     const step = 1 / (buttons.length - 1)
                     const myTarget = i * step
 
                     // Distance from current progress
                     const dist = Math.abs(progress - myTarget)
 
-                    // Range of visibility: +/- step * 0.8 (slightly overlap)
+                    // Range of visibility: +/- step * 1.2
                     const visibleRange = step * 1.2
 
                     // Opacity calculation
@@ -94,12 +96,12 @@ export function HeroGhostButtons({ progress, isMobile }: HeroGhostButtonsProps) 
                         opacity = Math.pow(opacity, 2)
                     }
 
-                    // Scale effect: 0.8 -> 1.1 -> 0.8
+                    // Scale effect: 0.9 -> 1.05 -> 0.9
                     const scale = 0.9 + (opacity * 0.15)
 
                     // Slide effect: slight vertical movement
                     // Enter from bottom, Exit to top
-                    const yOffset = (progress - myTarget) * -100
+                    const yOffset = (progress - myTarget) * -120
 
                     // Only render if impactful
                     if (opacity < 0.01) return null
@@ -112,6 +114,7 @@ export function HeroGhostButtons({ progress, isMobile }: HeroGhostButtonsProps) 
                             rel="noreferrer"
                             className="
                                 absolute
+                                left-1/2 top-1/2
                                 flex items-center justify-center gap-3 
                                 w-[85vw] max-w-[320px] py-4
                                 bg-white/10 backdrop-blur-2xl 
@@ -123,7 +126,8 @@ export function HeroGhostButtons({ progress, isMobile }: HeroGhostButtonsProps) 
                             "
                             style={{
                                 opacity: opacity,
-                                transform: `translateY(${yOffset}px) scale(${scale})`,
+                                // Center explicitly + apply animation
+                                transform: `translate(-50%, calc(-50% + ${yOffset}px)) scale(${scale})`,
                                 zIndex: Math.round(opacity * 100),
                                 border: `1px solid rgba(255,255,255, ${0.3 + opacity * 0.7})`,
                                 filter: `brightness(${1 + opacity * 0.2})`
