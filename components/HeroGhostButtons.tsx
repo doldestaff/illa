@@ -71,55 +71,38 @@ export function HeroGhostButtons({ progress, isMobile }: HeroGhostButtonsProps) 
 
     // --- MOBILE LOGIC (Scroll Carousel) ---
     // progress 0 -> 1 should slide the items.
-    // "apresente-os 1 de cada vez" -> Enter from right?
-    // "botão que alcança o meio fica maior" -> Center scaling.
-
-    // Let's assume a "virtual scroll" where progress 0 = first item far right, progress 1 = last item centered?
-    // Or progress 0 = first item centered?
-    // User said "apresente-os 1 de cada vez". This implies they start hidden or just entering.
 
     // Config values
-    const ITEM_WIDTH = 260 // approx width of a button on mobile
-    const SPACING = 20
+    const ITEM_WIDTH = 280 // Wider buttons
+    const SPACING = 24
     const TOTAL_WIDTH = (ITEM_WIDTH + SPACING) * buttons.length
 
     // We want to map progress (0-1) to an X offset.
-    // Let's say at 0, we show nothing (offset extremely positive).
-    // At 1, we show the last one?
-
-    // Refined Interpretation: "Movem na horizontal"
-    // Let's make the track slide from right to left as we scroll down.
-    // Start: First button entering from right.
-    // End: Last button visible/centered.
+    // Start: First button entering from right (60vw)
+    // End: Last button exiting to left (-TOTAL_WIDTH + 40vw)
+    // To ensure all are seen, we need to travel the full length plus some buffer.
 
     return (
-        <div className="absolute bottom-[20vh] left-0 right-0 z-20 flex justify-center pointer-events-none overflow-hidden h-32 items-center">
+        <div className="absolute bottom-[25vh] left-0 right-0 z-20 flex justify-center pointer-events-none overflow-hidden h-40 items-center">
             {/* Track */}
             <div
-                className="flex items-center gap-4 relative pointer-events-auto transition-transform duration-75 ease-linear will-change-transform"
+                className="flex items-center gap-6 relative pointer-events-auto transition-transform duration-75 ease-linear will-change-transform"
                 style={{
-                    // Calculate transform based on progress.
-                    // Start offset: Window width (offscreen right)
-                    // End offset: -TOTAL_WIDTH + Window Width (scrolled past?)
-                    // Let's tune: 
-                    // 0.0 -> Start entering (translateX = 50vw)
-                    // 1.0 -> Last item near center (translateX = -TOTAL_WIDTH + 50vw + buffer)
-                    transform: `translateX(calc(60vw - ${progress * (TOTAL_WIDTH + 100)}px))`
+                    // Tune the travel distance to Ensure all buttons pass the center
+                    transform: `translateX(calc(70vw - ${progress * (TOTAL_WIDTH + 200)}px))`
                 }}
             >
                 {buttons.map((btn, i) => {
                     // Calculate "center-ness" for scaling
-                    // We need to know the button's absolute position relative to viewport center.
-                    // This is hard to do purely with CSS in this structure without individual transforms.
-                    // However, we can approximate "active index" based on progress.
-
-                    const activeIndex = progress * (buttons.length + 1) - 1 // -1 to start before 0
+                    const activeIndex = progress * (buttons.length + 0.5) - 0.5
                     const dist = Math.abs(i - activeIndex)
-                    const isCenter = dist < 0.6 // Threshold for "center"
+                    const isCenter = dist < 0.5
 
-                    // Simple scale based on distance
-                    const scale = Math.max(0.8, 1.2 - (dist * 0.4))
-                    const opacity = Math.max(0.4, 1 - (dist * 0.3))
+                    // Scale Logic:
+                    // Base size: 1.0 (already larger via CSS)
+                    // Center boost: +50% -> 1.5
+                    const scale = Math.max(1.0, 1.5 - (dist * 0.8))
+                    const opacity = Math.max(0.3, 1 - (dist * 0.4))
 
                     return (
                         <a
@@ -129,22 +112,23 @@ export function HeroGhostButtons({ progress, isMobile }: HeroGhostButtonsProps) 
                             rel="noreferrer"
                             className="
                                 flex items-center gap-3 
-                                px-6 py-4
-                                bg-white/10 backdrop-blur-xl 
-                                border border-white/30 rounded-2xl 
-                                text-white text-base font-bold tracking-wide whitespace-nowrap
+                                px-8 py-5
+                                bg-white/10 backdrop-blur-3xl 
+                                border border-white/30 rounded-3xl 
+                                text-white text-lg font-bold tracking-wide whitespace-nowrap
                                 transition-all duration-300
                                 shadow-2xl shadow-black/20
                             "
                             style={{
                                 transform: `scale(${scale})`,
                                 opacity: opacity,
-                                border: isCenter ? '2px solid rgba(255,255,255,0.8)' : '1px solid rgba(255,255,255,0.2)',
-                                background: isCenter ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)'
+                                border: isCenter ? '3px solid rgba(255,255,255,0.9)' : '1px solid rgba(255,255,255,0.2)',
+                                background: isCenter ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.05)',
+                                boxShadow: isCenter ? '0 20px 40px rgba(0,0,0,0.3)' : 'none'
                             }}
                         >
-                            <btn.icon size={24} />
-                            <span className="drop-shadow-sm">{btn.label}</span>
+                            <btn.icon size={28} />
+                            <span className="drop-shadow-md">{btn.label}</span>
                         </a>
                     )
                 })}
