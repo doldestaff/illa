@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { MessageCircle, MapPin, Info, Phone, ShoppingBag, Store } from 'lucide-react'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 interface HeroGhostButtonsProps {
     progress: number // 0 to 1
@@ -70,17 +70,25 @@ export function HeroGhostButtons({ progress, isMobile }: HeroGhostButtonsProps) 
     }
 
     // --- MOBILE LOGIC (Scroll Carousel) ---
-    // progress 0 -> 1 should slide the items.
 
     // Config values
-    const ITEM_WIDTH = 280 // Wider buttons
+    const ITEM_WIDTH = 280 // Width of a button
     const SPACING = 24
     const TOTAL_WIDTH = (ITEM_WIDTH + SPACING) * buttons.length
 
-    // We want to map progress (0-1) to an X offset.
-    // Start: First button entering from right (60vw)
-    // End: Last button exiting to left (-TOTAL_WIDTH + 40vw)
-    // To ensure all are seen, we need to travel the full length plus some buffer.
+    // Scroll Travel Logic
+    // Start: 90vw (Just entering from right)
+    // End: -TOTAL_WIDTH + 10vw (Fully exited to left)
+    const startX = 90 // vw
+    // We calculate the end X in pixels roughly:
+    // We want the last item to clear the screen.
+    // Let's use a cleaner interpolation.
+
+    // We need a way to determine per-button visibility based on its position.
+    // Since we don't have the exact DOM rects during render easily without refs,
+    // we will approximate based on 'progress'.
+
+    // Total travel distance in 'units' corresponding to TOTAL_WIDTH + ScreenWidth
 
     return (
         <div className="absolute bottom-[25vh] left-0 right-0 z-20 flex justify-center pointer-events-none overflow-hidden h-40 items-center">
@@ -88,21 +96,36 @@ export function HeroGhostButtons({ progress, isMobile }: HeroGhostButtonsProps) 
             <div
                 className="flex items-center gap-6 relative pointer-events-auto transition-transform duration-75 ease-linear will-change-transform"
                 style={{
-                    // Tune the travel distance to Ensure all buttons pass the center
-                    transform: `translateX(calc(70vw - ${progress * (TOTAL_WIDTH + 200)}px))`
+                    // Move from right (100vw) to left (past all items)
+                    transform: `translateX(calc(100vw - ${progress * (TOTAL_WIDTH + window.innerWidth)}px))`
                 }}
             >
                 {buttons.map((btn, i) => {
-                    // Calculate "center-ness" for scaling
-                    const activeIndex = progress * (buttons.length + 0.5) - 0.5
+                    // Calculate "Active Index"
+                    // We map the progress to which item index is currently near the center.
+                    // Range 0 -> 1 covers indices 0 -> N.
+
+                    const activeIndex = progress * (buttons.length + 1.5) - 0.75
                     const dist = Math.abs(i - activeIndex)
-                    const isCenter = dist < 0.5
+                    const isCenter = dist < 0.6
 
                     // Scale Logic:
-                    // Base size: 1.0 (already larger via CSS)
-                    // Center boost: +50% -> 1.5
-                    const scale = Math.max(1.0, 1.5 - (dist * 0.8))
-                    const opacity = Math.max(0.3, 1 - (dist * 0.4))
+                    // Base size 1.0 -> Active 1.5
+                    const scale = Math.max(1.0, 1.5 - (dist * 0.7))
+
+                    // Opacity Logic:
+                    // Base opacity 0.6 (increased) -> Active 1.0
+                    // Fade out at edges: approximate by distance from center
+                    // If distance is large (> 2.5), opacity drops to 0 (fade out)
+                    let opacity = Math.max(0.6, 1 - (dist * 0.4))
+
+                    // Edge Fade: if dist > 2.2, sharp drop
+                    if (dist > 2.2) {
+                        opacity = Math.max(0, 0.6 - ((dist - 2.2) * 1.5))
+                    }
+
+                    // Boost center opacity
+                    if (isCenter) opacity = 1
 
                     return (
                         <a
@@ -122,9 +145,10 @@ export function HeroGhostButtons({ progress, isMobile }: HeroGhostButtonsProps) 
                             style={{
                                 transform: `scale(${scale})`,
                                 opacity: opacity,
-                                border: isCenter ? '3px solid rgba(255,255,255,0.9)' : '1px solid rgba(255,255,255,0.2)',
-                                background: isCenter ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.05)',
-                                boxShadow: isCenter ? '0 20px 40px rgba(0,0,0,0.3)' : 'none'
+                                border: isCenter ? '3px solid rgba(255,255,255,0.95)' : '1px solid rgba(255,255,255,0.3)',
+                                background: isCenter ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.08)',
+                                boxShadow: isCenter ? '0 20px 40px rgba(0,0,0,0.4)' : 'none',
+                                filter: isCenter ? 'brightness(1.1)' : 'none'
                             }}
                         >
                             <btn.icon size={28} />

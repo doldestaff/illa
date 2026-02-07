@@ -1,13 +1,15 @@
 'use client'
 
 import Link from 'next/link'
-import { Menu, ShoppingBag } from 'lucide-react'
+import { Menu, ShoppingBag, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useState } from 'react'
 import Image from 'next/image'
+import { AuthModal } from './AuthModal'
 
 export function Navbar() {
     const [isOpen, setIsOpen] = useState(false)
+    const [showAuthModal, setShowAuthModal] = useState(false)
 
     // Links Config
     const externalLinks = {
@@ -21,108 +23,112 @@ export function Navbar() {
     }
 
     return (
-        <nav className="fixed top-0 left-0 right-0 z-50 pointer-events-none transition-all duration-300">
-            <div
-                className="container mx-auto px-4 flex items-center justify-between pointer-events-auto"
-                style={{
-                    paddingTop: 'max(1.5rem, env(safe-area-inset-top))',
-                    paddingBottom: '1.5rem'
-                }}
-            >
-                {/* Brand */}
-                <Link href="/" className="flex items-center gap-3 group relative z-50">
-                    <div className="relative w-[100px] h-[30px] md:w-[200px] md:h-[60px] transition-transform group-hover:scale-105 filter drop-shadow-md">
-                        <Image
-                            src="/brand/logo.png"
-                            alt="Illa Sorvetes"
-                            fill
-                            className="object-contain object-left"
-                            priority
-                        />
-                    </div>
-                </Link>
-
-                {/* Desktop Links - Floating Pills */}
-                <div className="hidden md:flex items-center gap-4">
-                    <Link href="#products" className="bg-white/90 backdrop-blur-md px-5 py-2 rounded-full text-dark font-semibold hover:bg-white hover:text-illa-pink transition-all shadow-sm hover:shadow-md">
-                        Produtos
-                    </Link>
-                    <a
-                        href={externalLinks.aboutExternal}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="bg-white/90 backdrop-blur-md px-5 py-2 rounded-full text-dark font-semibold hover:bg-white hover:text-illa-pink transition-all shadow-sm hover:shadow-md"
-                    >
-                        Quem Somos
-                    </a>
-                    <a
-                        href={externalLinks.maps}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="bg-white/90 backdrop-blur-md px-5 py-2 rounded-full text-dark font-semibold hover:bg-white hover:text-illa-pink transition-all shadow-sm hover:shadow-md"
-                    >
-                        Lojas
-                    </a>
-                    <a
-                        href={externalLinks.franchise}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="bg-white/90 backdrop-blur-md px-5 py-2 rounded-full text-dark font-semibold hover:bg-white hover:text-illa-pink transition-all shadow-sm hover:shadow-md"
-                    >
-                        Franquias
-                    </a>
-                    <a
-                        href={externalLinks.ifood}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="bg-illa-pink text-white px-6 py-2 rounded-full font-bold hover:bg-pink-600 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 hover:-translate-y-0.5"
-                    >
-                        <ShoppingBag size={18} />
-                        Pedir Agora
-                    </a>
-                </div>
-
-                {/* Mobile Menu Toggle */}
-                <button
-                    onClick={() => setIsOpen(!isOpen)}
-                    className="md:hidden bg-white/90 backdrop-blur-md p-3 rounded-full text-dark shadow-sm hover:shadow-md relative z-50"
-                >
-                    <Menu size={20} />
-                </button>
-
-                {/* Mobile Menu Overlay */}
+        <>
+            <nav className="fixed top-0 left-0 right-0 z-50 pointer-events-none transition-all duration-300">
                 <div
-                    className={cn(
-                        "fixed inset-0 bg-white z-40 flex flex-col items-center justify-center gap-6 transition-all duration-300 md:hidden",
-                        isOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
-                    )}
+                    className="container mx-auto px-4 flex items-center justify-between pointer-events-auto"
+                    style={{
+                        paddingTop: 'max(1.5rem, env(safe-area-inset-top))',
+                        paddingBottom: '1.5rem'
+                    }}
                 >
-                    <Link href="#products" onClick={() => setIsOpen(false)} className="text-2xl font-bold text-dark hover:text-illa-pink">
-                        Produtos
+                    {/* Brand */}
+                    <Link href="/" className="flex items-center gap-3 group relative z-50">
+                        <div className="relative w-[100px] h-[30px] md:w-[200px] md:h-[60px] transition-transform group-hover:scale-105 filter drop-shadow-md">
+                            <Image
+                                src="/brand/logo.png"
+                                alt="Illa Sorvetes"
+                                fill
+                                className="object-contain object-left"
+                                priority
+                            />
+                        </div>
                     </Link>
-                    <a href={externalLinks.aboutExternal} target="_blank" rel="noreferrer" className="text-2xl font-bold text-dark hover:text-illa-pink">
-                        Quem Somos
-                    </a>
-                    <a href={externalLinks.maps} target="_blank" rel="noreferrer" className="text-2xl font-bold text-dark hover:text-illa-pink">
-                        Lojas
-                    </a>
-                    <a href={externalLinks.franchise} target="_blank" rel="noreferrer" className="text-2xl font-bold text-dark hover:text-illa-pink">
-                        Seja um Franqueado
-                    </a>
-                    <div className="flex gap-4 mt-8">
-                        <a href={externalLinks.instagram} target="_blank" rel="noreferrer" className="text-dark hover:text-illa-pink">Instagram</a>
-                        <a href={externalLinks.facebook} target="_blank" rel="noreferrer" className="text-dark hover:text-illa-pink">Facebook</a>
+
+                    {/* Desktop Actions - Simplified */}
+                    <div className="hidden md:flex items-center gap-4">
+                        <button
+                            onClick={() => setShowAuthModal(true)}
+                            className="
+                                flex items-center gap-2
+                                px-6 py-2 
+                                rounded-full 
+                                text-white font-bold tracking-wide text-sm
+                                bg-white/10 backdrop-blur-md border border-white/20
+                                hover:bg-white/20 hover:border-white/40 hover:scale-105
+                                active:scale-95
+                                transition-all shadow-lg
+                            "
+                        >
+                            <User size={18} />
+                            LOGIN
+                        </button>
+
+                        <a
+                            href={externalLinks.ifood}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="bg-illa-pink text-white px-6 py-2 rounded-full font-bold hover:bg-pink-600 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 hover:-translate-y-0.5"
+                        >
+                            <ShoppingBag size={18} />
+                            Pedir Agora
+                        </a>
                     </div>
-                    <a
-                        href={externalLinks.ifood}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="mt-4 bg-illa-pink text-white px-8 py-3 rounded-full font-bold text-xl hover:bg-pink-600 shadow-lg"
+
+                    {/* Mobile Menu Toggle */}
+                    <button
+                        onClick={() => setIsOpen(!isOpen)}
+                        className="md:hidden bg-white/90 backdrop-blur-md p-3 rounded-full text-dark shadow-sm hover:shadow-md relative z-50"
                     >
-                        Pedir Agora
-                    </a>
+                        <Menu size={20} />
+                    </button>
+
+                    {/* Mobile Menu Overlay */}
+                    <div
+                        className={cn(
+                            "fixed inset-0 bg-white z-40 flex flex-col items-center justify-center gap-6 transition-all duration-300 md:hidden",
+                            isOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
+                        )}
+                    >
+                        <Link href="#products" onClick={() => setIsOpen(false)} className="text-2xl font-bold text-dark hover:text-illa-pink">
+                            Produtos
+                        </Link>
+                        <a href={externalLinks.aboutExternal} target="_blank" rel="noreferrer" className="text-2xl font-bold text-dark hover:text-illa-pink">
+                            Quem Somos
+                        </a>
+                        <a href={externalLinks.maps} target="_blank" rel="noreferrer" className="text-2xl font-bold text-dark hover:text-illa-pink">
+                            Lojas
+                        </a>
+                        <a href={externalLinks.franchise} target="_blank" rel="noreferrer" className="text-2xl font-bold text-dark hover:text-illa-pink">
+                            Seja um Franqueado
+                        </a>
+
+                        <button
+                            onClick={() => { setIsOpen(false); setShowAuthModal(true); }}
+                            className="flex items-center gap-2 text-2xl font-bold text-dark hover:text-illa-pink"
+                        >
+                            <User size={24} />
+                            Minha Conta
+                        </button>
+
+                        <div className="flex gap-4 mt-8">
+                            <a href={externalLinks.instagram} target="_blank" rel="noreferrer" className="text-dark hover:text-illa-pink">Instagram</a>
+                            <a href={externalLinks.facebook} target="_blank" rel="noreferrer" className="text-dark hover:text-illa-pink">Facebook</a>
+                        </div>
+                        <a
+                            href={externalLinks.ifood}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="mt-4 bg-illa-pink text-white px-8 py-3 rounded-full font-bold text-xl hover:bg-pink-600 shadow-lg"
+                        >
+                            Pedir Agora
+                        </a>
+                    </div>
                 </div>
-            </div>
-        </nav>
+            </nav>
+
+            {/* Auth Modal */}
+            <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
+        </>
     )
 }
