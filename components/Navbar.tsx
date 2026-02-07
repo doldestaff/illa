@@ -31,7 +31,7 @@ export function Navbar() {
             >
                 {/* Brand */}
                 <Link href="/" className="flex items-center gap-3 group relative z-50">
-                    <div className="relative w-[100px] h-[30px] md:w-[140px] md:h-[40px] transition-transform group-hover:scale-105 filter drop-shadow-md">
+                    <div className="relative w-[100px] h-[30px] md:w-[200px] md:h-[60px] transition-transform group-hover:scale-105 filter drop-shadow-md">
                         <Image
                             src="/brand/logo.png"
                             alt="Illa Sorvetes"

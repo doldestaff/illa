@@ -18,7 +18,7 @@ export function HeroScrollFrames() {
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [debugInfo, setDebugInfo] = useState<string>('Init...')
-    const [showButtons, setShowButtons] = useState(false)
+    const [visibleCount, setVisibleCount] = useState(0)
 
     // Config
     const SCROLL_HEIGHT = '500vh'
@@ -165,10 +165,20 @@ export function HeroScrollFrames() {
 
             drawFrame(frameIndex)
 
-            // Ghost Buttons Trigger (> 10%)
-            const shouldShow = progress > 0.1
-            setShowButtons(prev => {
-                if (prev !== shouldShow) return shouldShow
+            // Ghost Buttons Progressive Reveal
+            // Start at frame 10, end at frame 60. Total 6 buttons.
+            const startFrame = 10
+            const endFrame = 60
+            const totalButtons = 6
+
+            let count = 0
+            if (frameIndex >= startFrame) {
+                const step = (endFrame - startFrame) / totalButtons
+                count = Math.min(totalButtons, Math.ceil((frameIndex - startFrame) / step))
+            }
+
+            setVisibleCount(prev => {
+                if (prev !== count) return count
                 return prev
             })
 
@@ -216,7 +226,7 @@ export function HeroScrollFrames() {
                 )}
 
                 {/* Ghost Buttons Overlay */}
-                <HeroGhostButtons visible={showButtons} />
+                <HeroGhostButtons visibleCount={visibleCount} />
             </div>
         </section>
     )

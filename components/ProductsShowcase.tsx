@@ -55,10 +55,10 @@ export function ProductsShowcase() {
             <div className="container mx-auto px-4">
                 <div className="text-center mb-16">
                     <span className="text-illa-pink font-bold uppercase tracking-widest text-sm mb-2 block">Sabores Inesquecíveis</span>
-                    <h2 ref={titleRef} className="font-script text-5xl md:text-6xl text-dark">Nossos Produtos</h2>
+                    <h2 ref={titleRef} className="font-script text-4xl md:text-6xl text-dark">Nossos Produtos</h2>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
                     {products.map((product) => (
                         <div
                             key={product.id}
