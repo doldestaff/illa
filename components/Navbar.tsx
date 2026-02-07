@@ -3,27 +3,13 @@
 import Link from 'next/link'
 import { Menu, ShoppingBag } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Image from 'next/image'
 
 export function Navbar() {
     const [isOpen, setIsOpen] = useState(false)
 
     // Links Config
-    const links = {
-        products: '#products', // Anchor
-        about: '#about',
-        locations: '#locations', // Anchor (or map link?) - User requested external map for "Localização" button usually, but menu might keep anchor
-        order: '/pedido', // Internal route or external? User said "Pedir no WhatsApp" for button? No, "iFood" link provided. 
-        // User Request:
-        // - Franquias (WhatsApp)
-        // - Quem somos (External)
-        // - Pedir (WhatsApp)
-        // - iFood
-        // - Localização (Maps)
-        // - Instagram / Facebook
-    }
-
     const externalLinks = {
         franchise: 'https://wa.me/5582997755961?text=Ol%C3%A1%20gostaria%20de%20saber%20mais%20sobre%20as%20franquias',
         aboutExternal: 'https://www.illasorvetes.com.br/quem-somos',
@@ -35,11 +21,17 @@ export function Navbar() {
     }
 
     return (
-        <nav className="fixed top-0 left-0 right-0 z-50 pointer-events-none">
-            <div className="container mx-auto px-4 py-6 flex items-center justify-between pointer-events-auto">
+        <nav className="fixed top-0 left-0 right-0 z-50 pointer-events-none transition-all duration-300">
+            <div
+                className="container mx-auto px-4 flex items-center justify-between pointer-events-auto"
+                style={{
+                    paddingTop: 'max(1.5rem, env(safe-area-inset-top))',
+                    paddingBottom: '1.5rem'
+                }}
+            >
                 {/* Brand */}
                 <Link href="/" className="flex items-center gap-3 group relative z-50">
-                    <div className="relative w-[120px] h-[34px] md:w-[140px] md:h-[40px] transition-transform group-hover:scale-105 filter drop-shadow-md">
+                    <div className="relative w-[100px] h-[30px] md:w-[140px] md:h-[40px] transition-transform group-hover:scale-105 filter drop-shadow-md">
                         <Image
                             src="/brand/logo.png"
                             alt="Illa Sorvetes"
@@ -95,7 +87,7 @@ export function Navbar() {
                     onClick={() => setIsOpen(!isOpen)}
                     className="md:hidden bg-white/90 backdrop-blur-md p-3 rounded-full text-dark shadow-sm hover:shadow-md relative z-50"
                 >
-                    <Menu size={24} />
+                    <Menu size={20} />
                 </button>
 
                 {/* Mobile Menu Overlay */}
