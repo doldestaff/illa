@@ -22,11 +22,12 @@ const globalCache: CacheData = {
 
 export function HeroScrollFrames() {
     const containerRef = useRef<HTMLDivElement>(null)
+    const contentRef = useRef<HTMLDivElement>(null)
     const canvasRef = useRef<HTMLCanvasElement>(null)
-    const triggerRef = useRef<ScrollTrigger | null>(null)
 
     const [isLoading, setIsLoading] = useState(!globalCache.manifest)
     const [error, setError] = useState<string | null>(null)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [debugInfo, setDebugInfo] = useState<string>('Init...')
     const [buttonProgress, setButtonProgress] = useState(0)
     const [isMobile, setIsMobile] = useState(false)
@@ -172,7 +173,7 @@ export function HeroScrollFrames() {
     const isReady = !isLoading && !!globalCache.manifest
 
     useLayoutEffect(() => {
-        if (!isReady || !containerRef.current || !canvasRef.current) return
+        if (!isReady || !containerRef.current || !canvasRef.current || !contentRef.current) return
 
         // Register
         gsap.registerPlugin(ScrollTrigger)
@@ -185,7 +186,7 @@ export function HeroScrollFrames() {
                 trigger: containerRef.current,
                 start: "top top",
                 end: "bottom bottom",
-                pin: canvasRef.current, // Pin the Canvas
+                pin: contentRef.current, // PIN THE CONTENT WRAPPER
                 scrub: 0.5, // 0.5s lag for smoothness
                 onUpdate: (self) => {
                     const progress = self.progress
@@ -230,18 +231,23 @@ export function HeroScrollFrames() {
             style={{ height: SCROLL_HEIGHT }}
         >
             {/* 
-                Canvas is pinned by GSAP. 
-                We remove 'sticky' CSS to let GSAP handle it.
-                'h-screen' ensures it fills viewport.
+                Pinned Content Wrapper.
+                GSAP pins this element.
+                Because it contains both Canvas and Buttons, they scroll together.
             */}
-            <canvas
-                ref={canvasRef}
-                className="w-full h-screen block bg-illa-pink"
-            />
+            <div
+                ref={contentRef}
+                className="relative w-full h-screen overflow-hidden bg-illa-pink"
+            >
+                <canvas
+                    ref={canvasRef}
+                    className="absolute inset-0 w-full h-full block"
+                />
 
-            {/* Ghost Buttons overlay on top of canvas */}
-            <div className="fixed bottom-0 left-0 w-full h-full pointer-events-none z-20">
-                <HeroGhostButtons progress={buttonProgress} isMobile={isMobile} />
+                {/* Ghost Buttons overlay - Absolute inside the pinned container */}
+                <div className="absolute inset-0 pointer-events-none z-20">
+                    <HeroGhostButtons progress={buttonProgress} isMobile={isMobile} />
+                </div>
             </div>
 
             {/* Loader Overlay - Only if truly loading initial assets */}
