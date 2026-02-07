@@ -20,6 +20,7 @@ export function HeroScrollFrames() {
         const checkMobile = () => {
             const mobile = window.matchMedia('(max-width: 768px)').matches
             setIsMobile(mobile)
+            console.log('Detect Device:', mobile ? 'Mobile' : 'Desktop')
             loadManifest(mobile ? 'mobile' : 'desktop')
         }
 
@@ -30,11 +31,13 @@ export function HeroScrollFrames() {
 
     const loadManifest = async (platform: 'mobile' | 'desktop') => {
         try {
-            const res = await fetch(`/hero/manifest.${platform}.json`)
-            if (!res.ok) throw new Error('Manifest not found')
+            const url = `/hero/manifest.${platform}.json`
+            console.log('Loading manifest:', url)
+            const res = await fetch(url)
+            if (!res.ok) throw new Error(`Manifest not found at ${url}`)
             const data = await res.json()
+            console.log('Manifest loaded:', data.frameCount, 'frames')
             setManifest(data)
-            // Reset for new platform
             setCurrentFrameIndex(0)
             setImages([])
         } catch (e) {
@@ -51,14 +54,11 @@ export function HeroScrollFrames() {
             for (let i = startIndex; i < endIndex; i++) {
                 const img = new Image()
                 img.src = manifest.frames[i]
-                // Optional: img.decode() if supported for smoother painting
             }
         }
 
-        // Load first few immediately
         preloadBatch(0, 10)
 
-        // Then rest progressively
         let loadedCount = 10
         const interval = setInterval(() => {
             if (loadedCount >= manifest.frames.length) {
@@ -67,7 +67,7 @@ export function HeroScrollFrames() {
             }
             preloadBatch(loadedCount, 10)
             loadedCount += 10
-        }, 500) // gentle batching
+        }, 500)
 
         return () => clearInterval(interval)
     }, [manifest])
@@ -82,13 +82,8 @@ export function HeroScrollFrames() {
         const handleScroll = () => {
             const rect = section.getBoundingClientRect()
 
-            // Calculate progress based on full section height relative to viewport
-            // We want the scroll to "feel" like it's pinned until the end
-            // "Scrolled" is how much of the section has moved UP past the viewport top
-            // Since it's sticky at top:0, the sticky container stays fixed.
-            // The section keeps moving up.
-            // Progress = (How far section top is from viewport top) / (Section Height - Viewport Height)
-            // rect.top is negative as we scroll down.
+            // Console log to debug scroll
+            // console.log('Scroll Top:', rect.top)
 
             const scrollDistance = section.offsetHeight - window.innerHeight
             const scrolled = rect.top * -1
@@ -99,7 +94,9 @@ export function HeroScrollFrames() {
             const frameIndex = Math.round(progress * (manifest.frameCount - 1))
 
             if (imgRef.current && manifest.frames[frameIndex]) {
-                imgRef.current.src = manifest.frames[frameIndex]
+                if (!imgRef.current.src.endsWith(manifest.frames[frameIndex])) {
+                    imgRef.current.src = manifest.frames[frameIndex]
+                }
             }
         }
 
@@ -114,15 +111,14 @@ export function HeroScrollFrames() {
     }, [manifest])
 
     if (!manifest || manifest.frames.length === 0) {
-        // Fallback or Loading State
-        return null
+        return <div className="h-screen w-full bg-black" />
     }
 
     return (
         <section
             ref={containerRef}
-            className="relative w-full"
-            style={{ height: '500vh' }} // Increased height for stronger scroll lock
+            className="relative w-full z-10"
+            style={{ height: '500vh' }}
         >
             <div
                 className="sticky top-0 w-full h-[100vh] overflow-hidden bg-black"
@@ -131,7 +127,8 @@ export function HeroScrollFrames() {
                     ref={imgRef}
                     src={manifest.frames[0]}
                     alt="Hero Sequence"
-                    className="w-full h-full object-cover object-top" // Ensure top is never cut off
+                    className="w-full h-full object-cover object-top"
+                    loading="eager"
                 />
             </div>
         </section>
