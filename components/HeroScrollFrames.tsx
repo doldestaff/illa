@@ -84,7 +84,12 @@ export function HeroScrollFrames() {
 
             // Calculate progress based on full section height relative to viewport
             // We want the scroll to "feel" like it's pinned until the end
-            // Total Scrollable Distance = Section Height - Viewport Height
+            // "Scrolled" is how much of the section has moved UP past the viewport top
+            // Since it's sticky at top:0, the sticky container stays fixed.
+            // The section keeps moving up.
+            // Progress = (How far section top is from viewport top) / (Section Height - Viewport Height)
+            // rect.top is negative as we scroll down.
+
             const scrollDistance = section.offsetHeight - window.innerHeight
             const scrolled = rect.top * -1
 
@@ -117,16 +122,16 @@ export function HeroScrollFrames() {
         <section
             ref={containerRef}
             className="relative w-full"
-            style={{ height: '350vh' }} // Increased height for longer scroll feel
+            style={{ height: '500vh' }} // Increased height for stronger scroll lock
         >
             <div
-                className="sticky top-0 w-full h-[100vh] overflow-hidden"
+                className="sticky top-0 w-full h-[100vh] overflow-hidden bg-black"
             >
                 <img
                     ref={imgRef}
                     src={manifest.frames[0]}
                     alt="Hero Sequence"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover object-top" // Ensure top is never cut off
                 />
             </div>
         </section>
