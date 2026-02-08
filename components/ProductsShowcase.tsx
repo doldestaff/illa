@@ -72,6 +72,8 @@ export function ProductsShowcase() {
                                         alt={product.name}
                                         fill
                                         className="object-contain drop-shadow-md"
+                                        loading="lazy"
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                     />
                                 </div>
                                 <h3 className="font-bold text-2xl text-dark mb-2">{product.name}</h3>

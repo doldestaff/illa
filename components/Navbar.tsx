@@ -3,13 +3,25 @@
 import Link from 'next/link'
 import { Menu, ShoppingBag, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { AuthModal } from './AuthModal'
 
 export function Navbar() {
     const [isOpen, setIsOpen] = useState(false)
     const [showAuthModal, setShowAuthModal] = useState(false)
+
+    // Scroll Lock for Mobile Menu
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden'
+        } else {
+            document.body.style.overflow = ''
+        }
+        return () => {
+            document.body.style.overflow = ''
+        }
+    }, [isOpen])
 
     // Links Config
     const externalLinks = {
@@ -28,13 +40,13 @@ export function Navbar() {
                 <div
                     className="container mx-auto px-4 flex items-center justify-between pointer-events-auto"
                     style={{
-                        paddingTop: 'max(1.5rem, env(safe-area-inset-top))',
-                        paddingBottom: '1.5rem'
+                        paddingTop: 'max(1rem, env(safe-area-inset-top))',
+                        paddingBottom: '1rem'
                     }}
                 >
                     <Link href="/" className="flex items-center gap-3 group relative z-50">
-                        {/* Increased size by 150% as requested */}
-                        <div className="relative w-[150px] h-[45px] md:w-[300px] md:h-[90px] transition-transform group-hover:scale-105 filter drop-shadow-md">
+                        {/* Logo increased but constrained for mobile safety */}
+                        <div className="relative w-[200px] h-[60px] md:w-[450px] md:h-[135px] transition-transform group-hover:scale-105 filter drop-shadow-md -ml-2">
                             <Image
                                 src="/brand/logo.png"
                                 alt="Illa Sorvetes"
@@ -49,16 +61,13 @@ export function Navbar() {
                     <div className="hidden md:flex items-center gap-4">
                         <button
                             onClick={() => setShowAuthModal(true)}
-                            className="
-                                flex items-center gap-2
-                                px-6 py-2 
-                                rounded-full 
-                                text-white font-bold tracking-wide text-sm
-                                bg-white/10 backdrop-blur-md border border-white/20
-                                hover:bg-white/20 hover:border-white/40 hover:scale-105
-                                active:scale-95
-                                transition-all shadow-lg
-                            "
+                            className={cn(
+                                "flex items-center gap-2 px-6 py-2 rounded-full",
+                                "text-white font-bold tracking-wide text-sm",
+                                "bg-white/10 backdrop-blur-md border border-white/20",
+                                "hover:bg-white/20 hover:border-white/40 hover:scale-105 active:scale-95",
+                                "transition-all shadow-lg"
+                            )}
                         >
                             <User size={18} />
                             LOGIN

@@ -25,10 +25,10 @@ export function HeroScrollFrames() {
     const contentRef = useRef<HTMLDivElement>(null)
     const canvasRef = useRef<HTMLCanvasElement>(null)
 
-    const [isLoading, setIsLoading] = useState(!globalCache.manifest)
+    // Mount state to prevent hydration mismatch
+    const [isMounted, setIsMounted] = useState(false)
+    const [isLoading, setIsLoading] = useState(true) // Start true, check cache on mount
     const [error, setError] = useState<string | null>(null)
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [debugInfo, setDebugInfo] = useState<string>('Init...')
     const [buttonProgress, setButtonProgress] = useState(0)
     const [isMobile, setIsMobile] = useState(false)
 
@@ -37,18 +37,17 @@ export function HeroScrollFrames() {
 
     // --- 2. Setup & Load ---
     useEffect(() => {
+        setIsMounted(true)
+
         const detectAndLoad = async () => {
             const mobile = window.matchMedia('(max-width: 768px)').matches
             setIsMobile(mobile)
-
             const platform = mobile ? 'mobile' : 'desktop'
 
             // If already cached for this platform, skip load
             if (globalCache.manifest && globalCache.platform === platform) {
-                setDebugInfo(`Using cached ${platform} manifest`)
                 setIsLoading(false)
-
-                // Ensure frame 0 is drawn immediately
+                // Ensure frame 0 is drawn immediately next tick
                 requestAnimationFrame(() => drawFrame(0))
                 return
             }
@@ -61,14 +60,12 @@ export function HeroScrollFrames() {
             }
 
             try {
-                setDebugInfo(`Loading ${platform} manifest...`)
                 const url = `/hero/manifest.${platform}.json`
                 const res = await fetch(url)
                 if (!res.ok) throw new Error(`Manifest 404 at ${url}`)
 
                 const data = await res.json()
                 globalCache.manifest = data
-                setDebugInfo(`Loaded ${data.frameCount} frames`)
 
                 // Start Preload
                 preloadImages(data.frames)
@@ -80,6 +77,11 @@ export function HeroScrollFrames() {
         }
 
         detectAndLoad()
+
+        // Cleanup function (though cache persists)
+        return () => {
+            // Optional: cancel any pending loads if we were tracking them
+        }
     }, [])
 
     const preloadImages = (frames: string[]) => {
@@ -92,7 +94,7 @@ export function HeroScrollFrames() {
         const loadSingle = (index: number) => {
             if (globalCache.images.has(index)) return Promise.resolve()
 
-            return new Promise<void>((resolve, reject) => {
+            return new Promise<void>((resolve) => {
                 const img = new Image()
                 img.src = frames[index]
                 img.onload = () => {
@@ -140,8 +142,10 @@ export function HeroScrollFrames() {
     // --- 3. Draw & Resize Logic ---
     const drawFrame = (index: number) => {
         const canvas = canvasRef.current
-        const ctx = canvas?.getContext('2d')
-        if (!canvas || !ctx || !globalCache.manifest) return
+        if (!canvas) return
+
+        const ctx = canvas.getContext('2d', { alpha: false }) // Optimize for no transparency
+        if (!ctx || !globalCache.manifest) return
 
         const img = globalCache.images.get(index)
 
@@ -163,17 +167,17 @@ export function HeroScrollFrames() {
             const sx = (img.naturalWidth - sw) / 2
             const sy = 0
 
-            ctx.clearRect(0, 0, w, h)
+            // Clear not strictly needed if we draw full cover, but good practice if safe
+            // ctx.clearRect(0, 0, w, h) 
             ctx.drawImage(img, sx, sy, sw, sh, 0, 0, w, h)
         }
     }
 
     // --- 4. GSAP ScrollTrigger Integration ---
-    // We need to define isReady first or move the effect below
-    const isReady = !isLoading && !!globalCache.manifest
+    const isReady = isMounted && !isLoading && !!globalCache.manifest
 
     useLayoutEffect(() => {
-        if (!isReady || !containerRef.current || !canvasRef.current || !contentRef.current) return
+        if (!isReady || !containerRef.current || !contentRef.current) return
 
         // Register
         gsap.registerPlugin(ScrollTrigger)
@@ -187,7 +191,7 @@ export function HeroScrollFrames() {
                 start: "top top",
                 end: "bottom bottom",
                 pin: contentRef.current, // PIN THE CONTENT WRAPPER
-                scrub: 0.5, // 0.5s lag for smoothness
+                scrub: 0, // Instant response, let browser smooth scroll handle it, or use small value like 0.1
                 onUpdate: (self) => {
                     const progress = self.progress
                     const frameIndex = Math.min(
@@ -214,6 +218,9 @@ export function HeroScrollFrames() {
     }, [isReady])
 
     // --- Render ---
+    // Prevent SSR hydration mismatch by rendering null/skeleton until mounted
+    if (!isMounted) return <div className="h-screen w-full bg-illa-pink" />
+
     if (error) {
         return (
             <div className="h-screen w-full bg-red-900 text-white flex flex-col items-center justify-center p-4">
@@ -233,7 +240,6 @@ export function HeroScrollFrames() {
             {/* 
                 Pinned Content Wrapper.
                 GSAP pins this element.
-                Because it contains both Canvas and Buttons, they scroll together.
             */}
             <div
                 ref={contentRef}

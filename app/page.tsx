@@ -5,7 +5,7 @@ import { HeroScrollFrames } from '@/components/HeroScrollFrames'
 import { LinktreeCards } from '@/components/LinktreeCards'
 import { ProductsShowcase } from '@/components/ProductsShowcase'
 import { SocialProof } from '@/components/SocialProof'
-import { Locations } from '@/components/Locations'
+import { StoreLocations } from '@/components/StoreLocations'
 import { GSAPRegistry } from '@/lib/gsap'
 
 export default function Home() {
@@ -20,7 +20,7 @@ export default function Home() {
         <ProductsShowcase />
       </div>
       <SocialProof />
-      <Locations />
+      <StoreLocations />
 
       <Footer />
     </main>
