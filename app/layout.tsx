@@ -33,7 +33,7 @@ export default function RootLayout({
         className={cn(
           openSans.variable,
           pacifico.variable,
-          'antialiased font-sans bg-white text-dark overflow-x-hidden'
+          'antialiased font-sans bg-white text-dark'
         )}
       >
         <SmoothScroll>{children}</SmoothScroll>

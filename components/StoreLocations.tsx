@@ -117,7 +117,7 @@ export function StoreLocations() {
                                             <span className="mt-1 w-4 h-4 rounded-full bg-illa-yellow/20 flex items-center justify-center shrink-0">
                                                 <span className="w-1.5 h-1.5 rounded-full bg-illa-yellow" />
                                             </span>
-                                            {store.address}
+                                            <span>{store.address}</span>
                                         </div>
 
                                         <div className="flex gap-6 flex-wrap">

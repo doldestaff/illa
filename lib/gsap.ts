@@ -2,11 +2,15 @@
 
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { useEffect } from 'react'
+import { useLayoutEffect } from 'react'
 
 export function GSAPRegistry() {
-    useEffect(() => {
+    useLayoutEffect(() => {
         gsap.registerPlugin(ScrollTrigger)
+        // Set defaults for better performance/behavior
+        ScrollTrigger.defaults({
+            markers: false
+        })
     }, [])
 
     return null

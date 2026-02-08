@@ -2,7 +2,9 @@ import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
 import { HeroScrollFrames } from '@/components/HeroScrollFrames'
 // import { HeroFramePlaceholder } from '@/components/HeroFramePlaceholder' // Kept for reference if needed
-import { LinktreeCards } from '@/components/LinktreeCards'
+// import { LinktreeCards } from '@/components/LinktreeCards' // Replaced by ParallaxButtonsSection
+// import { ParallaxButtonsSection } from '@/components/ParallaxButtonsSection'
+import { PinnedButtonsParallax } from '@/components/PinnedButtonsParallax'
 import { ProductsShowcase } from '@/components/ProductsShowcase'
 import { SocialProof } from '@/components/SocialProof'
 import { StoreLocations } from '@/components/StoreLocations'
@@ -15,7 +17,8 @@ export default function Home() {
       <Navbar />
 
       <HeroScrollFrames />
-      <LinktreeCards />
+      {/* <ParallaxButtonsSection /> */}
+      <PinnedButtonsParallax />
       <div id="products">
         <ProductsShowcase />
       </div>

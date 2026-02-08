@@ -52,6 +52,7 @@ export function Navbar() {
                                 alt="Illa Sorvetes"
                                 fill
                                 className="object-contain object-left"
+                                sizes="120px"
                                 priority
                             />
                         </div>
