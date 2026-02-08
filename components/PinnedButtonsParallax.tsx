@@ -134,10 +134,24 @@ export function PinnedButtonsParallax() {
         >
             <div
                 ref={wrapperRef}
-                className="sticky top-0 w-full h-screen flex items-center justify-center overflow-hidden perspective-container bg-radial-gradient"
+                className="sticky top-0 w-full h-screen flex items-center justify-center overflow-hidden perspective-container"
             >
+                {/* Video Background */}
+                <div className="absolute inset-0 z-0">
+                    <video
+                        src="/instagram/reels/mobile/reels-1.mp4"
+                        className="w-full h-full object-cover"
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                    />
+                    {/* Overlay for readability - Light glass */}
+                    <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px]" />
+                </div>
+
                 {/* Background Decor relative to sticky container */}
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-gray-50 via-white to-white opacity-80 pointer-events-none" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-transparent via-white/40 to-white/70 pointer-events-none z-0" />
 
                 {/* Stage */}
                 <div className="relative w-full max-w-md h-[400px] flex items-center justify-center" style={{ perspective: '1000px', transformStyle: 'preserve-3d' }}>
