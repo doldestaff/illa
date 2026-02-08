@@ -134,7 +134,7 @@ export function PinnedButtonsParallax() {
         >
             <div
                 ref={wrapperRef}
-                className="sticky top-0 w-full h-screen flex items-center justify-center overflow-hidden perspective-container"
+                className="sticky top-0 w-full h-[100dvh] flex items-center justify-center overflow-hidden perspective-container"
             >
                 {/* Video Background */}
                 <div className="absolute inset-0 z-0">

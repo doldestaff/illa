@@ -36,7 +36,7 @@ export function HeroScrollFrames() {
     const [isMobile, setIsMobile] = useState(false)
 
     // Config
-    const SCROLL_HEIGHT = '500vh'
+    const SCROLL_HEIGHT = isMobile ? '350vh' : '500vh'
 
     // --- 2. Setup & Load ---
     useEffect(() => {
@@ -236,7 +236,7 @@ export function HeroScrollFrames() {
         >
             <div
                 ref={contentRef}
-                className="sticky top-0 w-full h-screen overflow-hidden bg-illa-pink will-change-transform" /* Sticky applied here */
+                className="sticky top-0 w-full h-[100dvh] overflow-hidden bg-illa-pink will-change-transform" /* Sticky applied here */
             >
                 <canvas
                     ref={canvasRef}
