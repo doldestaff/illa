@@ -1,99 +1,88 @@
 'use client'
 
 import { useRef, useEffect } from 'react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { ChevronRight } from 'lucide-react'
-import Link from 'next/link'
+import { motion, useScroll, useTransform } from 'framer-motion'
 import Image from 'next/image'
+import Link from 'next/link'
 
-const products = [
-    { id: 1, name: 'Clássicos', color: 'bg-blue-100', image: '/brand/placeholder-icecream.svg' },
-    { id: 2, name: 'Frutas', color: 'bg-green-100', image: '/brand/placeholder-popsicle.svg' },
-    { id: 3, name: 'Kids', color: 'bg-pink-100', image: '/brand/placeholder-kids.svg' },
-    { id: 4, name: 'Premium', color: 'bg-purple-100', image: '/brand/placeholder-premium.svg' },
-]
+const realProducts = Array.from({ length: 10 }, (_, i) => ({
+    id: i + 1,
+    name: `Sabor Illa ${i + 1}`, // Placeholder names since we don't know exact flavors
+    image: `/brand/product/product-${i + 1}.png`,
+    color: i % 2 === 0 ? 'bg-pink-50' : 'bg-blue-50', // Alternating soft backgrounds
+}))
+
+// Duplicate for infinite loop
+const marqueeProducts = [...realProducts, ...realProducts]
 
 export function ProductsShowcase() {
-    const container = useRef(null)
-    const titleRef = useRef(null)
-    const cardsRef = useRef([])
-
-    useEffect(() => {
-        const ctx = gsap.context(() => {
-            // Title Reveal
-            gsap.from(titleRef.current, {
-                scrollTrigger: {
-                    trigger: titleRef.current,
-                    start: 'top 80%',
-                },
-                y: 50,
-                opacity: 0,
-                duration: 1,
-                ease: 'power3.out'
-            })
-
-            // Cards Stagger
-            gsap.from('.product-card', {
-                scrollTrigger: {
-                    trigger: container.current,
-                    start: 'top 70%',
-                },
-                y: 100,
-                opacity: 0,
-                duration: 0.8,
-                stagger: 0.1,
-                ease: 'back.out(1.2)'
-            })
-
-        }, container)
-        return () => ctx.revert()
-    }, [])
-
     return (
-        <section id="products" ref={container} className="py-24 bg-white relative">
-            <div className="container mx-auto px-4">
-                <div className="text-center mb-16">
-                    <span className="text-illa-pink font-bold uppercase tracking-widest text-sm mb-2 block">Sabores Inesquecíveis</span>
-                    <h2 ref={titleRef} className="font-script text-4xl md:text-6xl text-dark">Nossos Produtos</h2>
-                </div>
+        <section id="products" className="py-24 bg-white overflow-hidden">
+            <div className="container mx-auto px-4 mb-16 text-center">
+                <span className="text-illa-pink font-bold uppercase tracking-widest text-sm mb-2 block">
+                    Sabores Inesquecíveis
+                </span>
+                <h2 className="font-script text-4xl md:text-6xl text-dark">
+                    Nossos Produtos
+                </h2>
+            </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-                    {products.map((product) => (
+            {/* Marquee Container */}
+            <div className="relative w-full">
+                <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+                <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+
+                <motion.div
+                    className="flex gap-8 w-max"
+                    animate={{ x: "-50%" }}
+                    transition={{
+                        repeat: Infinity,
+                        ease: "linear",
+                        duration: 30, // Adjust speed here
+                    }}
+                    whileHover={{ animationPlayState: 'paused' }} // CSS handling for pause might be better, but let's try motion's hover
+                    style={{ x: 0 }}
+                >
+                    {marqueeProducts.map((product, index) => (
                         <div
-                            key={product.id}
-                            className={`product-card group relative aspect-[3/4] rounded-[2rem] overflow-hidden ${product.color} cursor-pointer transition-transform hover:-translate-y-2 duration-500`}
+                            key={`${product.id}-${index}`}
+                            className={`group relative flex-shrink-0 w-[280px] h-[400px] rounded-[2.5rem] ${product.color} p-8 flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-illa-pink/20 cursor-pointer`}
                         >
-                            {/* Placeholder content since we don't have real images yet */}
-                            <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
-                                <div className="relative w-32 h-32 mb-6 group-hover:scale-110 transition-transform duration-500">
-                                    <Image
-                                        src={product.image}
-                                        alt={product.name}
-                                        fill
-                                        className="object-contain drop-shadow-md"
-                                        loading="lazy"
-                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                    />
-                                </div>
-                                <h3 className="font-bold text-2xl text-dark mb-2">{product.name}</h3>
-                                <p className="text-dark/60 text-sm">Explosão de sabor em cada pedaço.</p>
+                            <div className="relative w-full h-[60%] mb-6">
+                                <Image
+                                    src={product.image}
+                                    alt={product.name}
+                                    fill
+                                    className="object-contain drop-shadow-lg group-hover:drop-shadow-2xl transition-all duration-500 group-hover:scale-110"
+                                    sizes="280px"
+                                />
+                            </div>
 
-                                <div className="absolute bottom-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300 translate-y-4 group-hover:translate-y-0">
-                                    <span className="bg-white text-dark px-4 py-2 rounded-full text-sm font-bold shadow-lg flex items-center gap-1">
-                                        Ver Mais <ChevronRight size={14} />
-                                    </span>
-                                </div>
+                            <h3 className="font-bold text-xl text-dark mb-1 text-center font-sans tracking-tight">
+                                {product.name}
+                            </h3>
+                            <p className="text-dark/50 text-xs font-medium uppercase tracking-wider">
+                                Premium
+                            </p>
+
+                            {/* Hover Overlay/Button */}
+                            <div className="absolute bottom-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-2 group-hover:translate-y-0">
+                                <span className="bg-white text-dark px-6 py-2 rounded-full text-sm font-bold shadow-lg">
+                                    Ver Detalhes
+                                </span>
                             </div>
                         </div>
                     ))}
-                </div>
+                </motion.div>
+            </div>
 
-                <div className="text-center mt-12">
-                    <Link href="/produtos" className="inline-block border-b-2 border-illa-pink text-dark font-bold hover:text-illa-pink transition-colors pb-1">
-                        Ver catálogo completo
-                    </Link>
-                </div>
+            <div className="text-center mt-16">
+                <Link
+                    href="/produtos"
+                    className="inline-block border-b-2 border-illa-pink text-dark font-bold hover:text-illa-pink transition-colors pb-1 text-lg"
+                >
+                    Ver catálogo completo
+                </Link>
             </div>
         </section>
     )
