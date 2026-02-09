@@ -9,7 +9,7 @@ const realProducts = Array.from({ length: 10 }, (_, i) => ({
     id: i + 1,
     name: `Sabor Illa ${i + 1}`, // Placeholder names since we don't know exact flavors
     image: `/brand/product/product-${i + 1}.png`,
-    color: i % 2 === 0 ? 'bg-pink-50' : 'bg-blue-50', // Alternating soft backgrounds
+    color: i % 2 === 0 ? 'bg-pink-50' : 'bg-yellow-50', // Alternating soft backgrounds
 }))
 
 // Duplicate for infinite loop
