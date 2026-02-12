@@ -14,9 +14,18 @@ export default async function MembersPage() {
 
     const { data: profile } = await supabase
         .from('profiles')
-        .select('full_name, whatsapp, email')
+        .select('full_name, whatsapp, email, avatar_path')
         .eq('id', user.id)
         .single()
+
+    // Generate signed URL for avatar if exists
+    let avatarUrl: string | null = null
+    if (profile?.avatar_path) {
+        const { data: signed } = await supabase.storage
+            .from('avatars')
+            .createSignedUrl(profile.avatar_path, 3600)
+        avatarUrl = signed?.signedUrl ?? null
+    }
 
     return (
         <MembersClient
@@ -25,6 +34,7 @@ export default async function MembersPage() {
                 email: user.email ?? '',
                 fullName: profile?.full_name ?? user.user_metadata?.full_name ?? '',
                 whatsapp: profile?.whatsapp ?? '',
+                avatarUrl,
             }}
         />
     )
