@@ -146,12 +146,12 @@ export function PinnedButtonsParallax() {
                         muted
                         playsInline
                     />
-                    {/* Overlay for readability - Light glass */}
-                    <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px]" />
+                    {/* Overlay for readability - Reduced opacity */}
+                    <div className="absolute inset-0 bg-white/10 backdrop-blur-[1px]" />
                 </div>
 
-                {/* Background Decor relative to sticky container */}
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-transparent via-white/40 to-white/70 pointer-events-none z-0" />
+                {/* Background Decor relative to sticky container - Adjusted gradient */}
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-transparent via-white/20 to-white/60 pointer-events-none z-0" />
 
                 {/* Stage */}
                 <div className="relative w-full max-w-md h-[400px] flex items-center justify-center" style={{ perspective: '1000px', transformStyle: 'preserve-3d' }}>

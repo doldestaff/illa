@@ -4,6 +4,8 @@ import './globals.css'
 import { SmoothScroll } from '@/components/SmoothScroll'
 import { cn } from '@/lib/utils'
 
+import KeepAlivePing from '@/components/KeepAlivePing'
+
 const openSans = Open_Sans({
   subsets: ['latin'],
   variable: '--font-open-sans',
@@ -36,6 +38,7 @@ export default function RootLayout({
           'antialiased font-sans bg-white text-dark'
         )}
       >
+        <KeepAlivePing />
         <SmoothScroll>{children}</SmoothScroll>
       </body>
     </html>

@@ -1,17 +1,51 @@
 'use client'
 
 import Link from 'next/link'
-import { Menu, ShoppingBag, User } from 'lucide-react'
+import { Menu, ShoppingBag, User, LogIn } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import Image from 'next/image'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { AuthModal } from './AuthModal'
+import { createSupabaseBrowser } from '@/lib/supabaseClient'
+import type { User as SupabaseUser } from '@supabase/supabase-js'
 
-export function Navbar() {
+function LoginParamListener({ onLoginParam }: { onLoginParam: () => void }) {
+    const searchParams = useSearchParams()
+    const router = useRouter()
+
+    useEffect(() => {
+        if (searchParams.get('login') === '1') {
+            onLoginParam()
+            const url = new URL(window.location.href)
+            url.searchParams.delete('login')
+            router.replace(url.pathname, { scroll: false })
+        }
+    }, [searchParams, onLoginParam, router])
+
+    return null
+}
+
+function NavbarInner() {
     const [isOpen, setIsOpen] = useState(false)
     const [showAuthModal, setShowAuthModal] = useState(false)
+    const [user, setUser] = useState<SupabaseUser | null>(null)
+    const router = useRouter()
 
-    // Scroll Lock for Mobile Menu
+    useEffect(() => {
+        const supabase = createSupabaseBrowser()
+
+        supabase.auth.getUser().then(({ data }) => {
+            setUser(data.user)
+        })
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setUser(session?.user ?? null)
+        })
+
+        return () => subscription.unsubscribe()
+    }, [])
+
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden'
@@ -23,7 +57,6 @@ export function Navbar() {
         }
     }, [isOpen])
 
-    // Links Config
     const externalLinks = {
         franchise: 'https://wa.me/5582997755961?text=Ol%C3%A1%20gostaria%20de%20saber%20mais%20sobre%20as%20franquias',
         aboutExternal: 'https://www.illasorvetes.com.br/quem-somos',
@@ -34,8 +67,20 @@ export function Navbar() {
         facebook: 'https://www.facebook.com/p/Illasorvetesoficial-100094697327857/'
     }
 
+    const handleAuthClick = () => {
+        if (user) {
+            router.push('/members')
+        } else {
+            setShowAuthModal(true)
+        }
+    }
+
     return (
         <>
+            <Suspense fallback={null}>
+                <LoginParamListener onLoginParam={() => setShowAuthModal(true)} />
+            </Suspense>
+
             <nav className="fixed top-0 left-0 right-0 z-50 pointer-events-none transition-all duration-300">
                 <div
                     className="container mx-auto px-4 flex items-center justify-between pointer-events-auto"
@@ -45,7 +90,6 @@ export function Navbar() {
                     }}
                 >
                     <Link href="/" className="flex items-center gap-3 group relative z-50">
-                        {/* Logo increased but constrained for mobile safety */}
                         <div className="relative w-[200px] h-[60px] md:w-[450px] md:h-[135px] transition-transform group-hover:scale-105 filter drop-shadow-md -ml-2">
                             <Image
                                 src="/brand/logo.png"
@@ -58,10 +102,10 @@ export function Navbar() {
                         </div>
                     </Link>
 
-                    {/* Desktop Actions - Simplified */}
+                    {/* Desktop Actions */}
                     <div className="hidden md:flex items-center gap-4">
                         <button
-                            onClick={() => setShowAuthModal(true)}
+                            onClick={handleAuthClick}
                             className={cn(
                                 "flex items-center gap-2 px-6 py-2 rounded-full",
                                 "text-white font-bold tracking-wide text-sm",
@@ -70,8 +114,17 @@ export function Navbar() {
                                 "transition-all shadow-lg"
                             )}
                         >
-                            <User size={18} />
-                            LOGIN
+                            {user ? (
+                                <>
+                                    <User size={18} />
+                                    MINHA CONTA
+                                </>
+                            ) : (
+                                <>
+                                    <LogIn size={18} />
+                                    LOGIN
+                                </>
+                            )}
                         </button>
 
                         <a
@@ -114,11 +167,11 @@ export function Navbar() {
                         </a>
 
                         <button
-                            onClick={() => { setIsOpen(false); setShowAuthModal(true); }}
+                            onClick={() => { setIsOpen(false); handleAuthClick(); }}
                             className="flex items-center gap-2 text-2xl font-bold text-dark hover:text-illa-pink"
                         >
                             <User size={24} />
-                            Minha Conta
+                            {user ? 'Minha Conta' : 'Entrar'}
                         </button>
 
                         <div className="flex gap-4 mt-8">
@@ -137,8 +190,11 @@ export function Navbar() {
                 </div>
             </nav>
 
-            {/* Auth Modal */}
             <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
         </>
     )
+}
+
+export function Navbar() {
+    return <NavbarInner />
 }
