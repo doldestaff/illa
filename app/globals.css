@@ -25,6 +25,76 @@
   }
 }
 
+/* Gamification Animations */
+@keyframes progress-glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 4px rgba(229, 1, 125, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 12px rgba(229, 1, 125, 0.6);
+  }
+}
+
+@keyframes confetti-pop {
+  0% {
+    opacity: 1;
+    transform: scale(0.5);
+  }
+
+  50% {
+    opacity: 0.8;
+    transform: scale(1.2);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+@keyframes countdown-tick {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.progress-glow {
+  animation: progress-glow 2s ease-in-out infinite;
+}
+
+.confetti-burst::before,
+.confetti-burst::after {
+  content: '🎉';
+  position: absolute;
+  font-size: 1.5rem;
+  animation: confetti-pop 1s ease-out forwards;
+}
+
+.confetti-burst::before {
+  top: 20%;
+  left: 30%;
+}
+
+.confetti-burst::after {
+  content: '✨';
+  top: 10%;
+  right: 25%;
+  animation-delay: 0.15s;
+}
+
+.countdown-pulse {
+  animation: countdown-tick 1s ease-in-out infinite;
+}
+
 /* Custom Utilities */
 @layer utilities {
   .text-balance {

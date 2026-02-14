@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createSupabaseServer } from '@/lib/supabaseServerClient'
-import MembersClient from '@/components/MembersClient'
+import MembersDashboard from '@/components/members/MembersDashboard'
+import type { MemberSnapshot } from '@/lib/gamification-types'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,30 +13,29 @@ export default async function MembersPage() {
         redirect('/?login=1')
     }
 
-    const { data: profile } = await supabase
-        .from('profiles')
-        .select('full_name, whatsapp, email, avatar_path')
-        .eq('id', user.id)
-        .single()
+    // Call the RPC that builds the entire dashboard snapshot
+    const { data: snapshot, error } = await supabase.rpc('ensure_member_home_state')
+
+    if (error || !snapshot) {
+        // Fallback: show minimal page if the RPC isn't yet deployed
+        console.error('ensure_member_home_state error:', error?.message)
+        redirect('/?login=1')
+    }
 
     // Generate signed URL for avatar if exists
     let avatarUrl: string | null = null
-    if (profile?.avatar_path) {
+    const avatarPath = (snapshot as MemberSnapshot).profile?.avatar_path
+    if (avatarPath) {
         const { data: signed } = await supabase.storage
             .from('avatars')
-            .createSignedUrl(profile.avatar_path, 3600)
+            .createSignedUrl(avatarPath, 3600)
         avatarUrl = signed?.signedUrl ?? null
     }
 
     return (
-        <MembersClient
-            user={{
-                id: user.id,
-                email: user.email ?? '',
-                fullName: profile?.full_name ?? user.user_metadata?.full_name ?? '',
-                whatsapp: profile?.whatsapp ?? '',
-                avatarUrl,
-            }}
+        <MembersDashboard
+            snapshot={snapshot as MemberSnapshot}
+            avatarUrl={avatarUrl}
         />
     )
 }

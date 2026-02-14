@@ -1,0 +1,111 @@
+export interface MemberProfile {
+    full_name: string | null
+    email: string | null
+    avatar_path: string | null
+    xp: number
+    points: number
+    streak_count: number
+    level: number
+    next_level_xp: number
+    referral_code: string | null
+    missing_fields: string[]
+}
+
+export interface MissionInstance {
+    instance_id: string
+    mission_id: string
+    title: string
+    description: string | null
+    kind: string
+    target: number
+    reward_xp: number
+    reward_points: number
+    progress: number
+    completed: boolean
+    claimed: boolean
+}
+
+export interface ActiveDrop {
+    id: string
+    title: string
+    description: string | null
+    reward_type: 'xp' | 'points'
+    reward_value: number
+    ends_at: string
+    already_claimed: boolean
+}
+
+export interface SecretMenuItem {
+    id: string
+    title: string
+    description: string | null
+    image_url: string | null
+    min_level: number
+    required_badge_id: string | null
+    drop_only: boolean
+    unlocked: boolean
+    unlock_reason: string | null
+}
+
+export interface RecipeItem {
+    id: string
+    title: string
+    description: string | null
+    tags: string[]
+    image_url: string | null
+    is_locked: boolean
+    min_level: number
+    saved: boolean
+    favorited: boolean
+    done: boolean
+}
+
+export interface LeaderboardEntry {
+    user_id: string
+    full_name: string | null
+    avatar_path: string | null
+    week_xp: number
+}
+
+export interface BirthdayState {
+    active: boolean
+    birth_date?: string
+    days_until?: number
+}
+
+export interface VipPayload {
+    short_code: string
+    expires_at: string
+    token_id: string
+}
+
+export interface MemberSnapshot {
+    profile: MemberProfile
+    missions: MissionInstance[]
+    active_drop: ActiveDrop | null
+    secret_menu: SecretMenuItem[]
+    recipes: RecipeItem[]
+    leaderboard: {
+        top10: LeaderboardEntry[]
+        user_position: number | null
+    }
+    referral_count: number
+    birthday: BirthdayState
+}
+
+export interface ClaimMissionResult {
+    success: boolean
+    xp: number
+    points: number
+    level: number
+    reward_xp: number
+    reward_points: number
+}
+
+export interface ClaimDropResult {
+    success: boolean
+    reward_type: string
+    reward_value: number
+    xp: number
+    points: number
+}
