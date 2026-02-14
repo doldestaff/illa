@@ -38,10 +38,10 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className={`relative overflow-hidden rounded-2xl border transition-colors duration-500 group ${isClaimed
-                    ? 'bg-white/5 border-white/5 opacity-50 grayscale'
-                    : canClaim
-                        ? 'bg-black/40 border-illa-pink/50 shadow-[0_0_20px_rgba(229,1,125,0.15)]'
-                        : 'bg-black/20 border-white/5 hover:bg-black/30 hover:border-white/10'
+                ? 'bg-white/5 border-white/5 opacity-50 grayscale'
+                : canClaim
+                    ? 'bg-black/80 border-illa-pink/50 shadow-[0_0_20px_rgba(229,1,125,0.15)] backdrop-blur-md'
+                    : 'bg-black/60 border-white/10 hover:bg-black/70 hover:border-white/20 backdrop-blur-md'
                 }`}
         >
             {/* Spotlight Effect (Only on non-claimed) */}
@@ -120,10 +120,10 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                             animate={{ width: `${percent}%` }}
                             transition={{ duration: 1, ease: "easeOut" }}
                             className={`h-full rounded-full relative ${canClaim
-                                    ? 'bg-gradient-to-r from-illa-pink to-purple-500 shadow-[0_0_8px_rgba(229,1,125,0.6)]'
-                                    : isCompleted
-                                        ? 'bg-emerald-400'
-                                        : 'bg-white/20'
+                                ? 'bg-gradient-to-r from-illa-pink to-purple-500 shadow-[0_0_8px_rgba(229,1,125,0.6)]'
+                                : isCompleted
+                                    ? 'bg-emerald-400'
+                                    : 'bg-white/20'
                                 }`}
                         >
                             {canClaim && (
