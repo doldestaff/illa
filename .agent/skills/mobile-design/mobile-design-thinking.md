@@ -283,6 +283,31 @@ GESTURE: [Gesture Type]
     └── Is audio feedback needed?
 ```
 
+## 🌊 FLUID GESTURE ARCHITECTURE (NEW STANDARD)
+
+**Gestures must be 1:1. Discrete taps are boring.**
+
+1.  **1:1 Tracking:**
+    - Users should "hold" the transition. If they drag 50%, the UI moves 50%.
+    - If they let go, spring physics takes over.
+    - **NEVER** use a simple "swipe detection" that just triggers an event. BIND the UI to the finger.
+
+2.  **Rubber Banding:**
+    - All scrollable/draggable areas must have "overdrag" resistance.
+
+3.  **Velocity Awareness:**
+    - A fast flick should throw the UI further than a slow drag.
+    - Use `decay` animations for tossing elements.
+
+## 📳 HAPTIC SOUNDSCAPES
+
+**Touch without feel is dead.**
+
+- **Success:** Heavy Impact.
+- **Warning:** Double Light Impact.
+- **Selection:** Light Tick (Rubber band limit).
+- **Texture:** Very light ticks while scrubbing (like a safe dial).
+
 ---
 
 ## 🎭 SPIRIT OVER CHECKLIST (Mobile Edition)

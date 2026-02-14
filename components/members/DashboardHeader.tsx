@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion'
-import { User, Star, Flame, Zap, ChevronRight } from 'lucide-react'
+import { User, Star, Flame, Zap, ChevronRight, Home } from 'lucide-react'
 import Link from 'next/link'
 import type { MemberProfile } from '@/lib/gamification-types'
 import { useRef } from 'react'
@@ -57,6 +57,15 @@ export default function DashboardHeader({ profile, avatarUrl }: Props) {
                     <div className="absolute top-1/2 -left-32 w-64 h-64 bg-purple-600/20 rounded-full blur-[80px] mix-blend-screen" />
                 </div>
 
+                {/* Back to Home Button (Top Left) */}
+                <Link
+                    href="/"
+                    className="absolute top-4 left-4 p-2 text-white/30 hover:text-white hover:bg-white/10 rounded-full transition-all z-50 transform hover:scale-110 active:scale-95"
+                    title="Voltar para Home"
+                >
+                    <Home size={20} />
+                </Link>
+
                 {/* 2. Glass Shine Effect */}
                 <motion.div
                     variants={SHIMMER_Animation}
@@ -66,7 +75,7 @@ export default function DashboardHeader({ profile, avatarUrl }: Props) {
                     style={{ backgroundSize: '200% 100%' }}
                 />
 
-                <div className="relative z-10 flex items-center gap-5">
+                <div className="relative z-10 flex items-center gap-5 mt-4">
                     {/* 3. 3D Avatar Container */}
                     <div className="relative group/avatar cursor-pointer">
                         <div className="absolute -inset-1 bg-gradient-to-br from-illa-pink to-illa-yellow rounded-full opacity-60 blur-md group-hover/avatar:opacity-100 group-hover/avatar:blur-lg transition duration-500"></div>

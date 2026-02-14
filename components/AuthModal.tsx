@@ -180,6 +180,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                 pointer-events-auto
                                 relative
                                 max-h-[90vh] overflow-y-auto
+                                md:max-h-none md:overflow-visible md:h-auto
                             "
                         >
                             {/* Close Button */}

@@ -282,26 +282,34 @@ Standard templates, typical layouts, common color schemes, overused patterns = *
 - **Break the "Safe/Round/Friendly" habit.** Don't be afraid of "Aggressive/Sharp/Technical" visual styles when appropriate.
 - Every project should have a **DIFFERENT** geometry. One sharp, one rounded, one organic, one brutalist.
 
-**✨ MANDATORY ACTIVE ANIMATION & VISUAL DEPTH (REQUIRED):**
+**✨ MANDATORY CINEMATIC INTERACTION & VISUAL DEPTH (REQUIRED):**
 
 - **STATIC DESIGN IS FAILURE.** UI must always feel alive and "Wow" the user with movement.
-- **Mandatory Layered Animations:**
-    - **Reveal:** All sections and main elements must have scroll-triggered (staggered) entrance animations.
-    - **Micro-interactions:** Every clickable/hoverable element must provide physical feedback (`scale`, `translate`, `glow-pulse`).
-    - **Spring Physics:** Animations should not be linear; they must feel organic and adhere to "spring" physics.
-- **Mandatory Visual Depth:**
-    - Do not use only flat colors/shadows; Use **Overlapping Elements, Parallax Layers, and Grain Textures** for depth.
-    - **Avoid:** Mesh Gradients and Glassmorphism (unless user specifically requests).
-- **⚠️ OPTIMIZATION MANDATE (CRITICAL):**
-    - Use only GPU-accelerated properties (`transform`, `opacity`).
-    - Use `will-change` strategically for heavy animations.
-    - `prefers-reduced-motion` support is MANDATORY.
+- **Micro-interactions:** Every clickable/hoverable element must provide physical feedback (`scale`, `translate`, `glow-pulse`).
+- **Spring Physics:** Animations should not be linear; they must feel organic and adhere to "spring" physics.
 
-**✅ EVERY design must achieve this trinity:**
+### 🎬 CINEMATIC INTERACTION STANDARDS (NEW MANDATE)
 
-1. Sharp/Net Geometry (Extremism)
-2. Bold Color Palette (No Purple)
-3. Fluid Animation & Modern Effects (Premium Feel)
+**All layouts must now be "Cinematic" by default. This means:**
+
+1.  **Entrance Choreography:**
+    - Nothing appears instantly. Everything MUST flow in.
+    - **Stagger Children:** Lists/Grids must stagger their children (0.1s delay).
+    - **Text Reveal:** Headlines should split by words/chars and reveal (e.g., `y: 100%` -> `0%`).
+
+2.  **The "Scroll Playground" (Lenis/Locomotive):**
+    - **Smooth Scroll:** Native scroll is banned for premium apps. Use `lenis` or similar.
+    - **Parallax Layers:** Backgrounds move slower than foregrounds (y: -20%).
+    - **Scroll-Linked Animation:** Elements must REACT to scroll position (e.g., expand/shrink/blur based on `scrollY`).
+
+3.  **Premium Motion Stack:**
+    - **Framer Motion** (React) or **GSAP** (Vanilla/Complex) are standard.
+    - **CSS Transitions** are ONLY for hover states. Complex layout shifts MUST use physics-based engines.
+
+### 🌑 OLED & DARK MODE FIDELITY
+
+- **True Black:** In dark mode, backgrounds must be `#000000` (OLED friendly), not gray `#121212`, unless layering requires it.
+- **Glow over Shadow:** Shadows don't exist in the dark. Use colored glows (`box-shadow` with color) to create depth.
 
 > 🔴 **If it looks generic, you have FAILED.** No exceptions. No memorized patterns. Think original. Break the "round everything" habit!
 
@@ -351,6 +359,8 @@ Verify your output against these **Automatic Rejection Triggers**. If ANY are tr
 | **The "Glow Trap"**  | Using soft gradients to make things "pop".          | **ACTION:** Use high-contrast solid colors or grain textures.        |
 | **The "Bento Trap"** | Organizing content in safe, rounded grid boxes.     | **ACTION:** Fragment the grid. Break alignment intentionally.        |
 | **The "Blue Trap"**  | Using any shade of default blue/teal as primary.    | **ACTION:** Switch to Acid Green, Signal Orange, or Deep Red.        |
+| **The "Static Trap"**| Elements appearing without orchestration/stagger.   | **ACTION:** Add `framer-motion` staggerChildren to parent container. |
+| **The "Jank Trap"**  | using `left/top/width` for animation.               | **ACTION:** Use ONLY `transform` and `opacity`.                      |
 
 > **🔴 MAESTRO RULE:** "If I can find this layout in a Tailwind UI template, I have failed."
 
