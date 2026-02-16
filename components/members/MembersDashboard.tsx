@@ -127,6 +127,7 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                     active_drop: prev.active_drop
                         ? { ...prev.active_drop, already_claimed: true }
                         : null,
+                    drops_claimed_count: (prev.drops_claimed_count ?? 0) + 1,
                 }))
                 updateProfileFromClaim(data)
             }
@@ -257,7 +258,7 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                     <div className="md:col-span-5 lg:col-span-4 relative">
                         <div className="md:sticky md:top-8 transition-all duration-300">
                             {/* HUD Header (User Stats) */}
-                            <DashboardHeader profile={snapshot.profile} avatarUrl={avatarUrl} />
+                            <DashboardHeader profile={snapshot.profile} avatarUrl={avatarUrl} dropsCount={snapshot.drops_claimed_count ?? 0} />
 
                             {/* Desktop/Tablet Only: Quick Action Links could go here later */}
                             <div className="hidden md:block mt-6 text-center">

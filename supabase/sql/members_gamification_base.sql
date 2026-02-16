@@ -284,6 +284,7 @@ v_vip jsonb;
 v_birthday jsonb;
 v_missing_fields jsonb := '[]'::jsonb;
 v_referral_count int;
+v_drops_claimed_count int;
 v_user_badges_list jsonb;
 BEGIN IF v_uid IS NULL THEN RAISE EXCEPTION 'Not authenticated';
 END IF;
@@ -554,6 +555,10 @@ SELECT COUNT(*) INTO v_referral_count
 FROM referral_events
 WHERE inviter_id = v_uid
     AND status = 'validated';
+-- Total drops claimed by this user
+SELECT COUNT(*) INTO v_drops_claimed_count
+FROM drop_claims
+WHERE user_id = v_uid;
 -- Birthday module
 IF v_profile.birth_date IS NOT NULL THEN
 DECLARE v_bday_this_year date := make_date(
@@ -625,6 +630,8 @@ RETURN jsonb_build_object(
     ),
     'referral_count',
     COALESCE(v_referral_count, 0),
+    'drops_claimed_count',
+    COALESCE(v_drops_claimed_count, 0),
     'birthday',
     v_birthday
 );

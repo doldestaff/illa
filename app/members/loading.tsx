@@ -3,8 +3,16 @@ import React from 'react'
 export default function Loading() {
     return (
         <div className="min-h-screen relative font-sans text-white overflow-x-hidden pb-32 bg-[#0B0B0D]">
-            {/* Background Placeholder */}
-            <div className="fixed inset-0 z-[-2] bg-[#0B0B0D]" />
+            {/* Background: First frame image (mobile) + dark fallback (desktop) */}
+            <div className="fixed inset-0 z-[-2] bg-[#0B0B0D]">
+                <img
+                    src="/members-bg/IllaMembers-mobile_001.webp"
+                    alt=""
+                    className="w-full h-full object-cover opacity-40 md:hidden"
+                    loading="eager"
+                    fetchPriority="high"
+                />
+            </div>
 
             <div className="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-8 lg:px-12 pt-6 pb-20">
                 <div className="flex flex-col md:grid md:grid-cols-12 gap-6 md:gap-10">

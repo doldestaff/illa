@@ -90,6 +90,7 @@ export interface MemberSnapshot {
         user_position: number | null
     }
     referral_count: number
+    drops_claimed_count: number
     birthday: BirthdayState
 }
 

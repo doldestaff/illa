@@ -9,6 +9,7 @@ import { useRef } from 'react'
 interface Props {
     profile: MemberProfile
     avatarUrl: string | null
+    dropsCount: number
 }
 
 const SHIMMER_Animation = {
@@ -24,7 +25,7 @@ const SHIMMER_Animation = {
     }
 }
 
-export default function DashboardHeader({ profile, avatarUrl }: Props) {
+export default function DashboardHeader({ profile, avatarUrl, dropsCount }: Props) {
     const ref = useRef<HTMLDivElement>(null)
     const { scrollY } = useScroll()
 
@@ -107,23 +108,69 @@ export default function DashboardHeader({ profile, avatarUrl }: Props) {
                                 {profile.full_name || 'Membro ILLA'}
                             </h1>
 
-                            {/* Ice Cream Streak */}
-                            {profile.streak_count > 0 && (
-                                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 shadow-[0_0_15px_rgba(249,115,22,0.2)]">
-                                    <IceCream size={14} className="text-orange-400 animate-[bounce_2s_infinite]" />
-                                    <span className="text-xs font-bold">{profile.streak_count}</span>
-                                </div>
-                            )}
+                            {/* Drops Collected — compact accent chip */}
+                            <motion.div
+                                className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#E5017D]/10 border border-[#E5017D]/20 relative overflow-hidden"
+                                animate={{
+                                    borderColor: [
+                                        'rgba(229,1,125,0.15)',
+                                        'rgba(229,1,125,0.35)',
+                                        'rgba(229,1,125,0.15)'
+                                    ]
+                                }}
+                                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                            >
+                                <IceCream size={12} className="text-[#E5017D] relative z-10" />
+                                <span className="text-[11px] font-bold text-[#E5017D] relative z-10">{dropsCount}</span>
+                            </motion.div>
                         </div>
 
-                        {/* Stats Row */}
-                        <div className="flex items-center gap-4 text-sm font-medium text-white/60 mt-2">
-                            <div className="flex items-center gap-1.5 text-white/90 bg-white/5 px-2 py-0.5 rounded-lg border border-white/5">
-                                <Zap size={14} className="text-illa-pink fill-current" />
-                                <span className="font-bold">{profile.points.toLocaleString()}</span>
-                                <span className="text-[10px] uppercase tracking-wider opacity-60 text-illa-pink">Moedas</span>
+                        {/* ── Coins (Moedas) — Hero Reward Display ── */}
+                        {/* UX: Von Restorff (focal isolation), Goal Gradient (visible accumulation),
+                             Anchoring (large number = "I have value"), Peak-End (breathing glow) */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3, duration: 0.6 }}
+                            className="mt-3 relative"
+                        >
+                            <div className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-[#E5017D]/8 via-[#1a1a2e]/80 to-[#E5017D]/5 border border-[#E5017D]/15 backdrop-blur-md relative overflow-hidden group">
+                                {/* Ambient radial glow behind icon */}
+                                <div className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-[#E5017D]/20 blur-xl pointer-events-none" />
+
+                                {/* Shimmer sweep */}
+                                <motion.div
+                                    className="absolute inset-0 bg-gradient-to-r from-transparent via-[#E5017D]/8 to-transparent skew-x-12 pointer-events-none"
+                                    animate={{ x: ['-150%', '250%'] }}
+                                    transition={{ duration: 4, repeat: Infinity, repeatDelay: 3, ease: 'linear' }}
+                                />
+
+                                {/* Icon with breathing glow */}
+                                <motion.div
+                                    className="relative z-10 flex items-center justify-center w-8 h-8 rounded-xl bg-[#E5017D]/15 border border-[#E5017D]/20"
+                                    animate={{
+                                        boxShadow: [
+                                            '0 0 0px rgba(229,1,125,0)',
+                                            '0 0 16px rgba(229,1,125,0.35)',
+                                            '0 0 0px rgba(229,1,125,0)'
+                                        ]
+                                    }}
+                                    transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+                                >
+                                    <Zap size={16} className="text-[#E5017D] fill-current" />
+                                </motion.div>
+
+                                {/* Number + Label (Anchoring: number large = perceived value) */}
+                                <div className="relative z-10 flex items-baseline gap-2">
+                                    <span className="text-xl font-black text-white tracking-tight tabular-nums">
+                                        {profile.points.toLocaleString()}
+                                    </span>
+                                    <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#E5017D]/70">
+                                        Moedas
+                                    </span>
+                                </div>
                             </div>
-                        </div>
+                        </motion.div>
 
                         {/* XP Progress Bar (Liquid Style) */}
                         <div className="mt-4 relative group/xp">
