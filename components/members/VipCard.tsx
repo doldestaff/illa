@@ -104,7 +104,7 @@ export default function VipCard({ referralCode, referralCount, vipPayload, onLoa
             {/* Title */}
             <div className="flex items-center gap-2">
                 <Crown size={20} className="text-illa-yellow" fill="currentColor" />
-                <h2 className="text-lg font-bold text-dark">Área VIP</h2>
+                <h2 className="text-lg font-bold text-white">Área VIP</h2>
             </div>
 
             {/* Main VIP Card - Holographic Look */}

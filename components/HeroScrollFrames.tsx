@@ -1,12 +1,11 @@
 'use client'
 
 import { useEffect, useRef, useState, useLayoutEffect } from 'react'
-import { Loader2, AlertTriangle } from 'lucide-react'
+import { AlertTriangle } from 'lucide-react'
 import { HeroGhostButtons } from './HeroGhostButtons'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useMotionValue } from 'framer-motion'
-import { cn } from '@/lib/utils'
 
 // --- 1. Global Singleton Cache ---
 interface CacheData {
@@ -38,7 +37,6 @@ export function HeroScrollFrames() {
     // Config
     const SCROLL_HEIGHT = isMobile ? '350vh' : '500vh'
 
-    // --- 2. Setup & Load ---
     // --- 2. Setup & Load ---
     useEffect(() => {
         setIsMounted(true)
@@ -261,16 +259,10 @@ export function HeroScrollFrames() {
                 </div>
             </div>
 
-            {/* Loader Overlay - Matches parent z-index logic if needed, but fixed is safer */}
-            <div
-                className={cn(
-                    "fixed inset-0 flex flex-col items-center justify-center bg-illa-pink z-50 text-white transition-opacity duration-500 pointer-events-none",
-                    isLoading ? "opacity-100" : "opacity-0"
-                )}
-            >
-                {/* <Loader2 className="animate-spin mb-4" size={48} /> */}
-                {/* Removed spinner to avoid visual noise since it should be instant now */}
-            </div>
+            {/* Loader Overlay - Instant hide, no fade */}
+            {isLoading && (
+                <div className="fixed inset-0 bg-illa-pink z-50 pointer-events-none" />
+            )}
         </section>
     )
 }
