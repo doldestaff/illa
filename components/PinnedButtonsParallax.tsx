@@ -93,12 +93,32 @@ export function PinnedButtonsParallax() {
                 })
             })
 
-            // Sequence: Each card enters → holds → exits
+            // Sequence with Overlap
             cardsRef.current.forEach((card, i) => {
                 if (!card) return
                 const zBase = cards.length - i
 
-                // Enter
+                // Logic: 
+                // Card 0 starts at time 0 (immediately).
+                // Card 1 starts 0.5s *before* Card 0 finishes holding (relative overlap).
+                // This creates a continuous stream instead of stop-and-go.
+
+                // Position parameter for timeline (startTime)
+                // If i=0, start at 0. Else, start relative to previous.
+                // We use a dummy previous animation end reference or just absolute positioning if needed, 
+                // but standard sequential + overlap is easiest with `<` or `-=` 
+
+                // Let's use simple relative chaining with overlap
+                // The FIRST card needs to be added normally.
+                // SUBSEQUENT cards need to be added with a negative position offset relative to the END of the previous timeline
+
+                // Actually, the simplest way for a scrubbed timeline where we "scroll through" them:
+                // We want equal spacing.
+                // Let's just key them absolutely or use a tight loop.
+
+                const startTime = i === 0 ? 0 : ">-0.5" // Start 0.5s before previous 'exit' finishes? No, general timeline logic.
+
+                // Let's define the "Show" phase.
                 tl.to(card, {
                     opacity: 1,
                     y: 0,
@@ -106,18 +126,18 @@ export function PinnedButtonsParallax() {
                     zIndex: zBase + 10,
                     duration: 1,
                     ease: "power2.out"
-                })
-                    // Hold
+                }, i === 0 ? 0 : ">-0.5") // Overlap start
+
                     .to(card, {
-                        scale: 1.02,
-                        duration: 0.6,
+                        scale: 1.05,
+                        duration: 0.8, // Slightly longer hold for readability
                         ease: "none"
                     })
-                    // Exit
+
                     .to(card, {
                         opacity: 0,
                         y: -60,
-                        scale: 1.08,
+                        scale: 1.1,
                         zIndex: 0,
                         duration: 0.8,
                         ease: "power2.in"

@@ -6,6 +6,7 @@ import { HeroGhostButtons } from './HeroGhostButtons'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useMotionValue } from 'framer-motion'
+import { cn } from '@/lib/utils'
 
 // --- 1. Global Singleton Cache ---
 interface CacheData {
@@ -247,7 +248,10 @@ export function HeroScrollFrames() {
         >
             <div
                 ref={contentRef}
-                className="sticky top-0 w-full h-[100dvh] overflow-hidden bg-illa-pink will-change-transform" /* Sticky applied here */
+                className={cn(
+                    "sticky top-0 w-full h-[100dvh] overflow-hidden bg-illa-pink will-change-transform transition-opacity duration-700",
+                    isLoading ? "opacity-0" : "opacity-100"
+                )}
             >
                 <canvas
                     ref={canvasRef}
