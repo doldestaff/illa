@@ -12,7 +12,8 @@ const cards = [
         title: 'Sobre Nós',
         description: 'Conheça nossa história de sabor e tradição.',
         icon: Info,
-        href: 'https://www.illasorvetes.com.br/quem-somos',
+        href: '#',
+        action: 'open-about-modal' as const,
         color: 'from-pink-500/10 to-purple-500/10',
         borderColor: 'border-white/50'
     },
@@ -160,8 +161,14 @@ export function PinnedButtonsParallax() {
                             key={card.id}
                             ref={(el) => { cardsRef.current[index] = el }}
                             href={card.href}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                            target={'action' in card ? undefined : '_blank'}
+                            rel={'action' in card ? undefined : 'noopener noreferrer'}
+                            onClick={(e) => {
+                                if ('action' in card && card.action) {
+                                    e.preventDefault()
+                                    window.dispatchEvent(new CustomEvent(card.action))
+                                }
+                            }}
                             className={cn(
                                 "absolute inset-0 m-auto",
                                 "w-[85vw] max-w-[360px] md:max-w-[420px] h-[300px] md:h-[400px]",
