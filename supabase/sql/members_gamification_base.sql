@@ -157,6 +157,7 @@ CREATE INDEX IF NOT EXISTS idx_referral_events_inviter ON public.referral_events
 -- =========================
 -- 3. WEEKLY LEADERBOARD VIEW
 -- =========================
+DROP VIEW IF EXISTS public.leaderboard_weekly;
 CREATE OR REPLACE VIEW public.leaderboard_weekly AS
 SELECT p.id AS user_id,
     p.full_name,
