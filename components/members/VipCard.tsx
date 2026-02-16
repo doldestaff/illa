@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import type { VipPayload } from '@/lib/gamification-types'
-import { CreditCard, QrCode, Copy, Check, Users, Loader2, Crown, Clock } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { CreditCard, QrCode, Copy, Check, Users, Loader2, Crown, Clock, Share2, Sparkles } from 'lucide-react'
 
 interface Props {
     referralCode: string | null
@@ -183,59 +184,128 @@ export default function VipCard({ referralCode, referralCount, vipPayload, onLoa
                 </div>
             </div>
 
-            {/* Referral Section (Glass) */}
+            {/* ── Referral Section (Cinematic) ── */}
             {referralCode && (
-                <div className="rounded-3xl border border-gray-200/60 bg-white/80 backdrop-blur-xl p-6 shadow-xl shadow-gray-200/50">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="p-2 rounded-full bg-illa-pink/10 text-illa-pink">
-                            <Users size={18} />
-                        </div>
-                        <div>
-                            <h3 className="text-sm font-bold text-dark">Indique e Ganhe</h3>
-                            <p className="text-xs text-dark/50">Ganhe badges exclusivas por indicações</p>
-                        </div>
-                    </div>
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3, duration: 0.6, ease: 'easeOut' }}
+                    className="relative rounded-3xl overflow-hidden"
+                >
+                    {/* Animated gradient border */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-illa-pink via-purple-600 to-amber-500 animate-[spin_8s_linear_infinite] opacity-60 blur-sm" />
 
-                    <div className="flex items-center gap-2 bg-gray-50/80 border border-gray-100 rounded-xl p-2 pl-3 mb-5 group focus-within:ring-2 ring-illa-pink/10 transition-all">
-                        <input
-                            type="text"
-                            readOnly
-                            value={`${origin}/?ref=${referralCode}`}
-                            className="flex-1 bg-transparent text-xs text-dark/60 font-mono outline-none truncate"
+                    {/* Inner card */}
+                    <div className="relative m-[2px] rounded-[22px] bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 p-6 overflow-hidden">
+
+                        {/* Shimmer sweep */}
+                        <motion.div
+                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent skew-x-12 pointer-events-none"
+                            animate={{ x: ['-100%', '200%'] }}
+                            transition={{ duration: 4, repeat: Infinity, repeatDelay: 3, ease: 'linear' }}
                         />
-                        <button
-                            onClick={() => copyToClipboard(`${origin}/?ref=${referralCode}`, 'ref')}
-                            className="p-2 rounded-lg bg-white shadow-sm border border-gray-100 text-dark/70 hover:text-illa-pink hover:border-illa-pink/30 hover:shadow-md transition-all active:scale-95"
-                        >
-                            {refCopied ? <Check size={14} /> : <Copy size={14} />}
-                        </button>
-                    </div>
 
-                    {/* Milestones Steps */}
-                    <div className="relative">
-                        {/* Progress Line */}
-                        <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-100 -translate-y-1/2 rounded-full z-0" />
-
-                        <div className="relative z-10 flex justify-between">
-                            {MILESTONES.map((m) => {
-                                const achieved = referralCount >= m
-                                return (
-                                    <div key={m} className="flex flex-col items-center gap-2 group">
-                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center border-4 transition-all duration-500 ${achieved
-                                            ? 'bg-illa-pink border-pink-100 text-white shadow-lg shadow-pink-200 scale-110'
-                                            : 'bg-white border-gray-100 text-gray-300'
-                                            }`}>
-                                            {achieved ? <Check size={14} strokeWidth={3} /> : <span className="text-[10px] font-bold">{m}</span>}
-                                        </div>
-                                        <span className={`text-[10px] font-bold transition-colors ${achieved ? 'text-illa-pink' : 'text-gray-300'}`}>
-                                            {m} {m === 1 ? 'amigo' : 'amigos'}
-                                        </span>
-                                    </div>
-                                )
-                            })}
+                        {/* Header */}
+                        <div className="relative flex items-center gap-3 mb-5">
+                            <motion.div
+                                animate={{ scale: [1, 1.15, 1] }}
+                                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                                className="p-2.5 rounded-2xl bg-gradient-to-br from-illa-pink/20 to-amber-500/20 border border-illa-pink/20"
+                            >
+                                <Sparkles size={20} className="text-illa-pink" />
+                            </motion.div>
+                            <div>
+                                <h3 className="text-lg font-black bg-gradient-to-r from-illa-pink via-pink-300 to-amber-400 bg-clip-text text-transparent">
+                                    Indique e Ganhe
+                                </h3>
+                                <p className="text-xs text-white/40">Compartilhe e desbloqueie recompensas exclusivas</p>
+                            </div>
                         </div>
+
+                        {/* Referral Link + Share */}
+                        <div className="relative flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl p-2 pl-3 mb-6 backdrop-blur-sm">
+                            <input
+                                type="text"
+                                readOnly
+                                value={`${origin}/?ref=${referralCode}`}
+                                className="flex-1 bg-transparent text-xs text-white/50 font-mono outline-none truncate"
+                            />
+                            <button
+                                onClick={() => copyToClipboard(`${origin}/?ref=${referralCode}`, 'ref')}
+                                className="p-2 rounded-lg bg-white/10 text-white/70 hover:bg-illa-pink hover:text-white transition-all active:scale-95"
+                            >
+                                {refCopied ? <Check size={14} /> : <Copy size={14} />}
+                            </button>
+                        </div>
+
+                        {/* Milestones */}
+                        <div className="relative mb-5">
+                            {/* Progress track */}
+                            <div className="absolute top-4 left-4 right-4 h-1 bg-white/5 rounded-full z-0" />
+                            {/* Animated progress fill */}
+                            <motion.div
+                                className="absolute top-4 left-4 h-1 bg-gradient-to-r from-illa-pink to-amber-400 rounded-full z-[1]"
+                                initial={{ width: 0 }}
+                                animate={{ width: `${Math.min(100, (referralCount / MILESTONES[MILESTONES.length - 1]) * 100)}%` }}
+                                transition={{ duration: 1.5, ease: 'easeOut', delay: 0.5 }}
+                                style={{ maxWidth: 'calc(100% - 32px)' }}
+                            />
+
+                            <div className="relative z-10 flex justify-between">
+                                {MILESTONES.map((m, i) => {
+                                    const achieved = referralCount >= m
+                                    return (
+                                        <motion.div
+                                            key={m}
+                                            initial={{ scale: 0 }}
+                                            animate={{ scale: 1 }}
+                                            transition={{ delay: 0.4 + i * 0.15, type: 'spring', stiffness: 300 }}
+                                            className="flex flex-col items-center gap-2"
+                                        >
+                                            <motion.div
+                                                animate={achieved ? {
+                                                    boxShadow: [
+                                                        '0 0 8px rgba(229,1,125,0.3)',
+                                                        '0 0 20px rgba(229,1,125,0.6)',
+                                                        '0 0 8px rgba(229,1,125,0.3)'
+                                                    ]
+                                                } : {}}
+                                                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                                                className={`w-9 h-9 rounded-full flex items-center justify-center border-2 transition-all ${achieved
+                                                    ? 'bg-gradient-to-br from-illa-pink to-pink-600 border-illa-pink/50 text-white'
+                                                    : 'bg-white/5 border-white/10 text-white/30'
+                                                    }`}
+                                            >
+                                                {achieved ? <Check size={14} strokeWidth={3} /> : <span className="text-[10px] font-bold">{m}</span>}
+                                            </motion.div>
+                                            <span className={`text-[10px] font-bold ${achieved ? 'text-illa-pink' : 'text-white/20'}`}>
+                                                {m} {m === 1 ? 'amigo' : 'amigos'}
+                                            </span>
+                                        </motion.div>
+                                    )
+                                })}
+                            </div>
+                        </div>
+
+                        {/* Share CTA */}
+                        <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.97 }}
+                            onClick={() => {
+                                const url = `${origin}/?ref=${referralCode}`
+                                if (navigator.share) {
+                                    navigator.share({ title: 'Illa Sorvetes', text: 'Entre no clube de membros da Illa!', url })
+                                } else {
+                                    copyToClipboard(url, 'ref')
+                                }
+                            }}
+                            className="w-full py-3 rounded-xl bg-gradient-to-r from-illa-pink to-pink-600 text-white text-sm font-bold flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(229,1,125,0.4)] hover:shadow-[0_4px_28px_rgba(229,1,125,0.6)] transition-shadow"
+                        >
+                            <Share2 size={16} />
+                            Compartilhar Link
+                        </motion.button>
                     </div>
-                </div>
+                </motion.div>
             )}
         </div>
     )
