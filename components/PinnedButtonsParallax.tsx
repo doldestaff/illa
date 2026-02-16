@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useLayoutEffect } from 'react'
+import { useRef, useLayoutEffect, useEffect, useState } from 'react'
 import { Info, Store, MapPin, MessageCircle, ShoppingBag, Instagram, ArrowRight, ArrowUp } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import gsap from 'gsap'
@@ -64,6 +64,48 @@ const cards = [
     }
 ]
 
+function LazyVideo() {
+    const videoRef = useRef<HTMLVideoElement>(null)
+    const containerRef = useRef<HTMLDivElement>(null)
+    const [isVisible, setIsVisible] = useState(false)
+
+    useEffect(() => {
+        const el = containerRef.current
+        if (!el) return
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsVisible(true)
+                    // Start playing only when visible
+                    videoRef.current?.play().catch(() => { })
+                } else {
+                    // Pause when off-screen to save resources
+                    videoRef.current?.pause()
+                }
+            },
+            { rootMargin: '200px', threshold: 0.01 }
+        )
+        observer.observe(el)
+        return () => observer.disconnect()
+    }, [])
+
+    return (
+        <div ref={containerRef} className="absolute inset-0 z-0">
+            <video
+                ref={videoRef}
+                src={isVisible ? '/instagram/reels/mobile/reels-1.mp4' : undefined}
+                className="w-full h-full object-cover"
+                loop
+                muted
+                playsInline
+                preload="none"
+            />
+            <div className="absolute inset-0 bg-white/10 backdrop-blur-[1px]" />
+        </div>
+    )
+}
+
 export function PinnedButtonsParallax() {
     const containerRef = useRef<HTMLDivElement>(null)
     const wrapperRef = useRef<HTMLDivElement>(null)
@@ -78,68 +120,71 @@ export function PinnedButtonsParallax() {
                     trigger: containerRef.current,
                     start: "top top",
                     end: "bottom bottom",
-                    scrub: 0.8,
+                    scrub: 0.6, // Faster response to touch
                 }
             })
 
-            // Initial state: All cards hidden below, scaled down
-            cardsRef.current.forEach((card) => {
-                if (!card) return
+            // Card 1: Start ALREADY VISIBLE (no enter animation needed)
+            const firstCard = cardsRef.current[0]
+            if (firstCard) {
+                gsap.set(firstCard, {
+                    opacity: 1,
+                    y: 0,
+                    scale: 1,
+                    zIndex: cards.length + 10,
+                })
+
+                // Card 1 just holds then exits
+                tl.to(firstCard, {
+                    scale: 1.03,
+                    duration: 0.8,
+                    ease: "none"
+                })
+                    .to(firstCard, {
+                        opacity: 0,
+                        y: -50,
+                        scale: 1.08,
+                        zIndex: 0,
+                        duration: 0.6,
+                        ease: "power2.in"
+                    })
+            }
+
+            // Cards 2-6: Hidden initially, then enter → hold → exit with overlap
+            cardsRef.current.forEach((card, i) => {
+                if (!card || i === 0) return
+
                 gsap.set(card, {
                     opacity: 0,
-                    y: 80,
-                    scale: 0.85,
+                    y: 60,
+                    scale: 0.9,
                     zIndex: 0,
                 })
-            })
 
-            // Sequence with Overlap
-            cardsRef.current.forEach((card, i) => {
-                if (!card) return
                 const zBase = cards.length - i
 
-                // Logic: 
-                // Card 0 starts at time 0 (immediately).
-                // Card 1 starts 0.5s *before* Card 0 finishes holding (relative overlap).
-                // This creates a continuous stream instead of stop-and-go.
-
-                // Position parameter for timeline (startTime)
-                // If i=0, start at 0. Else, start relative to previous.
-                // We use a dummy previous animation end reference or just absolute positioning if needed, 
-                // but standard sequential + overlap is easiest with `<` or `-=` 
-
-                // Let's use simple relative chaining with overlap
-                // The FIRST card needs to be added normally.
-                // SUBSEQUENT cards need to be added with a negative position offset relative to the END of the previous timeline
-
-                // Actually, the simplest way for a scrubbed timeline where we "scroll through" them:
-                // We want equal spacing.
-                // Let's just key them absolutely or use a tight loop.
-
-                const startTime = i === 0 ? 0 : ">-0.5" // Start 0.5s before previous 'exit' finishes? No, general timeline logic.
-
-                // Let's define the "Show" phase.
+                // Enter (overlap with previous card's exit by 0.3)
                 tl.to(card, {
                     opacity: 1,
                     y: 0,
                     scale: 1,
                     zIndex: zBase + 10,
-                    duration: 1,
+                    duration: 0.6,
                     ease: "power2.out"
-                }, i === 0 ? 0 : ">-0.5") // Overlap start
-
+                }, ">-0.3")
+                    // Hold
                     .to(card, {
-                        scale: 1.05,
-                        duration: 0.8, // Slightly longer hold for readability
+                        scale: 1.03,
+                        duration: 0.8,
                         ease: "none"
                     })
-
+                    // Exit
                     .to(card, {
                         opacity: 0,
-                        y: -60,
-                        scale: 1.1,
+                        y: -50,
+                        scale: 1.08,
                         zIndex: 0,
-                        duration: 0.8,
+                        duration: 0.6,
                         ease: "power2.in"
                     })
             })
@@ -152,24 +197,14 @@ export function PinnedButtonsParallax() {
     return (
         <section
             ref={containerRef}
-            className="relative w-full h-[600vh] bg-white text-dark"
+            className="relative w-full h-[500vh] bg-white text-dark"
         >
             <div
                 ref={wrapperRef}
                 className="sticky top-0 w-full h-[100dvh] flex items-center justify-center overflow-hidden"
             >
-                {/* Video Background */}
-                <div className="absolute inset-0 z-0">
-                    <video
-                        src="/instagram/reels/mobile/reels-1.mp4"
-                        className="w-full h-full object-cover"
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                    />
-                    <div className="absolute inset-0 bg-white/10 backdrop-blur-[1px]" />
-                </div>
+                {/* Lazy Video Background */}
+                <LazyVideo />
 
                 {/* Background Decor */}
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-transparent via-white/20 to-white/60 pointer-events-none z-0" />
