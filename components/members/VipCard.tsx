@@ -192,15 +192,15 @@ export default function VipCard({ referralCode, referralCount, vipPayload, onLoa
                     transition={{ delay: 0.3, duration: 0.6, ease: 'easeOut' }}
                     className="relative rounded-3xl overflow-hidden"
                 >
-                    {/* Animated gradient border */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-illa-pink via-purple-600 to-amber-500 animate-[spin_8s_linear_infinite] opacity-60 blur-sm" />
+                    {/* Animated gradient border (soft pink tones) */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-illa-pink/40 via-rose-300/50 to-pink-200/40 animate-[spin_8s_linear_infinite] opacity-70 blur-sm" />
 
-                    {/* Inner card */}
-                    <div className="relative m-[2px] rounded-[22px] bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 p-6 overflow-hidden">
+                    {/* Inner card — frosted glass */}
+                    <div className="relative m-[2px] rounded-[22px] bg-white/90 backdrop-blur-xl p-6 overflow-hidden">
 
                         {/* Shimmer sweep */}
                         <motion.div
-                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent skew-x-12 pointer-events-none"
+                            className="absolute inset-0 bg-gradient-to-r from-transparent via-illa-pink/6 to-transparent skew-x-12 pointer-events-none"
                             animate={{ x: ['-100%', '200%'] }}
                             transition={{ duration: 4, repeat: Infinity, repeatDelay: 3, ease: 'linear' }}
                         />
@@ -210,29 +210,29 @@ export default function VipCard({ referralCode, referralCount, vipPayload, onLoa
                             <motion.div
                                 animate={{ scale: [1, 1.15, 1] }}
                                 transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                                className="p-2.5 rounded-2xl bg-gradient-to-br from-illa-pink/20 to-amber-500/20 border border-illa-pink/20"
+                                className="p-2.5 rounded-2xl bg-gradient-to-br from-illa-pink/10 to-rose-200/30 border border-illa-pink/15"
                             >
                                 <Sparkles size={20} className="text-illa-pink" />
                             </motion.div>
                             <div>
-                                <h3 className="text-lg font-black bg-gradient-to-r from-illa-pink via-pink-300 to-amber-400 bg-clip-text text-transparent">
+                                <h3 className="text-lg font-black bg-gradient-to-r from-illa-pink to-rose-400 bg-clip-text text-transparent">
                                     Indique e Ganhe
                                 </h3>
-                                <p className="text-xs text-white/40">Compartilhe e desbloqueie recompensas exclusivas</p>
+                                <p className="text-xs text-dark/40">Compartilhe e desbloqueie recompensas exclusivas</p>
                             </div>
                         </div>
 
                         {/* Referral Link + Share */}
-                        <div className="relative flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl p-2 pl-3 mb-6 backdrop-blur-sm">
+                        <div className="relative flex items-center gap-2 bg-gray-50/80 border border-gray-200/60 rounded-xl p-2 pl-3 mb-6">
                             <input
                                 type="text"
                                 readOnly
                                 value={`${origin}/?ref=${referralCode}`}
-                                className="flex-1 bg-transparent text-xs text-white/50 font-mono outline-none truncate"
+                                className="flex-1 bg-transparent text-xs text-dark/50 font-mono outline-none truncate"
                             />
                             <button
                                 onClick={() => copyToClipboard(`${origin}/?ref=${referralCode}`, 'ref')}
-                                className="p-2 rounded-lg bg-white/10 text-white/70 hover:bg-illa-pink hover:text-white transition-all active:scale-95"
+                                className="p-2 rounded-lg bg-white shadow-sm border border-gray-100 text-dark/60 hover:bg-illa-pink hover:text-white hover:border-illa-pink/30 transition-all active:scale-95"
                             >
                                 {refCopied ? <Check size={14} /> : <Copy size={14} />}
                             </button>
@@ -241,10 +241,10 @@ export default function VipCard({ referralCode, referralCount, vipPayload, onLoa
                         {/* Milestones */}
                         <div className="relative mb-5">
                             {/* Progress track */}
-                            <div className="absolute top-4 left-4 right-4 h-1 bg-white/5 rounded-full z-0" />
+                            <div className="absolute top-4 left-4 right-4 h-1 bg-gray-100 rounded-full z-0" />
                             {/* Animated progress fill */}
                             <motion.div
-                                className="absolute top-4 left-4 h-1 bg-gradient-to-r from-illa-pink to-amber-400 rounded-full z-[1]"
+                                className="absolute top-4 left-4 h-1 bg-gradient-to-r from-illa-pink to-rose-400 rounded-full z-[1]"
                                 initial={{ width: 0 }}
                                 animate={{ width: `${Math.min(100, (referralCount / MILESTONES[MILESTONES.length - 1]) * 100)}%` }}
                                 transition={{ duration: 1.5, ease: 'easeOut', delay: 0.5 }}
@@ -265,20 +265,20 @@ export default function VipCard({ referralCode, referralCount, vipPayload, onLoa
                                             <motion.div
                                                 animate={achieved ? {
                                                     boxShadow: [
-                                                        '0 0 8px rgba(229,1,125,0.3)',
-                                                        '0 0 20px rgba(229,1,125,0.6)',
-                                                        '0 0 8px rgba(229,1,125,0.3)'
+                                                        '0 0 6px rgba(229,1,125,0.15)',
+                                                        '0 0 14px rgba(229,1,125,0.3)',
+                                                        '0 0 6px rgba(229,1,125,0.15)'
                                                     ]
                                                 } : {}}
                                                 transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
                                                 className={`w-9 h-9 rounded-full flex items-center justify-center border-2 transition-all ${achieved
-                                                    ? 'bg-gradient-to-br from-illa-pink to-pink-600 border-illa-pink/50 text-white'
-                                                    : 'bg-white/5 border-white/10 text-white/30'
+                                                    ? 'bg-gradient-to-br from-illa-pink to-rose-400 border-illa-pink/30 text-white'
+                                                    : 'bg-gray-50 border-gray-200 text-gray-300'
                                                     }`}
                                             >
                                                 {achieved ? <Check size={14} strokeWidth={3} /> : <span className="text-[10px] font-bold">{m}</span>}
                                             </motion.div>
-                                            <span className={`text-[10px] font-bold ${achieved ? 'text-illa-pink' : 'text-white/20'}`}>
+                                            <span className={`text-[10px] font-bold ${achieved ? 'text-illa-pink' : 'text-gray-300'}`}>
                                                 {m} {m === 1 ? 'amigo' : 'amigos'}
                                             </span>
                                         </motion.div>
@@ -299,7 +299,7 @@ export default function VipCard({ referralCode, referralCount, vipPayload, onLoa
                                     copyToClipboard(url, 'ref')
                                 }
                             }}
-                            className="w-full py-3 rounded-xl bg-gradient-to-r from-illa-pink to-pink-600 text-white text-sm font-bold flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(229,1,125,0.4)] hover:shadow-[0_4px_28px_rgba(229,1,125,0.6)] transition-shadow"
+                            className="w-full py-3 rounded-xl bg-gradient-to-r from-illa-pink to-rose-500 text-white text-sm font-bold flex items-center justify-center gap-2 shadow-[0_4px_16px_rgba(229,1,125,0.25)] hover:shadow-[0_4px_24px_rgba(229,1,125,0.4)] transition-shadow"
                         >
                             <Share2 size={16} />
                             Compartilhar Link
