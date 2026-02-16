@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import type { MissionInstance } from '@/lib/gamification-types'
-import { CheckCircle, Circle, Target, Gift, Loader2, Sparkles, Zap } from 'lucide-react'
+import { CheckCircle, Circle, Target, Gift, Loader2, Sparkles, IceCream } from 'lucide-react'
 import { motion } from 'framer-motion'
 import MissionCard from './MissionCard'
 

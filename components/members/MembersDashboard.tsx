@@ -9,7 +9,7 @@ import type {
 } from '@/lib/gamification-types'
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
-import { Gift, Sparkles, Flame, IceCream } from 'lucide-react'
+import { Coins } from 'lucide-react'
 import DashboardHeader from './DashboardHeader'
 import DailyMissions from './DailyMissions'
 import FlashDrop from './FlashDrop'
@@ -225,19 +225,24 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
         }
     }, [])
 
-    // ── Reward Toast Timer (every 60s) ──
+    // ── Random Coin Reward Timer (every 60s) ──
+    // UX Psychology: Variable Ratio Reinforcement — random rewards
+    // trigger dopamine more effectively than fixed rewards
     useEffect(() => {
-        const rewardMessages = [
-            { message: 'Continue explorando! Você está quase subindo de nível 🎯', icon: <Sparkles size={18} className="text-illa-yellow" /> },
-            { message: 'Que tal completar uma missão agora? 🍦', icon: <IceCream size={18} className="text-illa-pink" /> },
-            { message: 'Seus pontos estão crescendo! Continue assim 🔥', icon: <Flame size={18} className="text-orange-400" /> },
-            { message: 'Tem recompensas esperando por você! 🎁', icon: <Gift size={18} className="text-illa-pink" /> },
-        ]
-        let msgIndex = 0
-
         const interval = setInterval(() => {
-            setRewardToast(rewardMessages[msgIndex % rewardMessages.length])
-            msgIndex++
+            const coins = Math.ceil(Math.random() * 5) // 1-5 random coins
+            // Optimistic update — instantly reflect in counter
+            setSnapshot((prev) => ({
+                ...prev,
+                profile: {
+                    ...prev.profile,
+                    points: prev.profile.points + coins,
+                },
+            }))
+            setRewardToast({
+                message: `Você ganhou ${coins} 🪙 Moeda${coins > 1 ? 's' : ''}!`,
+                icon: <Coins size={18} className="text-[#FAFF00] drop-shadow-[0_0_6px_rgba(250,255,0,0.6)]" />,
+            })
             setTimeout(() => setRewardToast(null), 4000)
         }, 60_000)
 

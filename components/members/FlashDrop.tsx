@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import type { ActiveDrop, MemberProfile } from '@/lib/gamification-types'
-import { Zap, Clock, PackageCheck, Loader2, Gift } from 'lucide-react'
+import { IceCream, Clock, PackageCheck, Loader2, Gift } from 'lucide-react'
 
 interface Props {
     drop: ActiveDrop | null
@@ -78,7 +78,7 @@ export default function FlashDrop({ drop, onClaim }: Props) {
                 <div className="flex items-start justify-between mb-6">
                     <div className="flex items-center gap-3">
                         <div className={`p-2.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-lg ${!claimed ? 'animate-bounce' : ''}`}>
-                            <Zap size={20} className="text-illa-yellow" fill="currentColor" />
+                            <IceCream size={20} className="text-illa-yellow" fill="currentColor" />
                         </div>
                         <div>
                             <h2 className="text-lg font-bold leading-tight drop-shadow-md">Flash Drop Ativo!</h2>
@@ -111,8 +111,8 @@ export default function FlashDrop({ drop, onClaim }: Props) {
                         onClick={handleClaim}
                         disabled={claimed || claiming}
                         className={`w-full py-3.5 rounded-xl font-bold text-sm transition-all shadow-lg flex items-center justify-center gap-2 ${claimed
-                                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 cursor-default'
-                                : 'bg-gradient-to-r from-illa-pink to-purple-600 hover:from-purple-600 hover:to-illa-pink text-white hover:scale-[1.02] active:scale-95 shadow-purple-600/30 ring-2 ring-white/20'
+                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 cursor-default'
+                            : 'bg-gradient-to-r from-illa-pink to-purple-600 hover:from-purple-600 hover:to-illa-pink text-white hover:scale-[1.02] active:scale-95 shadow-purple-600/30 ring-2 ring-white/20'
                             }`}
                     >
                         {claiming ? (

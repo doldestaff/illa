@@ -1,7 +1,7 @@
 'use client'
 
 import type { MemberProfile } from '@/lib/gamification-types'
-import { User, Star, Flame, Zap, ChevronRight } from 'lucide-react'
+import { User, Star, Flame, Coins, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 
 interface Props {
@@ -73,7 +73,7 @@ export default function HudHeader({ profile, avatarUrl }: Props) {
                     <div className="flex items-center gap-3 text-sm font-medium text-white/60 mt-1.5">
                         <div className="flex items-center gap-1.5 text-white/80">
                             <div className="p-1 rounded bg-illa-pink/20 text-illa-pink">
-                                <Zap size={12} fill="currentColor" />
+                                <Coins size={12} className="text-[#FAFF00]" />
                             </div>
                             <span className="font-semibold text-white">{profile.points.toLocaleString()}</span>
                             <span className="text-xs font-normal opacity-70">pontos</span>
