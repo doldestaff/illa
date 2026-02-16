@@ -78,46 +78,47 @@ export function PinnedButtonsParallax() {
                     trigger: containerRef.current,
                     start: "top top",
                     end: "bottom bottom",
-                    // NO PIN - Using CSS Sticky
-                    scrub: 1, // Smooth scrub
+                    scrub: 0.8,
                 }
             })
 
-            // Initial state for all cards: Hidden, far back
-            cardsRef.current.forEach((card, i) => {
+            // Initial state: All cards hidden below, scaled down
+            cardsRef.current.forEach((card) => {
                 if (!card) return
                 gsap.set(card, {
                     opacity: 0,
-                    z: -240,
-                    y: 60,
+                    y: 80,
                     scale: 0.85,
-                    display: 'flex' // Ensure they are layout-ready
+                    zIndex: 0,
                 })
             })
 
-            // Sequence
+            // Sequence: Each card enters → holds → exits
             cardsRef.current.forEach((card, i) => {
+                if (!card) return
+                const zBase = cards.length - i
+
                 // Enter
                 tl.to(card, {
                     opacity: 1,
-                    z: 0,
                     y: 0,
                     scale: 1,
+                    zIndex: zBase + 10,
                     duration: 1,
                     ease: "power2.out"
                 })
                     // Hold
                     .to(card, {
-                        z: 20,
-                        duration: 0.5,
+                        scale: 1.02,
+                        duration: 0.6,
                         ease: "none"
                     })
                     // Exit
                     .to(card, {
                         opacity: 0,
-                        z: 100, // Move past the camera
-                        y: -20,
-                        scale: 1.1,
+                        y: -60,
+                        scale: 1.08,
+                        zIndex: 0,
                         duration: 0.8,
                         ease: "power2.in"
                     })
@@ -135,7 +136,7 @@ export function PinnedButtonsParallax() {
         >
             <div
                 ref={wrapperRef}
-                className="sticky top-0 w-full h-[100dvh] flex items-center justify-center overflow-hidden perspective-container"
+                className="sticky top-0 w-full h-[100dvh] flex items-center justify-center overflow-hidden"
             >
                 {/* Video Background */}
                 <div className="absolute inset-0 z-0">
@@ -147,15 +148,14 @@ export function PinnedButtonsParallax() {
                         muted
                         playsInline
                     />
-                    {/* Overlay for readability - Reduced opacity */}
                     <div className="absolute inset-0 bg-white/10 backdrop-blur-[1px]" />
                 </div>
 
-                {/* Background Decor relative to sticky container - Adjusted gradient */}
+                {/* Background Decor */}
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-transparent via-white/20 to-white/60 pointer-events-none z-0" />
 
                 {/* Stage */}
-                <div className="relative w-full max-w-md h-[400px] flex items-center justify-center" style={{ perspective: '1000px', transformStyle: 'preserve-3d' }}>
+                <div className="relative w-full max-w-md h-[320px] md:h-[400px] flex items-center justify-center">
                     {cards.map((card, index) => (
                         <a
                             key={card.id}
@@ -172,20 +172,14 @@ export function PinnedButtonsParallax() {
                             className={cn(
                                 "absolute inset-0 m-auto",
                                 "w-[85vw] max-w-[360px] md:max-w-[420px] h-[300px] md:h-[400px]",
-                                // CLOUD GLASS STYLE
                                 "bg-white/20 backdrop-blur-3xl border",
                                 card.borderColor,
                                 "rounded-[3rem] shadow-[0_8px_32px_0_rgba(255,255,255,0.2)]",
-                                // HOVER GLOW
                                 "hover:shadow-[0_0_50px_rgba(255,255,255,0.4)] hover:bg-white/30 hover:border-white/80",
                                 "flex flex-col items-center justify-center text-center p-8",
-                                "cursor-pointer group transition-all duration-500 ease-out",
+                                "cursor-pointer group transition-shadow duration-500 ease-out",
                                 "will-change-transform"
                             )}
-                            style={{
-                                transformStyle: 'preserve-3d',
-                                backfaceVisibility: 'hidden'
-                            }}
                         >
                             {/* Inner Cloud Gradient */}
                             <div className={cn(
@@ -193,7 +187,7 @@ export function PinnedButtonsParallax() {
                                 card.color
                             )} />
 
-                            <div className="relative z-10 flex flex-col items-center gap-6 transform translate-z-10">
+                            <div className="relative z-10 flex flex-col items-center gap-6">
                                 <div className={cn(
                                     "w-24 h-24 rounded-full flex items-center justify-center bg-white/80 backdrop-blur-sm shadow-xl mb-2",
                                     "group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 ease-out",
