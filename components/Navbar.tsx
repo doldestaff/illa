@@ -1,12 +1,13 @@
 'use client'
 
 import Link from 'next/link'
-import { Menu, ShoppingBag, User, LogIn } from 'lucide-react'
+import { Menu, ShoppingBag, User, LogIn, IceCream, MapPin, Store, Info } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useState, useEffect, Suspense } from 'react'
 import Image from 'next/image'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { AuthModal } from './AuthModal'
+import { AboutModal } from './AboutModal'
 import { createSupabaseBrowser } from '@/lib/supabaseClient'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 
@@ -75,6 +76,15 @@ function NavbarInner() {
         }
     }
 
+    // About Modal Logic
+    const [isAboutOpen, setIsAboutOpen] = useState(false)
+
+    useEffect(() => {
+        const handleOpenAbout = () => setIsAboutOpen(true)
+        window.addEventListener('open-about-modal', handleOpenAbout)
+        return () => window.removeEventListener('open-about-modal', handleOpenAbout)
+    }, [])
+
     return (
         <>
             <Suspense fallback={null}>
@@ -141,56 +151,140 @@ function NavbarInner() {
                     {/* Mobile Menu Toggle */}
                     <button
                         onClick={() => setIsOpen(!isOpen)}
-                        className="md:hidden bg-white/90 backdrop-blur-md p-3 rounded-full text-dark shadow-sm hover:shadow-md relative z-50"
+                        className={cn(
+                            "md:hidden relative z-50 w-12 h-12 flex items-center justify-center rounded-full transition-all duration-300 shadow-sm",
+                            isOpen
+                                ? "bg-white text-illa-pink rotate-90 shadow-lg ring-2 ring-illa-pink/20"
+                                : "bg-white/90 backdrop-blur-md text-dark hover:shadow-md hover:scale-105 active:scale-95"
+                        )}
+                        aria-label="Toggle Menu"
                     >
-                        <Menu size={20} />
+                        <div className="relative w-6 h-6">
+                            <Menu
+                                className={cn(
+                                    "absolute inset-0 transition-all duration-300",
+                                    isOpen ? "opacity-0 rotate-90 scale-50" : "opacity-100 rotate-0 scale-100"
+                                )}
+                                size={24}
+                            />
+                            <div
+                                className={cn(
+                                    "absolute inset-0 flex items-center justify-center font-bold text-2xl transition-all duration-300",
+                                    isOpen ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-50"
+                                )}
+                            >
+                                ✕
+                            </div>
+                        </div>
                     </button>
 
                     {/* Mobile Menu Overlay */}
                     <div
                         className={cn(
-                            "fixed inset-0 bg-white z-40 flex flex-col items-center justify-center gap-6 transition-all duration-300 md:hidden",
-                            isOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
+                            "fixed inset-0 bg-white/95 backdrop-blur-xl z-40 flex flex-col transition-all duration-500 md:hidden",
+                            isOpen ? "opacity-100 visible translate-y-0" : "opacity-0 invisible pointer-events-none -translate-y-4"
                         )}
+                        style={{
+                            paddingTop: 'max(5rem, env(safe-area-inset-top))',
+                            paddingBottom: 'max(2rem, env(safe-area-inset-bottom))'
+                        }}
                     >
-                        <Link href="#products" onClick={() => setIsOpen(false)} className="text-2xl font-bold text-dark hover:text-illa-pink">
-                            Produtos
-                        </Link>
-                        <a href={externalLinks.aboutExternal} target="_blank" rel="noreferrer" className="text-2xl font-bold text-dark hover:text-illa-pink">
-                            Quem Somos
-                        </a>
-                        <a href={externalLinks.maps} target="_blank" rel="noreferrer" className="text-2xl font-bold text-dark hover:text-illa-pink">
-                            Lojas
-                        </a>
-                        <a href={externalLinks.franchise} target="_blank" rel="noreferrer" className="text-2xl font-bold text-dark hover:text-illa-pink">
-                            Seja um Franqueado
-                        </a>
+                        {/* Main Navigation Links (Center) */}
+                        <div className="flex-1 flex flex-col items-center justify-center gap-8 px-6 overflow-y-auto">
+                            <Link
+                                href="#products"
+                                onClick={() => setIsOpen(false)}
+                                className={cn(
+                                    "w-full bg-gray-50 hover:bg-white border border-transparent hover:border-illa-pink/20",
+                                    "py-4 rounded-xl flex items-center justify-center gap-3",
+                                    "text-xl font-bold text-dark transition-all duration-300 active:scale-95 shadow-sm"
+                                )}
+                            >
+                                <IceCream size={24} className="text-illa-pink/80" />
+                                Produtos
+                            </Link>
 
-                        <button
-                            onClick={() => { setIsOpen(false); handleAuthClick(); }}
-                            className="flex items-center gap-2 text-2xl font-bold text-dark hover:text-illa-pink"
-                        >
-                            <User size={24} />
-                            {user ? 'Minha Conta' : 'Entrar'}
-                        </button>
+                            <button
+                                onClick={() => { setIsAboutOpen(true); setIsOpen(false); }}
+                                className={cn(
+                                    "w-full bg-gray-50 hover:bg-white border border-transparent hover:border-illa-pink/20",
+                                    "py-4 rounded-xl flex items-center justify-center gap-3",
+                                    "text-xl font-bold text-dark transition-all duration-300 active:scale-95 shadow-sm"
+                                )}
+                            >
+                                <Info size={24} className="text-illa-pink/80" />
+                                Quem Somos
+                            </button>
 
-                        <div className="flex gap-4 mt-8">
-                            <a href={externalLinks.instagram} target="_blank" rel="noreferrer" className="text-dark hover:text-illa-pink">Instagram</a>
-                            <a href={externalLinks.facebook} target="_blank" rel="noreferrer" className="text-dark hover:text-illa-pink">Facebook</a>
+                            <a
+                                href={externalLinks.maps}
+                                target="_blank"
+                                rel="noreferrer"
+                                className={cn(
+                                    "w-full bg-gray-50 hover:bg-white border border-transparent hover:border-illa-pink/20",
+                                    "py-4 rounded-xl flex items-center justify-center gap-3",
+                                    "text-xl font-bold text-dark transition-all duration-300 active:scale-95 shadow-sm"
+                                )}
+                            >
+                                <MapPin size={24} className="text-illa-pink/80" />
+                                Lojas
+                            </a>
+
+                            <a
+                                href={externalLinks.franchise}
+                                target="_blank"
+                                rel="noreferrer"
+                                className={cn(
+                                    "w-full bg-gray-50 hover:bg-white border border-transparent hover:border-illa-pink/20",
+                                    "py-4 rounded-xl flex items-center justify-center gap-3",
+                                    "text-xl font-bold text-dark transition-all duration-300 active:scale-95 shadow-sm"
+                                )}
+                            >
+                                <Store size={24} className="text-illa-pink/80" />
+                                Seja Franqueado
+                            </a>
                         </div>
-                        <a
-                            href={externalLinks.ifood}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="mt-4 bg-illa-pink text-white px-8 py-3 rounded-full font-bold text-xl hover:bg-pink-600 shadow-lg"
-                        >
-                            Pedir Agora
-                        </a>
+
+                        {/* Bottom Actions (Strategic Placement) */}
+                        <div className="w-full px-6 pb-6 flex flex-col gap-4 bg-gradient-to-t from-white to-transparent pt-8">
+                            {/* Login/account Button - Highly Clickable */}
+                            <button
+                                onClick={() => { setIsOpen(false); handleAuthClick(); }}
+                                className={cn(
+                                    "w-full py-4 rounded-xl font-bold text-lg tracking-wide shadow-xl flex items-center justify-center gap-3 transition-all",
+                                    "bg-white border-2 border-illa-pink text-illa-pink hover:bg-illa-pink hover:text-white",
+                                    "active:scale-95 active:shadow-sm"
+                                )}
+                            >
+                                <User size={22} className="" />
+                                {user ? 'MINHA CONTA' : 'ACESSAR CONTA'}
+                            </button>
+
+                            <a
+                                href={externalLinks.ifood}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="w-full bg-illa-pink text-white py-4 rounded-xl font-black text-xl hover:bg-pink-600 shadow-lg shadow-pink-200/50 flex items-center justify-center gap-3 active:scale-95 transition-all"
+                            >
+                                <ShoppingBag size={22} />
+                                PEDIR AGORA
+                            </a>
+
+                            <div className="flex justify-center gap-8 mt-4 opacity-60">
+                                <a href={externalLinks.instagram} target="_blank" rel="noreferrer" className="text-dark hover:text-illa-pink transition-colors p-2">
+                                    Instagram
+                                </a>
+                                <a href={externalLinks.facebook} target="_blank" rel="noreferrer" className="text-dark hover:text-illa-pink transition-colors p-2">
+                                    Facebook
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </nav>
 
             <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
+            <AboutModal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
         </>
     )
 }

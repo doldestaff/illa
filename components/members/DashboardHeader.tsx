@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion'
-import { User, Star, Flame, Zap, ChevronRight, Home } from 'lucide-react'
+import { User, Star, IceCream, Zap, ChevronRight, Home } from 'lucide-react'
 import Link from 'next/link'
 import type { MemberProfile } from '@/lib/gamification-types'
 import { useRef } from 'react'
@@ -107,10 +107,10 @@ export default function DashboardHeader({ profile, avatarUrl }: Props) {
                                 {profile.full_name || 'Membro ILLA'}
                             </h1>
 
-                            {/* Flame Streak */}
+                            {/* Ice Cream Streak */}
                             {profile.streak_count > 0 && (
                                 <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 shadow-[0_0_15px_rgba(249,115,22,0.2)]">
-                                    <Flame size={14} fill="currentColor" className="animate-[pulse_1.5s_ease-in-out_infinite]" />
+                                    <IceCream size={14} className="text-orange-400 animate-[bounce_2s_infinite]" />
                                     <span className="text-xs font-bold">{profile.streak_count}</span>
                                 </div>
                             )}
@@ -121,7 +121,7 @@ export default function DashboardHeader({ profile, avatarUrl }: Props) {
                             <div className="flex items-center gap-1.5 text-white/90 bg-white/5 px-2 py-0.5 rounded-lg border border-white/5">
                                 <Zap size={14} className="text-illa-pink fill-current" />
                                 <span className="font-bold">{profile.points.toLocaleString()}</span>
-                                <span className="text-[10px] uppercase tracking-wider opacity-60">pts</span>
+                                <span className="text-[10px] uppercase tracking-wider opacity-60 text-illa-pink">Moedas</span>
                             </div>
                         </div>
 

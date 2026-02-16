@@ -31,12 +31,20 @@ function DesktopButtons({ progress }: { progress: MotionValue<number> }) {
                         const scale = useTransform(progress, [start, start + 0.1], [0.8, 1])
                         const display = useTransform(progress, p => p >= start ? 'flex' : 'none')
 
+                        const isAction = btn.label === 'QUEM SOMOS' || btn.label === 'CONTATO'
+
                         return (
                             <motion.a
                                 key={btn.label}
                                 href={btn.link}
-                                target="_blank"
-                                rel="noreferrer"
+                                target={isAction ? undefined : "_blank"}
+                                rel={isAction ? undefined : "noreferrer"}
+                                onClick={(e) => {
+                                    if (btn.label === 'QUEM SOMOS') {
+                                        e.preventDefault()
+                                        window.dispatchEvent(new CustomEvent('open-about-modal'))
+                                    }
+                                }}
                                 style={{ opacity, x, scale, display }}
                                 className="
                                     flex items-center gap-3 
@@ -48,6 +56,7 @@ function DesktopButtons({ progress }: { progress: MotionValue<number> }) {
                                     active:scale-95
                                     transition-colors
                                     shadow-2xl shadow-black/20
+                                    cursor-pointer
                                 "
                             >
                                 <btn.icon size={20} />
@@ -63,7 +72,12 @@ function DesktopButtons({ progress }: { progress: MotionValue<number> }) {
 
 function MobileButtons({ progress }: { progress: MotionValue<number> }) {
     return (
-        <div className="absolute bottom-[20vh] left-0 right-0 z-20 flex justify-center pointer-events-none h-32 items-center">
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.5 }}
+            className="absolute bottom-[20vh] left-0 right-0 z-20 flex justify-center pointer-events-none h-32 items-center"
+        >
             <div className="relative w-full h-full">
                 {buttons.map((btn, i) => {
                     const step = 1 / (buttons.length - 1)
@@ -84,12 +98,20 @@ function MobileButtons({ progress }: { progress: MotionValue<number> }) {
                     const zIndex = useTransform(opacity, (o) => Math.round(o * 100))
                     const display = useTransform(opacity, (o) => o > 0.01 ? 'flex' : 'none')
 
+                    const isAction = btn.label === 'QUEM SOMOS'
+
                     return (
                         <motion.a
                             key={btn.label}
                             href={btn.link}
-                            target="_blank"
-                            rel="noreferrer"
+                            target={isAction ? undefined : "_blank"}
+                            rel={isAction ? undefined : "noreferrer"}
+                            onClick={(e) => {
+                                if (isAction) {
+                                    e.preventDefault()
+                                    window.dispatchEvent(new CustomEvent('open-about-modal'))
+                                }
+                            }}
                             style={{
                                 opacity,
                                 scale,
@@ -111,6 +133,7 @@ function MobileButtons({ progress }: { progress: MotionValue<number> }) {
                                 shadow-xl shadow-black/20
                                 cursor-pointer pointer-events-auto
                                 will-change-transform
+                                hover:bg-white/20 hover:scale-105 active:scale-95 transition-all
                             "
                         >
                             <btn.icon size={24} />
@@ -119,7 +142,7 @@ function MobileButtons({ progress }: { progress: MotionValue<number> }) {
                     )
                 })}
             </div>
-        </div>
+        </motion.div>
     )
 }
 

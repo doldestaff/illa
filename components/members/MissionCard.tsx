@@ -107,7 +107,12 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                         <div className="flex items-center gap-1.5">
                             {mission.reward_xp > 0 && (
                                 <span className="flex items-center gap-0.5 text-purple-300 bg-purple-500/10 px-1.5 py-0.5 rounded border border-purple-500/20">
-                                    <Zap size={8} fill="currentColor" /> +{mission.reward_xp}
+                                    <Zap size={8} fill="currentColor" /> +{mission.reward_xp} XP
+                                </span>
+                            )}
+                            {mission.reward_points > 0 && (
+                                <span className="flex items-center gap-0.5 text-illa-pink bg-illa-pink/10 px-1.5 py-0.5 rounded border border-illa-pink/20">
+                                    <Zap size={8} fill="currentColor" /> +{mission.reward_points} Moedas
                                 </span>
                             )}
                         </div>

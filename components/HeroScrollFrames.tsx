@@ -39,6 +39,7 @@ export function HeroScrollFrames() {
     const SCROLL_HEIGHT = isMobile ? '350vh' : '500vh'
 
     // --- 2. Setup & Load ---
+    // --- 2. Setup & Load ---
     useEffect(() => {
         setIsMounted(true)
 
@@ -47,9 +48,12 @@ export function HeroScrollFrames() {
             setIsMobile(mobile)
             const platform = mobile ? 'mobile' : 'desktop'
 
+            // Define Start Offsets
+            const START_OFFSET = mobile ? 4 : 2 // 004.webp (mobile) or 002.webp (desktop)
+
             if (globalCache.manifest && globalCache.platform === platform) {
                 setIsLoading(false)
-                requestAnimationFrame(() => drawFrame(0))
+                requestAnimationFrame(() => drawFrame(START_OFFSET))
                 return
             }
 
@@ -67,7 +71,7 @@ export function HeroScrollFrames() {
                 const data = await res.json()
                 globalCache.manifest = data
 
-                preloadImages(data.frames)
+                preloadImages(data.frames, START_OFFSET)
 
             } catch (e: any) {
                 console.error('Hero: Failed to load:', e)
@@ -78,10 +82,11 @@ export function HeroScrollFrames() {
         detectAndLoad()
     }, [])
 
-    const preloadImages = (frames: string[]) => {
+    const preloadImages = (frames: string[], startOffset: number) => {
         let loadedCount = 0
         const total = frames.length
-        const priorityIndices = [0, 1, 2, total - 1]
+        // Prioritize the START_OFFSET frame so we can render immediately
+        const priorityIndices = [startOffset, startOffset + 1, startOffset + 2, total - 1]
 
         const loadSingle = (index: number) => {
             if (globalCache.images.has(index)) return Promise.resolve()
@@ -92,9 +97,10 @@ export function HeroScrollFrames() {
                 img.onload = () => {
                     globalCache.images.set(index, img)
                     loadedCount++
-                    if (index === 0) {
+                    // Show content as soon as the start frame is ready
+                    if (index === startOffset) {
                         setIsLoading(false)
-                        requestAnimationFrame(() => drawFrame(0))
+                        requestAnimationFrame(() => drawFrame(startOffset))
                         // Force refresh needed even for sticky? Maybe not, but good for ScrollTrigger bounds
                         ScrollTrigger.refresh()
                     }
@@ -104,7 +110,10 @@ export function HeroScrollFrames() {
             })
         }
 
-        Promise.all(priorityIndices.map(i => loadSingle(i))).then(() => {
+        Promise.all(priorityIndices.map(i => {
+            if (i < total) return loadSingle(i)
+            return Promise.resolve()
+        })).then(() => {
             const loadNextBatch = () => {
                 const batchSize = 5
                 let nextIndex = 0
@@ -168,6 +177,8 @@ export function HeroScrollFrames() {
             })
 
             const totalFrames = globalCache.manifest!.frameCount - 1
+            const mobile = window.matchMedia('(max-width: 768px)').matches
+            const START_OFFSET = mobile ? 4 : 2
 
             const ctx = gsap.context(() => {
                 ScrollTrigger.create({
@@ -179,9 +190,11 @@ export function HeroScrollFrames() {
                     invalidateOnRefresh: true,
                     onUpdate: (self) => {
                         const progress = self.progress
+
+                        // Map 0..1 progress to startOffset..totalFrames
                         const frameIndex = Math.min(
                             totalFrames,
-                            Math.max(0, Math.round(progress * totalFrames))
+                            Math.max(START_OFFSET, Math.round(START_OFFSET + (progress * (totalFrames - START_OFFSET))))
                         )
 
                         requestAnimationFrame(() => drawFrame(frameIndex))
@@ -255,9 +268,10 @@ export function HeroScrollFrames() {
                     isLoading ? "opacity-100" : "opacity-0"
                 )}
             >
-                <Loader2 className="animate-spin mb-4" size={48} />
-                <p className="font-semibold tracking-wider">LOADING EXPERIENCE...</p>
+                {/* <Loader2 className="animate-spin mb-4" size={48} /> */}
+                {/* Removed spinner to avoid visual noise since it should be instant now */}
             </div>
         </section>
     )
 }
+

@@ -72,9 +72,12 @@ export function Footer() {
                                 </a>
                             </li>
                             <li>
-                                <a href={externalLinks.aboutExternal} target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white hover:translate-x-1 transition-all inline-block">
+                                <button
+                                    onClick={() => window.dispatchEvent(new CustomEvent('open-about-modal'))}
+                                    className="text-white/70 hover:text-white hover:translate-x-1 transition-all inline-block text-left"
+                                >
                                     Quem Somos
-                                </a>
+                                </button>
                             </li>
                             <li>
                                 <a href={externalLinks.maps} target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white hover:translate-x-1 transition-all inline-block">

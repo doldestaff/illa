@@ -158,19 +158,22 @@ CREATE INDEX IF NOT EXISTS idx_referral_events_inviter ON public.referral_events
 -- 3. WEEKLY LEADERBOARD VIEW
 -- =========================
 CREATE OR REPLACE VIEW public.leaderboard_weekly AS
-SELECT mi.user_id,
+SELECT p.id AS user_id,
     p.full_name,
     p.avatar_path,
-    COALESCE(SUM(m.reward_xp), 0)::int AS week_xp
-FROM public.mission_instances mi
-    JOIN public.missions m ON m.id = mi.mission_id
-    JOIN public.profiles p ON p.id = mi.user_id
-WHERE mi.claimed_at IS NOT NULL
-    AND mi.claimed_at >= date_trunc('week', now())
-GROUP BY mi.user_id,
-    p.full_name,
-    p.avatar_path
-ORDER BY week_xp DESC;
+    COALESCE(sub.week_xp, 0)::int AS week_xp
+FROM public.profiles p
+    LEFT JOIN (
+        SELECT mi.user_id,
+            SUM(m.reward_xp) AS week_xp
+        FROM public.mission_instances mi
+            JOIN public.missions m ON m.id = mi.mission_id
+        WHERE mi.claimed_at IS NOT NULL
+            AND mi.claimed_at >= date_trunc('week', now())
+        GROUP BY mi.user_id
+    ) sub ON sub.user_id = p.id
+ORDER BY week_xp DESC,
+    p.full_name ASC;
 -- =========================
 -- 4. ENABLE RLS
 -- =========================

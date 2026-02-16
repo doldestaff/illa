@@ -15,6 +15,7 @@ const imageCache: Map<number, HTMLImageElement> = new Map()
 export default function MembersScrollBackground() {
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const [isMobile, setIsMobile] = useState(false)
+    const [isLoaded, setIsLoaded] = useState(false)
     const { scrollYProgress } = useScroll() // 0 to 1
 
     // Smooth scroll for less jittery frames
@@ -49,12 +50,15 @@ export default function MembersScrollBackground() {
             img.onload = () => {
                 imageCache.set(index, img)
                 loadedCount++
-                if (index === 0) drawFrame(0) // Draw first frame immediately
+                if (index === 2) {
+                    drawFrame(index) // Draw first visible frame immediately
+                    setIsLoaded(true)
+                }
             }
         }
 
         // Priority load: First frame + coarse steps
-        loadFrame(0)
+        loadFrame(2)
         for (let i = 0; i < FRAME_Count; i += 5) loadFrame(i)
 
         // Lazy load the rest
@@ -124,8 +128,11 @@ export default function MembersScrollBackground() {
     return (
         <canvas
             ref={canvasRef}
-            className="fixed inset-0 w-full h-full pointer-events-none z-[-1]"
-            style={{ opacity: 0.4 }} // Fade it slightly behind UI
+            className={cn(
+                "fixed inset-0 w-full h-full pointer-events-none z-[-1]",
+                "transition-opacity duration-1000 ease-out",
+                isLoaded ? "opacity-40" : "opacity-0"
+            )}
         />
     )
 }
