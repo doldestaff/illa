@@ -9,17 +9,40 @@ import type {
 } from '@/lib/gamification-types'
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { Coins } from 'lucide-react'
 import DashboardHeader from './DashboardHeader'
 import DailyMissions from './DailyMissions'
 import FlashDrop from './FlashDrop'
-import SecretMenu from './SecretMenu'
-import RecipesLibrary from './RecipesLibrary'
 import VipCard from './VipCard'
-import WeeklyLeaderboard from './WeeklyLeaderboard'
-import BirthdayModule from './BirthdayModule'
-import IllaAmbientBackground from './IllaAmbientBackground'
 import MembersScrollBackground from './MembersScrollBackground'
+
+// ── Lazy-loaded below-fold components (perf: only ship JS when needed) ──
+const SectionSkeleton = () => (
+    <div className="rounded-2xl bg-white/5 border border-white/5 p-6 animate-pulse">
+        <div className="h-4 w-1/3 bg-white/10 rounded mb-4" />
+        <div className="space-y-3">
+            <div className="h-3 w-full bg-white/5 rounded" />
+            <div className="h-3 w-2/3 bg-white/5 rounded" />
+        </div>
+    </div>
+)
+
+const SecretMenu = dynamic(() => import('./SecretMenu'), {
+    loading: () => <SectionSkeleton />,
+})
+const RecipesLibrary = dynamic(() => import('./RecipesLibrary'), {
+    loading: () => <SectionSkeleton />,
+})
+const WeeklyLeaderboard = dynamic(() => import('./WeeklyLeaderboard'), {
+    loading: () => <SectionSkeleton />,
+})
+const BirthdayModule = dynamic(() => import('./BirthdayModule'), {
+    loading: () => <SectionSkeleton />,
+})
+const IllaAmbientBackground = dynamic(() => import('./IllaAmbientBackground'), {
+    ssr: false,
+})
 
 interface Props {
     snapshot: MemberSnapshot
@@ -299,22 +322,36 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                     </div>
 
                     {/* RIGHT COLUMN (Scrollable Content) */}
-                    <div className="md:col-span-7 lg:col-span-8 space-y-6">
+                    <motion.div
+                        className="md:col-span-7 lg:col-span-8 space-y-6"
+                        initial="hidden"
+                        animate="visible"
+                        variants={{
+                            hidden: { opacity: 0 },
+                            visible: {
+                                opacity: 1,
+                                transition: { staggerChildren: 0.12, delayChildren: 0.15 },
+                            },
+                        }}
+                    >
 
                         {/* Daily Missions (Priority) */}
-                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
+                        <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
                             <DailyMissions missions={snapshot.missions} onClaim={handleMissionClaim} />
-                        </div>
+                        </motion.div>
 
                         {/* Secondary Content Grid */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <motion.div
+                            className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+                            variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } }}
+                        >
                             {/* Active Drop */}
-                            <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
+                            <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
                                 <FlashDrop drop={snapshot.active_drop} onClaim={handleDropClaim} />
-                            </div>
+                            </motion.div>
 
                             {/* VIP Card */}
-                            <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+                            <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
                                 <VipCard
                                     referralCode={snapshot.profile.referral_code}
                                     referralCount={snapshot.referral_count}
@@ -322,25 +359,36 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                                     onLoadVip={handleVipLoad}
                                     onShareCopy={handleShareCopy}
                                 />
-                            </div>
-                        </div>
+                            </motion.div>
+                        </motion.div>
 
                         {/* Wide Modules */}
-                        <div className="space-y-6">
-                            <SecretMenu items={snapshot.secret_menu} />
+                        <motion.div
+                            className="space-y-6"
+                            variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } }}
+                        >
+                            <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
+                                <SecretMenu items={snapshot.secret_menu} />
+                            </motion.div>
 
-                            <RecipesLibrary
-                                recipes={snapshot.recipes}
-                                userLevel={snapshot.profile.level}
-                                onToggle={handleRecipeToggle}
-                            />
+                            <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
+                                <RecipesLibrary
+                                    recipes={snapshot.recipes}
+                                    userLevel={snapshot.profile.level}
+                                    onToggle={handleRecipeToggle}
+                                />
+                            </motion.div>
 
-                            <WeeklyLeaderboard
-                                leaderboard={snapshot.leaderboard}
-                            />
+                            <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
+                                <WeeklyLeaderboard
+                                    leaderboard={snapshot.leaderboard}
+                                />
+                            </motion.div>
 
-                            <BirthdayModule birthday={snapshot.birthday} />
-                        </div>
+                            <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
+                                <BirthdayModule birthday={snapshot.birthday} />
+                            </motion.div>
+                        </motion.div>
 
                         <div className="md:hidden text-center py-8">
                             <Link
@@ -350,7 +398,7 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                                 Editar perfil completo →
                             </Link>
                         </div>
-                    </div>
+                    </motion.div>
                 </div>
             </div>
 

@@ -39,7 +39,7 @@ export default function WeeklyLeaderboard({ leaderboard }: Props) {
     return (
         <div className="space-y-3">
             <div className="flex items-center justify-between">
-                <h2 className="text-lg font-bold text-dark flex items-center gap-2">
+                <h2 className="text-lg font-bold text-white flex items-center gap-2 drop-shadow-md">
                     <Trophy size={20} className="text-illa-yellow" />
                     Ranking Semanal
                 </h2>
