@@ -29,16 +29,17 @@ export default function DashboardHeader({ profile, avatarUrl, dropsCount }: Prop
     const ref = useRef<HTMLDivElement>(null)
     const { scrollY } = useScroll()
 
-    // Parallax & Resize effects based on scroll
-    // Header shrinks from 110% scale to 95%
+    // Parallax only on desktop (mobile scrolls naturally with content)
     const scale = useTransform(scrollY, [0, 200], [1, 0.95])
-    // Opacity fades slightly to focus on content
     const opacity = useTransform(scrollY, [0, 300], [1, 0.9])
     const y = useTransform(scrollY, [0, 200], [0, 10])
 
+    // XP progress toward next level (total XP / threshold)
+    const totalXp = profile.xp
+    const nextLevelXp = profile.next_level_xp
     const progressPercent =
-        profile.next_level_xp > 0
-            ? Math.min(100, Math.round((profile.xp / profile.next_level_xp) * 100))
+        nextLevelXp > 0
+            ? Math.min(100, Math.round((totalXp / nextLevelXp) * 100))
             : 0
 
     const missingFields = profile.missing_fields || []
@@ -48,9 +49,9 @@ export default function DashboardHeader({ profile, avatarUrl, dropsCount }: Prop
         <motion.div
             ref={ref}
             style={{ scale, opacity, y }}
-            className="sticky top-4 z-40 mb-8"
+            className="md:sticky md:top-4 z-40 mb-6 md:mb-8"
         >
-            <div className="relative overflow-hidden rounded-[2rem] bg-black/40 backdrop-blur-2xl border border-white/10 text-white p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] transition-all duration-500 group">
+            <div className="relative overflow-hidden rounded-[2rem] bg-black/40 backdrop-blur-lg md:backdrop-blur-2xl border border-white/10 text-white p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] group">
 
                 {/* 1. Dynamic Ambient Background (Internal) */}
                 <div className="absolute inset-0 overflow-hidden rounded-[2rem]">
@@ -174,9 +175,15 @@ export default function DashboardHeader({ profile, avatarUrl, dropsCount }: Prop
 
                         {/* XP Progress Bar (Liquid Style) */}
                         <div className="mt-4 relative group/xp">
-                            <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider text-white/40 mb-1.5">
-                                <span>XP Progress</span>
-                                <span className="text-white/70">{progressPercent}%</span>
+                            <div className="flex justify-between items-baseline text-[10px] font-bold uppercase tracking-wider text-white/40 mb-1.5">
+                                <span className="flex items-baseline gap-1">
+                                    <span className="text-sm font-black text-white tabular-nums">{totalXp}</span>
+                                    <span>XP</span>
+                                </span>
+                                <span className="flex items-baseline gap-1">
+                                    <span className="text-white/60">/ {nextLevelXp}</span>
+                                    <span>XP</span>
+                                </span>
                             </div>
                             <div className="h-3 bg-black/40 rounded-full overflow-hidden backdrop-blur-sm border border-white/5 shadow-inner">
                                 <motion.div

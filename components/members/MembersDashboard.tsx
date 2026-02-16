@@ -7,8 +7,9 @@ import type {
     ClaimDropResult,
     VipPayload,
 } from '@/lib/gamification-types'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
+import { Gift, Sparkles, Flame, IceCream } from 'lucide-react'
 import DashboardHeader from './DashboardHeader'
 import DailyMissions from './DailyMissions'
 import FlashDrop from './FlashDrop'
@@ -29,6 +30,7 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
     const [snapshot, setSnapshot] = useState(initial)
     const [vipPayload, setVipPayload] = useState<VipPayload | null>(null)
     const progressTracked = useRef(false)
+    const [rewardToast, setRewardToast] = useState<{ message: string; icon: React.ReactNode } | null>(null)
 
     // ── Auto-track "visit" mission on mount ──
     useEffect(() => {
@@ -223,6 +225,25 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
         }
     }, [])
 
+    // ── Reward Toast Timer (every 60s) ──
+    useEffect(() => {
+        const rewardMessages = [
+            { message: 'Continue explorando! Você está quase subindo de nível 🎯', icon: <Sparkles size={18} className="text-illa-yellow" /> },
+            { message: 'Que tal completar uma missão agora? 🍦', icon: <IceCream size={18} className="text-illa-pink" /> },
+            { message: 'Seus pontos estão crescendo! Continue assim 🔥', icon: <Flame size={18} className="text-orange-400" /> },
+            { message: 'Tem recompensas esperando por você! 🎁', icon: <Gift size={18} className="text-illa-pink" /> },
+        ]
+        let msgIndex = 0
+
+        const interval = setInterval(() => {
+            setRewardToast(rewardMessages[msgIndex % rewardMessages.length])
+            msgIndex++
+            setTimeout(() => setRewardToast(null), 4000)
+        }, 60_000)
+
+        return () => clearInterval(interval)
+    }, [])
+
     // ── Scroll Background Effect ──
     const { scrollY } = useScroll()
     const backgroundColor = useTransform(
@@ -327,6 +348,22 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                     </div>
                 </div>
             </div>
+
+            {/* Reward Toast */}
+            <AnimatePresence>
+                {rewardToast && (
+                    <motion.div
+                        initial={{ y: -80, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: -80, opacity: 0 }}
+                        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                        className="fixed top-6 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-3 px-5 py-3 rounded-2xl bg-black/80 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)] max-w-[90vw]"
+                    >
+                        {rewardToast.icon}
+                        <span className="text-sm font-medium text-white">{rewardToast.message}</span>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     )
 }

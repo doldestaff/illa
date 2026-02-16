@@ -161,18 +161,9 @@ CREATE OR REPLACE VIEW public.leaderboard_weekly AS
 SELECT p.id AS user_id,
     p.full_name,
     p.avatar_path,
-    COALESCE(sub.week_xp, 0)::int AS week_xp
+    COALESCE(p.xp, 0)::int AS xp
 FROM public.profiles p
-    LEFT JOIN (
-        SELECT mi.user_id,
-            SUM(m.reward_xp) AS week_xp
-        FROM public.mission_instances mi
-            JOIN public.missions m ON m.id = mi.mission_id
-        WHERE mi.claimed_at IS NOT NULL
-            AND mi.claimed_at >= date_trunc('week', now())
-        GROUP BY mi.user_id
-    ) sub ON sub.user_id = p.id
-ORDER BY week_xp DESC,
+ORDER BY xp DESC,
     p.full_name ASC;
 -- =========================
 -- 4. ENABLE RLS
@@ -529,8 +520,8 @@ SELECT COALESCE(
                 lw.full_name,
                 'avatar_path',
                 lw.avatar_path,
-                'week_xp',
-                lw.week_xp
+                'xp',
+                lw.xp
             )
         ),
         '[]'::jsonb
@@ -545,7 +536,7 @@ SELECT rn INTO v_user_position
 FROM (
         SELECT user_id,
             row_number() OVER (
-                ORDER BY week_xp DESC
+                ORDER BY xp DESC
             ) AS rn
         FROM leaderboard_weekly
     ) sub

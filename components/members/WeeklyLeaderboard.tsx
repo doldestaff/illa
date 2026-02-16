@@ -76,7 +76,7 @@ export default function WeeklyLeaderboard({ leaderboard }: Props) {
                             </div>
 
                             <span className="text-xs font-bold text-dark/60 flex-shrink-0">
-                                {entry.week_xp.toLocaleString('pt-BR')} XP
+                                {entry.xp.toLocaleString('pt-BR')} XP
                             </span>
                         </div>
                     )

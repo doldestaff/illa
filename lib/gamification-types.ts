@@ -64,7 +64,7 @@ export interface LeaderboardEntry {
     user_id: string
     full_name: string | null
     avatar_path: string | null
-    week_xp: number
+    xp: number
 }
 
 export interface BirthdayState {
