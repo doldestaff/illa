@@ -195,21 +195,21 @@ function NavbarInner() {
                         )}
                         style={{
                             paddingTop: 'max(5rem, env(safe-area-inset-top))',
-                            paddingBottom: 'max(2rem, env(safe-area-inset-bottom))'
+                            paddingBottom: 'max(1rem, env(safe-area-inset-bottom))'
                         }}
                     >
                         {/* Main Navigation Links (Center) */}
-                        <div className="flex-1 flex flex-col items-center justify-center gap-8 px-6 overflow-y-auto">
+                        <div className="flex-1 flex flex-col items-center justify-center gap-2 px-6 overflow-y-auto">
                             <Link
                                 href="#products"
                                 onClick={() => setIsOpen(false)}
                                 className={cn(
                                     "w-full bg-gray-50 hover:bg-white border border-transparent hover:border-illa-pink/20",
-                                    "py-4 rounded-xl flex items-center justify-center gap-3",
-                                    "text-xl font-bold text-dark transition-all duration-300 active:scale-95 shadow-sm"
+                                    "py-3 rounded-xl flex items-center justify-center gap-3",
+                                    "text-lg font-bold text-dark transition-all duration-300 active:scale-95 shadow-sm"
                                 )}
                             >
-                                <IceCream size={24} className="text-illa-pink/80" />
+                                <IceCream size={20} className="text-illa-pink/80" />
                                 Produtos
                             </Link>
 
@@ -217,11 +217,11 @@ function NavbarInner() {
                                 onClick={() => { setIsAboutOpen(true); setIsOpen(false); }}
                                 className={cn(
                                     "w-full bg-gray-50 hover:bg-white border border-transparent hover:border-illa-pink/20",
-                                    "py-4 rounded-xl flex items-center justify-center gap-3",
-                                    "text-xl font-bold text-dark transition-all duration-300 active:scale-95 shadow-sm"
+                                    "py-3 rounded-xl flex items-center justify-center gap-3",
+                                    "text-lg font-bold text-dark transition-all duration-300 active:scale-95 shadow-sm"
                                 )}
                             >
-                                <Info size={24} className="text-illa-pink/80" />
+                                <Info size={20} className="text-illa-pink/80" />
                                 Quem Somos
                             </button>
 
@@ -231,11 +231,11 @@ function NavbarInner() {
                                 rel="noreferrer"
                                 className={cn(
                                     "w-full bg-gray-50 hover:bg-white border border-transparent hover:border-illa-pink/20",
-                                    "py-4 rounded-xl flex items-center justify-center gap-3",
-                                    "text-xl font-bold text-dark transition-all duration-300 active:scale-95 shadow-sm"
+                                    "py-3 rounded-xl flex items-center justify-center gap-3",
+                                    "text-lg font-bold text-dark transition-all duration-300 active:scale-95 shadow-sm"
                                 )}
                             >
-                                <MapPin size={24} className="text-illa-pink/80" />
+                                <MapPin size={20} className="text-illa-pink/80" />
                                 Lojas
                             </a>
 
@@ -245,27 +245,27 @@ function NavbarInner() {
                                 rel="noreferrer"
                                 className={cn(
                                     "w-full bg-gray-50 hover:bg-white border border-transparent hover:border-illa-pink/20",
-                                    "py-4 rounded-xl flex items-center justify-center gap-3",
-                                    "text-xl font-bold text-dark transition-all duration-300 active:scale-95 shadow-sm"
+                                    "py-3 rounded-xl flex items-center justify-center gap-3",
+                                    "text-lg font-bold text-dark transition-all duration-300 active:scale-95 shadow-sm"
                                 )}
                             >
-                                <Store size={24} className="text-illa-pink/80" />
+                                <Store size={20} className="text-illa-pink/80" />
                                 Seja Franqueado
                             </a>
                         </div>
 
                         {/* Bottom Actions (Strategic Placement) */}
-                        <div className="w-full px-6 pb-6 flex flex-col gap-4 bg-gradient-to-t from-white to-transparent pt-8">
+                        <div className="w-full px-6 pb-6 flex flex-col gap-3 bg-gradient-to-t from-white to-transparent pt-4">
                             {/* Login/account Button - Highly Clickable */}
                             <button
                                 onClick={() => { setIsOpen(false); handleAuthClick(); }}
                                 className={cn(
-                                    "w-full py-4 rounded-xl font-bold text-lg tracking-wide shadow-xl flex items-center justify-center gap-3 transition-all",
+                                    "w-full py-3 rounded-xl font-bold text-base tracking-wide shadow-xl flex items-center justify-center gap-3 transition-all",
                                     "bg-white border-2 border-illa-pink text-illa-pink hover:bg-illa-pink hover:text-white",
                                     "active:scale-95 active:shadow-sm"
                                 )}
                             >
-                                <User size={22} className="" />
+                                <User size={20} className="" />
                                 {user ? 'MINHA CONTA' : 'ACESSAR CONTA'}
                             </button>
 
@@ -273,29 +273,29 @@ function NavbarInner() {
                                 href={externalLinks.ifood}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="w-full bg-illa-pink text-white py-4 rounded-xl font-black text-xl hover:bg-pink-600 shadow-lg shadow-pink-200/50 flex items-center justify-center gap-3 active:scale-95 transition-all"
+                                className="w-full bg-illa-pink text-white py-3 rounded-xl font-black text-lg hover:bg-pink-600 shadow-lg shadow-pink-200/50 flex items-center justify-center gap-3 active:scale-95 transition-all"
                             >
-                                <ShoppingBag size={22} />
+                                <ShoppingBag size={20} />
                                 PEDIR AGORA
                             </a>
 
-                            <div className="flex justify-center gap-8 mt-4 opacity-60">
-                                <a href={externalLinks.instagram} target="_blank" rel="noreferrer" className="text-dark hover:text-illa-pink transition-colors p-2">
+                            <div className="flex justify-center gap-6 mt-2 opacity-60">
+                                <a href={externalLinks.instagram} target="_blank" rel="noreferrer" className="text-dark hover:text-illa-pink transition-colors p-1">
                                     Instagram
                                 </a>
-                                <a href={externalLinks.facebook} target="_blank" rel="noreferrer" className="text-dark hover:text-illa-pink transition-colors p-2">
+                                <a href={externalLinks.facebook} target="_blank" rel="noreferrer" className="text-dark hover:text-illa-pink transition-colors p-1">
                                     Facebook
                                 </a>
                             </div>
 
                             {/* Admin Access - Subtle */}
-                            <div className="flex justify-center mt-1 pb-4">
+                            <div className="flex justify-center mt-1 pb-2">
                                 <Link
                                     href="/admin"
                                     onClick={() => setIsOpen(false)}
-                                    className="text-[10px] uppercase font-bold tracking-widest text-gray-300 hover:text-illa-pink transition-colors p-2 flex items-center gap-1.5"
+                                    className="text-[10px] uppercase font-bold tracking-widest text-gray-300 hover:text-illa-pink transition-colors p-1 flex items-center gap-1.5"
                                 >
-                                    <Shield size={12} />
+                                    <Shield size={10} />
                                     Área Administrativa
                                 </Link>
                             </div>
