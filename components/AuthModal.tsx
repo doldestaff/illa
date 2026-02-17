@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X, Mail, Lock, User, ArrowRight, Phone, Instagram, Facebook, Loader2 } from 'lucide-react'
+import { X, Mail, Lock, User, ArrowRight, Phone, Instagram, Facebook, Loader2, Tag } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
@@ -383,6 +383,20 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                     </div>
                                 </div>
                                 <div className="h-2 md:h-auto md:w-2 bg-gradient-to-r md:bg-gradient-to-b from-illa-purple via-illa-pink to-orange-400" />
+                            </div>
+
+                            {/* Footer Action */}
+                            <div className="bg-gray-50 p-4 border-t border-gray-100 flex justify-center">
+                                <button
+                                    onClick={() => {
+                                        onClose()
+                                        router.push('/descontos')
+                                    }}
+                                    className="flex items-center gap-2 text-sm font-bold text-illa-pink hover:text-pink-600 transition-colors"
+                                >
+                                    <Tag size={16} />
+                                    CONHECER LOJA DE DESCONTOS
+                                </button>
                             </div>
                         </motion.div>
                     </div>

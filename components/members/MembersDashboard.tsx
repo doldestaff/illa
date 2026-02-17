@@ -5,16 +5,20 @@ import type {
     MemberSnapshot,
     ClaimMissionResult,
     ClaimDropResult,
+    CelebrationClaimResult,
+    SorvetesRedemption,
     VipPayload,
 } from '@/lib/gamification-types'
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
+import { motion, useScroll, useTransform } from 'framer-motion'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
-import { Coins } from 'lucide-react'
 import DashboardHeader from './DashboardHeader'
 import DailyMissions from './DailyMissions'
+import StorePromoCard from './StorePromoCard'
 import FlashDrop from './FlashDrop'
 import VipCard from './VipCard'
+import OnlineCelebrationManager from './OnlineCelebrationManager'
+import SorvetesFreeCta from './SorvetesFreeCta'
 import MembersScrollBackground from './MembersScrollBackground'
 
 // ── Lazy-loaded below-fold components (perf: only ship JS when needed) ──
@@ -40,6 +44,9 @@ const WeeklyLeaderboard = dynamic(() => import('./WeeklyLeaderboard'), {
 const BirthdayModule = dynamic(() => import('./BirthdayModule'), {
     loading: () => <SectionSkeleton />,
 })
+const RewardTimeline = dynamic(() => import('./RewardTimeline'), {
+    loading: () => <SectionSkeleton />,
+})
 const IllaAmbientBackground = dynamic(() => import('./IllaAmbientBackground'), {
     ssr: false,
 })
@@ -52,8 +59,24 @@ interface Props {
 export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props) {
     const [snapshot, setSnapshot] = useState(initial)
     const [vipPayload, setVipPayload] = useState<VipPayload | null>(null)
+    const [sorvetesCount, setSorvetesCount] = useState(initial.sorvetes_free_count ?? 0)
     const progressTracked = useRef(false)
-    const [rewardToast, setRewardToast] = useState<{ message: string; icon: React.ReactNode } | null>(null)
+
+    // ── Fetch real sorvetes count from dedicated API (always in sync with admin) ──
+    useEffect(() => {
+        const fetchSorvetesCount = async () => {
+            try {
+                const res = await fetch('/api/sorvetes-free/count')
+                if (res.ok) {
+                    const data = await res.json()
+                    setSorvetesCount(data.sorvetes_count ?? 0)
+                }
+            } catch {
+                // Silent fail — use snapshot fallback
+            }
+        }
+        fetchSorvetesCount()
+    }, [])
 
     // ── Auto-track "visit" mission on mount ──
     useEffect(() => {
@@ -94,9 +117,16 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
         }
     }, [initial.profile.missing_fields])
 
-    // ── Update profile from any claim result ──
+    // ── Update profile from any claim result (server is single source of truth) ──
     const updateProfileFromClaim = useCallback(
-        (result: { xp: number; points: number; level?: number }) => {
+        (result: {
+            xp: number
+            points: number
+            level?: number
+            xp_into_level?: number
+            xp_for_next_level?: number
+            xp_to_next_level?: number
+        }) => {
             setSnapshot((prev) => ({
                 ...prev,
                 profile: {
@@ -104,10 +134,9 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                     xp: result.xp,
                     points: result.points,
                     level: result.level ?? prev.profile.level,
-                    next_level_xp:
-                        result.level && result.level > prev.profile.level
-                            ? (result.level + 1) * (result.level + 1) * 50
-                            : prev.profile.next_level_xp,
+                    xp_into_level: result.xp_into_level ?? prev.profile.xp_into_level,
+                    xp_for_next_level: result.xp_for_next_level ?? prev.profile.xp_for_next_level,
+                    xp_to_next_level: result.xp_to_next_level ?? prev.profile.xp_to_next_level,
                 },
             }))
         },
@@ -248,29 +277,30 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
         }
     }, [])
 
-    // ── Random Coin Reward Timer (every 60s) ──
-    // UX Psychology: Variable Ratio Reinforcement — random rewards
-    // trigger dopamine more effectively than fixed rewards
-    useEffect(() => {
-        const interval = setInterval(() => {
-            const coins = Math.ceil(Math.random() * 5) // 1-5 random coins
-            // Optimistic update — instantly reflect in counter
-            setSnapshot((prev) => ({
-                ...prev,
-                profile: {
-                    ...prev.profile,
-                    points: prev.profile.points + coins,
-                },
-            }))
-            setRewardToast({
-                message: `Você ganhou ${coins} 🪙 Moeda${coins > 1 ? 's' : ''}!`,
-                icon: <Coins size={18} className="text-[#FAFF00] drop-shadow-[0_0_6px_rgba(250,255,0,0.6)]" />,
-            })
-            setTimeout(() => setRewardToast(null), 4000)
-        }, 60_000)
+    // ── Celebration / Sorvetes handlers ──
+    const handleCelebrationClaim = useCallback(
+        (result: CelebrationClaimResult) => {
+            if (result.success) {
+                setSnapshot((prev) => ({
+                    ...prev,
+                    profile: { ...prev.profile, points: result.points },
+                }))
+            }
+        },
+        []
+    )
 
-        return () => clearInterval(interval)
-    }, [])
+    const handleSorvetesRedeem = useCallback(
+        (result: SorvetesRedemption) => {
+            if (result.success) {
+                setSnapshot((prev) => ({
+                    ...prev,
+                    profile: { ...prev.profile, points: result.new_points },
+                }))
+            }
+        },
+        []
+    )
 
     // ── Scroll Background Effect ──
     const { scrollY } = useScroll()
@@ -307,7 +337,7 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                     <div className="md:col-span-5 lg:col-span-4 relative">
                         <div className="md:sticky md:top-8 transition-all duration-300">
                             {/* HUD Header (User Stats) */}
-                            <DashboardHeader profile={snapshot.profile} avatarUrl={avatarUrl} dropsCount={snapshot.drops_claimed_count ?? 0} />
+                            <DashboardHeader profile={snapshot.profile} avatarUrl={avatarUrl} dropsCount={snapshot.drops_claimed_count ?? 0} sorvetesCount={sorvetesCount} />
 
                             {/* Desktop/Tablet Only: Quick Action Links could go here later */}
                             <div className="hidden md:block mt-6 text-center">
@@ -338,6 +368,11 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                         {/* Daily Missions (Priority) */}
                         <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
                             <DailyMissions missions={snapshot.missions} onClaim={handleMissionClaim} />
+                        </motion.div>
+
+                        {/* Store Promo Card (New Feature) */}
+                        <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
+                            <StorePromoCard />
                         </motion.div>
 
                         {/* Secondary Content Grid */}
@@ -382,11 +417,26 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                             <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
                                 <WeeklyLeaderboard
                                     leaderboard={snapshot.leaderboard}
+                                    currentUserId={snapshot.profile.id}
+                                    currentUserXP={snapshot.profile.xp}
                                 />
                             </motion.div>
 
                             <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
                                 <BirthdayModule birthday={snapshot.birthday} />
+                            </motion.div>
+
+                            {/* Sorvetes Free CTA */}
+                            <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
+                                <SorvetesFreeCta
+                                    currentPoints={snapshot.profile.points}
+                                    onRedeem={handleSorvetesRedeem}
+                                />
+                            </motion.div>
+
+                            {/* Reward Timeline (Audit Ledger) */}
+                            <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
+                                <RewardTimeline />
                             </motion.div>
                         </motion.div>
 
@@ -402,21 +452,8 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                 </div>
             </div>
 
-            {/* Reward Toast */}
-            <AnimatePresence>
-                {rewardToast && (
-                    <motion.div
-                        initial={{ y: -80, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        exit={{ y: -80, opacity: 0 }}
-                        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                        className="fixed top-6 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-3 px-5 py-3 rounded-2xl bg-black/80 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)] max-w-[90vw]"
-                    >
-                        {rewardToast.icon}
-                        <span className="text-sm font-medium text-white">{rewardToast.message}</span>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            {/* Online Celebration Manager (real server-backed claim toast) */}
+            <OnlineCelebrationManager onClaim={handleCelebrationClaim} />
         </div>
     )
 }

@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import type { ActiveDrop, MemberProfile } from '@/lib/gamification-types'
-import { IceCream, Clock, PackageCheck, Loader2, Gift } from 'lucide-react'
+import { IceCream, Clock, PackageCheck, Loader2, Gift, HelpCircle, X, ChevronRight, Zap } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 interface Props {
     drop: ActiveDrop | null
@@ -13,6 +14,7 @@ export default function FlashDrop({ drop, onClaim }: Props) {
     const [timeLeft, setTimeLeft] = useState('')
     const [claiming, setClaiming] = useState(false)
     const [claimed, setClaimed] = useState(drop?.already_claimed ?? false)
+    const [showWizard, setShowWizard] = useState(false)
 
     const calculateTimeLeft = useCallback(() => {
         if (!drop) return ''
@@ -74,8 +76,16 @@ export default function FlashDrop({ drop, onClaim }: Props) {
             <div className="absolute -top-32 -left-32 w-64 h-64 bg-purple-500/30 rounded-full blur-[80px] animate-pulse" />
             <div className="absolute -bottom-32 -right-32 w-64 h-64 bg-illa-pink/30 rounded-full blur-[80px] animate-pulse" />
 
+            <button
+                onClick={() => setShowWizard(true)}
+                className="absolute top-4 right-4 text-[10px] font-bold text-white/40 hover:text-white flex items-center gap-1 transition-colors bg-white/5 px-2 py-1 rounded-full cursor-pointer z-20 hover:bg-white/10"
+            >
+                <HelpCircle size={12} />
+                O que é um drop?
+            </button>
+
             <div className="relative z-10">
-                <div className="flex items-start justify-between mb-6">
+                <div className="flex items-start justify-between mb-6 pt-2">
                     <div className="flex items-center gap-3">
                         <div className={`p-2.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-lg ${!claimed ? 'animate-bounce' : ''}`}>
                             <IceCream size={20} className="text-illa-yellow" fill="currentColor" />
@@ -90,7 +100,7 @@ export default function FlashDrop({ drop, onClaim }: Props) {
                     </div>
 
                     {drop.reward_type && (
-                        <div className="flex flex-col items-end">
+                        <div className="flex flex-col items-end mt-4">
                             <span className="text-[10px] text-white/50 uppercase tracking-wider font-bold">Recompensa</span>
                             <span className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-illa-yellow to-amber-300 drop-shadow-sm">
                                 +{drop.reward_value} {drop.reward_type === 'points' ? 'Pts' : 'XP'}
@@ -131,6 +141,56 @@ export default function FlashDrop({ drop, onClaim }: Props) {
                     </button>
                 </div>
             </div>
+
+            {/* Drop Wizard Modal */}
+            <AnimatePresence>
+                {showWizard && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 rounded-3xl"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="bg-gray-900 border border-white/10 rounded-2xl p-5 w-full h-full relative flex flex-col items-center text-center overflow-hidden"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <button
+                                onClick={() => setShowWizard(false)}
+                                className="absolute top-3 right-3 text-white/50 hover:text-white"
+                            >
+                                <X size={20} />
+                            </button>
+
+                            <div className="flex-1 flex flex-col items-center justify-center space-y-4">
+                                <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-illa-pink via-purple-500 to-indigo-500 flex items-center justify-center shadow-lg shadow-purple-500/30 animate-pulse">
+                                    <Zap size={32} className="text-white" fill="currentColor" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-black text-white mb-2">O que é um Drop?</h3>
+                                    <p className="text-sm text-white/70 leading-relaxed">
+                                        Drops são <strong>recompensas relâmpago</strong> que aparecem de surpresa.
+                                    </p>
+                                    <p className="text-xs text-white/50 mt-2">
+                                        Eles duram pouco tempo! Se você vir um ativo, corra para resgatar XP ou Moedas extras.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <button
+                                onClick={() => setShowWizard(false)}
+                                className="w-full py-3 bg-white text-black font-bold rounded-xl hover:scale-[1.02] active:scale-95 transition-transform"
+                            >
+                                Entendi!
+                            </button>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     )
 }

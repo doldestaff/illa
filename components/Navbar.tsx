@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Menu, ShoppingBag, User, LogIn, IceCream, MapPin, Store, Info } from 'lucide-react'
+import { Menu, ShoppingBag, User, LogIn, IceCream, MapPin, Store, Info, Shield, Tag } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useState, useEffect, Suspense } from 'react'
 import Image from 'next/image'
@@ -146,6 +146,15 @@ function NavbarInner() {
                             <ShoppingBag size={18} />
                             Pedir Agora
                         </a>
+
+
+                        <Link
+                            href="/descontos"
+                            className="bg-white/10 text-white p-2.5 rounded-full font-bold hover:bg-white/20 transition-all shadow-lg hover:shadow-xl flex items-center justify-center hover:-translate-y-0.5 border border-white/20"
+                            title="Loja de Descontos"
+                        >
+                            <Tag size={18} />
+                        </Link>
                     </div>
 
                     {/* Mobile Menu Toggle */}
@@ -278,10 +287,22 @@ function NavbarInner() {
                                     Facebook
                                 </a>
                             </div>
+
+                            {/* Admin Access - Subtle */}
+                            <div className="flex justify-center mt-1 pb-4">
+                                <Link
+                                    href="/admin"
+                                    onClick={() => setIsOpen(false)}
+                                    className="text-[10px] uppercase font-bold tracking-widest text-gray-300 hover:text-illa-pink transition-colors p-2 flex items-center gap-1.5"
+                                >
+                                    <Shield size={12} />
+                                    Área Administrativa
+                                </Link>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </nav>
+            </nav >
 
             <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
             <AboutModal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />

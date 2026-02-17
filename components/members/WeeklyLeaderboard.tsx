@@ -9,6 +9,7 @@ interface Props {
         user_position: number | null
     }
     currentUserId?: string
+    currentUserXP?: number
 }
 
 function getRankIcon(rank: number) {
@@ -23,7 +24,7 @@ function getInitials(name: string | null): string {
     return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
 }
 
-export default function WeeklyLeaderboard({ leaderboard }: Props) {
+export default function WeeklyLeaderboard({ leaderboard, currentUserId, currentUserXP }: Props) {
     const { top10, user_position } = leaderboard
 
     if (top10.length === 0) {
@@ -35,6 +36,14 @@ export default function WeeklyLeaderboard({ leaderboard }: Props) {
             </div>
         )
     }
+
+    // Sync current user's XP if they are in the top 10
+    const syncedTop10 = top10.map(entry => {
+        if (currentUserId && entry.user_id === currentUserId && currentUserXP !== undefined) {
+            return { ...entry, xp: currentUserXP }
+        }
+        return entry
+    }).sort((a, b) => b.xp - a.xp) // Re-sort to maintain order if XP changes affect rank
 
     return (
         <div className="space-y-3">
@@ -51,7 +60,7 @@ export default function WeeklyLeaderboard({ leaderboard }: Props) {
             </div>
 
             <div className="rounded-2xl border border-gray-200/60 bg-white/80 backdrop-blur-sm overflow-hidden">
-                {top10.map((entry, i) => {
+                {syncedTop10.map((entry, i) => {
                     const rank = i + 1
                     return (
                         <div
@@ -63,19 +72,35 @@ export default function WeeklyLeaderboard({ leaderboard }: Props) {
                                 {getRankIcon(rank)}
                             </div>
 
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-illa-pink/20 to-orange-200/20 flex items-center justify-center flex-shrink-0">
-                                <span className="text-[10px] font-bold text-dark/50">
-                                    {getInitials(entry.full_name)}
-                                </span>
+                            <div className={`relative w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 border bg-gradient-to-br ${rank === 1 ? 'from-amber-300 to-yellow-500 border-yellow-200 shadow-lg shadow-yellow-500/20' : 'from-gray-100 to-gray-200 border-gray-200'
+                                }`}>
+                                {entry.avatar_path ? (
+                                    <img
+                                        src={entry.avatar_path.startsWith('http')
+                                            ? entry.avatar_path
+                                            : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${entry.avatar_path}`}
+                                        alt={entry.full_name || 'User'}
+                                        className="w-full h-full rounded-full object-cover"
+                                    />
+                                ) : (
+                                    <span className={`text-[10px] font-bold ${rank === 1 ? 'text-yellow-900' : 'text-gray-500'}`}>
+                                        {getInitials(entry.full_name)}
+                                    </span>
+                                )}
+                                {rank <= 3 && (
+                                    <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-white rounded-full flex items-center justify-center shadow-sm">
+                                        <Trophy size={8} className="text-amber-500" />
+                                    </div>
+                                )}
                             </div>
 
                             <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold text-dark truncate">
+                                <p className={`text-sm font-semibold truncate ${currentUserId && entry.user_id === currentUserId ? 'text-illa-pink font-bold' : 'text-dark'}`}>
                                     {entry.full_name || 'Membro'}
                                 </p>
                             </div>
 
-                            <span className="text-xs font-bold text-dark/60 flex-shrink-0">
+                            <span className={`text-xs font-bold flex-shrink-0 tabular-nums ${currentUserId && entry.user_id === currentUserId ? 'text-illa-pink' : 'text-dark/60'}`}>
                                 {entry.xp.toLocaleString('pt-BR')} XP
                             </span>
                         </div>

@@ -35,44 +35,49 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
             onMouseMove={handleMouseMove}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className={`relative overflow-hidden rounded-2xl border transition-colors duration-500 group ${isClaimed
-                ? 'bg-white/5 border-white/5 opacity-50 grayscale'
+            whileHover={canClaim && !claiming ? { scale: 1.02, y: -4 } : {}}
+            whileTap={canClaim && !claiming ? { scale: 0.98 } : {}}
+            className={`relative overflow-hidden rounded-3xl border transition-all duration-500 group h-full flex flex-col justify-between ${isClaimed
+                ? 'bg-white/5 border-white/5 opacity-50 grayscale contrast-75'
                 : canClaim
-                    ? 'bg-black/80 border-illa-pink/50 shadow-[0_0_20px_rgba(229,1,125,0.15)] backdrop-blur-md'
-                    : 'bg-black/60 border-white/10 hover:bg-black/70 hover:border-white/20 backdrop-blur-md'
-                }`}
+                    ? 'bg-gradient-to-br from-gray-900/90 to-black/90 border-illa-pink/50 shadow-[0_8px_32px_rgba(229,1,125,0.25)] ring-1 ring-illa-pink/30'
+                    : 'bg-gradient-to-br from-white/10 to-white/5 border-white/10 hover:border-white/20 shadow-lg shadow-black/20'
+                } backdrop-blur-xl`}
         >
-            {/* Spotlight Effect (Only on non-claimed) */}
+            {/* Cinematic Spotlight (Only on active cards) */}
             {!isClaimed && (
                 <motion.div
-                    className="pointer-events-none absolute -inset-px opacity-0 transition duration-300 group-hover:opacity-100"
+                    className="pointer-events-none absolute -inset-px opacity-0 transition duration-500 group-hover:opacity-100 mix-blend-overlay"
                     style={style}
                 >
-                    <div className="absolute inset-0 bg-gradient-to-r from-illa-pink/20 to-purple-500/20 opacity-50" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-illa-pink to-purple-500 opacity-20" />
                 </motion.div>
             )}
 
             {/* Content */}
-            <div className="relative z-10 p-5 text-white">
-                <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                        <h3 className={`font-bold text-sm leading-tight ${isClaimed ? 'text-white/40' : 'text-white'}`}>
-                            {mission.title}
-                        </h3>
+            <div className="relative z-10 p-5 flex-1 flex flex-col">
+                <div className="flex items-start justify-between gap-3 mb-2">
+                    <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                            {isCompleted && !isClaimed && (
+                                <span className="flex h-2 w-2 rounded-full bg-illa-yellow animate-pulse shadow-[0_0_8px_#FFED00]" />
+                            )}
+                            <h3 className={`font-bold text-base leading-tight tracking-tight trancate ${isClaimed ? 'text-white/40' : 'text-white drop-shadow-sm'}`}>
+                                {mission.title}
+                            </h3>
+                        </div>
                         {mission.description && (
-                            <p className="text-xs text-white/50 mt-1 line-clamp-1">
+                            <p className="text-xs text-white/50 leading-relaxed line-clamp-2 min-h-[2.5em]">
                                 {mission.description}
                             </p>
                         )}
                     </div>
 
-                    {/* Action Button Area */}
-                    <div className="shrink-0">
+                    {/* Status Badge / Button */}
+                    <div className="shrink-0 pt-1">
                         {isClaimed ? (
-                            <div className="flex items-center gap-1 text-emerald-400 font-bold text-[10px] bg-emerald-500/10 px-2 py-1 rounded-full border border-emerald-500/20">
-                                <CheckCircle size={12} />
+                            <div className="flex items-center gap-1.5 text-emerald-400 font-bold text-[10px] bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20 shadow-[0_0_10px_rgba(52,211,153,0.1)]">
+                                <CheckCircle size={12} strokeWidth={3} />
                                 <span>FEITO</span>
                             </div>
                         ) : canClaim ? (
@@ -81,60 +86,69 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                                 disabled={claiming}
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
-                                className="relative overflow-hidden flex items-center gap-2 bg-gradient-to-r from-illa-pink to-purple-600 text-white text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg shadow-illa-pink/30 hover:shadow-illa-pink/50 border border-white/20 transition-all disabled:opacity-70"
+                                className="relative overflow-hidden flex items-center gap-2 bg-gradient-to-r from-illa-pink to-purple-600 text-white text-[10px] font-black tracking-wide px-3 py-1.5 rounded-full shadow-[0_4px_12px_rgba(229,1,125,0.4)] border border-white/20 transition-all disabled:opacity-70 disabled:cursor-not-allowed group/btn"
                             >
+                                <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700 ease-in-out" />
                                 {claiming ? (
                                     <Loader2 size={12} className="animate-spin" />
                                 ) : (
                                     <>
-                                        <Sparkles size={12} fill="currentColor" />
+                                        <Sparkles size={12} fill="currentColor" className="animate-pulse" />
                                         RESGATAR
                                     </>
                                 )}
                             </motion.button>
                         ) : (
-                            <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/20">
+                            <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/20 shadow-inner">
                                 <Circle size={14} strokeWidth={2.5} />
                             </div>
                         )}
                     </div>
                 </div>
 
-                {/* Progress Indicator */}
-                <div className="mt-4">
-                    <div className="flex items-center justify-between text-[10px] font-bold text-white/30 mb-1.5 uppercase tracking-wider">
-                        <span>{mission.progress} / {mission.target}</span>
-                        <div className="flex items-center gap-1.5">
-                            {mission.reward_xp > 0 && (
-                                <span className="flex items-center gap-0.5 text-purple-300 bg-purple-500/10 px-1.5 py-0.5 rounded border border-purple-500/20">
-                                    <Coins size={8} className="text-[#FAFF00]" /> +{mission.reward_xp} XP
-                                </span>
-                            )}
-                            {mission.reward_points > 0 && (
-                                <span className="flex items-center gap-0.5 text-illa-pink bg-illa-pink/10 px-1.5 py-0.5 rounded border border-illa-pink/20">
-                                    <Coins size={8} className="text-[#FAFF00]" /> +{mission.reward_points} Moedas
-                                </span>
-                            )}
-                        </div>
+                {/* Footer: Rewards & Progress */}
+                <div className="mt-auto pt-4 space-y-3">
+                    {/* Rewards Tags */}
+                    <div className="flex flex-wrap gap-2">
+                        {mission.reward_xp > 0 && (
+                            <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-md border ${isClaimed ? 'bg-white/5 text-white/30 border-white/5' : 'bg-purple-500/20 text-purple-200 border-purple-500/30'}`}>
+                                <Sparkles size={10} className={isClaimed ? '' : "text-purple-300"} />
+                                +{mission.reward_xp} XP
+                            </span>
+                        )}
+                        {mission.reward_points > 0 && (
+                            <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-md border ${isClaimed ? 'bg-white/5 text-white/30 border-white/5' : 'bg-illa-pink/10 text-illa-pink border-illa-pink/20'}`}>
+                                <Coins size={10} className={isClaimed ? '' : "text-illa-yellow"} />
+                                +{mission.reward_points} Moedas
+                            </span>
+                        )}
                     </div>
 
-                    {/* Liquid Progress Bar */}
-                    <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
-                        <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${percent}%` }}
-                            transition={{ duration: 1, ease: "easeOut" }}
-                            className={`h-full rounded-full relative ${canClaim
-                                ? 'bg-gradient-to-r from-illa-pink to-purple-500 shadow-[0_0_8px_rgba(229,1,125,0.6)]'
-                                : isCompleted
-                                    ? 'bg-emerald-400'
-                                    : 'bg-white/20'
-                                }`}
-                        >
-                            {canClaim && (
-                                <div className="absolute inset-0 bg-white/50 animate-[shimmer_1s_infinite] skew-x-12" />
-                            )}
-                        </motion.div>
+                    {/* Neon Liquid Progress Bar */}
+                    <div className="relative">
+                        <div className="flex justify-between text-[10px] font-bold mb-1.5 uppercase tracking-wider">
+                            <span className={`${isCompleted ? 'text-emerald-400' : 'text-white/40'}`}>progresso</span>
+                            <span className={`${isCompleted ? 'text-emerald-400' : 'text-white/60'}`}>
+                                {mission.progress} <span className="text-white/30">/</span> {mission.target}
+                            </span>
+                        </div>
+                        <div className="h-2 bg-black/40 rounded-full overflow-hidden shadow-inner ring-1 ring-white/5">
+                            <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: `${percent}%` }}
+                                transition={{ duration: 1.2, ease: "easeOut" }}
+                                className={`h-full rounded-full relative ${isClaimed
+                                    ? 'bg-white/20'
+                                    : isCompleted
+                                        ? 'bg-gradient-to-r from-emerald-400 to-teal-400 shadow-[0_0_12px_rgba(52,211,153,0.6)]'
+                                        : 'bg-gradient-to-r from-illa-yellow via-orange-400 to-illa-pink shadow-[0_0_12px_rgba(229,1,125,0.5)]'
+                                    }`}
+                            >
+                                {canClaim && (
+                                    <div className="absolute inset-0 bg-white/40 w-full animate-[shimmer_2s_infinite] skew-x-12 opacity-50" />
+                                )}
+                            </motion.div>
+                        </div>
                     </div>
                 </div>
             </div>

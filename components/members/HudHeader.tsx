@@ -10,10 +10,12 @@ interface Props {
 }
 
 export default function HudHeader({ profile, avatarUrl }: Props) {
-    // Calculate progress to next level
-    const progressPercent =
-        profile.next_level_xp > 0
-            ? Math.min(100, Math.round((profile.xp / profile.next_level_xp) * 100))
+    // Calculate progress within current level (server-provided)
+    const isMaxLevel = profile.xp_for_next_level === 0
+    const progressPercent = isMaxLevel
+        ? 100
+        : profile.xp_for_next_level > 0
+            ? Math.min(100, Math.round((profile.xp_into_level / profile.xp_for_next_level) * 100))
             : 0
 
     // Check if profile is incomplete (for CTA)
@@ -83,8 +85,8 @@ export default function HudHeader({ profile, avatarUrl }: Props) {
                     {/* XP Bar */}
                     <div className="mt-4 relative group/xp">
                         <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider text-white/30 mb-1.5 group-hover/xp:text-white/50 transition-colors">
-                            <span>{profile.xp} XP</span>
-                            <span>{profile.next_level_xp} XP</span>
+                            <span>{profile.xp_into_level} / {isMaxLevel ? '∞' : profile.xp_for_next_level} XP</span>
+                            <span>{isMaxLevel ? 'Nível máximo!' : `Faltam ${profile.xp_to_next_level} XP`}</span>
                         </div>
                         <div className="h-2.5 bg-white/5 rounded-full overflow-hidden backdrop-blur-sm border border-white/5 shadow-inner">
                             <div
@@ -95,7 +97,10 @@ export default function HudHeader({ profile, avatarUrl }: Props) {
                             </div>
                         </div>
                         <p className="text-right text-[10px] text-white/30 mt-1 group-hover/xp:text-white/50 transition-colors">
-                            Faltam <span className="text-white/70 font-bold">{profile.next_level_xp - profile.xp} XP</span> para o próximo nível
+                            {isMaxLevel
+                                ? <span className="text-white/70 font-bold">Nível máximo alcançado! 🎉</span>
+                                : <>Faltam <span className="text-white/70 font-bold">{profile.xp_to_next_level} XP</span> para o próximo nível</>
+                            }
                         </p>
                     </div>
                 </div>

@@ -10,6 +10,7 @@ interface Props {
     profile: MemberProfile
     avatarUrl: string | null
     dropsCount: number
+    sorvetesCount: number
 }
 
 const SHIMMER_Animation = {
@@ -25,7 +26,7 @@ const SHIMMER_Animation = {
     }
 }
 
-export default function DashboardHeader({ profile, avatarUrl, dropsCount }: Props) {
+export default function DashboardHeader({ profile, avatarUrl, dropsCount, sorvetesCount }: Props) {
     const ref = useRef<HTMLDivElement>(null)
     const { scrollY } = useScroll()
 
@@ -34,12 +35,15 @@ export default function DashboardHeader({ profile, avatarUrl, dropsCount }: Prop
     const opacity = useTransform(scrollY, [0, 300], [1, 0.9])
     const y = useTransform(scrollY, [0, 200], [0, 10])
 
-    // XP progress toward next level (total XP / threshold)
-    const totalXp = profile.xp
-    const nextLevelXp = profile.next_level_xp
-    const progressPercent =
-        nextLevelXp > 0
-            ? Math.min(100, Math.round((totalXp / nextLevelXp) * 100))
+    // XP progress within current level (server-provided)
+    const xpInto = profile.xp_into_level
+    const xpForNext = profile.xp_for_next_level
+    const xpToNext = profile.xp_to_next_level
+    const isMaxLevel = xpForNext === 0
+    const progressPercent = isMaxLevel
+        ? 100
+        : xpForNext > 0
+            ? Math.min(100, Math.round((xpInto / xpForNext) * 100))
             : 0
 
     const missingFields = profile.missing_fields || []
@@ -51,18 +55,25 @@ export default function DashboardHeader({ profile, avatarUrl, dropsCount }: Prop
             style={{ scale, opacity, y }}
             className="md:sticky md:top-4 z-40 mb-6 md:mb-8"
         >
-            <div className="relative overflow-hidden rounded-[2rem] bg-white/90 backdrop-blur-xl md:backdrop-blur-2xl border border-white/40 text-gray-900 p-6 shadow-[0_20px_40px_-5px_rgba(0,0,0,0.1)] group">
+            <div className="relative overflow-hidden rounded-[2.5rem] bg-white/[0.02] backdrop-blur-[50px] border border-white/10 text-white p-6 md:p-8 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.4)] ring-1 ring-white/20 group transition-all duration-500 hover:bg-white/[0.05]">
 
-                {/* 1. Dynamic Ambient Background (Internal) */}
-                <div className="absolute inset-0 overflow-hidden rounded-[2rem]">
-                    <div className="absolute -top-32 -right-32 w-80 h-80 bg-rose-100/60 rounded-full blur-[100px] animate-pulse mix-blend-multiply" />
-                    <div className="absolute top-1/2 -left-32 w-64 h-64 bg-purple-100/60 rounded-full blur-[80px] mix-blend-multiply" />
+                {/* 0. Gloss Overlay (Top-Down Reflection) */}
+                <div className="absolute inset-x-0 top-0 h-2/3 bg-gradient-to-b from-white/15 via-white/5 to-transparent pointer-events-none" />
+
+                {/* 1. Dynamic 'Vitral' Ambient Background */}
+                <div className="absolute inset-0 overflow-hidden rounded-[2.5rem]">
+                    {/* Prismatic Orbs - intensified & animated */}
+                    <div className="absolute -top-32 -right-32 w-[35rem] h-[35rem] bg-gradient-to-br from-rose-500/30 via-fuchsia-500/30 to-indigo-500/30 rounded-full blur-[80px] mix-blend-screen animate-pulse duration-[4000ms]" />
+                    <div className="absolute top-20 -left-20 w-[28rem] h-[28rem] bg-gradient-to-tr from-cyan-500/30 via-sky-500/30 to-blue-500/30 rounded-full blur-[60px] mix-blend-screen animate-pulse duration-[5000ms]" />
+
+                    {/* Glass Noise/Texture */}
+                    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-150 contrast-150 mix-blend-overlay" />
                 </div>
 
                 {/* Back to Home Button (Top Left) */}
                 <Link
                     href="/"
-                    className="absolute top-4 left-4 p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100/50 rounded-full transition-all z-50 transform hover:scale-110 active:scale-95"
+                    className="absolute top-4 left-4 p-2 text-white/50 hover:text-white hover:bg-white/10 rounded-full transition-all z-50 transform hover:scale-110 active:scale-95"
                     title="Voltar para Home"
                 >
                     <Home size={20} />
@@ -81,7 +92,7 @@ export default function DashboardHeader({ profile, avatarUrl, dropsCount }: Prop
                     {/* 3. 3D Avatar Container */}
                     <div className="relative group/avatar cursor-pointer">
                         <div className="absolute -inset-1 bg-gradient-to-br from-illa-pink to-illa-yellow rounded-full opacity-60 blur-md group-hover/avatar:opacity-100 group-hover/avatar:blur-lg transition duration-500"></div>
-                        <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-white bg-gray-100 ring-4 ring-white/50 shadow-2xl transform transition-transform group-hover/avatar:scale-105 duration-300">
+                        <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-white/50 bg-black/20 ring-4 ring-white/20 shadow-2xl transform transition-transform group-hover/avatar:scale-105 duration-300">
                             {profile.avatar_path && avatarUrl ? (
                                 <img
                                     src={avatarUrl}
@@ -105,98 +116,92 @@ export default function DashboardHeader({ profile, avatarUrl, dropsCount }: Prop
                     {/* Info Section */}
                     <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
-                            <h1 className="text-2xl font-bold truncate text-transparent bg-clip-text bg-gradient-to-r from-gray-900 to-gray-600 tracking-tight drop-shadow-sm">
+                            <h1 className="text-2xl font-bold truncate text-white tracking-tight drop-shadow-sm filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
                                 {profile.full_name || 'Membro ILLA'}
                             </h1>
 
-                            {/* Drops Collected — compact accent chip */}
+                            {/* Sorvetes Free — Animated & Premium */}
                             <motion.div
-                                className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#E5017D]/10 border border-[#E5017D]/20 relative overflow-hidden"
-                                animate={{
-                                    borderColor: [
-                                        'rgba(229,1,125,0.15)',
-                                        'rgba(229,1,125,0.35)',
-                                        'rgba(229,1,125,0.15)'
-                                    ]
-                                }}
-                                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                                key={sorvetesCount} // Triggers animation on change
+                                initial={{ scale: 0.8 }}
+                                animate={{ scale: [1, 1.2, 1] }}
+                                transition={{ duration: 0.4, ease: "easeInOut" }}
+                                className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#E5017D]/30 border border-[#E5017D]/40 relative overflow-hidden backdrop-blur-md shadow-[0_0_15px_rgba(229,1,125,0.3)] group/sorvete"
                             >
-                                <IceCream size={12} className="text-[#E5017D] relative z-10" />
-                                <span className="text-[11px] font-bold text-[#E5017D] relative z-10">{dropsCount}</span>
+                                {/* Internal Glow */}
+                                <div className="absolute inset-0 bg-[#E5017D]/20 blur-md" />
+
+                                <IceCream size={14} className="text-white drop-shadow-md relative z-10 group-hover/sorvete:rotate-12 transition-transform" />
+                                <span className="text-sm font-black text-white relative z-10 drop-shadow-sm">{sorvetesCount}</span>
+
+                                {/* Sparkle Effect */}
+                                <motion.div
+                                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-12"
+                                    animate={{ x: ['-200%', '200%'] }}
+                                    transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                                />
                             </motion.div>
                         </div>
 
-                        {/* ── Coins (Moedas) — Hero Reward Display ── */}
-                        {/* UX: Von Restorff (focal isolation), Goal Gradient (visible accumulation),
-                             Anchoring (large number = "I have value"), Peak-End (breathing glow) */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 8 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.3, duration: 0.6 }}
-                            className="mt-3 relative"
-                        >
-                            <div className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-gray-900 border border-gray-800 backdrop-blur-md relative overflow-hidden group shadow-lg shadow-gray-200/50">
-                                {/* Ambient radial glow behind icon */}
-                                <div className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-[#FAFF00]/20 blur-xl pointer-events-none" />
+                        {/* ── Coins (Moedas) — Refined & Palatable ── */}
+                        <div className="mt-3 relative group/coins cursor-default">
+                            <div className="flex items-center gap-3 px-4 py-2 rounded-[1.2rem] bg-black/30 border border-white/10 backdrop-blur-md relative overflow-hidden shadow-lg shadow-black/10">
+                                {/* Ambient gold glow */}
+                                <div className="absolute left-0 top-0 bottom-0 w-16 bg-[#FCD34D]/10 blur-xl pointer-events-none" />
 
-                                {/* Shimmer sweep */}
-                                <motion.div
-                                    className="absolute inset-0 bg-gradient-to-r from-transparent via-[#FAFF00]/8 to-transparent skew-x-12 pointer-events-none"
-                                    animate={{ x: ['-150%', '250%'] }}
-                                    transition={{ duration: 4, repeat: Infinity, repeatDelay: 3, ease: 'linear' }}
-                                />
+                                {/* Icon Container - Single Coin Representation */}
+                                <div className="relative z-10 flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-[#FCD34D] to-[#F59E0B] shadow-[0_2px_8px_rgba(245,158,11,0.4)] border border-[#FCD34D]/50 group-hover/coins:scale-110 transition-transform duration-300">
+                                    <span className="text-[#78350F] font-bold text-lg leading-none pt-[1px]">$</span>
+                                </div>
 
-                                {/* Icon with breathing glow */}
-                                <motion.div
-                                    className="relative z-10 flex items-center justify-center w-8 h-8 rounded-xl bg-[#FAFF00]/15 border border-[#FAFF00]/20"
-                                    animate={{
-                                        boxShadow: [
-                                            '0 0 0px rgba(250,255,0,0)',
-                                            '0 0 16px rgba(250,255,0,0.4)',
-                                            '0 0 0px rgba(250,255,0,0)'
-                                        ]
-                                    }}
-                                    transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-                                >
-                                    <Coins size={16} className="text-[#FAFF00] drop-shadow-[0_0_6px_rgba(250,255,0,0.6)]" />
-                                </motion.div>
-
-                                {/* Number + Label (Anchoring: number large = perceived value) */}
+                                {/* Number + Label */}
                                 <div className="relative z-10 flex items-baseline gap-2">
-                                    <span className="text-xl font-black text-white tracking-tight tabular-nums">
+                                    <span className="text-xl font-black text-white tracking-tight tabular-nums drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]">
                                         {profile.points.toLocaleString()}
                                     </span>
-                                    <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#FAFF00]/70">
+                                    <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#FCD34D]">
                                         Moedas
                                     </span>
                                 </div>
                             </div>
-                        </motion.div>
+                        </div>
 
                         {/* XP Progress Bar (Liquid Style) */}
                         <div className="mt-4 relative group/xp">
-                            <div className="flex justify-between items-baseline text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">
+                            <div className="flex justify-between items-baseline text-[10px] font-bold uppercase tracking-wider text-white/50 mb-1.5">
                                 <span className="flex items-baseline gap-1">
-                                    <span className="text-sm font-black text-gray-900 tabular-nums">{totalXp}</span>
-                                    <span>XP</span>
+                                    <span className="text-sm font-black text-white tabular-nums">{xpInto}</span>
+                                    <span>/ {isMaxLevel ? '∞' : xpForNext} XP</span>
                                 </span>
-                                <span className="flex items-baseline gap-1">
-                                    <span className="text-gray-500">/ {nextLevelXp}</span>
-                                    <span>XP</span>
+                                <span className="text-white/50">
+                                    {isMaxLevel
+                                        ? 'Nível máximo!'
+                                        : `Faltam ${xpToNext} XP`
+                                    }
                                 </span>
                             </div>
-                            <div className="h-3 bg-gray-100 rounded-full overflow-hidden border border-gray-200 shadow-inner">
+                            <div className="h-5 bg-black/10 rounded-full overflow-hidden border border-white/10 shadow-[inner_0_2px_4px_rgba(0,0,0,0.1)] relative group/bar">
                                 <motion.div
                                     initial={{ width: 0 }}
                                     animate={{ width: `${progressPercent}%` }}
                                     transition={{ duration: 1.5, ease: "easeOut" }}
-                                    className="h-full bg-gradient-to-r from-illa-pink via-purple-500 to-indigo-500 relative"
+                                    className="h-full bg-gradient-to-r from-illa-pink via-purple-500 to-illa-yellow relative"
                                 >
-                                    {/* Liquid shine */}
-                                    <div className="absolute inset-0 bg-white/30 animate-[shimmer_2s_infinite] skew-x-12 opacity-50" />
-                                    {/* Glow tip */}
-                                    <div className="absolute right-0 top-0 bottom-0 w-2 bg-white/50 blur-[2px] shadow-[0_0_10px_white]" />
+                                    {/* Palatable Glow (Juicy) */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-white/20" />
+
+                                    {/* Liquid shimmer - enticing movement */}
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-12 animate-[shimmer_2s_infinite] opacity-70 w-[200%]" />
+
+                                    {/* Leading Edge Glow (Peak-End Rule) */}
+                                    <div className="absolute right-0 top-0 bottom-0 w-3 bg-white blur-[4px] shadow-[0_0_20px_white]" />
+
+                                    {/* Particles/Bubbles (Optional delight) */}
+                                    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay" />
                                 </motion.div>
+
+                                {/* Glass Tube Highlight - curve sensation */}
+                                <div className="absolute inset-x-0 top-0 h-[40%] bg-gradient-to-b from-white/30 to-transparent pointer-events-none" />
                             </div>
                         </div>
                     </div>

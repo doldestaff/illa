@@ -1,4 +1,5 @@
 export interface MemberProfile {
+    id: string
     full_name: string | null
     email: string | null
     avatar_path: string | null
@@ -6,7 +7,9 @@ export interface MemberProfile {
     points: number
     streak_count: number
     level: number
-    next_level_xp: number
+    xp_into_level: number
+    xp_for_next_level: number
+    xp_to_next_level: number
     referral_code: string | null
     missing_fields: string[]
 }
@@ -91,6 +94,7 @@ export interface MemberSnapshot {
     }
     referral_count: number
     drops_claimed_count: number
+    sorvetes_free_count: number
     birthday: BirthdayState
 }
 
@@ -99,6 +103,9 @@ export interface ClaimMissionResult {
     xp: number
     points: number
     level: number
+    xp_into_level: number
+    xp_for_next_level: number
+    xp_to_next_level: number
     reward_xp: number
     reward_points: number
 }
@@ -109,4 +116,35 @@ export interface ClaimDropResult {
     reward_value: number
     xp: number
     points: number
+}
+
+export interface CelebrationWindow {
+    window_id: number
+    reward_points: number
+    window_end: string
+    status: 'open' | 'cooldown'
+}
+
+export interface CelebrationClaimResult {
+    success: boolean
+    points: number
+    reward_points: number
+}
+
+export interface SorvetesRedemption {
+    success: boolean
+    voucher_code: string
+    expires_at: string
+    cost: number
+    new_points: number
+}
+
+export interface LedgerEntry {
+    id: number
+    created_at: string
+    kind: string
+    delta_xp: number
+    delta_points: number
+    source_id: string | null
+    meta: Record<string, unknown>
 }

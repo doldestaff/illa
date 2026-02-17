@@ -24,6 +24,11 @@ ADD COLUMN IF NOT EXISTS referred_by uuid REFERENCES public.profiles(id);
 ALTER TABLE public.profiles
 ADD COLUMN IF NOT EXISTS avatar_path text;
 -- =========================
+-- 1.1 ALTER missions TABLE
+-- =========================
+ALTER TABLE public.missions
+ADD COLUMN IF NOT EXISTS target_user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE;
+-- =========================
 -- 2. CREATE TABLES
 -- =========================
 -- Missions (definitions)
@@ -266,6 +271,10 @@ v_today date := current_date;
 v_period_key text := to_char(current_date, 'YYYY-MM-DD');
 v_level int;
 v_next_level_xp int;
+v_current_level_xp_start int;
+v_xp_into_level int;
+v_xp_for_next_level int;
+v_xp_to_next_level int;
 v_missions jsonb;
 v_active_drop jsonb;
 v_secret_menu jsonb;
@@ -301,6 +310,11 @@ WHERE id = v_uid;
 -- Compute level
 v_level := xp_to_level(COALESCE(v_profile.xp, 0));
 v_next_level_xp := xp_for_level(v_level + 1);
+-- Calculate derived XP values for frontend progress bar
+v_current_level_xp_start := xp_for_level(v_level);
+v_xp_into_level := COALESCE(v_profile.xp, 0) - v_current_level_xp_start;
+v_xp_for_next_level := v_next_level_xp - v_current_level_xp_start;
+v_xp_to_next_level := v_next_level_xp - COALESCE(v_profile.xp, 0);
 -- Missing profile fields
 IF v_profile.full_name IS NULL
 OR v_profile.full_name = '' THEN v_missing_fields := v_missing_fields || '"name"'::jsonb;
@@ -320,7 +334,11 @@ SELECT v_uid,
     v_period_key
 FROM missions m
 WHERE m.is_active = true
-    AND m.frequency = 'daily' ON CONFLICT (user_id, mission_id, period_key) DO NOTHING;
+    AND m.frequency = 'daily'
+    AND (
+        m.target_user_id IS NULL
+        OR m.target_user_id = v_uid
+    ) ON CONFLICT (user_id, mission_id, period_key) DO NOTHING;
 -- Auto-complete "visit" missions (user is visiting the panel right now)
 UPDATE mission_instances mi
 SET progress = m.target,
@@ -584,6 +602,8 @@ END IF;
 RETURN jsonb_build_object(
     'profile',
     jsonb_build_object(
+        'id',
+        v_uid,
         'full_name',
         v_profile.full_name,
         'email',
@@ -600,6 +620,12 @@ RETURN jsonb_build_object(
         v_level,
         'next_level_xp',
         v_next_level_xp,
+        'xp_into_level',
+        v_xp_into_level,
+        'xp_for_next_level',
+        v_xp_for_next_level,
+        'xp_to_next_level',
+        v_xp_to_next_level,
         'referral_code',
         v_profile.referral_code,
         'missing_fields',
@@ -842,3 +868,86 @@ GRANT EXECUTE ON FUNCTION public.xp_to_level(int) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.xp_for_level(int) TO authenticated;
 -- Grant select on view
 GRANT SELECT ON public.leaderboard_weekly TO authenticated;
+-- -------------------------------------------------------
+-- admin_create_custom_mission()
+-- -------------------------------------------------------
+CREATE OR REPLACE FUNCTION public.admin_create_custom_mission(
+        p_target_user_id uuid,
+        p_title text,
+        p_xp int,
+        p_points int
+    ) RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = public AS $$
+DECLARE v_mission_id uuid;
+v_period_key text := to_char(current_date, 'YYYY-MM-DD');
+BEGIN -- 1. Create the mission definition
+INSERT INTO missions (
+        title,
+        description,
+        kind,
+        target,
+        reward_xp,
+        reward_points,
+        frequency,
+        is_active,
+        sort,
+        target_user_id
+    )
+VALUES (
+        p_title,
+        'Missão exclusiva para você!',
+        'custom',
+        1,
+        p_xp,
+        p_points,
+        'daily',
+        true,
+        99,
+        p_target_user_id
+    )
+RETURNING id INTO v_mission_id;
+-- 2. Immediately create the instance for today so it shows up now
+INSERT INTO mission_instances (user_id, mission_id, period_key)
+VALUES (p_target_user_id, v_mission_id, v_period_key) ON CONFLICT (user_id, mission_id, period_key) DO NOTHING;
+RETURN jsonb_build_object('success', true, 'mission_id', v_mission_id);
+END;
+$$;
+GRANT EXECUTE ON FUNCTION public.admin_create_custom_mission(uuid, text, int, int) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.get_or_rotate_vip_token() TO authenticated;
+GRANT EXECUTE ON FUNCTION public.xp_to_level(int) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.xp_for_level(int) TO authenticated;
+-- Grant select on view
+GRANT SELECT ON public.leaderboard_weekly TO authenticated;
+-- -------------------------------------------------------
+-- admin_grant_currency()
+-- -------------------------------------------------------
+CREATE OR REPLACE FUNCTION public.admin_grant_currency(
+        p_target_user_id uuid,
+        p_xp_amount int,
+        p_points_amount int
+    ) RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = public AS $$
+DECLARE v_new_xp int;
+v_new_points int;
+BEGIN -- Update the user's profile atomically
+UPDATE profiles
+SET xp = COALESCE(xp, 0) + p_xp_amount,
+    points = COALESCE(points, 0) + p_points_amount
+WHERE id = p_target_user_id
+RETURNING xp,
+    points INTO v_new_xp,
+    v_new_points;
+IF NOT FOUND THEN RETURN jsonb_build_object('success', false, 'error', 'User not found');
+END IF;
+-- Optional: Log this transaction if we had a ledger table (skipping for now as per instructions)
+RETURN jsonb_build_object(
+    'success',
+    true,
+    'new_xp',
+    v_new_xp,
+    'new_points',
+    v_new_points
+);
+END;
+$$;
+GRANT EXECUTE ON FUNCTION public.admin_grant_currency(uuid, int, int) TO authenticated;
