@@ -91,16 +91,29 @@ function LazyVideo() {
     }, [])
 
     return (
-        <div ref={containerRef} className="absolute inset-0 z-0">
+        <div ref={containerRef} className="absolute inset-0 z-0 bg-gray-100">
+            {/* Poster Image (Immediate Load) */}
+            <div className={cn(
+                "absolute inset-0 bg-cover bg-center transition-opacity duration-700",
+                isVisible ? "opacity-0" : "opacity-100"
+            )}
+                style={{ backgroundImage: "url('/instagram/reels/cover.jpg')" }}
+            />
+
             <video
                 ref={videoRef}
-                src={isVisible ? '/instagram/reels/mobile/reels-1.mp4' : undefined}
-                className="w-full h-full object-cover"
+                className={cn(
+                    "w-full h-full object-cover transition-opacity duration-1000",
+                    isVisible ? "opacity-100" : "opacity-0"
+                )}
                 loop
                 muted
                 playsInline
                 preload="none"
-            />
+                poster="/instagram/reels/cover.jpg"
+            >
+                {isVisible && <source src="/instagram/reels/mobile/reels-1.mp4" type="video/mp4" />}
+            </video>
             <div className="absolute inset-0 bg-white/10 backdrop-blur-[1px]" />
         </div>
     )
