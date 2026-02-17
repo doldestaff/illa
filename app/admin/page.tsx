@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import AdminDashboard from '@/components/admin/AdminDashboard'
 import { Shield, Eye, EyeOff, Home } from 'lucide-react'
 import Link from 'next/link'
@@ -8,12 +8,16 @@ import Link from 'next/link'
 const ADMIN_TOKEN = '6c5e3a7b8f2d1e4a9c0b5d8f3e6a1b4c'
 
 export default function AdminPage() {
-    const [isAuthed, setIsAuthed] = useState(() => {
+    const [isAuthed, setIsAuthed] = useState(false)
+
+    useEffect(() => {
         if (typeof window !== 'undefined') {
-            return sessionStorage.getItem('admin_token') === ADMIN_TOKEN
+            const token = sessionStorage.getItem('admin_token')
+            if (token === ADMIN_TOKEN) {
+                setIsAuthed(true)
+            }
         }
-        return false
-    })
+    }, [])
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)

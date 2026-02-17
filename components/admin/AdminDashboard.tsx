@@ -1,13 +1,16 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Plus, Minus, IceCream, RefreshCw, LogOut, BarChart3, Users, Target, CheckCircle, XCircle, Coins } from 'lucide-react'
+import { Plus, Minus, IceCream, RefreshCw, LogOut, BarChart3, Users, Target, CheckCircle, XCircle, Coins, Droplet, Zap, Trash2, Clock } from 'lucide-react'
 
 interface UserSorvetes {
     id: string
     full_name: string | null
     email: string | null
     sorvetes_count: number
+    xp: number
+    points: number
+    drops: number
 }
 
 interface UserMission {
@@ -31,14 +34,14 @@ export default function AdminDashboard({ token }: Props) {
     const [actionLoading, setActionLoading] = useState<string | null>(null)
     const [view, setView] = useState<'table' | 'chart'>('table')
 
-    // === TABS: Sorvetes | Loja | Missões | Saldo ===
-    const [activeTab, setActiveTab] = useState<'sorvetes' | 'loja' | 'missoes' | 'balance'>('sorvetes')
+    // === TABS: Sorvetes | Loja | Missões | Saldo | Drops ===
+    const [activeTab, setActiveTab] = useState<'sorvetes' | 'loja' | 'missoes' | 'balance' | 'drops'>('sorvetes')
 
     // === DATA STATES ===
     const [discountStats, setDiscountStats] = useState<any>(null)
 
     // === BALANCE STATE ===
-    const [balanceForm, setBalanceForm] = useState({ xp: 0, points: 0 })
+    const [balanceForm, setBalanceForm] = useState({ xp: 0, points: 0, drops: 0 })
     const [updatingBalance, setUpdatingBalance] = useState(false)
 
     // === MISSIONS STATE ===
@@ -88,6 +91,32 @@ export default function AdminDashboard({ token }: Props) {
         }
     }
 
+    const handleDropAction = async (userId: string, amount: number) => {
+        const actionKey = `${userId}-drop-${amount > 0 ? 'add' : 'sub'}`
+        setActionLoading(actionKey)
+        try {
+            await fetch('/api/admin/balance', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-admin-token': token,
+                },
+                body: JSON.stringify({
+                    target_user_id: userId,
+                    xp_amount: 0,
+                    points_amount: 0,
+                    drops_amount: amount
+                })
+            })
+            await fetchUsers()
+        } catch (err) {
+            console.error(err)
+            alert('Erro ao atualizar drops')
+        } finally {
+            setActionLoading(null)
+        }
+    }
+
     const handleLogout = () => {
         sessionStorage.removeItem('admin_token')
         window.location.reload()
@@ -95,6 +124,17 @@ export default function AdminDashboard({ token }: Props) {
 
     const maxSorvetes = Math.max(1, ...users.map((u) => u.sorvetes_count))
 
+    const [dropsList, setDropsList] = useState<any[]>([])
+    const [creatingDrop, setCreatingDrop] = useState(false)
+    const [newDrop, setNewDrop] = useState({
+        title: '',
+        description: '',
+        reward_type: 'points',
+        reward_value: 50,
+        duration_minutes: 60
+    })
+
+    // === FETCHERS ===
     // === LOJA FETCH ===
     const fetchDiscountStats = useCallback(async () => {
         try {
@@ -153,8 +193,8 @@ export default function AdminDashboard({ token }: Props) {
         e.preventDefault()
         if (!selectedUserId) return
 
-        if (balanceForm.xp === 0 && balanceForm.points === 0) {
-            alert('Insira um valor de XP ou Pontos para adicionar/remover.')
+        if (balanceForm.xp === 0 && balanceForm.points === 0 && balanceForm.drops === 0) {
+            alert('Insira um valor de XP, Pontos ou Drops para adicionar/remover.')
             return
         }
 
@@ -169,15 +209,16 @@ export default function AdminDashboard({ token }: Props) {
                 body: JSON.stringify({
                     target_user_id: selectedUserId,
                     xp_amount: Number(balanceForm.xp),
-                    points_amount: Number(balanceForm.points)
+                    points_amount: Number(balanceForm.points),
+                    drops_amount: Number(balanceForm.drops)
                 }),
             })
 
             const data = await res.json()
 
             if (res.ok && data.success) {
-                alert(`Saldo atualizado!\nNovo XP total: ${data.new_xp}\nNovos Pontos totais: ${data.new_points}`)
-                setBalanceForm({ xp: 0, points: 0 })
+                alert(`Saldo atualizado!\nNovo XP total: ${data.new_xp}\nNovos Pontos totais: ${data.new_points}\nNovos Drops totais: ${data.new_drops}`)
+                setBalanceForm({ xp: 0, points: 0, drops: 0 })
                 // Refresh user list to show updated totals if we were showing them
                 fetchUsers()
             } else {
@@ -227,6 +268,61 @@ export default function AdminDashboard({ token }: Props) {
         }
     }
 
+    const fetchDrops = useCallback(async () => {
+        try {
+            const res = await fetch('/api/admin/drops', {
+                headers: { 'x-admin-token': token }
+            })
+            if (res.ok) {
+                const data = await res.json()
+                setDropsList(data)
+            }
+        } catch (err) {
+            console.error(err)
+        }
+    }, [token])
+
+    const handleCreateDrop = async (e: React.FormEvent) => {
+        e.preventDefault()
+        setCreatingDrop(true)
+        try {
+            const res = await fetch('/api/admin/drops', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-admin-token': token
+                },
+                body: JSON.stringify(newDrop)
+            })
+            if (res.ok) {
+                alert('Drop criado com sucesso!')
+                setNewDrop({ title: '', description: '', reward_type: 'points', reward_value: 50, duration_minutes: 60 })
+                fetchDrops()
+            } else {
+                alert('Erro ao criar drop')
+            }
+        } catch (err) {
+            console.error(err)
+        } finally {
+            setCreatingDrop(false)
+        }
+    }
+
+    const handleDeleteDrop = async (id: string) => {
+        if (!confirm('Tem certeza que deseja excluir este drop?')) return
+        try {
+            const res = await fetch(`/api/admin/drops?id=${id}`, {
+                method: 'DELETE',
+                headers: { 'x-admin-token': token }
+            })
+            if (res.ok) {
+                fetchDrops()
+            }
+        } catch (err) {
+            console.error(err)
+        }
+    }
+
     return (
         <div className="min-h-screen bg-[#0B0B0D] text-white">
             {/* Header */}
@@ -238,7 +334,7 @@ export default function AdminDashboard({ token }: Props) {
                         </div>
                         <div>
                             <h1 className="text-lg font-bold">Painel Admin</h1>
-                            <div className="flex gap-2 text-[11px] font-bold tracking-wide">
+                            <div className="flex flex-wrap justify-center md:justify-start gap-2 text-[11px] font-bold tracking-wide">
                                 <button
                                     onClick={() => setActiveTab('sorvetes')}
                                     className={`uppercase transition-colors ${activeTab === 'sorvetes' ? 'text-white' : 'text-white/40 hover:text-white'}`}
@@ -265,6 +361,13 @@ export default function AdminDashboard({ token }: Props) {
                                     className={`uppercase transition-colors ${activeTab === 'balance' ? 'text-white' : 'text-white/40 hover:text-white'}`}
                                 >
                                     Saldo
+                                </button>
+                                <span className="text-white/20">|</span>
+                                <button
+                                    onClick={() => setActiveTab('drops')}
+                                    className={`uppercase transition-colors ${activeTab === 'drops' ? 'text-white' : 'text-white/40 hover:text-white'}`}
+                                >
+                                    Drops
                                 </button>
                             </div>
                         </div>
@@ -293,6 +396,7 @@ export default function AdminDashboard({ token }: Props) {
                                 if (activeTab === 'sorvetes') fetchUsers()
                                 else if (activeTab === 'loja') fetchDiscountStats()
                                 else if (activeTab === 'missoes' && selectedUserId) fetchUserMissions(selectedUserId)
+                                else if (activeTab === 'drops') fetchDrops()
                             }}
                             title="Atualizar"
                             className="p-2 rounded-lg bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-all"
@@ -340,9 +444,9 @@ export default function AdminDashboard({ token }: Props) {
                                 {users.map((user) => (
                                     <div
                                         key={user.id}
-                                        className="flex items-center gap-3 p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-white/10 transition-all"
+                                        className="flex flex-col sm:flex-row sm:items-center items-start gap-4 sm:gap-3 p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-white/10 transition-all"
                                     >
-                                        <div className="flex-1 min-w-0">
+                                        <div className="flex-1 min-w-0 w-full sm:w-auto">
                                             <div className="font-bold text-sm truncate">
                                                 {user.full_name || 'Sem nome'}
                                             </div>
@@ -350,27 +454,57 @@ export default function AdminDashboard({ token }: Props) {
                                                 {user.email || user.id.slice(0, 8)}
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-illa-pink/10 border border-illa-pink/20">
-                                            <IceCream size={14} className="text-illa-pink" />
-                                            <span className="text-lg font-black tabular-nums text-illa-pink">
-                                                {user.sorvetes_count}
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center gap-1.5">
-                                            <button
-                                                onClick={() => handleAction(user.id, 'subtract')}
-                                                disabled={actionLoading === `${user.id}-subtract` || user.sorvetes_count === 0}
-                                                className="w-9 h-9 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-90 flex items-center justify-center"
-                                            >
-                                                <Minus size={14} />
-                                            </button>
-                                            <button
-                                                onClick={() => handleAction(user.id, 'add')}
-                                                disabled={actionLoading === `${user.id}-add`}
-                                                className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-90 flex items-center justify-center"
-                                            >
-                                                <Plus size={14} />
-                                            </button>
+
+                                        <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+                                            {/* Drops Quick Edit */}
+                                            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/20 group/drops hover:bg-blue-500/20 transition-colors">
+                                                <div className="flex items-center gap-1.5 mr-1">
+                                                    <div className="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center">
+                                                        <Droplet size={10} className="text-blue-400" />
+                                                    </div>
+                                                    <span className="text-sm font-black tabular-nums text-blue-400 min-w-[1.5ch] text-center">
+                                                        {user.drops || 0}
+                                                    </span>
+                                                </div>
+                                                <div className="flex items-center gap-0.5">
+                                                    <button
+                                                        onClick={() => handleDropAction(user.id, -1)}
+                                                        disabled={actionLoading === `${user.id}-drop-sub` || (user.drops || 0) <= 0}
+                                                        className="w-6 h-6 rounded-md bg-white/5 hover:bg-red-500/20 text-white/40 hover:text-red-400 disabled:opacity-20 disabled:cursor-not-allowed transition-all active:scale-90 flex items-center justify-center"
+                                                    >
+                                                        <Minus size={10} strokeWidth={3} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDropAction(user.id, 1)}
+                                                        disabled={actionLoading === `${user.id}-drop-add`}
+                                                        className="w-6 h-6 rounded-md bg-white/5 hover:bg-blue-500/20 text-white/40 hover:text-blue-400 disabled:opacity-20 disabled:cursor-not-allowed transition-all active:scale-90 flex items-center justify-center"
+                                                    >
+                                                        <Plus size={10} strokeWidth={3} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-illa-pink/10 border border-illa-pink/20">
+                                                <IceCream size={14} className="text-illa-pink" />
+                                                <span className="text-lg font-black tabular-nums text-illa-pink">
+                                                    {user.sorvetes_count}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-1.5">
+                                                <button
+                                                    onClick={() => handleAction(user.id, 'subtract')}
+                                                    disabled={actionLoading === `${user.id}-subtract` || user.sorvetes_count === 0}
+                                                    className="w-9 h-9 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-90 flex items-center justify-center"
+                                                >
+                                                    <Minus size={14} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleAction(user.id, 'add')}
+                                                    disabled={actionLoading === `${user.id}-add`}
+                                                    className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-90 flex items-center justify-center"
+                                                >
+                                                    <Plus size={14} />
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
@@ -753,7 +887,185 @@ export default function AdminDashboard({ token }: Props) {
                         </div>
                     </div>
                 )}
+
+                {/* === DROPS VIEW === */}
+                {activeTab === 'drops' && (
+                    <div className="space-y-4 md:space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                            {/* Create Drop Form */}
+                            <div className="md:col-span-1 space-y-4">
+                                <div className="bg-white/5 border border-white/10 rounded-2xl p-4 md:p-6 md:sticky md:top-24">
+                                    <div className="flex items-center gap-2 mb-6">
+                                        <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                                            <Droplet size={18} className="text-blue-400" />
+                                        </div>
+                                        <h2 className="text-lg font-bold">Lançar Novo Drop</h2>
+                                    </div>
+
+                                    <form onSubmit={handleCreateDrop} className="space-y-4">
+                                        <div>
+                                            <label className="text-[10px] font-bold uppercase text-white/40 mb-1 block">Título do Evento</label>
+                                            <input
+                                                type="text"
+                                                value={newDrop.title}
+                                                onChange={e => setNewDrop({ ...newDrop, title: e.target.value })}
+                                                className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-blue-500/50 focus:outline-none transition-colors"
+                                                placeholder="Ex: Flash Sale de Verão"
+                                                required
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="text-[10px] font-bold uppercase text-white/40 mb-1 block">Descrição (Opcional)</label>
+                                            <textarea
+                                                value={newDrop.description}
+                                                onChange={e => setNewDrop({ ...newDrop, description: e.target.value })}
+                                                className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-blue-500/50 focus:outline-none transition-colors resize-none h-24"
+                                                placeholder="Detalhes do evento..."
+                                            />
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div>
+                                                <label className="text-[10px] font-bold uppercase text-white/40 mb-1 block">Tipo de Recompensa</label>
+                                                <div className="flex gap-1 bg-black/20 p-1 rounded-xl border border-white/10">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setNewDrop({ ...newDrop, reward_type: 'xp' })}
+                                                        className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 ${newDrop.reward_type === 'xp' ? 'bg-purple-500/20 text-purple-300 shadow-sm' : 'text-white/40 hover:text-white/60'}`}
+                                                    >
+                                                        <Zap size={12} /> XP
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setNewDrop({ ...newDrop, reward_type: 'points' })}
+                                                        className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 ${newDrop.reward_type === 'points' ? 'bg-yellow-500/20 text-yellow-300 shadow-sm' : 'text-white/40 hover:text-white/60'}`}
+                                                    >
+                                                        <Coins size={12} /> Moedas
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label className="text-[10px] font-bold uppercase text-white/40 mb-1 block">Valor</label>
+                                                <input
+                                                    type="number"
+                                                    value={newDrop.reward_value}
+                                                    onChange={e => setNewDrop({ ...newDrop, reward_value: Number(e.target.value) })}
+                                                    className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-[9px] text-sm text-white focus:border-blue-500/50 focus:outline-none transition-colors"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label className="text-[10px] font-bold uppercase text-white/40 mb-1 block">Duração</label>
+                                            <div className="grid grid-cols-4 gap-2 mb-2">
+                                                {[30, 60, 360, 1440].map(mins => (
+                                                    <button
+                                                        key={mins}
+                                                        type="button"
+                                                        onClick={() => setNewDrop({ ...newDrop, duration_minutes: mins })}
+                                                        className={`py-2 rounded-lg text-[10px] font-bold border transition-all ${newDrop.duration_minutes === mins ? 'bg-blue-500/20 border-blue-500/50 text-blue-300' : 'bg-black/20 border-white/5 text-white/40 hover:bg-white/5'}`}
+                                                    >
+                                                        {mins < 60 ? `${mins}m` : `${mins / 60}h`}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            <div className="relative">
+                                                <Clock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20" />
+                                                <input
+                                                    type="number"
+                                                    value={newDrop.duration_minutes}
+                                                    onChange={e => setNewDrop({ ...newDrop, duration_minutes: Number(e.target.value) })}
+                                                    className="w-full bg-black/20 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-sm text-white focus:border-blue-500/50 focus:outline-none transition-colors"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <button
+                                            type="submit"
+                                            disabled={creatingDrop || !newDrop.title}
+                                            className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-blue-900/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                        >
+                                            {creatingDrop ? <RefreshCw size={16} className="animate-spin" /> : <Droplet size={16} />}
+                                            {creatingDrop ? 'Criando...' : 'Lançar Drop Agora'}
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            {/* Active Drops List */}
+                            <div className="md:col-span-2">
+                                <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden min-h-[600px] flex flex-col">
+                                    <div className="p-4 md:p-6 border-b border-white/10 bg-white/5 sticky top-0 z-10 backdrop-blur-md flex justify-between items-center">
+                                        <h3 className="font-bold text-white flex items-center gap-2">
+                                            <Zap size={18} className="text-yellow-400" />
+                                            Drops Ativos & Recentes
+                                        </h3>
+                                        <button onClick={fetchDrops} className="text-xs font-bold text-blue-400 hover:text-blue-300 transition-colors">
+                                            Atualizar Lista
+                                        </button>
+                                    </div>
+
+                                    <div className="p-4 md:p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {dropsList.map((drop: any) => {
+                                            const isActive = new Date(drop.ends_at) > new Date()
+                                            return (
+                                                <div key={drop.id} className={`group relative rounded-2xl border p-5 transition-all w-full flex flex-col justify-between ${isActive ? 'bg-gradient-to-br from-blue-500/10 to-purple-500/5 border-blue-500/20 hover:border-blue-500/40' : 'bg-white/5 border-white/5 opacity-60 hover:opacity-100'}`}>
+                                                    <div>
+                                                        <div className="flex justify-between items-start mb-3">
+                                                            <div className={`px-2 py-1 rounded-md text-[10px] font-black uppercase tracking-wider ${isActive ? 'bg-green-500/20 text-green-400 border border-green-500/20' : 'bg-gray-500/20 text-gray-400 border border-gray-500/20'}`}>
+                                                                {isActive ? 'ATIVO AGORA' : 'ENCERRADO'}
+                                                            </div>
+                                                            <button
+                                                                onClick={() => handleDeleteDrop(drop.id)}
+                                                                className="text-white/20 hover:text-red-400 transition-colors p-1"
+                                                                title="Excluir Drop"
+                                                            >
+                                                                <Trash2 size={14} />
+                                                            </button>
+                                                        </div>
+
+                                                        <h4 className="font-bold text-lg leading-tight mb-1">{drop.title}</h4>
+                                                        <p className="text-xs text-white/50 line-clamp-2 h-8">{drop.description || 'Sem descrição'}</p>
+
+                                                        <div className="mt-4 flex items-center gap-3">
+                                                            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border ${drop.reward_type === 'xp' ? 'bg-purple-500/10 border-purple-500/20 text-purple-300' : 'bg-yellow-500/10 border-yellow-500/20 text-yellow-300'}`}>
+                                                                {drop.reward_type === 'xp' ? <Zap size={14} /> : <Coins size={14} />}
+                                                                <span className="font-bold text-sm">+{drop.reward_value}</span>
+                                                            </div>
+                                                            <div className="text-[10px] text-white/40 flex items-center gap-1">
+                                                                <Clock size={12} />
+                                                                {isActive
+                                                                    ? `Encerra em ${Math.max(0, Math.ceil((new Date(drop.ends_at).getTime() - new Date().getTime()) / (1000 * 60)))} min`
+                                                                    : `Encerrado em ${new Date(drop.ends_at).toLocaleDateString()}`
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Decorative Elements */}
+                                                    {isActive && (
+                                                        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl -z-10 group-hover:bg-blue-500/20 transition-all" />
+                                                    )}
+                                                </div>
+                                            )
+                                        })}
+
+                                        {dropsList.length === 0 && (
+                                            <div className="col-span-full py-12 text-center text-white/20 border-2 border-dashed border-white/5 rounded-2xl flex flex-col items-center justify-center">
+                                                <Droplet size={32} className="mb-3 opacity-20" />
+                                                <p className="text-sm font-medium">Nenhum evento de drop encontrado.</p>
+                                                <p className="text-xs mt-1">Crie o primeiro drop para começar!</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                )}
             </div>
-        </div>
+        </div >
     )
 }

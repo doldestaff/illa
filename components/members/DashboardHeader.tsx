@@ -144,23 +144,40 @@ export default function DashboardHeader({ profile, avatarUrl, dropsCount, sorvet
                         </div>
 
                         {/* ── Coins (Moedas) — Refined & Palatable ── */}
-                        <div className="mt-3 relative group/coins cursor-default">
-                            <div className="flex items-center gap-3 px-4 py-2 rounded-[1.2rem] bg-black/30 border border-white/10 backdrop-blur-md relative overflow-hidden shadow-lg shadow-black/10">
-                                {/* Ambient gold glow */}
-                                <div className="absolute left-0 top-0 bottom-0 w-16 bg-[#FCD34D]/10 blur-xl pointer-events-none" />
+                        <div className="mt-3 flex items-center gap-3">
+                            <div className="relative group/coins cursor-default">
+                                <div className="flex items-center gap-3 px-4 py-2 rounded-[1.2rem] bg-black/30 border border-white/10 backdrop-blur-md relative overflow-hidden shadow-lg shadow-black/10">
+                                    {/* Ambient gold glow */}
+                                    <div className="absolute left-0 top-0 bottom-0 w-16 bg-[#FCD34D]/10 blur-xl pointer-events-none" />
 
-                                {/* Icon Container - Single Coin Representation */}
-                                <div className="relative z-10 flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-[#FCD34D] to-[#F59E0B] shadow-[0_2px_8px_rgba(245,158,11,0.4)] border border-[#FCD34D]/50 group-hover/coins:scale-110 transition-transform duration-300">
-                                    <span className="text-[#78350F] font-bold text-lg leading-none pt-[1px]">$</span>
+                                    {/* Icon Container - Single Coin Representation */}
+                                    <div className="relative z-10 flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-[#FCD34D] to-[#F59E0B] shadow-[0_2px_8px_rgba(245,158,11,0.4)] border border-[#FCD34D]/50 group-hover/coins:scale-110 transition-transform duration-300">
+                                        <span className="text-[#78350F] font-bold text-lg leading-none pt-[1px]">$</span>
+                                    </div>
+
+                                    {/* Number + Label */}
+                                    <div className="relative z-10 flex items-baseline gap-2">
+                                        <span className="text-xl font-black text-white tracking-tight tabular-nums drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]">
+                                            {profile.points.toLocaleString()}
+                                        </span>
+                                        <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#FCD34D]">
+                                            Moedas
+                                        </span>
+                                    </div>
                                 </div>
+                            </div>
 
-                                {/* Number + Label */}
-                                <div className="relative z-10 flex items-baseline gap-2">
-                                    <span className="text-xl font-black text-white tracking-tight tabular-nums drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]">
-                                        {profile.points.toLocaleString()}
-                                    </span>
-                                    <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#FCD34D]">
-                                        Moedas
+                            {/* ── Drops Counter ── */}
+                            <div className="relative group/drops cursor-default">
+                                <div className="flex items-center gap-2 px-3 py-2 rounded-[1.2rem] bg-blue-900/40 border border-blue-500/30 backdrop-blur-md relative overflow-hidden shadow-lg shadow-blue-900/20">
+                                    <div className="relative z-10 flex items-center justify-center w-6 h-6">
+                                        {/* Simple droplet icon using CSS/SVG since we might not have the icon imported yet or want a custom look */}
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.6)]">
+                                            <path d="M12 2.25c-5.385 5.965-8.25 10.518-8.25 14.12 0 4.293 3.409 7.63 7.828 7.63 1.954 0 3.829-.68 5.3-1.956 2.37-2.057 3.543-5.074 2.871-7.859-1.28-5.32-6.505-10.74-7.749-11.935Z" />
+                                        </svg>
+                                    </div>
+                                    <span className="text-lg font-black text-white tabular-nums drop-shadow-sm">
+                                        {profile.drops || 0}
                                     </span>
                                 </div>
                             </div>

@@ -5,6 +5,7 @@ export interface MemberProfile {
     avatar_path: string | null
     xp: number
     points: number
+    drops: number
     streak_count: number
     level: number
     xp_into_level: number

@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     }
 
     try {
-        const { target_user_id, xp_amount, points_amount } = await request.json()
+        const { target_user_id, xp_amount, points_amount, drops_amount } = await request.json()
 
         if (!target_user_id) {
             return NextResponse.json({ error: 'target_user_id is required' }, { status: 400 })
@@ -22,7 +22,8 @@ export async function POST(request: Request) {
         const { data, error } = await supabase.rpc('admin_grant_currency', {
             p_target_user_id: target_user_id,
             p_xp_amount: Number(xp_amount) || 0,
-            p_points_amount: Number(points_amount) || 0
+            p_points_amount: Number(points_amount) || 0,
+            p_drops_amount: Number(drops_amount) || 0
         })
 
         if (error) {
