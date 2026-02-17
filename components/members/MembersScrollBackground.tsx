@@ -73,39 +73,64 @@ export default function MembersScrollBackground() {
         ctx.drawImage(img, dx, dy, dw, dh)
     }, [])
 
-    // Preload all frames
+    // Optimized Preloading (Staggered Batches)
     useEffect(() => {
         if (!isMobile) return
 
         const loadFrame = (index: number) => {
             if (imageCache.has(index)) {
-                // Already cached — draw first frame immediately
                 if (index === 1 && !isLoaded) {
                     drawFrame(1)
                     setIsLoaded(true)
                 }
-                return
+                return Promise.resolve()
             }
 
-            const img = new Image()
-            img.src = `${PATH_PREFIX}${index.toString().padStart(3, '0')}${PATH_SUFFIX}`
-
-            img.onload = () => {
-                imageCache.set(index, img)
-                // Draw first visible frame as soon as it loads
-                if (index === 1 && !isLoaded) {
-                    drawFrame(1)
-                    setIsLoaded(true)
+            return new Promise<void>((resolve) => {
+                const img = new Image()
+                img.src = `${PATH_PREFIX}${index.toString().padStart(3, '0')}${PATH_SUFFIX}`
+                img.onload = () => {
+                    imageCache.set(index, img)
+                    if (index === 1 && !isLoaded) {
+                        drawFrame(1)
+                        setIsLoaded(true)
+                    }
+                    resolve()
                 }
+                img.onerror = () => resolve() // Continue even if error
+            })
+        }
+
+        const loadBatch = async (start: number, end: number) => {
+            const promises = []
+            for (let i = start; i < end && i < FRAME_COUNT; i++) {
+                promises.push(loadFrame(i))
+            }
+            await Promise.all(promises)
+        }
+
+        const runSequence = async () => {
+            // 1. Critical: Hero Frame
+            await loadFrame(1)
+
+            // 2. High Priority: First 15 frames (initial scroll interaction)
+            await loadBatch(0, 15)
+
+            // 3. Medium Priority: Keyframes (every 5th frame for rough scrubbing)
+            const keyframes = []
+            for (let i = 15; i < FRAME_COUNT; i += 5) keyframes.push(i)
+            await Promise.all(keyframes.map(loadFrame))
+
+            // 4. Low Priority: Fill in the gaps (chunked to yield to UI)
+            for (let i = 15; i < FRAME_COUNT; i += 10) {
+                // Load 10 frames at a time
+                await loadBatch(i, i + 10)
+                // Small delay to let UI breathe
+                await new Promise(r => setTimeout(r, 50))
             }
         }
 
-        // Priority: frame 1 (the hero frame), then every 5th, then all
-        loadFrame(1)
-        for (let i = 0; i < FRAME_COUNT; i += 5) loadFrame(i)
-        requestAnimationFrame(() => {
-            for (let i = 0; i < FRAME_COUNT; i++) loadFrame(i)
-        })
+        runSequence()
     }, [isMobile, drawFrame, isLoaded])
 
     // Scroll-driven frame rendering
