@@ -72,7 +72,7 @@ export default function WeeklyLeaderboard({ leaderboard, currentUserId, currentU
                                 {getRankIcon(rank)}
                             </div>
 
-                            <div className={`relative w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 border bg-gradient-to-br ${rank === 1 ? 'from-amber-300 to-yellow-500 border-yellow-200 shadow-lg shadow-yellow-500/20' : 'from-gray-100 to-gray-200 border-gray-200'
+                            <div className={`relative w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 border bg-gradient-to-br group ${rank === 1 ? 'from-amber-300 to-yellow-500 border-yellow-200 shadow-lg shadow-yellow-500/20' : 'from-gray-100 to-gray-200 border-gray-200'
                                 }`}>
                                 {entry.avatar_path ? (
                                     <img
@@ -80,6 +80,10 @@ export default function WeeklyLeaderboard({ leaderboard, currentUserId, currentU
                                             ? entry.avatar_path
                                             : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${entry.avatar_path}`}
                                         alt={entry.full_name || 'User'}
+                                        onError={(e) => {
+                                            e.currentTarget.style.display = 'none';
+                                            e.currentTarget.parentElement?.classList.add('fallback-avatar');
+                                        }}
                                         className="w-full h-full rounded-full object-cover"
                                     />
                                 ) : (
@@ -87,6 +91,15 @@ export default function WeeklyLeaderboard({ leaderboard, currentUserId, currentU
                                         {getInitials(entry.full_name)}
                                     </span>
                                 )}
+                                {/* Fallback Initial if image fails */}
+                                {entry.avatar_path && (
+                                    <div className="hidden group-[.fallback-avatar]:flex absolute inset-0 items-center justify-center">
+                                        <span className={`text-[10px] font-bold ${rank === 1 ? 'text-yellow-900' : 'text-gray-500'}`}>
+                                            {getInitials(entry.full_name)}
+                                        </span>
+                                    </div>
+                                )}
+
                                 {rank <= 3 && (
                                     <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-white rounded-full flex items-center justify-center shadow-sm">
                                         <Trophy size={8} className="text-amber-500" />

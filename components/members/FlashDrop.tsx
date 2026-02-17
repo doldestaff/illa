@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import type { ActiveDrop, MemberProfile } from '@/lib/gamification-types'
-import { IceCream, Clock, PackageCheck, Loader2, Gift, HelpCircle, X, ChevronRight, Zap } from 'lucide-react'
+import type { ActiveDrop } from '@/lib/gamification-types'
+import { IceCream, Clock, PackageCheck, Loader2, Gift, HelpCircle, X, Zap, Radio, AlertCircle } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 interface Props {
@@ -16,6 +16,7 @@ export default function FlashDrop({ drop, onClaim }: Props) {
     const [claimed, setClaimed] = useState(drop?.already_claimed ?? false)
     const [showWizard, setShowWizard] = useState(false)
 
+    // Calculate time left
     const calculateTimeLeft = useCallback(() => {
         if (!drop) return ''
         const end = new Date(drop.ends_at).getTime()
@@ -55,137 +56,247 @@ export default function FlashDrop({ drop, onClaim }: Props) {
         }
     }
 
-    if (!drop) {
-        return (
-            <div className="rounded-3xl border border-dashed border-gray-200/50 bg-gray-50/50 p-6 flex flex-col items-center justify-center text-center gap-2 group hover:bg-gray-50 transition-colors">
-                <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-300 group-hover:scale-110 transition-transform">
-                    <PackageCheck size={24} />
-                </div>
-                <div>
-                    <p className="text-sm font-bold text-dark/40">Sem Drops Ativos</p>
-                    <p className="text-xs text-dark/30">Fique atento para recompensas relâmpago!</p>
-                </div>
-            </div>
-        )
-    }
-
     return (
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-900 to-purple-900 text-white p-6 shadow-2xl shadow-purple-900/40 border border-white/10 group">
-            {/* Animated Background Mesh */}
-            <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay" />
-            <div className="absolute -top-32 -left-32 w-64 h-64 bg-purple-500/30 rounded-full blur-[80px] animate-pulse" />
-            <div className="absolute -bottom-32 -right-32 w-64 h-64 bg-illa-pink/30 rounded-full blur-[80px] animate-pulse" />
+        <div className="relative overflow-hidden rounded-3xl transition-all duration-500 group h-full">
+            <AnimatePresence mode="wait">
+                {!drop ? (
+                    // ─── SIGNAL SCANNER MODE (NO DROP) ───
+                    <motion.div
+                        key="scanning"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="relative h-full min-h-[240px] w-full bg-white/5 backdrop-blur-2xl border border-white/30 rounded-3xl flex flex-col items-center justify-center p-6 text-center overflow-hidden group shadow-[0_0_50px_rgba(255,255,255,0.15)] hover:shadow-[0_0_80px_rgba(255,255,255,0.25)] transition-shadow duration-700"
+                    >
+                        {/* 1. Dynamic Conic Background */}
+                        <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                            className="absolute inset-[-50%] bg-[conic-gradient(from_0deg,transparent_0deg,rgba(229,1,125,0.1)_90deg,transparent_180deg,rgba(252,211,77,0.1)_270deg,transparent_360deg)] opacity-50 blur-xl"
+                        />
 
-            <button
-                onClick={() => setShowWizard(true)}
-                className="absolute top-4 right-4 text-[10px] font-bold text-white/40 hover:text-white flex items-center gap-1 transition-colors bg-white/5 px-2 py-1 rounded-full cursor-pointer z-20 hover:bg-white/10"
-            >
-                <HelpCircle size={12} />
-                O que é um drop?
-            </button>
+                        {/* 2. Grid & Noise Overlay */}
+                        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay" />
+                        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:20px_20px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_80%)]" />
 
-            <div className="relative z-10">
-                <div className="flex items-start justify-between mb-6 pt-2">
-                    <div className="flex items-center gap-3">
-                        <div className={`p-2.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-lg ${!claimed ? 'animate-bounce' : ''}`}>
-                            <IceCream size={20} className="text-illa-yellow" fill="currentColor" />
-                        </div>
-                        <div>
-                            <h2 className="text-lg font-bold leading-tight drop-shadow-md">Flash Drop Ativo!</h2>
-                            <div className="flex items-center gap-1.5 text-xs font-medium text-white/70 bg-black/20 px-2 py-0.5 rounded-lg w-fit mt-1">
-                                <Clock size={12} />
-                                <span className="font-mono tracking-wide countdown-pulse text-illa-yellow">{timeLeft}</span>
+                        {/* 3. Scanner Radar Effect */}
+                        <div className="relative z-10 flex flex-col items-center justify-center gap-6">
+                            <div className="relative w-24 h-24 flex items-center justify-center">
+                                {/* Core Pulse */}
+                                <motion.div
+                                    animate={{
+                                        scale: [1, 1.2, 1],
+                                        boxShadow: [
+                                            "0 0 0 0px rgba(229, 1, 125, 0)",
+                                            "0 0 0 10px rgba(229, 1, 125, 0.2)",
+                                            "0 0 0 20px rgba(229, 1, 125, 0)"
+                                        ]
+                                    }}
+                                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                                    className="absolute inset-0 rounded-full bg-gradient-to-br from-illa-pink/20 to-illa-yellow/20 backdrop-blur-sm border border-white/10"
+                                />
+
+                                {/* Harmonic Rings */}
+                                {[0, 1, 2].map((i) => (
+                                    <motion.div
+                                        key={i}
+                                        initial={{ opacity: 0, scale: 0.8 }}
+                                        animate={{
+                                            opacity: [0, 0.5, 0],
+                                            scale: [0.8, 2.5],
+                                            borderColor: ["rgba(252, 211, 77, 0.8)", "rgba(229, 1, 125, 0.8)", "rgba(59, 130, 246, 0)"]
+                                        }}
+                                        transition={{
+                                            duration: 3,
+                                            repeat: Infinity,
+                                            delay: i * 0.8,
+                                            ease: "easeOut"
+                                        }}
+                                        className="absolute inset-0 rounded-full border border-t-transparent border-l-transparent border-r-white/20 border-b-white/20"
+                                        style={{ rotate: i * 45 }}
+                                    />
+                                ))}
+
+                                {/* Rotating Scanner Beam */}
+                                <motion.div
+                                    animate={{ rotate: 360 }}
+                                    transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                                    className="absolute inset-0 rounded-full border-t-2 border-illa-pink/80 shadow-[0_0_15px_rgba(229,1,125,0.5)]"
+                                >
+                                    <div className="absolute inset-0 bg-gradient-to-b from-illa-pink/20 to-transparent opacity-50 blur-sm" />
+                                </motion.div>
+
+                                {/* Center Icon */}
+                                <motion.div
+                                    animate={{ color: ["#E5017D", "#FCD34D", "#E5017D"] }}
+                                    transition={{ duration: 4, repeat: Infinity }}
+                                    className="relative z-20 bg-black/50 p-3 rounded-full border border-white/10 backdrop-blur-md"
+                                >
+                                    <Radio size={28} />
+                                </motion.div>
+                            </div>
+
+                            <div className="space-y-2 relative">
+                                <motion.div
+                                    initial={{ opacity: 0, y: 5 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.2 }}
+                                    className="flex items-center justify-center gap-2"
+                                >
+                                    {/* Light removed */}
+                                    <h3 className="text-sm font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/50 tracking-[0.2em] uppercase">
+                                        SCANNER ONLINE
+                                    </h3>
+                                </motion.div>
+
+                                <p className="text-xs font-medium text-white/60 h-4 flex items-center justify-center gap-1 tracking-wide">
+                                    <span>Aguardando por novos drops</span>
+                                    <motion.span
+                                        animate={{ opacity: [0, 1, 0] }}
+                                        transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 0.2, times: [0, 0.2, 1] }}
+                                    >.</motion.span>
+                                    <motion.span
+                                        animate={{ opacity: [0, 1, 0] }}
+                                        transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 0.2, delay: 0.2, times: [0, 0.2, 1] }}
+                                    >.</motion.span>
+                                    <motion.span
+                                        animate={{ opacity: [0, 1, 0] }}
+                                        transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 0.2, delay: 0.4, times: [0, 0.2, 1] }}
+                                    >.</motion.span>
+                                </p>
                             </div>
                         </div>
-                    </div>
 
-                    {drop.reward_type && (
-                        <div className="flex flex-col items-end mt-4">
-                            <span className="text-[10px] text-white/50 uppercase tracking-wider font-bold">Recompensa</span>
-                            <span className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-illa-yellow to-amber-300 drop-shadow-sm">
-                                +{drop.reward_value} {drop.reward_type === 'points' ? 'Pts' : 'XP'}
-                            </span>
-                        </div>
-                    )}
-                </div>
-
-                <div className="space-y-4">
-                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/5">
-                        <h3 className="font-bold text-sm text-white mb-1">{drop.title}</h3>
-                        <p className="text-xs text-white/70 leading-relaxed">
-                            {drop.description || 'Resgate esta recompensa exclusiva por tempo limitado!'}
-                        </p>
-                    </div>
-
-                    <button
-                        onClick={handleClaim}
-                        disabled={claimed || claiming}
-                        className={`w-full py-3.5 rounded-xl font-bold text-sm transition-all shadow-lg flex items-center justify-center gap-2 ${claimed
-                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 cursor-default'
-                            : 'bg-gradient-to-r from-illa-pink to-purple-600 hover:from-purple-600 hover:to-illa-pink text-white hover:scale-[1.02] active:scale-95 shadow-purple-600/30 ring-2 ring-white/20'
-                            }`}
+                        {/* Scanline removed */}
+                    </motion.div>
+                ) : (
+                    // ─── LIVE EVENT MODE (ACTIVE DROP) ───
+                    <motion.div
+                        key="active-drop"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        className="relative h-full bg-gradient-to-br from-illa-pink via-purple-600 to-indigo-900 text-white p-6 shadow-2xl shadow-purple-500/30 border border-white/20 rounded-3xl overflow-hidden"
                     >
-                        {claiming ? (
-                            <Loader2 size={18} className="animate-spin" />
-                        ) : claimed ? (
-                            <>
-                                <PackageCheck size={18} />
-                                Drop Resgatado
-                            </>
-                        ) : (
-                            <>
-                                <Gift size={18} className="animate-pulse" />
-                                Resgatar Recompensa
-                            </>
-                        )}
-                    </button>
-                </div>
-            </div>
+                        {/* Chaotic Background Energy */}
+                        <motion.div
+                            animate={{ opacity: [0.1, 0.3, 0.1], scale: [1, 1.1, 1] }}
+                            transition={{ duration: 3, repeat: Infinity }}
+                            className="absolute -top-32 -right-32 w-64 h-64 bg-illa-yellow/30 rounded-full blur-[80px] mix-blend-overlay"
+                        />
+                        <motion.div
+                            animate={{ opacity: [0.1, 0.3, 0.1], scale: [1, 1.1, 1] }}
+                            transition={{ duration: 4, repeat: Infinity, delay: 1 }}
+                            className="absolute -bottom-32 -left-32 w-64 h-64 bg-cyan-400/30 rounded-full blur-[80px] mix-blend-overlay"
+                        />
+                        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-overlay" />
 
-            {/* Drop Wizard Modal */}
+                        {/* Top Bar */}
+                        <div className="relative z-10 flex justify-between items-start mb-6">
+                            <motion.div
+                                initial={{ x: -20, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                className="flex items-center gap-2 bg-black/30 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10"
+                            >
+                                <span className="relative flex h-2.5 w-2.5">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                                </span>
+                                <span className="text-[10px] font-black uppercase tracking-wider text-white">Event Live</span>
+                            </motion.div>
+
+                            <button
+                                onClick={() => setShowWizard(true)}
+                                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                            >
+                                <HelpCircle size={14} />
+                            </button>
+                        </div>
+
+                        {/* Main Content */}
+                        <div className="relative z-10 text-center space-y-4">
+                            <motion.div
+                                animate={{ y: [0, -5, 0] }}
+                                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                            >
+                                <h2 className="text-2xl md:text-3xl font-black italic uppercase leading-none drop-shadow-xl">
+                                    Flash Drop!
+                                </h2>
+                                <p className="text-sm font-medium text-white/80 mt-2 line-clamp-2">
+                                    {drop.title}
+                                </p>
+                            </motion.div>
+
+                            {/* Rewards Box */}
+                            <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
+                                <div className="text-[10px] font-bold uppercase text-white/50 mb-1">Recompensa</div>
+                                <div className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-white/80 drop-shadow-sm">
+                                    +{drop.reward_value} <span className="text-lg text-illa-yellow">{drop.reward_type === 'points' ? 'PTS' : 'XP'}</span>
+                                </div>
+                            </div>
+
+                            {/* Countdown */}
+                            <div className="flex items-center justify-center gap-2 font-mono text-xs text-white/60 bg-black/20 rounded-lg py-1">
+                                <Clock size={12} />
+                                <span>{timeLeft} restantes</span>
+                            </div>
+
+                            {/* Action Button */}
+                            <button
+                                onClick={handleClaim}
+                                disabled={claimed || claiming}
+                                className={`w-full py-4 rounded-xl font-black text-sm uppercase tracking-wide transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-2 ${claimed
+                                    ? 'bg-emerald-500 text-white cursor-default'
+                                    : 'bg-white text-illa-pink hover:bg-gray-50'
+                                    }`}
+                            >
+                                {claiming ? (
+                                    <Loader2 size={18} className="animate-spin text-illa-pink" />
+                                ) : claimed ? (
+                                    <>
+                                        <PackageCheck size={18} /> Resgatado!
+                                    </>
+                                ) : (
+                                    <>
+                                        <Zap size={18} fill="currentColor" /> RESGATAR AGORA
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Wizard Modal (Reuse existing structure with slight tweak) */}
             <AnimatePresence>
                 {showWizard && (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="absolute inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 rounded-3xl"
+                        className="absolute inset-0 z-50 bg-black/90 backdrop-blur-xl flex items-center justify-center p-4 rounded-3xl"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <motion.div
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.9, opacity: 0 }}
-                            className="bg-gray-900 border border-white/10 rounded-2xl p-5 w-full h-full relative flex flex-col items-center text-center overflow-hidden"
-                            onClick={(e) => e.stopPropagation()}
+                            className="w-full text-center space-y-6"
                         >
-                            <button
-                                onClick={() => setShowWizard(false)}
-                                className="absolute top-3 right-3 text-white/50 hover:text-white"
-                            >
-                                <X size={20} />
-                            </button>
-
-                            <div className="flex-1 flex flex-col items-center justify-center space-y-4">
-                                <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-illa-pink via-purple-500 to-indigo-500 flex items-center justify-center shadow-lg shadow-purple-500/30 animate-pulse">
-                                    <Zap size={32} className="text-white" fill="currentColor" />
-                                </div>
-                                <div>
-                                    <h3 className="text-xl font-black text-white mb-2">O que é um Drop?</h3>
-                                    <p className="text-sm text-white/70 leading-relaxed">
-                                        Drops são <strong>recompensas relâmpago</strong> que aparecem de surpresa.
-                                    </p>
-                                    <p className="text-xs text-white/50 mt-2">
-                                        Eles duram pouco tempo! Se você vir um ativo, corra para resgatar XP ou Moedas extras.
-                                    </p>
-                                </div>
+                            <div className="w-20 h-20 mx-auto rounded-full bg-illa-pink/20 flex items-center justify-center animate-pulse">
+                                <AlertCircle size={40} className="text-illa-pink" />
                             </div>
-
+                            <div>
+                                <h3 className="text-xl font-black text-white">Zonas de Drops</h3>
+                                <p className="text-sm text-white/50 mt-2 max-w-[200px] mx-auto">
+                                    Fique atento ao scanner. Quando um drop aparecer, você terá poucos minutos para resgatar!
+                                </p>
+                            </div>
                             <button
                                 onClick={() => setShowWizard(false)}
-                                className="w-full py-3 bg-white text-black font-bold rounded-xl hover:scale-[1.02] active:scale-95 transition-transform"
+                                className="px-8 py-3 bg-white text-black font-bold rounded-xl"
                             >
-                                Entendi!
+                                Entendi
                             </button>
                         </motion.div>
                     </motion.div>
@@ -194,3 +305,4 @@ export default function FlashDrop({ drop, onClaim }: Props) {
         </div>
     )
 }
+

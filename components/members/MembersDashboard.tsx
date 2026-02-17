@@ -20,6 +20,7 @@ import VipCard from './VipCard'
 import OnlineCelebrationManager from './OnlineCelebrationManager'
 import SorvetesFreeCta from './SorvetesFreeCta'
 import MembersScrollBackground from './MembersScrollBackground'
+import { createSupabaseBrowser } from '@/lib/supabaseClient'
 
 // ── Lazy-loaded below-fold components (perf: only ship JS when needed) ──
 const SectionSkeleton = () => (
@@ -77,6 +78,44 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
         }
         fetchSorvetesCount()
     }, [])
+
+    // ── Supabase Realtime: Listen for new drops ──
+    const fetchActiveDrop = useCallback(async () => {
+        try {
+            const res = await fetch('/api/drops/active')
+            if (res.ok) {
+                const data = await res.json()
+                setSnapshot(prev => ({ ...prev, active_drop: data.drop }))
+            }
+        } catch {
+            // fail silent
+        }
+    }, [])
+
+    useEffect(() => {
+        const supabase = createSupabaseBrowser()
+        const channel = supabase
+            .channel('active_drops_realtime')
+            .on(
+                'postgres_changes',
+                { event: '*', schema: 'public', table: 'active_drops' },
+                () => {
+                    fetchActiveDrop()
+                }
+            )
+            .subscribe()
+
+        // Poll every 30s as backup
+        const interval = setInterval(fetchActiveDrop, 30000)
+
+        // Initial fetch
+        fetchActiveDrop()
+
+        return () => {
+            supabase.removeChannel(channel)
+            clearInterval(interval)
+        }
+    }, [fetchActiveDrop])
 
     // ── Auto-track "visit" mission on mount ──
     useEffect(() => {
