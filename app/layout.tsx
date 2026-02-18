@@ -5,6 +5,7 @@ import { SmoothScroll } from '@/components/SmoothScroll'
 import { cn } from '@/lib/utils'
 
 import KeepAlivePing from '@/components/KeepAlivePing'
+import { CinematicToastProvider } from '@/components/notifications/CinematicToastProvider'
 
 const openSans = Open_Sans({
   subsets: ['latin'],
@@ -39,7 +40,11 @@ export default function RootLayout({
         )}
       >
         <KeepAlivePing />
-        <SmoothScroll>{children}</SmoothScroll>
+        <SmoothScroll>
+          <CinematicToastProvider>
+            {children}
+          </CinematicToastProvider>
+        </SmoothScroll>
       </body>
     </html>
   )

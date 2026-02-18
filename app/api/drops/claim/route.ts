@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createSupabaseServer } from '@/lib/supabaseServerClient'
+import { sendNotification } from '@/lib/notifications'
 
 export async function POST(request: Request) {
     const supabase = await createSupabaseServer()
@@ -22,6 +23,16 @@ export async function POST(request: Request) {
         if (error) {
             return NextResponse.json({ error: error.message }, { status: 400 })
         }
+
+        // Fire Notification
+        await sendNotification({
+            userId: user.id,
+            title: 'Drop Resgatado! 🎁',
+            body: 'Seu drop foi adicionado à carteira.',
+            kind: 'drop',
+            priority: 2,
+            supabase
+        })
 
         return NextResponse.json(data)
     } catch {
