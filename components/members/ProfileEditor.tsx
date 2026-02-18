@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { createSupabaseBrowser } from '@/lib/supabaseClient'
 import Link from 'next/link'
 import Image from 'next/image'
-import MembersScrollBackground from './MembersScrollBackground'
+import ScrollBg from './MembersScrollBackground'
 
 interface ProfileEditorProps {
     user: {
@@ -139,7 +139,7 @@ export default function ProfileEditor({ user }: ProfileEditorProps) {
 
             {/* Background Layer - Dark Mode + Scroll Frames */}
             <div className="fixed inset-0 bg-[#0B0B0D] z-[-2]" />
-            <MembersScrollBackground />
+            <ScrollBg />
 
             {/* Header - Dark Glass */}
             <div className="bg-black/20 backdrop-blur-xl border-b border-white/5 sticky top-0 z-50">

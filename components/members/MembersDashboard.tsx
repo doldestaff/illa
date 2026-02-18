@@ -15,11 +15,13 @@ import dynamic from 'next/dynamic'
 import DashboardHeader from './DashboardHeader'
 import DailyMissions from './DailyMissions'
 import StorePromoCard from './StorePromoCard'
-import FlashDrop from './FlashDrop'
 import VipCard from './VipCard'
 import OnlineCelebrationManager from './OnlineCelebrationManager'
+import DashboardActionGrid from './DashboardActionGrid'
+import ActionModal from './ActionModal'
+import FlashDrop from './FlashDrop'
 import SorvetesFreeCta from './SorvetesFreeCta'
-import MembersScrollBackground from './MembersScrollBackground'
+import ScrollBg from './MembersScrollBackground'
 import { createSupabaseBrowser } from '@/lib/supabaseClient'
 import { usePushNotifications } from '@/hooks/usePushNotifications'
 import { Bell } from 'lucide-react'
@@ -64,6 +66,7 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
     const [snapshot, setSnapshot] = useState(initial)
     const [vipPayload, setVipPayload] = useState<VipPayload | null>(null)
     const [sorvetesCount, setSorvetesCount] = useState(initial.sorvetes_free_count ?? 0)
+    const [activeModal, setActiveModal] = useState<'history' | 'scanner' | 'sorvetes' | null>(null)
     const progressTracked = useRef(false)
     const { isSupported, isSubscribed, subscribe } = usePushNotifications()
 
@@ -224,29 +227,7 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
         [snapshot, updateProfileFromClaim, isSupported, isSubscribed, subscribe]
     )
 
-    // ── Drop claim handler ──
-    const handleDropClaim = useCallback(
-        async (dropId: string) => {
-            const res = await fetch('/api/drops/claim', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ drop_id: dropId }),
-            })
-            const data: ClaimDropResult = await res.json()
-            if (data.success) {
-                setSnapshot((prev) => ({
-                    ...prev,
-                    active_drop: prev.active_drop
-                        ? { ...prev.active_drop, already_claimed: true }
-                        : null,
-                    drops_claimed_count: (prev.drops_claimed_count ?? 0) + 1,
-                }))
-                updateProfileFromClaim(data)
-            }
-            return data
-        },
-        [updateProfileFromClaim]
-    )
+
 
     // ── Recipe toggle handler (also tracks recipe mission progress) ──
     const handleRecipeToggle = useCallback(
@@ -348,6 +329,31 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
         []
     )
 
+    // ── Drop claim handler (Restored for scanner) ──
+    const handleDropClaim = useCallback(
+        async (dropId: string) => {
+            const res = await fetch('/api/drops/claim', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ drop_id: dropId }),
+            })
+            const data: ClaimDropResult = await res.json()
+            if (data.success) {
+                setSnapshot((prev) => ({
+                    ...prev,
+                    active_drop: prev.active_drop
+                        ? { ...prev.active_drop, already_claimed: true }
+                        : null,
+                    drops_claimed_count: (prev.drops_claimed_count ?? 0) + 1,
+                }))
+                updateProfileFromClaim(data)
+            }
+            return data
+        },
+        [updateProfileFromClaim]
+    )
+
+    // ── Sorvetes redeem handler (Restored for popup) ──
     const handleSorvetesRedeem = useCallback(
         (result: SorvetesRedemption) => {
             if (result.success) {
@@ -355,10 +361,21 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                     ...prev,
                     profile: { ...prev.profile, points: result.new_points },
                 }))
+                // Optional: Close modal on success?
+                // setActiveModal(null) 
             }
         },
         []
     )
+
+
+
+    // ── Action Grid Handler ──
+    const handleAction = useCallback((actionId: string) => {
+        if (actionId === 'history' || actionId === 'scanner' || actionId === 'sorvetes') {
+            setActiveModal(actionId)
+        }
+    }, [])
 
     // ── Scroll Background Effect ──
     const { scrollY } = useScroll()
@@ -377,8 +394,8 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                 style={{ backgroundColor }}
             />
 
-            {/* 0.5 Mobile Scroll Background (Frames) */}
-            <MembersScrollBackground />
+            {/* 0.5 Mobile Scroll Background (Frames) - Restored */}
+            <ScrollBg />
 
             {/* 1. Global Ambient Background (Hidden on mobile to prioritize frames) */}
             <div className="hidden md:block">
@@ -406,6 +423,37 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                                     Gerenciar conta
                                 </Link>
                             </div>
+                            {/* ─── ACTION MODALS ─── */}
+                            <ActionModal
+                                isOpen={!!activeModal}
+                                onClose={() => setActiveModal(null)}
+                                title={
+                                    activeModal === 'history' ? 'Histórico de Recompensas' :
+                                        activeModal === 'scanner' ? 'Scanner de Drops' :
+                                            activeModal === 'sorvetes' ? 'Sorvetes Free' : ''
+                                }
+                                themeGradient={
+                                    activeModal === 'history' ? 'from-blue-500 to-indigo-600' :
+                                        activeModal === 'scanner' ? 'from-illa-pink to-rose-500' :
+                                            activeModal === 'sorvetes' ? 'from-amber-400 to-orange-500' :
+                                                'from-white to-gray-400'
+                                }
+                            >
+                                {activeModal === 'history' && <RewardTimeline />}
+
+                                {activeModal === 'scanner' && (
+                                    <div className="h-[400px] md:h-[500px]">
+                                        <FlashDrop drop={snapshot.active_drop} onClaim={handleDropClaim} />
+                                    </div>
+                                )}
+
+                                {activeModal === 'sorvetes' && (
+                                    <SorvetesFreeCta
+                                        currentPoints={snapshot.profile.points}
+                                        onRedeem={handleSorvetesRedeem}
+                                    />
+                                )}
+                            </ActionModal>
                         </div>
                     </div>
 
@@ -423,8 +471,12 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                         }}
                     >
 
+
+                        {/* Quick Actions Grid (Premium) */}
+                        <DashboardActionGrid onAction={handleAction} />
+
                         {/* Daily Missions (Priority) */}
-                        <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
+                        <motion.div id="missions" variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
                             <DailyMissions missions={snapshot.missions} onClaim={handleMissionClaim} />
                         </motion.div>
 
@@ -438,10 +490,8 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                             className="grid grid-cols-1 sm:grid-cols-2 gap-4"
                             variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } }}
                         >
-                            {/* Active Drop */}
-                            <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
-                                <FlashDrop drop={snapshot.active_drop} onClaim={handleDropClaim} />
-                            </motion.div>
+                            {/* Active Drop (Removed per user request) */}
+
 
                             {/* VIP Card */}
                             <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
@@ -484,18 +534,7 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                                 <BirthdayModule birthday={snapshot.birthday} />
                             </motion.div>
 
-                            {/* Sorvetes Free CTA */}
-                            <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
-                                <SorvetesFreeCta
-                                    currentPoints={snapshot.profile.points}
-                                    onRedeem={handleSorvetesRedeem}
-                                />
-                            </motion.div>
 
-                            {/* Reward Timeline (Audit Ledger) */}
-                            <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
-                                <RewardTimeline />
-                            </motion.div>
                         </motion.div>
 
                         <div className="md:hidden text-center py-8">
