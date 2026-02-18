@@ -236,7 +236,7 @@ export function ScrollFrameCanvasEngine({
             state.current.props.onFrameChange(idx, idx / maxFrame)
         }
 
-        const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true })
+        const ctx = canvas.getContext('2d', { alpha: false })
         if (!ctx) return
 
         // Layout: Cover
