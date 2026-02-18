@@ -6,6 +6,7 @@ import Link from 'next/link'
 import type { MemberProfile } from '@/lib/gamification-types'
 import { useRef, useState } from 'react'
 import InventoryModal from './InventoryModal'
+import { NotificationBell } from '../notifications/NotificationBell'
 
 interface Props {
     profile: MemberProfile
@@ -128,6 +129,8 @@ export default function DashboardHeader({ profile, avatarUrl, dropsCount, sorvet
                                 <h1 className="text-2xl font-bold truncate text-white tracking-tight drop-shadow-sm filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
                                     {profile.full_name || 'Membro ILLA'}
                                 </h1>
+                                <NotificationBell />
+
 
                                 {/* Sorvetes Free — Animated & Premium (CLICKABLE) */}
                                 <motion.button

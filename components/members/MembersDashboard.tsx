@@ -21,6 +21,9 @@ import OnlineCelebrationManager from './OnlineCelebrationManager'
 import SorvetesFreeCta from './SorvetesFreeCta'
 import MembersScrollBackground from './MembersScrollBackground'
 import { createSupabaseBrowser } from '@/lib/supabaseClient'
+import { usePushNotifications } from '@/hooks/usePushNotifications'
+import { Bell } from 'lucide-react'
+import { toast } from 'sonner'
 
 // ── Lazy-loaded below-fold components (perf: only ship JS when needed) ──
 const SectionSkeleton = () => (
@@ -62,6 +65,7 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
     const [vipPayload, setVipPayload] = useState<VipPayload | null>(null)
     const [sorvetesCount, setSorvetesCount] = useState(initial.sorvetes_free_count ?? 0)
     const progressTracked = useRef(false)
+    const { isSupported, isSubscribed, subscribe } = usePushNotifications()
 
     // ── Fetch real sorvetes count from dedicated API (always in sync with admin) ──
     useEffect(() => {
@@ -192,6 +196,21 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
             })
             const data: ClaimMissionResult = await res.json()
             if (data.success) {
+                // ── FIRST MISSION PROMPT ──
+                // Check if this is the first mission completion (count is 0 before this claim)
+                const completedCount = snapshot.missions.filter(m => m.completed).length
+                if (completedCount === 0 && isSupported && !isSubscribed) {
+                    toast('Parabéns pela primeira missão! 🚀', {
+                        description: 'Quer ativar notificações para saber quando ganhar prêmios?',
+                        action: {
+                            label: 'Ativar',
+                            onClick: () => subscribe()
+                        },
+                        duration: 8000,
+                        icon: <Bell className="text-illa-pink" />
+                    })
+                }
+
                 setSnapshot((prev) => ({
                     ...prev,
                     missions: prev.missions.map((m) =>
@@ -202,7 +221,7 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
             }
             return data
         },
-        [updateProfileFromClaim]
+        [snapshot, updateProfileFromClaim, isSupported, isSubscribed, subscribe]
     )
 
     // ── Drop claim handler ──
