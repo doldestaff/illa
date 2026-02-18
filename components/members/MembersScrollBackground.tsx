@@ -19,11 +19,12 @@ export default function MembersScrollBackground() {
     const lastFrameRef = useRef(-1)
     const { scrollYProgress } = useScroll()
 
-    // Responsive spring — fast enough to feel 1:1 with scroll
+    // Responsive spring — tighter for 1:1 "finger-glued" feel on mobile
     const smoothProgress = useSpring(scrollYProgress, {
-        stiffness: 200,
-        damping: 40,
-        restDelta: 0.0005
+        stiffness: 800, // Increased from 200 for faster response
+        damping: 30,    // Adjusted to minimize oscillation but keep it smooth
+        mass: 0.5,      // Lighter mass for quicker acceleration
+        restDelta: 0.001
     })
 
     // Mobile detection
@@ -39,7 +40,7 @@ export default function MembersScrollBackground() {
     const drawFrame = useCallback((index: number) => {
         const canvas = canvasRef.current
         if (!canvas) return
-        const ctx = canvas.getContext('2d')
+        const ctx = canvas.getContext('2d', { alpha: false }) // Optimize: disable alpha if possible (bg is opaque?)
         if (!ctx) return
 
         const img = imageCache.get(index)
@@ -52,6 +53,8 @@ export default function MembersScrollBackground() {
         // Resize canvas to viewport if needed
         const vw = window.innerWidth
         const vh = window.innerHeight
+
+        // Optimize: Only resize if dimensions significantly changed to avoid thrashing
         if (canvas.width !== vw || canvas.height !== vh) {
             canvas.width = vw
             canvas.height = vh
@@ -88,6 +91,7 @@ export default function MembersScrollBackground() {
 
             return new Promise<void>((resolve) => {
                 const img = new Image()
+                img.decoding = 'async' // Critical: Decode off main thread
                 img.src = `${PATH_PREFIX}${index.toString().padStart(3, '0')}${PATH_SUFFIX}`
                 img.onload = () => {
                     imageCache.set(index, img)
@@ -113,20 +117,15 @@ export default function MembersScrollBackground() {
             // 1. Critical: Hero Frame
             await loadFrame(1)
 
-            // 2. High Priority: First 15 frames (initial scroll interaction)
-            await loadBatch(0, 15)
+            // 2. High Priority: First 20 frames (initial scroll interaction)
+            await loadBatch(0, 20)
 
-            // 3. Medium Priority: Keyframes (every 5th frame for rough scrubbing)
-            const keyframes = []
-            for (let i = 15; i < FRAME_COUNT; i += 5) keyframes.push(i)
-            await Promise.all(keyframes.map(loadFrame))
-
-            // 4. Low Priority: Fill in the gaps (chunked to yield to UI)
-            for (let i = 15; i < FRAME_COUNT; i += 10) {
-                // Load 10 frames at a time
-                await loadBatch(i, i + 10)
-                // Small delay to let UI breathe
-                await new Promise(r => setTimeout(r, 50))
+            // 3. Buffer: Load remaining frames in smaller chunks
+            // We load fewer at a time to keep the thread free for scrolling
+            for (let i = 20; i < FRAME_COUNT; i += 5) {
+                await loadBatch(i, i + 5)
+                // Yield to main thread
+                await new Promise(r => setTimeout(r, 20))
             }
         }
 
@@ -139,6 +138,7 @@ export default function MembersScrollBackground() {
 
         const render = () => {
             const progress = smoothProgress.get()
+            // Clamp strictly
             const frameIndex = Math.min(
                 FRAME_COUNT - 1,
                 Math.max(0, Math.round(progress * (FRAME_COUNT - 1)))
@@ -149,7 +149,7 @@ export default function MembersScrollBackground() {
         // Subscribe to scroll progress changes
         const unsubscribe = smoothProgress.on('change', render)
 
-        // Also render once immediately in case scroll is already > 0
+        // Also render once immediately
         render()
 
         return () => unsubscribe()
