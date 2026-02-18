@@ -19,8 +19,6 @@ import VipCard from './VipCard'
 import OnlineCelebrationManager from './OnlineCelebrationManager'
 import DashboardActionGrid from './DashboardActionGrid'
 import ActionModal from './ActionModal'
-import FlashDrop from './FlashDrop'
-import SorvetesFreeCta from './SorvetesFreeCta'
 import ScrollBg from './MembersScrollBackground'
 import { createSupabaseBrowser } from '@/lib/supabaseClient'
 import { usePushNotifications } from '@/hooks/usePushNotifications'
@@ -57,6 +55,14 @@ const IllaAmbientBackground = dynamic(() => import('./IllaAmbientBackground'), {
     ssr: false,
 })
 
+// Dynamic Modals (Heavy framer motion / interactions)
+const FlashDrop = dynamic(() => import('./FlashDrop'), {
+    loading: () => <div className="h-96 flex items-center justify-center"><SectionSkeleton /></div>,
+})
+const SorvetesFreeCta = dynamic(() => import('./SorvetesFreeCta'), {
+    loading: () => <div className="h-96 flex items-center justify-center"><SectionSkeleton /></div>,
+})
+
 interface Props {
     snapshot: MemberSnapshot
     avatarUrl: string | null
@@ -70,24 +76,16 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
     const progressTracked = useRef(false)
     const { isSupported, isSubscribed, subscribe } = usePushNotifications()
 
-    // ── Fetch real sorvetes count from dedicated API (always in sync with admin) ──
-    useEffect(() => {
-        const fetchSorvetesCount = async () => {
-            try {
-                const res = await fetch('/api/sorvetes-free/count')
-                if (res.ok) {
-                    const data = await res.json()
-                    setSorvetesCount(data.sorvetes_count ?? 0)
-                }
-            } catch {
-                // Silent fail — use snapshot fallback
-            }
-        }
-        fetchSorvetesCount()
-    }, [])
+    // ── Fetch real sorvetes count ──
+    // Removed duplicate fetch on mount, relying on Snapshot unless stale?
+    // User requested "Remove duplicate client refetches on mount".
+    // So we just use initial state.
 
     // ── Supabase Realtime: Listen for new drops ──
     const fetchActiveDrop = useCallback(async () => {
+        // Optimization: Don't fetch if tab hidden
+        if (document.hidden) return
+
         try {
             const res = await fetch('/api/drops/active')
             if (res.ok) {
@@ -112,8 +110,8 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
             )
             .subscribe()
 
-        // Poll every 30s as backup
-        const interval = setInterval(fetchActiveDrop, 30000)
+        // Poll every 2 minutes (120s) as backup, gated by visibility
+        const interval = setInterval(fetchActiveDrop, 120000)
 
         // Initial fetch
         fetchActiveDrop()
@@ -226,8 +224,6 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
         },
         [snapshot, updateProfileFromClaim, isSupported, isSubscribed, subscribe]
     )
-
-
 
     // ── Recipe toggle handler (also tracks recipe mission progress) ──
     const handleRecipeToggle = useCallback(
