@@ -3,6 +3,7 @@ import { Open_Sans, Pacifico } from 'next/font/google'
 import './globals.css'
 import { SmoothScroll } from '@/components/SmoothScroll'
 import { cn } from '@/lib/utils'
+import { Analytics } from '@vercel/analytics/next'
 
 import KeepAlivePing from '@/components/KeepAlivePing'
 import { CinematicToastProvider } from '@/components/notifications/CinematicToastProvider'
@@ -45,6 +46,7 @@ export default function RootLayout({
             {children}
           </CinematicToastProvider>
         </SmoothScroll>
+        <Analytics />
       </body>
     </html>
   )
