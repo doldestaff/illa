@@ -4,7 +4,7 @@ import './globals.css'
 import { SmoothScroll } from '@/components/SmoothScroll'
 import { cn } from '@/lib/utils'
 
-import KeepAlivePing from '@/components/KeepAlivePing'
+
 import { CinematicToastProvider } from '@/components/notifications/CinematicToastProvider'
 
 const openSans = Open_Sans({
@@ -39,7 +39,6 @@ export default function RootLayout({
           'antialiased font-sans bg-white text-dark'
         )}
       >
-        <KeepAlivePing />
         <SmoothScroll>
           <CinematicToastProvider>
             {children}

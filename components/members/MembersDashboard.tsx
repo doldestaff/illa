@@ -18,7 +18,9 @@ import StorePromoCard from './StorePromoCard'
 import VipCard from './VipCard'
 import OnlineCelebrationManager from './OnlineCelebrationManager'
 import DashboardActionGrid from './DashboardActionGrid'
-import ActionModal from './ActionModal'
+const ActionModal = dynamic(() => import('./ActionModal'), {
+    loading: () => null,
+})
 import ScrollBg from './MembersScrollBackground'
 import { createSupabaseBrowser } from '@/lib/supabaseClient'
 import { usePushNotifications } from '@/hooks/usePushNotifications'

@@ -30,7 +30,12 @@ export function NotificationBell() {
         fetchCount()
         const channel = supabase
             .channel('notifications-bell')
-            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, () => fetchCount())
+            .on('postgres_changes', {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'notifications',
+                filter: `user_id=eq.${(await supabase.auth.getUser()).data.user?.id}`
+            }, () => fetchCount())
             .subscribe()
         return () => { supabase.removeChannel(channel) }
     }, [])

@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect, useState, useCallback } from 'react'
 import { cn } from '@/lib/utils'
+import { useLenis } from 'lenis/react'
 
 // --- Types ---
 
@@ -109,7 +110,6 @@ export function ScrollFrameCanvasEngine({
         cache: new FrameCache(),
         lastScrollY: -1,
         lastFrameIndex: -1,
-        ticking: false,
         appHeight: 0,
         appWidth: 0,
         mountTime: Date.now(),
@@ -199,9 +199,6 @@ export function ScrollFrameCanvasEngine({
             await Promise.all(Array.from(toLoad).map(i => loadFrame(i, true)))
 
             setIsLoaded(true)
-
-            // Kickstart loop
-            requestScrollUpdate()
         }
         init()
     }, [priorityFrames, loadFrame])
@@ -217,9 +214,6 @@ export function ScrollFrameCanvasEngine({
         const idx = Math.max(0, Math.min(maxFrame, Math.round(frameIndex)))
 
         if (!force && state.current.lastFrameIndex === idx) {
-            // Even if frame is same, check if we need to report progress driven updates
-            // But usually we assume frame change drives it. 
-            // Logic below handles reporting anyway.
             return
         }
 
@@ -255,10 +249,6 @@ export function ScrollFrameCanvasEngine({
         }
 
         if (!frame) {
-            // Frame missing? Try nearest neighbor
-            // (Simulates "hold previous frame")
-            // We don't clearRect to preserve previous frame naturally
-            // But if we jumped far, we might want to find *something*
             return
         }
 
@@ -280,14 +270,9 @@ export function ScrollFrameCanvasEngine({
         for (let i = 1; i <= 2; i++) loadFrame(idx - i)
     }
 
-    // --- 4. Scroll Logic ---
-    const update = () => {
-        state.current.ticking = false
-
-        const scrollY = window.scrollY
-        // If container height not provided, use a default multiplier
-        // Default: 350vh total scroll for mobile, 500vh for desktop usually
-        // But here we need to map scroll -> frames.
+    // --- 4. Scroll Logic (LENIS DRIVEN) ---
+    useLenis(({ scroll }) => {
+        const scrollY = scroll
 
         const totalHeight = state.current.props.scrollContainerHeight || (state.current.appHeight * 4)
         const viewH = state.current.appHeight
@@ -297,24 +282,7 @@ export function ScrollFrameCanvasEngine({
         const targetFrame = progress * (state.current.props.frameCount - 1)
 
         draw(targetFrame)
-    }
-
-    const requestScrollUpdate = () => {
-        if (!state.current.ticking) {
-            requestAnimationFrame(update)
-            state.current.ticking = true
-        }
-    }
-
-    useEffect(() => {
-        window.addEventListener('scroll', requestScrollUpdate, { passive: true })
-        return () => window.removeEventListener('scroll', requestScrollUpdate)
-    }, [])
-
-    // Initial Tick
-    useEffect(() => {
-        requestScrollUpdate()
-    }, [])
+    }, [loadFrame]) // Dep is stable
 
     return (
         <div

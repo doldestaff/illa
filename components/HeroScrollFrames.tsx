@@ -28,12 +28,7 @@ export function HeroScrollFrames() {
     const DESKTOP_HEIGHT_vh = 500
     const SCROLL_HEIGHT_vh = isMobile ? MOBILE_HEIGHT_vh : DESKTOP_HEIGHT_vh
 
-    // Derived pixels for engine (approximate until mount, but engine handles dynamic resize)
-    // We pass the "total scrollable height" expected by the engine to map 0..1
-    // The engine expects pixel value. We can estimate or use window.innerHeight
-    // Better to let engine handle it or pass a simplified "scrollLength" scalar?
-    // Engine v2 has `scrollContainerHeight`.
-    const [containerHeightPx, setContainerHeightPx] = useState(0)
+
 
 
     // --- Setup & Load ---
@@ -41,14 +36,6 @@ export function HeroScrollFrames() {
         setIsMounted(true)
         const mobile = window.matchMedia('(max-width: 768px)').matches
         setIsMobile(mobile)
-
-        const updateHeight = () => {
-            const h = window.innerHeight
-            const vh = mobile ? MOBILE_HEIGHT_vh : DESKTOP_HEIGHT_vh
-            setContainerHeightPx(h * (vh / 100))
-        }
-        updateHeight()
-        window.addEventListener('resize', updateHeight)
 
         const loadManifest = async () => {
             const platform = mobile ? 'mobile' : 'desktop'
@@ -64,8 +51,6 @@ export function HeroScrollFrames() {
             }
         }
         loadManifest()
-
-        return () => window.removeEventListener('resize', updateHeight)
     }, [])
 
     const handleFrameChange = (index: number, progress: number) => {
@@ -105,7 +90,7 @@ export function HeroScrollFrames() {
                         frameCount={manifest.frameCount}
                         getFrameUrl={(i) => manifest.frames[i]}
                         posterUrl={manifest.frames[isMobile ? 4 : 2] || ''} // Fallback to start frame
-                        scrollContainerHeight={containerHeightPx}
+                        scrollContainerHeight={undefined}
                         priorityFrames={[0, 1, 2, 3, 4]}
                         onFrameChange={handleFrameChange}
                         debug={typeof window !== 'undefined' && window.location.search.includes('debugHero')}
