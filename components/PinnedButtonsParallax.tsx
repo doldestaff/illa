@@ -240,7 +240,7 @@ export function PinnedButtonsParallax() {
             className="relative w-full h-[500vh] bg-white text-dark"
         >
             <div
-                className="sticky top-0 w-full h-[100dvh] flex items-center justify-center overflow-hidden"
+                className="sticky top-0 w-full h-[100dvh] flex items-center justify-center overflow-hidden pointer-events-none touch-pan-y"
             >
                 {/* Lazy Video Background */}
                 <LazyVideo />
@@ -264,7 +264,7 @@ export function PinnedButtonsParallax() {
                                 }
                             }}
                             className={cn(
-                                "absolute inset-0 m-auto",
+                                "absolute inset-0 m-auto pointer-events-auto",
                                 "w-[85vw] max-w-[360px] md:max-w-[420px] h-[300px] md:h-[400px]",
                                 "bg-white/20 backdrop-blur-md border", // Reduced blur for performance
                                 card.borderColor,

@@ -9,21 +9,14 @@ import { HeroEngine } from './hero/HeroEngine'
 
 export function HeroScrollFrames() {
     // Mount state
-    const [isMounted, setIsMounted] = useState(false)
-    const [isMobile, setIsMobile] = useState(false)
+    const [isMobile, setIsMobile] = useState<boolean | null>(null)
     const [error, setError] = useState<string | null>(null)
 
     // Stable Refs
     const buttonProgress = useMotionValue(0)
 
-    // Config
-    const MOBILE_HEIGHT_vh = 350
-    const DESKTOP_HEIGHT_vh = 500
-    const SCROLL_HEIGHT_vh = isMobile ? MOBILE_HEIGHT_vh : DESKTOP_HEIGHT_vh
-
     // --- Setup & Load ---
     useEffect(() => {
-        setIsMounted(true)
         const checkMobile = () => {
             const mobile = window.matchMedia('(max-width: 768px)').matches
             setIsMobile(mobile)
@@ -43,7 +36,12 @@ export function HeroScrollFrames() {
     }
 
     // --- Render ---
-    if (!isMounted) return <div className="h-screen w-full bg-illa-pink" />
+    if (isMobile === null) return <div className="h-screen w-full bg-illa-pink" />
+
+    // Config
+    const MOBILE_HEIGHT_vh = 350
+    const DESKTOP_HEIGHT_vh = 500
+    const SCROLL_HEIGHT_vh = isMobile ? MOBILE_HEIGHT_vh : DESKTOP_HEIGHT_vh
 
 
 

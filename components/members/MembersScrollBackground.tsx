@@ -1,8 +1,20 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { HeroEngine } from '@/components/hero/HeroEngine'
 
 export default function MembersScrollBackground() {
+    const [isMobile, setIsMobile] = useState(false)
+
+    useEffect(() => {
+        const check = () => setIsMobile(window.innerWidth < 768)
+        check()
+        window.addEventListener('resize', check)
+        return () => window.removeEventListener('resize', check)
+    }, [])
+
+    if (!isMobile) return null
+
     return (
         <div className="fixed inset-0 w-full h-full pointer-events-none z-[-1] md:hidden">
             <HeroEngine
@@ -17,7 +29,6 @@ export default function MembersScrollBackground() {
                 posterUrl="/members-bg/IllaMembers-mobile_001.webp"
                 className="w-full h-full opacity-30 mix-blend-overlay"
             />
-            {/* The previous component had opacity/blend logic implicitly? No, it was just frames. */}
         </div>
     )
 }
