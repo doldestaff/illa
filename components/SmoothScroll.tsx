@@ -9,18 +9,25 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
     const lenisRef = useRef<any>(null)
 
     useEffect(() => {
-        function update(time: number) {
+        // 1. Force GSAP execution order
+        gsap.ticker.remove(gsap.updateRoot)
+        gsap.ticker.add((time) => {
             lenisRef.current?.lenis?.raf(time * 1000)
+            gsap.updateRoot(time)
+        })
+
+        // 2. Bind ScrollTrigger update to Lenis scroll
+        const lenis = lenisRef.current?.lenis
+        if (lenis) {
+            ScrollTrigger.refresh()
+            lenis.on('scroll', ScrollTrigger.update)
         }
 
-        // Bind GSAP Ticker to Lenis
-        gsap.ticker.add(update)
-
-        // Disable GSAP lag smoothing for better sync
-        gsap.ticker.lagSmoothing(0)
-
         return () => {
-            gsap.ticker.remove(update)
+            gsap.ticker.remove(gsap.updateRoot)
+            if (lenis) {
+                lenis.off('scroll', ScrollTrigger.update)
+            }
         }
     }, [])
 
@@ -33,6 +40,7 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
                 duration: 1.5,
                 smoothWheel: true,
                 touchMultiplier: 2,
+                syncTouch: true, // Critical for mobile
             }}
         >
             {children}

@@ -1,10 +1,10 @@
 'use client'
 
-import { useRef, useLayoutEffect, useEffect, useState } from 'react'
+import { useRef, useLayoutEffect, useState } from 'react'
 import { Info, Store, MapPin, MessageCircle, ShoppingBag, Instagram, ArrowRight, ArrowUp } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useLenis } from 'lenis/react'
 
 const cards = [
     {
@@ -64,6 +64,9 @@ const cards = [
     }
 ]
 
+// ... LazyVideo component (unchanged) ...
+import { useEffect } from 'react'
+
 function LazyVideo() {
     const videoRef = useRef<HTMLVideoElement>(null)
     const containerRef = useRef<HTMLDivElement>(null)
@@ -77,10 +80,8 @@ function LazyVideo() {
             ([entry]) => {
                 if (entry.isIntersecting) {
                     setIsVisible(true)
-                    // Start playing only when visible
                     videoRef.current?.play().catch(() => { })
                 } else {
-                    // Pause when off-screen to save resources
                     videoRef.current?.pause()
                 }
             },
@@ -92,25 +93,20 @@ function LazyVideo() {
 
     return (
         <div ref={containerRef} className="absolute inset-0 z-0 bg-gray-100">
-            {/* Poster Image (Immediate Load) */}
             <div className={cn(
-                "absolute inset-0 bg-cover bg-center transition-opacity duration-700",
+                "absolute inset-0 bg-cover bg-center transition-opacity duration-700 bg-gray-200", // Fallback color
                 isVisible ? "opacity-0" : "opacity-100"
             )}
-                style={{ backgroundImage: "url('/instagram/reels/cover.jpg')" }}
+            // style={{ backgroundImage: "url('/instagram/reels/cover.jpg')" }} // 404 Fix
             />
-
             <video
                 ref={videoRef}
                 className={cn(
                     "w-full h-full object-cover transition-opacity duration-1000",
                     isVisible ? "opacity-100" : "opacity-0"
                 )}
-                loop
-                muted
-                playsInline
-                preload="none"
-                poster="/instagram/reels/cover.jpg"
+                loop muted playsInline preload="none"
+            // poster="/instagram/reels/cover.jpg" // 404 Fix
             >
                 {isVisible && <source src="/instagram/reels/mobile/reels-1.mp4" type="video/mp4" />}
             </video>
@@ -121,90 +117,111 @@ function LazyVideo() {
 
 export function PinnedButtonsParallax() {
     const containerRef = useRef<HTMLDivElement>(null)
-    const wrapperRef = useRef<HTMLDivElement>(null)
     const cardsRef = useRef<(HTMLAnchorElement | null)[]>([])
 
-    useLayoutEffect(() => {
-        gsap.registerPlugin(ScrollTrigger)
+    // --- Direct Scroll Logic (No GSAP Scrub) ---
+    useLenis(({ scroll }) => {
+        if (!containerRef.current) return
 
-        const ctx = gsap.context(() => {
-            const tl = gsap.timeline({
-                scrollTrigger: {
-                    trigger: containerRef.current,
-                    start: "top top",
-                    end: "bottom bottom",
-                    scrub: 0.6, // Faster response to touch
-                }
-            })
+        const rect = containerRef.current.getBoundingClientRect()
+        const top = rect.top // Distance from viewport top
+        const height = rect.height
+        const windowH = window.innerHeight
 
-            // Card 1: Start ALREADY VISIBLE (no enter animation needed)
-            const firstCard = cardsRef.current[0]
-            if (firstCard) {
-                gsap.set(firstCard, {
-                    opacity: 1,
-                    y: 0,
-                    scale: 1,
-                    zIndex: cards.length + 10,
-                })
+        // Calculate progress: 0 when container starts entering, 1 when it leaves
+        // But we want pinning logic: 
+        // Logic: The "sticky" part happens via CSS.
+        // We just need to know how far through the sticky section we are.
+        // Since the parent is h-[500vh] and sticky is h-[100dvh],
+        // The effective scrollable distance is 400vh.
 
-                // Card 1 just holds then exits
-                tl.to(firstCard, {
-                    scale: 1.03,
-                    duration: 0.8,
-                    ease: "none"
-                })
-                    .to(firstCard, {
-                        opacity: 0,
-                        y: -50,
-                        scale: 1.08,
-                        zIndex: 0,
-                        duration: 0.6,
-                        ease: "power2.in"
-                    })
+        // Calculate Scroll Progress within the section
+        // When top is 0 (stuck at top), progress = 0
+        // When top is -(height - windowH), progress = 1
+
+        const scrollableDist = height - windowH
+        // Clamp simple progress 0..1
+        // Note: rect.top is negative as we scroll down
+        const rawProgress = -top / scrollableDist
+        const progress = Math.max(0, Math.min(1, rawProgress))
+
+        // Update Cards based on progress
+        const totalCards = cards.length
+        // We want to sequence them. 
+        // Card 1: 0.0 -> 0.16
+        // Card 2: 0.16 -> 0.32
+        // etc.
+
+        // Let's iterate manually for max performance
+        const step = 1 / totalCards
+        // Overlap factor
+        const overlap = 0.5
+
+        cardsRef.current.forEach((card, i) => {
+            if (!card) return
+
+            // Normalized time for this card
+            // We want card I to be fully active at i * step
+            // And exit at (i + 1) * step
+
+            // Re-use logic: Enter -> Hold -> Exit
+            // Using a simple sine wave or direct mapping
+
+            // Let's simply map:
+            // 0..0.2 : Enter
+            // 0.2..0.8 : Hold
+            // 0.8..1.0 : Exit
+
+            // Global Timeline position for this card
+            const start = (i * step) - (i > 0 ? (step * overlap) : 0)
+            const duration = step + (step * overlap)
+            const end = start + duration
+
+            // Local card progress 0..1
+            let localP = (progress - start) / duration
+
+            // Clamp
+            if (localP < 0) localP = 0
+            if (localP > 1) localP = 1
+
+            // Animate properties based on localP
+            let opacity = 0
+            let y = 50
+            let scale = 0.9
+            const zIndex = (i === 0) ? 10 : (progress > start ? 20 + i : 0)
+
+            if (localP < 0.2) {
+                // Entering
+                const t = localP / 0.2 // 0..1
+                opacity = t
+                y = 50 * (1 - t)
+                scale = 0.9 + (0.1 * t)
+            } else if (localP > 0.8) {
+                // Exiting
+                const t = (localP - 0.8) / 0.2 // 0..1
+                opacity = 1 - t
+                y = -50 * t
+                scale = 1 + (0.05 * t)
+            } else {
+                // Holding
+                opacity = 1
+                y = 0
+                scale = 1
             }
 
-            // Cards 2-6: Hidden initially, then enter → hold → exit with overlap
-            cardsRef.current.forEach((card, i) => {
-                if (!card || i === 0) return
+            // First card special case: Start visible
+            if (i === 0 && progress < step) {
+                opacity = 1
+                y = Math.min(0, y) // Don't go below
+                scale = Math.max(1, scale)
+            }
 
-                gsap.set(card, {
-                    opacity: 0,
-                    y: 60,
-                    scale: 0.9,
-                    zIndex: 0,
-                })
+            // Apply via CSS OM directly (fastest)
+            card.style.opacity = opacity.toString()
+            card.style.transform = `translate3d(0, ${y}px, 0) scale(${scale})`
+            card.style.zIndex = Math.round(opacity * 10).toString()
+        })
 
-                const zBase = cards.length - i
-
-                // Enter (overlap with previous card's exit by 0.3)
-                tl.to(card, {
-                    opacity: 1,
-                    y: 0,
-                    scale: 1,
-                    zIndex: zBase + 10,
-                    duration: 0.6,
-                    ease: "power2.out"
-                }, ">-0.3")
-                    // Hold
-                    .to(card, {
-                        scale: 1.03,
-                        duration: 0.8,
-                        ease: "none"
-                    })
-                    // Exit
-                    .to(card, {
-                        opacity: 0,
-                        y: -50,
-                        scale: 1.08,
-                        zIndex: 0,
-                        duration: 0.6,
-                        ease: "power2.in"
-                    })
-            })
-
-        }, containerRef)
-
-        return () => ctx.revert()
     }, [])
 
     return (
@@ -213,7 +230,6 @@ export function PinnedButtonsParallax() {
             className="relative w-full h-[500vh] bg-white text-dark"
         >
             <div
-                ref={wrapperRef}
                 className="sticky top-0 w-full h-[100dvh] flex items-center justify-center overflow-hidden"
             >
                 {/* Lazy Video Background */}
@@ -240,14 +256,15 @@ export function PinnedButtonsParallax() {
                             className={cn(
                                 "absolute inset-0 m-auto",
                                 "w-[85vw] max-w-[360px] md:max-w-[420px] h-[300px] md:h-[400px]",
-                                "bg-white/20 backdrop-blur-3xl border",
+                                "bg-white/20 backdrop-blur-md border", // Reduced blur for performance
                                 card.borderColor,
                                 "rounded-[3rem] shadow-[0_8px_32px_0_rgba(255,255,255,0.2)]",
                                 "hover:shadow-[0_0_50px_rgba(255,255,255,0.4)] hover:bg-white/30 hover:border-white/80",
                                 "flex flex-col items-center justify-center text-center p-8",
                                 "cursor-pointer group transition-shadow duration-500 ease-out",
-                                "will-change-transform"
+                                "will-change-transform" // Hint to browser
                             )}
+                            style={{ opacity: 0 }} // Start hidden (JS controls it)
                         >
                             {/* Inner Cloud Gradient */}
                             <div className={cn(

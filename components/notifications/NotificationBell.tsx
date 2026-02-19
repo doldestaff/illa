@@ -28,16 +28,28 @@ export function NotificationBell() {
 
     useEffect(() => {
         fetchCount()
-        const channel = supabase
-            .channel('notifications-bell')
-            .on('postgres_changes', {
-                event: 'INSERT',
-                schema: 'public',
-                table: 'notifications',
-                filter: `user_id=eq.${(await supabase.auth.getUser()).data.user?.id}`
-            }, () => fetchCount())
-            .subscribe()
-        return () => { supabase.removeChannel(channel) }
+        let channel: ReturnType<typeof supabase.channel> | null = null
+
+        const setupRealtime = async () => {
+            const { data: { user } } = await supabase.auth.getUser()
+            if (!user) return
+
+            channel = supabase
+                .channel(`notifications:${user.id}`)
+                .on('postgres_changes', {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'notifications',
+                    filter: `user_id=eq.${user.id}`
+                }, () => fetchCount())
+                .subscribe()
+        }
+
+        setupRealtime()
+
+        return () => {
+            if (channel) supabase.removeChannel(channel)
+        }
     }, [])
 
     // Close on click outside

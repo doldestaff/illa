@@ -1,24 +1,17 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { AlertTriangle } from 'lucide-react'
 import { HeroGhostButtons } from './HeroGhostButtons'
 import { useMotionValue } from 'framer-motion'
 import { cn } from '@/lib/utils'
-import { ScrollFrameCanvasEngine } from './hero/ScrollFrameCanvasEngine'
-
-// --- Types ---
-interface Manifest {
-    frameCount: number
-    frames: string[]
-}
+import { HeroEngine } from './hero/HeroEngine'
 
 export function HeroScrollFrames() {
     // Mount state
     const [isMounted, setIsMounted] = useState(false)
-    const [manifest, setManifest] = useState<Manifest | null>(null)
-    const [error, setError] = useState<string | null>(null)
     const [isMobile, setIsMobile] = useState(false)
+    const [error, setError] = useState<string | null>(null)
 
     // Stable Refs
     const buttonProgress = useMotionValue(0)
@@ -28,55 +21,35 @@ export function HeroScrollFrames() {
     const DESKTOP_HEIGHT_vh = 500
     const SCROLL_HEIGHT_vh = isMobile ? MOBILE_HEIGHT_vh : DESKTOP_HEIGHT_vh
 
-
-
-
     // --- Setup & Load ---
     useEffect(() => {
         setIsMounted(true)
-        const mobile = window.matchMedia('(max-width: 768px)').matches
-        setIsMobile(mobile)
-
-        const loadManifest = async () => {
-            const platform = mobile ? 'mobile' : 'desktop'
-            try {
-                const url = `/hero/manifest.${platform}.json`
-                const res = await fetch(url)
-                if (!res.ok) throw new Error(`Manifest 404`)
-                const data = await res.json()
-                setManifest(data)
-            } catch (e: any) {
-                console.error('Hero Load Error:', e)
-                setError(e.message)
-            }
+        const checkMobile = () => {
+            const mobile = window.matchMedia('(max-width: 768px)').matches
+            setIsMobile(mobile)
         }
-        loadManifest()
+        checkMobile()
+        window.addEventListener('resize', checkMobile)
+        return () => window.removeEventListener('resize', checkMobile)
     }, [])
 
-    const handleFrameChange = (index: number, progress: number) => {
-        // Ghost Button Logic (Frame 10 to 60)
-        // We might need to map this based on exact frame counts from manifest
-        // But 10-60 is the "safe zone" logic from before.
-        const startFrame = 10
-        const endFrame = 60
-        let btnProg = 0
-        if (index >= startFrame) {
-            btnProg = Math.min(1, Math.max(0, (index - startFrame) / (endFrame - startFrame)))
-        }
-        buttonProgress.set(btnProg)
+    const handleProgress = (progress: number) => {
+        // Ghost Button Logic (Visible roughly from 15% to 80% of scroll)
+        // Map 0.15 -> 0, 0.8 -> 1
+        const start = 0.15
+        const end = 0.8
+        const p = Math.max(0, Math.min(1, (progress - start) / (end - start)))
+        buttonProgress.set(p)
     }
 
     // --- Render ---
     if (!isMounted) return <div className="h-screen w-full bg-illa-pink" />
 
-    if (error) {
-        return (
-            <div className="h-screen w-full bg-red-900 text-white flex flex-col items-center justify-center p-4">
-                <AlertTriangle size={48} className="mb-4" />
-                <p className="opacity-80 font-mono text-xs">{error}</p>
-            </div>
-        )
-    }
+
+
+
+
+    // ...
 
     return (
         <section
@@ -85,20 +58,16 @@ export function HeroScrollFrames() {
         >
             <div className="sticky top-0 w-full h-[100dvh] overflow-hidden bg-illa-pink">
 
-                {manifest ? (
-                    <ScrollFrameCanvasEngine
-                        frameCount={manifest.frameCount}
-                        getFrameUrl={(i) => manifest.frames[i]}
-                        posterUrl={manifest.frames[isMobile ? 4 : 2] || ''} // Fallback to start frame
-                        scrollContainerHeight={undefined}
-                        priorityFrames={[0, 1, 2, 3, 4]}
-                        onFrameChange={handleFrameChange}
-                        debug={typeof window !== 'undefined' && window.location.search.includes('debugHero')}
-                    />
-                ) : (
-                    // Initial loader state
-                    <div className="absolute inset-0 bg-illa-pink" />
-                )}
+                {/* New Unified Engine */}
+                <HeroEngine
+                    manifestUrl={`/hero/manifest.${isMobile ? 'mobile' : 'desktop'}.json`}
+                    posterUrl={`/hero/${isMobile ? 'mobile' : 'desktop'}/frames/hero-1-${isMobile ? 'mobile' : 'desktop'}_000.webp`} // Corrected path from manifest
+                    scrollMode="viewport"
+                    scrollSectionHeightVh={SCROLL_HEIGHT_vh}
+                    onProgress={handleProgress}
+                    debug={typeof window !== 'undefined' && window.location.search.includes('debugHero')}
+                    className="z-10"
+                />
 
                 <div className="absolute inset-0 pointer-events-none z-20">
                     <HeroGhostButtons progress={buttonProgress} isMobile={isMobile} />

@@ -4,6 +4,7 @@ import React, { useRef, useEffect, useState, useCallback } from 'react'
 import { cn } from '@/lib/utils'
 import { useLenis } from 'lenis/react'
 
+
 // --- Types ---
 
 export interface ScrollFrameEngineProps {
@@ -274,8 +275,10 @@ export function ScrollFrameCanvasEngine({
     useLenis(({ scroll }) => {
         const scrollY = scroll
 
+        // Fallback to prop or calculated height
         const totalHeight = state.current.props.scrollContainerHeight || (state.current.appHeight * 4)
         const viewH = state.current.appHeight
+        // Ensure strictly positive scrollable range
         const scrollable = Math.max(1, totalHeight - viewH)
 
         const progress = Math.max(0, Math.min(1, scrollY / scrollable))
