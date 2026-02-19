@@ -82,21 +82,15 @@ function MobileButtons({ progress }: { progress: MotionValue<number> }) {
                 {buttons.map((btn, i) => {
                     const step = 1 / (buttons.length - 1)
                     const myTarget = i * step
-                    const visibleRange = step * 1.2
+                    const visibleRange = step * 2.5 // Widen range for smooth fade
 
-                    const opacity = useTransform(progress, (p) => {
-                        const dist = Math.abs(p - myTarget)
-                        if (dist < visibleRange) {
-                            const val = 1 - (dist / visibleRange)
-                            return Math.pow(val, 2)
-                        }
-                        return 0
-                    })
+                    // Make all buttons fully visible and same size
+                    const opacity = 1
+                    const scale = 1
 
-                    const scale = useTransform(opacity, [0, 1], [0.9, 1.05])
-                    const yOffset = useTransform(progress, (p) => (p - myTarget) * -120)
-                    const zIndex = useTransform(opacity, (o) => Math.round(o * 100))
-                    const display = useTransform(opacity, (o) => o > 0.01 ? 'flex' : 'none')
+                    const yOffset = useTransform(progress, (p) => (p - myTarget) * -450)
+                    const zIndex = 100
+                    const display = 'flex'
 
                     const isAction = btn.label === 'QUEM SOMOS'
 
