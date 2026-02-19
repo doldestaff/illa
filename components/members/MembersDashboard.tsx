@@ -64,6 +64,9 @@ const FlashDrop = dynamic(() => import('./FlashDrop'), {
 const SorvetesFreeCta = dynamic(() => import('./SorvetesFreeCta'), {
     loading: () => <div className="h-96 flex items-center justify-center"><SectionSkeleton /></div>,
 })
+const InviteModalContent = dynamic(() => import('./InviteModalContent'), {
+    loading: () => <div className="h-48 flex items-center justify-center"><SectionSkeleton /></div>,
+})
 
 interface Props {
     snapshot: MemberSnapshot
@@ -74,7 +77,7 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
     const [snapshot, setSnapshot] = useState(initial)
     const [vipPayload, setVipPayload] = useState<VipPayload | null>(null)
     const [sorvetesCount, setSorvetesCount] = useState(initial.sorvetes_free_count ?? 0)
-    const [activeModal, setActiveModal] = useState<'history' | 'scanner' | 'sorvetes' | null>(null)
+    const [activeModal, setActiveModal] = useState<'history' | 'scanner' | 'sorvetes' | 'invite' | null>(null)
     const progressTracked = useRef(false)
     const { isSupported, isSubscribed, subscribe } = usePushNotifications()
 
@@ -370,8 +373,8 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
 
     // ── Action Grid Handler ──
     const handleAction = useCallback((actionId: string) => {
-        if (actionId === 'history' || actionId === 'scanner' || actionId === 'sorvetes') {
-            setActiveModal(actionId)
+        if (actionId === 'history' || actionId === 'scanner' || actionId === 'sorvetes' || actionId === 'invite') {
+            setActiveModal(actionId as 'history' | 'scanner' | 'sorvetes' | 'invite')
         }
     }, [])
 
@@ -428,13 +431,15 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                                 title={
                                     activeModal === 'history' ? 'Histórico de Recompensas' :
                                         activeModal === 'scanner' ? 'Scanner de Drops' :
-                                            activeModal === 'sorvetes' ? 'Sorvetes Free' : ''
+                                            activeModal === 'sorvetes' ? 'Sorvetes Free' :
+                                                activeModal === 'invite' ? 'Indique e Ganhe' : ''
                                 }
                                 themeGradient={
                                     activeModal === 'history' ? 'from-blue-500 to-indigo-600' :
                                         activeModal === 'scanner' ? 'from-illa-pink to-rose-500' :
                                             activeModal === 'sorvetes' ? 'from-amber-400 to-orange-500' :
-                                                'from-white to-gray-400'
+                                                activeModal === 'invite' ? 'from-fuchsia-500 to-purple-600' :
+                                                    'from-white to-gray-400'
                                 }
                             >
                                 {activeModal === 'history' && <RewardTimeline />}
@@ -449,6 +454,14 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                                     <SorvetesFreeCta
                                         currentPoints={snapshot.profile.points}
                                         onRedeem={handleSorvetesRedeem}
+                                    />
+                                )}
+
+                                {activeModal === 'invite' && (
+                                    <InviteModalContent
+                                        referralCode={snapshot.profile.referral_code}
+                                        referralCount={snapshot.referral_count}
+                                        onShareCopy={handleShareCopy}
                                     />
                                 )}
                             </ActionModal>
