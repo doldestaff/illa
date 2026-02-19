@@ -24,6 +24,7 @@ export interface HeroEngineProps {
     scrollSectionHeightVh?: number
     // Callback for progress (0..1) to drive other animations
     onProgress?: (progress: number) => void
+    startIndex?: number
     debug?: boolean
 }
 
@@ -32,7 +33,6 @@ interface Manifest {
     frames: string[]
 }
 
-// --- LRU Cache ---
 // --- LRU Cache ---
 class FrameCache {
     private cache = new Map<number, ImageBitmap | HTMLImageElement>()
@@ -84,6 +84,7 @@ export function HeroEngine({
     scrollMode = 'viewport',
     scrollSectionHeightVh = 500,
     onProgress,
+    startIndex = 0,
     debug = false
 }: HeroEngineProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -97,7 +98,7 @@ export function HeroEngine({
     const state = useRef({
         cache: new FrameCache(),
         inflight: new Set<number>(),
-        lastFrameIndex: -1,
+        lastFrameIndex: startIndex, // Start at requested index
         appHeight: 0,
         appWidth: 0,
         isMobile: false,
@@ -329,9 +330,13 @@ export function HeroEngine({
 
         if (onProgress) onProgress(progress)
 
-        const targetFrame = progress * (state.current.frameCount - 1)
+        // START INDEX MAPPING (Clamp 0..1 to startIndex..last)
+        const start = startIndex || 0
+        const end = state.current.frameCount - 1
+        const targetFrame = start + (progress * (end - start))
+
         draw(targetFrame)
-    }, [manifest, scrollMode, scrollSectionHeightVh, loadFrame])
+    }, [manifest, scrollMode, scrollSectionHeightVh, loadFrame, startIndex])
 
     return (
         <div ref={containerRef} className={cn("absolute inset-0 w-full h-full overflow-hidden", className)}>
