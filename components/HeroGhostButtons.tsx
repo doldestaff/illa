@@ -15,56 +15,130 @@ const buttons = [
     { label: 'FRANQUIAS', icon: Store, link: 'https://wa.me/5582997755961?text=Ol%C3%A1%20gostaria%20de%20saber%20mais%20sobre%20as%20franquias' },
 ]
 
+function DesktopGhostButton({ btn, i, total, progress }: { btn: (typeof buttons)[0], i: number, total: number, progress: MotionValue<number> }) {
+    const step = 1 / total
+    const start = step * i
+
+    const opacity = useTransform(progress, [start, start + 0.1], [0, 1])
+    const x = useTransform(progress, [start, start + 0.1], [50, 0])
+    const scale = useTransform(progress, [start, start + 0.1], [0.8, 1])
+    const display = useTransform(progress, p => p >= start ? 'flex' : 'none')
+
+    const isAction = btn.label === 'QUEM SOMOS' || btn.label === 'CONTATO'
+
+    return (
+        <motion.a
+            href={btn.link}
+            target={isAction ? undefined : "_blank"}
+            rel={isAction ? undefined : "noreferrer"}
+            onClick={(e) => {
+                if (btn.label === 'QUEM SOMOS') {
+                    e.preventDefault()
+                    window.dispatchEvent(new CustomEvent('open-about-modal'))
+                }
+            }}
+            style={{ opacity, x, scale, display }}
+            className="
+                flex items-center gap-3 
+                px-6 py-2.5 
+                bg-white/10 backdrop-blur-xl 
+                border border-white/30 rounded-full 
+                text-white text-sm font-bold tracking-wide whitespace-nowrap
+                hover:bg-white/20 hover:scale-105 hover:border-white/50 
+                active:scale-95
+                transition-colors
+                shadow-2xl shadow-black/20
+                cursor-pointer
+            "
+        >
+            <btn.icon size={20} />
+            <span className="drop-shadow-sm">{btn.label}</span>
+        </motion.a>
+    )
+}
+
 function DesktopButtons({ progress }: { progress: MotionValue<number> }) {
     return (
         <div className="absolute bottom-8 left-0 right-0 z-20 flex justify-center pointer-events-none transition-all duration-300">
             <div className="w-full max-w-6xl px-4 pointer-events-auto">
                 <div className="flex justify-center gap-4 items-center">
-                    {buttons.map((btn, i) => {
-                        const step = 1 / buttons.length
-                        const start = step * i
-
-                        const opacity = useTransform(progress, [start, start + 0.1], [0, 1])
-                        const x = useTransform(progress, [start, start + 0.1], [50, 0])
-                        const scale = useTransform(progress, [start, start + 0.1], [0.8, 1])
-                        const display = useTransform(progress, p => p >= start ? 'flex' : 'none')
-
-                        const isAction = btn.label === 'QUEM SOMOS' || btn.label === 'CONTATO'
-
-                        return (
-                            <motion.a
-                                key={btn.label}
-                                href={btn.link}
-                                target={isAction ? undefined : "_blank"}
-                                rel={isAction ? undefined : "noreferrer"}
-                                onClick={(e) => {
-                                    if (btn.label === 'QUEM SOMOS') {
-                                        e.preventDefault()
-                                        window.dispatchEvent(new CustomEvent('open-about-modal'))
-                                    }
-                                }}
-                                style={{ opacity, x, scale, display }}
-                                className="
-                                    flex items-center gap-3 
-                                    px-6 py-2.5 
-                                    bg-white/10 backdrop-blur-xl 
-                                    border border-white/30 rounded-full 
-                                    text-white text-sm font-bold tracking-wide whitespace-nowrap
-                                    hover:bg-white/20 hover:scale-105 hover:border-white/50 
-                                    active:scale-95
-                                    transition-colors
-                                    shadow-2xl shadow-black/20
-                                    cursor-pointer
-                                "
-                            >
-                                <btn.icon size={20} />
-                                <span className="drop-shadow-sm">{btn.label}</span>
-                            </motion.a>
-                        )
-                    })}
+                    {buttons.map((btn, i) => (
+                        <DesktopGhostButton key={btn.label} btn={btn} i={i} total={buttons.length} progress={progress} />
+                    ))}
                 </div>
             </div>
         </div>
+    )
+}
+
+function MobileGhostButton({ btn, i, total, progress }: { btn: (typeof buttons)[0], i: number, total: number, progress: MotionValue<number> }) {
+    const step = 1 / (total - 1)
+    const myTarget = i * step
+    const visibleRange = step * 2.5 // Widen range for smooth fade
+
+    // Create a much stronger visual connection with the background
+    // by making the scale pop and the vertical travel speed higher
+    const rawOpacity = useTransform(progress, (p) => {
+        const dist = Math.abs(p - myTarget)
+        if (dist < visibleRange) {
+            const normalizedDist = dist / visibleRange
+            return Math.cos(normalizedDist * Math.PI / 2)
+        }
+        return 0
+    })
+
+    // Keep minimum opacity at 0.15 so they don't completely vanish until edge
+    const opacity = useTransform(rawOpacity, (o) => Math.max(0, o))
+
+    // Stronger pop effect
+    const scale = useTransform(opacity, [0, 1], [0.85, 1.15])
+
+    // Much faster vertical travel for intense parallax
+    const yOffset = useTransform(progress, (p) => (p - myTarget) * -700)
+
+    const zIndex = useTransform(opacity, (o) => Math.round(o * 100))
+    const display = useTransform(opacity, (o) => o > 0.05 ? 'flex' : 'none')
+
+    const isAction = btn.label === 'QUEM SOMOS'
+
+    return (
+        <motion.a
+            href={btn.link}
+            target={isAction ? undefined : "_blank"}
+            rel={isAction ? undefined : "noreferrer"}
+            onClick={(e) => {
+                if (isAction) {
+                    e.preventDefault()
+                    window.dispatchEvent(new CustomEvent('open-about-modal'))
+                }
+            }}
+            style={{
+                opacity,
+                scale,
+                y: yOffset,
+                x: '-50%',
+                left: '50%',
+                top: '50%',
+                marginTop: '-2rem',
+                zIndex,
+                display
+            }}
+            className="
+                absolute
+                flex items-center justify-center gap-3 
+                w-[85vw] max-w-[320px] py-4
+                bg-white/10 backdrop-blur-2xl 
+                border border-white/30 rounded-2xl 
+                text-white text-lg font-bold tracking-wide
+                shadow-xl shadow-black/20
+                cursor-pointer pointer-events-auto
+                will-change-transform
+                hover:bg-white/20 hover:scale-105 active:scale-95 transition-all
+            "
+        >
+            <btn.icon size={24} />
+            <span className="drop-shadow-md">{btn.label}</span>
+        </motion.a>
     )
 }
 
@@ -77,77 +151,9 @@ function MobileButtons({ progress }: { progress: MotionValue<number> }) {
             className="absolute bottom-[20vh] left-0 right-0 z-20 flex justify-center pointer-events-none h-32 items-center"
         >
             <div className="relative w-full h-full">
-                {buttons.map((btn, i) => {
-                    const step = 1 / (buttons.length - 1)
-                    const myTarget = i * step
-                    const visibleRange = step * 2.5 // Widen range for smooth fade
-
-                    // Create a much stronger visual connection with the background
-                    // by making the scale pop and the vertical travel speed higher
-                    const rawOpacity = useTransform(progress, (p) => {
-                        const dist = Math.abs(p - myTarget)
-                        if (dist < visibleRange) {
-                            const normalizedDist = dist / visibleRange
-                            return Math.cos(normalizedDist * Math.PI / 2)
-                        }
-                        return 0
-                    })
-
-                    // Keep minimum opacity at 0.15 so they don't completely vanish until edge
-                    const opacity = useTransform(rawOpacity, (o) => Math.max(0, o))
-
-                    // Stronger pop effect
-                    const scale = useTransform(opacity, [0, 1], [0.85, 1.15])
-
-                    // Much faster vertical travel for intense parallax
-                    const yOffset = useTransform(progress, (p) => (p - myTarget) * -700)
-
-                    const zIndex = useTransform(opacity, (o) => Math.round(o * 100))
-                    const display = useTransform(opacity, (o) => o > 0.05 ? 'flex' : 'none')
-
-                    const isAction = btn.label === 'QUEM SOMOS'
-
-                    return (
-                        <motion.a
-                            key={btn.label}
-                            href={btn.link}
-                            target={isAction ? undefined : "_blank"}
-                            rel={isAction ? undefined : "noreferrer"}
-                            onClick={(e) => {
-                                if (isAction) {
-                                    e.preventDefault()
-                                    window.dispatchEvent(new CustomEvent('open-about-modal'))
-                                }
-                            }}
-                            style={{
-                                opacity,
-                                scale,
-                                y: yOffset,
-                                x: '-50%',
-                                left: '50%',
-                                top: '50%',
-                                marginTop: '-2rem',
-                                zIndex,
-                                display
-                            }}
-                            className="
-                                absolute
-                                flex items-center justify-center gap-3 
-                                w-[85vw] max-w-[320px] py-4
-                                bg-white/10 backdrop-blur-2xl 
-                                border border-white/30 rounded-2xl 
-                                text-white text-lg font-bold tracking-wide
-                                shadow-xl shadow-black/20
-                                cursor-pointer pointer-events-auto
-                                will-change-transform
-                                hover:bg-white/20 hover:scale-105 active:scale-95 transition-all
-                            "
-                        >
-                            <btn.icon size={24} />
-                            <span className="drop-shadow-md">{btn.label}</span>
-                        </motion.a>
-                    )
-                })}
+                {buttons.map((btn, i) => (
+                    <MobileGhostButton key={btn.label} btn={btn} i={i} total={buttons.length} progress={progress} />
+                ))}
             </div>
         </motion.div>
     )
