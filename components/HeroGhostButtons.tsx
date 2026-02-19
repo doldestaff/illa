@@ -13,8 +13,6 @@ const buttons = [
     { label: 'IFOOD', icon: ShoppingBag, link: 'https://www.ifood.com.br/delivery/maceio-al/illa-sorvetes---sorveteria-serraria-serraria/403679e8-d45f-4f93-8fc9-c5e0e6f2dd04' },
     { label: 'LOCALIZAÇÃO', icon: MapPin, link: 'https://maps.app.goo.gl/cUzZ9QYTDXnjqyWU8' },
     { label: 'FRANQUIAS', icon: Store, link: 'https://wa.me/5582997755961?text=Ol%C3%A1%20gostaria%20de%20saber%20mais%20sobre%20as%20franquias' },
-    { label: 'QUEM SOMOS', icon: Info, link: 'https://www.illasorvetes.com.br/quem-somos' },
-    { label: 'CONTATO', icon: Phone, link: 'https://wa.me/558287286990' },
 ]
 
 function DesktopButtons({ progress }: { progress: MotionValue<number> }) {
@@ -84,13 +82,28 @@ function MobileButtons({ progress }: { progress: MotionValue<number> }) {
                     const myTarget = i * step
                     const visibleRange = step * 2.5 // Widen range for smooth fade
 
-                    // Make all buttons fully visible and same size
-                    const opacity = 1
-                    const scale = 1
+                    // Create a much stronger visual connection with the background
+                    // by making the scale pop and the vertical travel speed higher
+                    const rawOpacity = useTransform(progress, (p) => {
+                        const dist = Math.abs(p - myTarget)
+                        if (dist < visibleRange) {
+                            const normalizedDist = dist / visibleRange
+                            return Math.cos(normalizedDist * Math.PI / 2)
+                        }
+                        return 0
+                    })
 
-                    const yOffset = useTransform(progress, (p) => (p - myTarget) * -450)
-                    const zIndex = 100
-                    const display = 'flex'
+                    // Keep minimum opacity at 0.15 so they don't completely vanish until edge
+                    const opacity = useTransform(rawOpacity, (o) => Math.max(0, o))
+
+                    // Stronger pop effect
+                    const scale = useTransform(opacity, [0, 1], [0.85, 1.15])
+
+                    // Much faster vertical travel for intense parallax
+                    const yOffset = useTransform(progress, (p) => (p - myTarget) * -700)
+
+                    const zIndex = useTransform(opacity, (o) => Math.round(o * 100))
+                    const display = useTransform(opacity, (o) => o > 0.05 ? 'flex' : 'none')
 
                     const isAction = btn.label === 'QUEM SOMOS'
 
