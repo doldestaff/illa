@@ -404,25 +404,30 @@ export function HeroEngine({
                         )
 
                         // We are sticky, so we assume scroll starts at top (0)
-                        const vh = state.current.appHeight
-                        const totalH = vh * (scrollSectionHeightVh / 100)
+                        const vh = state.current.appHeight || window.innerHeight
+                        const totalH = vh * ((scrollSectionHeightVh || 500) / 100)
 
                         // Limit tracking to the height of the hero section
                         const scrollable = totalH - vh
-                        progress = Math.max(0, Math.min(1, scrollY / scrollable))
+                        progress = scrollable > 0 ? Math.max(0, Math.min(1, scrollY / scrollable)) : 0
                     } else {
                         // Document mode
                         const docH = Math.max(
                             document.body.scrollHeight, document.documentElement.scrollHeight
                         )
-                        const limit = docH - state.current.appHeight
-                        progress = Math.max(0, Math.min(1, scrollY / limit))
+                        const limit = docH - (state.current.appHeight || window.innerHeight)
+                        progress = limit > 0 ? Math.max(0, Math.min(1, scrollY / limit)) : 0
                     }
 
                     if (onProgress) onProgress(progress)
 
+                    // Critical fix: map progress correctly to the frame range
+                    // Note: Instead of always starting at `startIndex`, we map 0->`startIndex` and 1->`end`
                     const start = startIndex || 0
                     const end = state.current.frameCount - 1
+
+                    // We need to ensure that when progress is 0, we are exactly at `startIndex`
+                    // And when progress is 1, we are exactly at `end`
                     const targetFrame = start + (progress * (end - start))
 
                     draw(targetFrame)
@@ -433,8 +438,15 @@ export function HeroEngine({
         }
 
         window.addEventListener('scroll', handleScroll, { passive: true })
-        // Initial setup
-        handleScroll()
+
+        // --- Critical Fix for Initial Render ---
+        // Force an immediate draw using the start index before any scroll calculation happens
+        window.requestAnimationFrame(() => {
+            if (onProgress) onProgress(0); // Ensure ghost buttons get initial progress = 0
+            draw(startIndex || 0, true);
+            // Then let the scroll handler update it if we are already scrolled down
+            handleScroll();
+        });
 
         return () => window.removeEventListener('scroll', handleScroll)
     }, [manifest, scrollMode, scrollSectionHeightVh, startIndex, onProgress])
@@ -455,12 +467,13 @@ export function HeroEngine({
             <img
                 src={posterUrl}
                 className={cn(
-                    "absolute inset-0 w-full h-full object-cover transition-opacity duration-300",
+                    "absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-out z-10",
                     isLoaded ? "opacity-0" : "opacity-100"
                 )}
+                alt="Illa Loading"
             />
 
-            <canvas ref={canvasRef} className="block w-full h-full object-cover will-change-contents" />
+            <canvas ref={canvasRef} className="absolute inset-0 block w-full h-full object-cover will-change-contents z-0" />
         </div>
     )
 }
