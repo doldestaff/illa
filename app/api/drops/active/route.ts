@@ -1,9 +1,10 @@
 
-import { createClient } from '@/lib/supabase/server'
+import { createSupabaseServer } from '@/lib/supabaseServerClient'
 import { NextResponse } from 'next/server'
 
+// Recreated file
 export async function GET() {
-    const supabase = await createClient()
+    const supabase = await createSupabaseServer()
 
     try {
         const { data: drop } = await supabase

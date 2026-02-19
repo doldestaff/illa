@@ -33,21 +33,19 @@ interface Manifest {
 }
 
 // --- LRU Cache ---
-const MAX_CACHE_SIZE = 60
+// --- LRU Cache ---
 class FrameCache {
     private cache = new Map<number, ImageBitmap | HTMLImageElement>()
     private accessHistory: number[] = []
+    limit = 60
 
-    get(index: number) {
-        const pos = this.accessHistory.indexOf(index)
-        if (pos > -1) this.accessHistory.splice(pos, 1)
-        this.accessHistory.push(index)
-        return this.cache.get(index)
+    setLimit(n: number) {
+        this.limit = n
+        this.prune()
     }
 
-    add(index: number, frame: ImageBitmap | HTMLImageElement) {
-        if (this.cache.has(index)) return
-        if (this.cache.size >= MAX_CACHE_SIZE) {
+    private prune() {
+        while (this.cache.size > this.limit) {
             const lru = this.accessHistory.shift()
             if (lru !== undefined) {
                 const img = this.cache.get(lru)
@@ -55,8 +53,22 @@ class FrameCache {
                 this.cache.delete(lru)
             }
         }
+    }
+
+    get(index: number) {
+        const pos = this.accessHistory.indexOf(index)
+        if (pos > -1) {
+            this.accessHistory.splice(pos, 1)
+            this.accessHistory.push(index)
+        }
+        return this.cache.get(index)
+    }
+
+    add(index: number, frame: ImageBitmap | HTMLImageElement) {
+        if (this.cache.has(index)) return
         this.cache.set(index, frame)
         this.accessHistory.push(index)
+        this.prune()
     }
 
     has(index: number) { return this.cache.has(index) }
@@ -88,6 +100,7 @@ export function HeroEngine({
         lastFrameIndex: -1,
         appHeight: 0,
         appWidth: 0,
+        isMobile: false,
         // Props for loop
         frameCount: 0,
         frames: [] as string[],
@@ -144,6 +157,10 @@ export function HeroEngine({
             state.current.appHeight = h
             state.current.appWidth = w
 
+            // Mobile detection for perf
+            state.current.isMobile = w < 768
+            state.current.cache.setLimit(state.current.isMobile ? 20 : 60)
+
             if (containerRef.current) {
                 containerRef.current.style.setProperty('--app-h', `${h}px`)
             }
@@ -170,6 +187,7 @@ export function HeroEngine({
         }
         return state.current.frames[index]
     }, [manualFrames])
+
     const loadFrame = useCallback(async (index: number, priority = false) => {
         if (!manifest && !state.current.isManual) return
         if (index < 0 || index >= state.current.frameCount) return
@@ -177,7 +195,9 @@ export function HeroEngine({
         if (state.current.inflight.has(index)) return // Already loading
 
         // Concurrency Limiter (prevent browser choke)
-        if (!priority && state.current.inflight.size > 6) return
+        // Aggressive on mobile
+        const maxInflight = state.current.isMobile ? 2 : 6
+        if (!priority && state.current.inflight.size >= maxInflight) return
 
         const url = getUrl(index)
         if (!url) return

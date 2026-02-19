@@ -80,24 +80,35 @@ function LazyVideo() {
             ([entry]) => {
                 if (entry.isIntersecting) {
                     setIsVisible(true)
-                    videoRef.current?.play().catch(() => { })
                 } else {
-                    videoRef.current?.pause()
+                    setIsVisible(false)
                 }
             },
-            { rootMargin: '200px', threshold: 0.01 }
+            { rootMargin: '200px', threshold: 0.1 }
         )
         observer.observe(el)
         return () => observer.disconnect()
     }, [])
 
+    useEffect(() => {
+        if (isVisible) {
+            const playPromise = videoRef.current?.play()
+            if (playPromise !== undefined) {
+                playPromise.catch((error) => {
+                    console.log('Auto-play was prevented:', error)
+                })
+            }
+        } else {
+            videoRef.current?.pause()
+        }
+    }, [isVisible])
+
     return (
         <div ref={containerRef} className="absolute inset-0 z-0 bg-gray-100">
             <div className={cn(
-                "absolute inset-0 bg-cover bg-center transition-opacity duration-700 bg-gray-200", // Fallback color
+                "absolute inset-0 bg-cover bg-center transition-opacity duration-700 bg-gray-200",
                 isVisible ? "opacity-0" : "opacity-100"
             )}
-            // style={{ backgroundImage: "url('/instagram/reels/cover.jpg')" }} // 404 Fix
             />
             <video
                 ref={videoRef}
@@ -106,9 +117,8 @@ function LazyVideo() {
                     isVisible ? "opacity-100" : "opacity-0"
                 )}
                 loop muted playsInline preload="none"
-            // poster="/instagram/reels/cover.jpg" // 404 Fix
             >
-                {isVisible && <source src="/instagram/reels/mobile/reels-1.mp4" type="video/mp4" />}
+                {isVisible && <source src="/instagram/reels/mobile/Insta-1.mp4" type="video/mp4" />}
             </video>
             <div className="absolute inset-0 bg-white/10 backdrop-blur-[1px]" />
         </div>
