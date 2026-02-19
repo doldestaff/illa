@@ -1,8 +1,6 @@
 {
-  "frameCount": 82,
+  "frameCount": 80,
   "frames": [
-    "/hero/mobile/frames/hero-1-mobile_000.webp",
-    "/hero/mobile/frames/hero-1-mobile_001.webp",
     "/hero/mobile/frames/hero-1-mobile_002.webp",
     "/hero/mobile/frames/hero-1-mobile_003.webp",
     "/hero/mobile/frames/hero-1-mobile_004.webp",

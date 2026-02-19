@@ -1,8 +1,6 @@
 {
-  "frameCount": 82,
+  "frameCount": 80,
   "frames": [
-    "/hero/desktop/frames/hero-1-desktop_000.webp",
-    "/hero/desktop/frames/hero-1-desktop_001.webp",
     "/hero/desktop/frames/hero-1-desktop_002.webp",
     "/hero/desktop/frames/hero-1-desktop_003.webp",
     "/hero/desktop/frames/hero-1-desktop_004.webp",

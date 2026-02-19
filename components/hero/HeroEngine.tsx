@@ -150,33 +150,52 @@ export function HeroEngine({
         return () => { active = false }
     }, [manifestUrl, manualFrames])
 
-    // --- 2. Resize Handler (Stable) ---
+    // --- 2. Resize Handler (Stable & Debounced) ---
     useEffect(() => {
+        let resizeTimer: NodeJS.Timeout
+
         const handleResize = () => {
-            const h = window.visualViewport ? window.visualViewport.height : window.innerHeight
-            const w = window.visualViewport ? window.visualViewport.width : window.innerWidth
-            state.current.appHeight = h
-            state.current.appWidth = w
+            clearTimeout(resizeTimer)
+            resizeTimer = setTimeout(() => {
+                const h = window.visualViewport ? window.visualViewport.height : window.innerHeight
+                const w = window.visualViewport ? window.visualViewport.width : window.innerWidth
 
-            // Mobile detection for perf
-            state.current.isMobile = w < 768
-            state.current.cache.setLimit(state.current.isMobile ? 20 : 60)
+                // Only update if dimensions actually changed significantly
+                if (Math.abs(state.current.appHeight - h) < 1 &&
+                    Math.abs(state.current.appWidth - w) < 1) return
 
-            if (containerRef.current) {
-                containerRef.current.style.setProperty('--app-h', `${h}px`)
-            }
-            // Redraw current
-            requestAnimationFrame(() => draw(state.current.lastFrameIndex, true))
+                state.current.appHeight = h
+                state.current.appWidth = w
+
+                // Mobile detection for perf
+                state.current.isMobile = w < 768
+                state.current.cache.setLimit(state.current.isMobile ? 20 : 60)
+
+                if (containerRef.current) {
+                    containerRef.current.style.setProperty('--app-h', `${h}px`)
+                }
+
+                // Force redraw on resize
+                requestAnimationFrame(() => draw(state.current.lastFrameIndex, true))
+            }, 100) // Debounce 100ms
         }
 
         window.addEventListener('resize', handleResize)
         if (window.visualViewport) window.visualViewport.addEventListener('resize', handleResize)
 
-        handleResize()
+        // Initial call without debounce
+        const h = window.visualViewport ? window.visualViewport.height : window.innerHeight
+        const w = window.visualViewport ? window.visualViewport.width : window.innerWidth
+        state.current.appHeight = h
+        state.current.appWidth = w
+        state.current.isMobile = w < 768
+        state.current.cache.setLimit(state.current.isMobile ? 20 : 60)
+        if (containerRef.current) containerRef.current.style.setProperty('--app-h', `${h}px`)
 
         return () => {
             window.removeEventListener('resize', handleResize)
             if (window.visualViewport) window.visualViewport.removeEventListener('resize', handleResize)
+            clearTimeout(resizeTimer)
         }
     }, [])
 
@@ -279,14 +298,12 @@ export function HeroEngine({
         if (canvas.width !== targetW || canvas.height !== targetH) {
             canvas.width = targetW
             canvas.height = targetH
-            ctx.scale(dpr, dpr)
-        } else {
-            // If not resizing, we might need to reset transform if we were doing complex things, 
-            // but here we just need to ensure we draw over everything.
-            // We rely on 'cover' to fill the screen.
-            ctx.resetTransform()
+            // Scale context once after resize
             ctx.scale(dpr, dpr)
         }
+        // NOTE: We do NOT resetTransform/scale every frame for performance.
+        // We assume the context state persists until resize clears it.
+        // If we needed to clear, we'd use ctx.clearRect, but we overwrite everything anyway.
 
         const iW = (frame instanceof ImageBitmap) ? frame.width : (frame as HTMLImageElement).naturalWidth
         const iH = (frame instanceof ImageBitmap) ? frame.height : (frame as HTMLImageElement).naturalHeight
