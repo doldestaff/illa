@@ -159,7 +159,7 @@ export function HeroEngine({
 
             // Mobile detection for perf
             state.current.isMobile = w < 768
-            state.current.cache.setLimit(state.current.isMobile ? 20 : 60)
+            state.current.cache.setLimit(state.current.isMobile ? 35 : 60)
 
             if (containerRef.current) {
                 containerRef.current.style.setProperty('--app-h', `${h}px`)
@@ -196,7 +196,7 @@ export function HeroEngine({
 
         // Concurrency Limiter (prevent browser choke)
         // Aggressive on mobile
-        const maxInflight = state.current.isMobile ? 2 : 6
+        const maxInflight = state.current.isMobile ? 4 : 6
         if (!priority && state.current.inflight.size >= maxInflight) return
 
         const url = getUrl(index)

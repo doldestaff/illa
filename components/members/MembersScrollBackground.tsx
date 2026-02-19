@@ -26,8 +26,9 @@ export default function MembersScrollBackground() {
                     pathSuffix: ".webp",
                     padStart: 3
                 }}
+                priorityFrames={[0, 1, 2, 3, 4, 5]}
                 posterUrl="/members-bg/IllaMembers-mobile_001.webp"
-                className="w-full h-full opacity-30 mix-blend-overlay"
+                className="w-full h-full opacity-60"
             />
         </div>
     )

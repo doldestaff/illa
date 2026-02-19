@@ -1,9 +1,6 @@
 import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
 import { HeroScrollFrames } from '@/components/HeroScrollFrames'
-// import { HeroFramePlaceholder } from '@/components/HeroFramePlaceholder' // Kept for reference if needed
-// import { LinktreeCards } from '@/components/LinktreeCards' // Replaced by ParallaxButtonsSection
-// import { ParallaxButtonsSection } from '@/components/ParallaxButtonsSection'
 import { PinnedButtonsParallax } from '@/components/PinnedButtonsParallax'
 import { ProductsShowcase } from '@/components/ProductsShowcase'
 import { SocialProof } from '@/components/SocialProof'
