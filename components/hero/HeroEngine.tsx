@@ -160,7 +160,7 @@ export function HeroEngine({
 
             // Mobile detection for perf
             state.current.isMobile = w < 768
-            state.current.cache.setLimit(state.current.isMobile ? 35 : 60)
+            state.current.cache.setLimit(state.current.isMobile ? 20 : 60)
 
             if (containerRef.current) {
                 containerRef.current.style.setProperty('--app-h', `${h}px`)
@@ -197,7 +197,7 @@ export function HeroEngine({
 
         // Concurrency Limiter (prevent browser choke)
         // Aggressive on mobile
-        const maxInflight = state.current.isMobile ? 4 : 6
+        const maxInflight = state.current.isMobile ? 2 : 6
         if (!priority && state.current.inflight.size >= maxInflight) return
 
         const url = getUrl(index)
@@ -301,7 +301,7 @@ export function HeroEngine({
         ctx.drawImage(frame, x, y, finalW, finalH)
 
         // Lookahead
-        let lookahead = 6 // Increased from 4
+        let lookahead = state.current.isMobile ? 3 : 6
         if (typeof navigator !== 'undefined' && 'deviceMemory' in navigator && (navigator as any).deviceMemory <= 4) {
             lookahead = 3
         }
