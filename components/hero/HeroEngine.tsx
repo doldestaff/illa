@@ -99,9 +99,11 @@ export function HeroEngine({
         cache: new FrameCache(),
         inflight: new Map<number, AbortController>(),
         lastFrameIndex: startIndex, // Start at requested index
+        targetFrameIndex: startIndex, // Actual visual target from scroll
         appHeight: 0,
         appWidth: 0,
         isMobile: false,
+        pendingDraw: false,
         // Props for loop
         frameCount: 0,
         frames: [] as string[],
@@ -169,14 +171,14 @@ export function HeroEngine({
 
                 // Mobile detection for perf
                 state.current.isMobile = w < 768
-                state.current.cache.setLimit(state.current.isMobile ? 20 : 60)
+                state.current.cache.setLimit(state.current.isMobile ? 60 : 80)
 
                 if (containerRef.current) {
                     containerRef.current.style.setProperty('--app-h', `${h}px`)
                 }
 
                 // Force redraw on resize
-                requestAnimationFrame(() => draw(state.current.lastFrameIndex, true))
+                scheduleDraw()
             }, 100) // Debounce 100ms
         }
 
@@ -189,7 +191,7 @@ export function HeroEngine({
         state.current.appHeight = h
         state.current.appWidth = w
         state.current.isMobile = w < 768
-        state.current.cache.setLimit(state.current.isMobile ? 20 : 60)
+        state.current.cache.setLimit(state.current.isMobile ? 60 : 80)
         if (containerRef.current) containerRef.current.style.setProperty('--app-h', `${h}px`)
 
         return () => {
@@ -208,6 +210,16 @@ export function HeroEngine({
         return state.current.frames[index]
     }, [manualFrames])
 
+    const scheduleDraw = useCallback(() => {
+        if (!state.current.pendingDraw) {
+            state.current.pendingDraw = true
+            requestAnimationFrame(() => {
+                state.current.pendingDraw = false
+                draw(state.current.targetFrameIndex, true)
+            })
+        }
+    }, [])
+
     const loadFrame = useCallback(async (index: number, priority = false) => {
         if (!manifest && !state.current.isManual) return
         if (index < 0 || index >= state.current.frameCount) return
@@ -216,13 +228,13 @@ export function HeroEngine({
 
         // Concurrency Limiter (prevent browser choke)
         // Aggressive on mobile
-        const maxInflight = state.current.isMobile ? 3 : 6
+        const maxInflight = state.current.isMobile ? 5 : 8
         if (!priority && state.current.inflight.size >= maxInflight) {
             // Priority Check: Abort furthest frame to make room for nearest frame
             let furthestIndex = -1
-            let maxDist = Math.abs(state.current.lastFrameIndex - index)
+            let maxDist = Math.abs(state.current.targetFrameIndex - index)
             for (const inflightIdx of state.current.inflight.keys()) {
-                const dist = Math.abs(state.current.lastFrameIndex - inflightIdx)
+                const dist = Math.abs(state.current.targetFrameIndex - inflightIdx)
                 if (dist > maxDist) {
                     maxDist = dist
                     furthestIndex = inflightIdx
@@ -254,8 +266,8 @@ export function HeroEngine({
             })
             state.current.cache.add(index, bitmap)
 
-            if (priority || Math.abs(state.current.lastFrameIndex - index) <= 1) {
-                requestAnimationFrame(() => draw(state.current.lastFrameIndex, true))
+            if (priority || Math.abs(state.current.targetFrameIndex - index) <= 1) {
+                scheduleDraw()
             }
         } catch (e: any) {
             if (e.name === 'AbortError') return // Ignore aborted fetches
@@ -265,7 +277,7 @@ export function HeroEngine({
             img.onload = () => {
                 if (!state.current.cache.has(index)) {
                     state.current.cache.add(index, img)
-                    if (priority) requestAnimationFrame(() => draw(state.current.lastFrameIndex, true))
+                    if (priority || Math.abs(state.current.targetFrameIndex - index) <= 1) scheduleDraw()
                 }
             }
         } finally {
@@ -280,11 +292,11 @@ export function HeroEngine({
         const init = async () => {
             const toLoad = new Set([startIndex || 0, ...priorityFrames])
             await Promise.all(Array.from(toLoad).map(i => loadFrame(i, true)))
-            requestAnimationFrame(() => draw(startIndex || 0, true))
+            scheduleDraw()
             setIsLoaded(true)
         }
         init()
-    }, [manifest, priorityFrames, loadFrame, startIndex])
+    }, [manifest, priorityFrames, loadFrame, startIndex, scheduleDraw])
 
     // --- 4. Draw Logic ---
     const draw = (frameIndex: number, force = false) => {
@@ -294,15 +306,17 @@ export function HeroEngine({
         const maxFrame = state.current.frameCount - 1
         const idx = Math.max(0, Math.min(maxFrame, Math.round(frameIndex)))
 
+        state.current.targetFrameIndex = idx
+
         if (!force && state.current.lastFrameIndex === idx) return
 
         const frame = state.current.cache.get(idx)
 
         // Lookahead Strategy (Bi-directional based on velocity)
         // We do this BEFORE returning on missing frame, so we don't halt preloading!
-        const isScrollingBackward = state.current.lastFrameIndex > idx;
+        const isScrollingBackward = state.current.targetFrameIndex < state.current.lastFrameIndex;
 
-        let lookahead = state.current.isMobile ? 3 : 6
+        let lookahead = state.current.isMobile ? 4 : 8
         if (typeof navigator !== 'undefined' && 'deviceMemory' in navigator && (navigator as any).deviceMemory <= 4) {
             lookahead = 3
         }
@@ -410,7 +424,7 @@ export function HeroEngine({
                 )}
             />
 
-            <canvas ref={canvasRef} className="block w-full h-full object-cover" />
+            <canvas ref={canvasRef} className="block w-full h-full object-cover will-change-contents" />
         </div>
     )
 }
