@@ -2,7 +2,6 @@
 
 import React, { useRef, useEffect, useState, useCallback } from 'react'
 import { cn } from '@/lib/utils'
-import { useLenis } from 'lenis/react'
 
 // --- Types ---
 export interface HeroEngineProps {
@@ -260,11 +259,21 @@ export function HeroEngine({
             const resp = await fetch(url, { signal: controller.signal })
             if (!resp.ok) throw new Error('404')
             const blob = await resp.blob()
-            const bitmap = await createImageBitmap(blob, {
-                premultiplyAlpha: 'none',
-                colorSpaceConversion: 'none'
-            })
-            state.current.cache.add(index, bitmap)
+
+            let frameSource: ImageBitmap | HTMLImageElement
+            try {
+                // Try off-main-thread decode
+                frameSource = await createImageBitmap(blob, {
+                    premultiplyAlpha: 'none',
+                    colorSpaceConversion: 'none'
+                })
+            } catch (bitmapError) {
+                // Fallback to Image element if createImageBitmap fails or is unsupported
+                frameSource = new Image()
+                frameSource.src = URL.createObjectURL(blob)
+            }
+
+            state.current.cache.add(index, frameSource)
 
             if (priority || Math.abs(state.current.targetFrameIndex - index) <= 1) {
                 scheduleDraw()
@@ -373,35 +382,62 @@ export function HeroEngine({
         ctx.drawImage(frame, x, y, finalW, finalH)
     }
 
-    // --- 5. Scroll Logic (Unified) ---
-    useLenis(({ scroll, limit }) => {
-        if (!manifest && !state.current.isManual) {
-            // console.warn('[HeroEngine] Scroll suppressed: No manifest')
-            return
+    // --- 5. Native Scroll Polling ---
+    // Bypass React / useLenis hook overhead to prevent mobile render lag
+    useEffect(() => {
+        if (!manifest && !state.current.isManual) return
+
+        let ticking = false
+
+        const handleScroll = () => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    const scrollY = window.scrollY
+                    let progress = 0
+
+                    if (scrollMode === 'viewport') {
+                        // Using documentElement for consistent mobile behavior
+                        const docH = Math.max(
+                            document.body.scrollHeight, document.documentElement.scrollHeight,
+                            document.body.offsetHeight, document.documentElement.offsetHeight,
+                            document.body.clientHeight, document.documentElement.clientHeight
+                        )
+
+                        // We are sticky, so we assume scroll starts at top (0)
+                        const vh = state.current.appHeight
+                        const totalH = vh * (scrollSectionHeightVh / 100)
+
+                        // Limit tracking to the height of the hero section
+                        const scrollable = totalH - vh
+                        progress = Math.max(0, Math.min(1, scrollY / scrollable))
+                    } else {
+                        // Document mode
+                        const docH = Math.max(
+                            document.body.scrollHeight, document.documentElement.scrollHeight
+                        )
+                        const limit = docH - state.current.appHeight
+                        progress = Math.max(0, Math.min(1, scrollY / limit))
+                    }
+
+                    if (onProgress) onProgress(progress)
+
+                    const start = startIndex || 0
+                    const end = state.current.frameCount - 1
+                    const targetFrame = start + (progress * (end - start))
+
+                    draw(targetFrame)
+                    ticking = false
+                })
+                ticking = true
+            }
         }
 
-        let progress = 0
+        window.addEventListener('scroll', handleScroll, { passive: true })
+        // Initial setup
+        handleScroll()
 
-        if (scrollMode === 'viewport') {
-            const vh = state.current.appHeight
-            const totalH = vh * (scrollSectionHeightVh / 100)
-            const scrollable = totalH - vh
-            progress = Math.max(0, Math.min(1, scroll / scrollable))
-        } else {
-            progress = Math.max(0, Math.min(1, scroll / limit))
-        }
-
-        // console.log('[HeroEngine] Scroll:', scroll, 'Progress:', progress) // Uncomment for heavy debugging
-
-        if (onProgress) onProgress(progress)
-
-        // START INDEX MAPPING (Clamp 0..1 to startIndex..last)
-        const start = startIndex || 0
-        const end = state.current.frameCount - 1
-        const targetFrame = start + (progress * (end - start))
-
-        draw(targetFrame)
-    }, [manifest, scrollMode, scrollSectionHeightVh, loadFrame, startIndex])
+        return () => window.removeEventListener('scroll', handleScroll)
+    }, [manifest, scrollMode, scrollSectionHeightVh, startIndex, onProgress])
 
     return (
         <div ref={containerRef} className={cn("absolute inset-0 w-full h-full overflow-hidden", className)}>
