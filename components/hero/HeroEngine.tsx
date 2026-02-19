@@ -97,7 +97,7 @@ export function HeroEngine({
     // Refs for Loop
     const state = useRef({
         cache: new FrameCache(),
-        inflight: new Set<number>(),
+        inflight: new Map<number, AbortController>(),
         lastFrameIndex: startIndex, // Start at requested index
         appHeight: 0,
         appWidth: 0,
@@ -216,16 +216,36 @@ export function HeroEngine({
 
         // Concurrency Limiter (prevent browser choke)
         // Aggressive on mobile
-        const maxInflight = state.current.isMobile ? 2 : 6
-        if (!priority && state.current.inflight.size >= maxInflight) return
+        const maxInflight = state.current.isMobile ? 3 : 6
+        if (!priority && state.current.inflight.size >= maxInflight) {
+            // Priority Check: Abort furthest frame to make room for nearest frame
+            let furthestIndex = -1
+            let maxDist = Math.abs(state.current.lastFrameIndex - index)
+            for (const inflightIdx of state.current.inflight.keys()) {
+                const dist = Math.abs(state.current.lastFrameIndex - inflightIdx)
+                if (dist > maxDist) {
+                    maxDist = dist
+                    furthestIndex = inflightIdx
+                }
+            }
+            if (furthestIndex !== -1) {
+                // Abort the furthest fetch to free up a slot
+                const controller = state.current.inflight.get(furthestIndex)
+                if (controller) controller.abort()
+                state.current.inflight.delete(furthestIndex)
+            } else {
+                return // No items further away, keep current inflight
+            }
+        }
 
         const url = getUrl(index)
         if (!url) return
 
-        state.current.inflight.add(index)
+        const controller = new AbortController()
+        state.current.inflight.set(index, controller)
 
         try {
-            const resp = await fetch(url)
+            const resp = await fetch(url, { signal: controller.signal })
             if (!resp.ok) throw new Error('404')
             const blob = await resp.blob()
             const bitmap = await createImageBitmap(blob, {
@@ -237,13 +257,16 @@ export function HeroEngine({
             if (priority || Math.abs(state.current.lastFrameIndex - index) <= 1) {
                 requestAnimationFrame(() => draw(state.current.lastFrameIndex, true))
             }
-        } catch {
+        } catch (e: any) {
+            if (e.name === 'AbortError') return // Ignore aborted fetches
             // Fallback for Safari/Older browsers or error
             const img = new Image()
             img.src = url
             img.onload = () => {
-                state.current.cache.add(index, img)
-                if (priority) requestAnimationFrame(() => draw(state.current.lastFrameIndex, true))
+                if (!state.current.cache.has(index)) {
+                    state.current.cache.add(index, img)
+                    if (priority) requestAnimationFrame(() => draw(state.current.lastFrameIndex, true))
+                }
             }
         } finally {
             state.current.inflight.delete(index)
@@ -255,12 +278,13 @@ export function HeroEngine({
         if (!manifest) return
 
         const init = async () => {
-            const toLoad = new Set([0, ...priorityFrames])
+            const toLoad = new Set([startIndex || 0, ...priorityFrames])
             await Promise.all(Array.from(toLoad).map(i => loadFrame(i, true)))
+            requestAnimationFrame(() => draw(startIndex || 0, true))
             setIsLoaded(true)
         }
         init()
-    }, [manifest, priorityFrames, loadFrame])
+    }, [manifest, priorityFrames, loadFrame, startIndex])
 
     // --- 4. Draw Logic ---
     const draw = (frameIndex: number, force = false) => {
@@ -274,7 +298,24 @@ export function HeroEngine({
 
         const frame = state.current.cache.get(idx)
 
-        // If frame is missing, triggers load but KEEP OLD FRAME (don't clear canvas)
+        // Lookahead Strategy (Bi-directional based on velocity)
+        // We do this BEFORE returning on missing frame, so we don't halt preloading!
+        const isScrollingBackward = state.current.lastFrameIndex > idx;
+
+        let lookahead = state.current.isMobile ? 3 : 6
+        if (typeof navigator !== 'undefined' && 'deviceMemory' in navigator && (navigator as any).deviceMemory <= 4) {
+            lookahead = 3
+        }
+
+        if (isScrollingBackward) {
+            for (let i = 1; i <= lookahead; i++) loadFrame(idx - i)
+            for (let i = 1; i <= Math.floor(lookahead / 2); i++) loadFrame(idx + i)
+        } else {
+            for (let i = 1; i <= lookahead; i++) loadFrame(idx + i)
+            for (let i = 1; i <= Math.floor(lookahead / 2); i++) loadFrame(idx - i)
+        }
+
+        // If frame is missing, triggers priority load but KEEP OLD FRAME (don't clear canvas)
         if (!frame) {
             loadFrame(idx, true) // Priority load
             return
@@ -316,13 +357,6 @@ export function HeroEngine({
         const y = (h - finalH) / 2
 
         ctx.drawImage(frame, x, y, finalW, finalH)
-
-        // Lookahead
-        let lookahead = state.current.isMobile ? 3 : 6
-        if (typeof navigator !== 'undefined' && 'deviceMemory' in navigator && (navigator as any).deviceMemory <= 4) {
-            lookahead = 3
-        }
-        for (let i = 1; i <= lookahead; i++) loadFrame(idx + i)
     }
 
     // --- 5. Scroll Logic (Unified) ---
