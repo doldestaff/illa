@@ -2,7 +2,8 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { Instagram, Facebook, MapPin, Mail, Phone } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { Instagram, Facebook, MapPin, Mail, Phone, ArrowRight } from 'lucide-react'
 
 const externalLinks = {
     franchise: 'https://wa.me/5582997755961?text=Ol%C3%A1%20gostaria%20de%20saber%20mais%20sobre%20as%20franquias',
@@ -13,6 +14,8 @@ const externalLinks = {
 }
 
 export function Footer() {
+    const router = useRouter()
+
     return (
         <footer className="bg-dark text-white pt-24 pb-12 relative overflow-hidden">
             {/* Background Pattern Overlay */}
@@ -93,15 +96,15 @@ export function Footer() {
                         <ul className="space-y-4">
                             <li className="flex items-start gap-3 text-white/70 hover:text-white transition-colors group">
                                 <MapPin size={20} className="text-illa-pink mt-1 shrink-0 group-hover:scale-110 transition-transform" />
-                                <span className="text-sm">Rua dos Sorvetes, 123<br />Centro, Maceió - AL</span>
+                                <span className="text-sm">Rua L, 04 Qd B Lote 02,<br />Serraria, Maceió - AL, 57046-090</span>
                             </li>
                             <li className="flex items-center gap-3 text-white/70 hover:text-white transition-colors group">
                                 <Mail size={20} className="text-illa-pink shrink-0 group-hover:scale-110 transition-transform" />
-                                <a href="mailto:ola@illasorvetes.com.br" className="text-sm">ola@illasorvetes.com.br</a>
+                                <a href="mailto:contato@illasorvetes.com.br" className="text-sm">contato@illasorvetes.com.br</a>
                             </li>
                             <li className="flex items-center gap-3 text-white/70 hover:text-white transition-colors group">
                                 <Phone size={20} className="text-illa-pink shrink-0 group-hover:scale-110 transition-transform" />
-                                <a href="tel:+558299999999" className="text-sm">+55 82 9999-9999</a>
+                                <a href="tel:+558287286990" className="text-sm">+55 82 8728-6990</a>
                             </li>
                         </ul>
                     </div>
@@ -110,18 +113,17 @@ export function Footer() {
                     <div className="space-y-6">
                         <h4 className="font-bold text-illa-yellow text-lg tracking-wide uppercase text-sm">Novidades</h4>
                         <p className="text-white/60 text-sm mb-4">
-                            Cadastre-se para receber novidades e ofertas exclusivas.
+                            Cadastre-se na nossa plataforma para receber ofertas exclusivas e acompanhar seus pedidos.
                         </p>
-                        <form className="flex flex-col gap-3" onSubmit={(e) => e.preventDefault()}>
-                            <input
-                                type="email"
-                                placeholder="Seu melhor e-mail"
-                                className="bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-illa-pink/50 transition-colors"
-                            />
-                            <button className="bg-illa-pink text-white font-bold py-3 px-6 rounded-lg hover:bg-white hover:text-illa-pink transition-all text-sm uppercase tracking-wider shadow-lg hover:shadow-illa-pink/20">
+                        <div className="flex flex-col gap-3">
+                            <button
+                                onClick={() => router.push('?login=1')}
+                                className="w-full flex items-center justify-center gap-2 bg-illa-pink text-white font-bold py-3.5 px-6 rounded-xl hover:bg-white hover:text-illa-pink transition-all text-sm uppercase tracking-wider shadow-lg shadow-pink-500/20 hover:shadow-pink-500/40 active:scale-95 group"
+                            >
                                 Inscrever-se
+                                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                             </button>
-                        </form>
+                        </div>
                     </div>
 
                 </div>

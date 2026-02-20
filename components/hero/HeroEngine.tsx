@@ -300,16 +300,21 @@ export function HeroEngine({
 
     // Initial Load
     useEffect(() => {
-        if (!manifest) return
-
         const init = async () => {
+            if (!manifest || state.current.frameCount === 0) return
+
+            // Load a small batch of initial frames to ensure smooth start
+            const priorityFrames = [0, 1, 2, 3, 4]
             const toLoad = new Set([startIndex || 0, ...priorityFrames])
+
+            // Wait for at least the starting frame to load before we even attempt to draw
             await Promise.all(Array.from(toLoad).map(i => loadFrame(i, true)))
+
+            // We do NOT set isLoaded here anymore. We wait for the first successful canvas draw.
             scheduleDraw()
-            setIsLoaded(true)
         }
         init()
-    }, [manifest, priorityFrames, loadFrame, startIndex, scheduleDraw])
+    }, [manifest, loadFrame, startIndex, scheduleDraw])
 
     // --- 4. Draw Logic ---
     const draw = (frameIndex: number, force = false) => {
@@ -384,6 +389,11 @@ export function HeroEngine({
         const y = (h - finalH) / 2
 
         ctx.drawImage(frame, x, y, finalW, finalH)
+
+        // We only set isLoaded once the *first* frame has actually been painted to the canvas
+        if (!isLoaded) {
+            setIsLoaded(true)
+        }
     }
 
     // --- 5. Native Scroll Polling ---
@@ -475,9 +485,19 @@ export function HeroEngine({
                     isLoaded ? "opacity-0" : "opacity-100"
                 )}
                 alt="Illa Loading"
+                style={{
+                    // Fallback to ensuring pointer events don't block
+                    pointerEvents: isLoaded ? 'none' : 'auto'
+                }}
             />
 
-            <canvas ref={canvasRef} className="absolute inset-0 block w-full h-full object-cover z-0" />
+            <canvas
+                ref={canvasRef}
+                className={cn(
+                    "absolute inset-0 block w-full h-full object-cover z-0 transition-opacity duration-700",
+                    isLoaded ? "opacity-100" : "opacity-0"
+                )}
+            />
         </div>
     )
 }

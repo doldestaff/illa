@@ -79,7 +79,6 @@ export function HeroScrollFrames() {
                     onProgress={handleProgress}
                     debug={typeof window !== 'undefined' && window.location.search.includes('debugHero')}
                     className="z-10"
-                    startIndex={6}
                 />
 
                 <div className="absolute inset-0 pointer-events-none z-20">

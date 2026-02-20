@@ -58,8 +58,11 @@ function DesktopGhostButton({ btn, i, total, progress }: { btn: (typeof buttons)
 }
 
 function DesktopButtons({ progress }: { progress: MotionValue<number> }) {
+    // Fade out entirely at the end of the scroll (0.85 -> 0.95)
+    const fadeOpacity = useTransform(progress, [0.85, 0.95], [1, 0])
+
     return (
-        <div className="absolute bottom-8 left-0 right-0 z-20 flex justify-center pointer-events-none transition-all duration-300">
+        <motion.div style={{ opacity: fadeOpacity }} className="absolute bottom-8 left-0 right-0 z-20 flex justify-center pointer-events-none transition-all duration-300">
             <div className="w-full max-w-6xl px-4 pointer-events-auto">
                 <div className="flex justify-center gap-4 items-center">
                     {buttons.map((btn, i) => (
@@ -67,7 +70,7 @@ function DesktopButtons({ progress }: { progress: MotionValue<number> }) {
                     ))}
                 </div>
             </div>
-        </div>
+        </motion.div>
     )
 }
 
@@ -75,61 +78,77 @@ function MobileButtons({ progress }: { progress: MotionValue<number> }) {
     // We map the 0..1 progress to a physical vertical translation of a container.
     // Let's assume the container needs to move up by say 250px to show all buttons.
     const scrollY = useTransform(progress, [0, 1], [0, -220])
+    // Fade out arrow quickly when user starts scrolling
+    const arrowOpacity = useTransform(progress, [0, 0.05], [1, 0])
+
+    // Fade out the entire module at the end of the scroll (e.g. 0.85 -> 0.95)
+    const fadeOpacity = useTransform(progress, [0.85, 0.95], [1, 0])
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 0.5 }}
-            className="absolute bottom-[20vh] left-0 right-0 z-20 flex justify-center h-[120px] items-center overflow-visible"
-        >
-            {/* The mask container limits visibility so it feels like they are sliding in and out */}
-            <div className="relative w-full h-[250px] flex justify-center items-center pointer-events-none [mask-image:linear-gradient(to_bottom,transparent,black_20%,black_80%,transparent)]">
+        <motion.div style={{ opacity: fadeOpacity }}>
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: "easeOut", delay: 0.5 }}
+                className="absolute bottom-[20vh] left-0 right-0 z-20 flex justify-center h-[120px] items-center overflow-visible"
+            >
+                {/* The mask container limits visibility so it feels like they are sliding in and out */}
+                <div className="relative w-full h-[250px] flex justify-center items-center pointer-events-none [mask-image:linear-gradient(to_bottom,transparent,black_20%,black_80%,transparent)]">
 
-                {/* The inner track that actually moves based on scroll progress */}
-                <motion.div
-                    style={{ y: scrollY }}
-                    className="absolute top-[180px] flex flex-col gap-6 items-center pointer-events-auto w-full"
-                >
-                    {buttons.map((btn, i) => {
-                        const isAction = btn.label === 'QUEM SOMOS' || btn.label === 'CONTATO'
+                    {/* The inner track that actually moves based on scroll progress */}
+                    <motion.div
+                        style={{ y: scrollY }}
+                        className="absolute top-[180px] flex flex-col gap-6 items-center pointer-events-auto w-full"
+                    >
+                        {buttons.map((btn, i) => {
+                            const isAction = btn.label === 'QUEM SOMOS' || btn.label === 'CONTATO'
 
-                        return (
-                            <a
-                                key={btn.label}
-                                href={btn.link}
-                                target={isAction ? undefined : "_blank"}
-                                rel={isAction ? undefined : "noreferrer"}
-                                onClick={(e) => {
-                                    if (btn.label === 'QUEM SOMOS') {
-                                        e.preventDefault()
-                                        window.dispatchEvent(new CustomEvent('open-about-modal'))
-                                    }
-                                }}
-                                className="
-                                    flex items-center justify-center gap-3 
-                                    w-[65vw] max-w-[260px] py-4
-                                    bg-illa-pink/90 backdrop-blur-xl hover:bg-illa-yellow hover:text-dark hover:border-transparent
-                                    border border-white/50 rounded-2xl 
-                                    text-white text-sm font-bold tracking-widest
-                                    cursor-pointer
-                                    active:scale-95 transition-all duration-300
-                                    group shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]
-                                "
-                            >
-                                <btn.icon size={18} className="text-current" />
-                                <span className="drop-shadow-md group-hover:drop-shadow-none">{btn.label}</span>
-                            </a>
-                        )
-                    })}
+                            return (
+                                <a
+                                    key={btn.label}
+                                    href={btn.link}
+                                    target={isAction ? undefined : "_blank"}
+                                    rel={isAction ? undefined : "noreferrer"}
+                                    onClick={(e) => {
+                                        if (btn.label === 'QUEM SOMOS') {
+                                            e.preventDefault()
+                                            window.dispatchEvent(new CustomEvent('open-about-modal'))
+                                        }
+                                    }}
+                                    className="
+                                        flex items-center justify-center gap-3 
+                                        w-[65vw] max-w-[260px] py-4
+                                        bg-illa-pink/90 backdrop-blur-xl hover:bg-illa-yellow hover:text-dark hover:border-transparent
+                                        border border-white/50 rounded-2xl 
+                                        text-white text-sm font-bold tracking-widest
+                                        cursor-pointer
+                                        active:scale-95 transition-all duration-300
+                                        group shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]
+                                    "
+                                >
+                                    <btn.icon size={18} className="text-current" />
+                                    <span className="drop-shadow-md group-hover:drop-shadow-none">{btn.label}</span>
+                                </a>
+                            )
+                        })}
+                    </motion.div>
 
-                    {/* Animated Scroll Arrow shown when the last button comes into view */}
-                    <div className="mt-4 flex flex-col items-center gap-1 animate-bounce text-white/70">
-                        <ChevronDown size={28} strokeWidth={1.5} />
-                    </div>
-                </motion.div>
+                </div>
+            </motion.div>
 
-            </div>
+            {/* Scroll Hint Arrow Fixed Near Bottom */}
+            <motion.div
+                style={{ opacity: arrowOpacity }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1, delay: 1 }}
+                className="absolute bottom-16 left-0 right-0 flex justify-center pointer-events-none z-30"
+            >
+                <div className="flex flex-col items-center gap-2 text-white/80 drop-shadow-lg">
+                    <ChevronDown size={32} strokeWidth={2} className="animate-bounce" />
+                    <span className="text-[10px] uppercase font-bold tracking-[0.2em] opacity-90">Scroll</span>
+                </div>
+            </motion.div>
         </motion.div>
     )
 }
