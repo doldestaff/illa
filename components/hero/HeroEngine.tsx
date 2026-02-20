@@ -269,8 +269,12 @@ export function HeroEngine({
                 })
             } catch (bitmapError) {
                 // Fallback to Image element if createImageBitmap fails or is unsupported
-                frameSource = new Image()
-                frameSource.src = URL.createObjectURL(blob)
+                frameSource = await new Promise<HTMLImageElement>((resolve, reject) => {
+                    const img = new Image()
+                    img.onload = () => resolve(img)
+                    img.onerror = reject
+                    img.src = URL.createObjectURL(blob)
+                })
             }
 
             state.current.cache.add(index, frameSource)
@@ -473,7 +477,7 @@ export function HeroEngine({
                 alt="Illa Loading"
             />
 
-            <canvas ref={canvasRef} className="absolute inset-0 block w-full h-full object-cover will-change-contents z-0" />
+            <canvas ref={canvasRef} className="absolute inset-0 block w-full h-full object-cover z-0" />
         </div>
     )
 }

@@ -1,9 +1,8 @@
 'use client'
 
-import { useRef, useLayoutEffect, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { Info, Store, MapPin, MessageCircle, ShoppingBag, Instagram, ArrowRight, ArrowUp } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import gsap from 'gsap'
 import { useLenis } from 'lenis/react'
 
 const cards = [
@@ -65,7 +64,6 @@ const cards = [
 ]
 
 // ... LazyVideo component (unchanged) ...
-import { useEffect } from 'react'
 
 function LazyVideo() {
     const videoRef = useRef<HTMLVideoElement>(null)
@@ -117,9 +115,8 @@ function LazyVideo() {
                     isVisible ? "opacity-100" : "opacity-0"
                 )}
                 loop muted playsInline preload="none"
-            >
-                {isVisible && <source src="/instagram/reels/mobile/Insta-1.mp4" type="video/mp4" />}
-            </video>
+                src="/instagram/reels/mobile/Insta-1.mp4"
+            />
             <div className="absolute inset-0 bg-white/10 backdrop-blur-[1px]" />
         </div>
     )
@@ -134,105 +131,122 @@ export function PinnedButtonsParallax() {
         if (!containerRef.current) return
 
         const rect = containerRef.current.getBoundingClientRect()
-        const top = rect.top // Distance from viewport top
+        const top = rect.top
         const height = rect.height
         const windowH = window.innerHeight
 
-        // Calculate progress: 0 when container starts entering, 1 when it leaves
-        // But we want pinning logic: 
-        // Logic: The "sticky" part happens via CSS.
-        // We just need to know how far through the sticky section we are.
-        // Since the parent is h-[500vh] and sticky is h-[100dvh],
-        // The effective scrollable distance is 400vh.
-
-        // Calculate Scroll Progress within the section
-        // When top is 0 (stuck at top), progress = 0
-        // When top is -(height - windowH), progress = 1
-
         const scrollableDist = height - windowH
-        // Clamp simple progress 0..1
-        // Note: rect.top is negative as we scroll down
         const rawProgress = -top / scrollableDist
         const progress = Math.max(0, Math.min(1, rawProgress))
 
-        // Update Cards based on progress
         const totalCards = cards.length
-        // We want to sequence them. 
-        // Card 1: 0.0 -> 0.16
-        // Card 2: 0.16 -> 0.32
-        // etc.
-
-        // Let's iterate manually for max performance
         const step = 1 / totalCards
-        // Overlap factor
         const overlap = 0.5
 
         cardsRef.current.forEach((card, i) => {
             if (!card) return
 
-            // Normalized time for this card
-            // We want card I to be fully active at i * step
-            // And exit at (i + 1) * step
-
-            // Re-use logic: Enter -> Hold -> Exit
-            // Using a simple sine wave or direct mapping
-
-            // Let's simply map:
-            // 0..0.2 : Enter
-            // 0.2..0.8 : Hold
-            // 0.8..1.0 : Exit
+            // Selective child elements for staggered animation
+            const content = card.querySelector('.card-content') as HTMLElement
+            const icon = card.querySelector('.card-icon') as HTMLElement
+            const highlight = card.querySelector('.glass-highlight') as HTMLElement
 
             // Global Timeline position for this card
             const start = (i * step) - (i > 0 ? (step * overlap) : 0)
             const duration = step + (step * overlap)
-            const end = start + duration
 
             // Local card progress 0..1
             let localP = (progress - start) / duration
-
-            // Clamp
             if (localP < 0) localP = 0
             if (localP > 1) localP = 1
 
-            // Animate properties based on localP
-            let opacity = 0
-            let y = 50
-            let scale = 0.9
-            const zIndex = (i === 0) ? 10 : (progress > start ? 20 + i : 0)
+            // Cinematic easing functions
+            const easeOutQuart = (t: number) => 1 - Math.pow(1 - t, 4)
+            const easeInCubic = (t: number) => t * t * t
 
-            if (localP < 0.2) {
-                // Entering
-                const t = localP / 0.2 // 0..1
-                opacity = t
-                y = 50 * (1 - t)
-                scale = 0.9 + (0.1 * t)
-            } else if (localP > 0.8) {
-                // Exiting
-                const t = (localP - 0.8) / 0.2 // 0..1
-                opacity = 1 - t
-                y = -50 * t
-                scale = 1 + (0.05 * t)
-            } else {
-                // Holding
+            let opacity = 0
+            let y = 100
+            let z = -600
+            let rotateX = 35
+            let scale = 0.7
+            let pointerEvents: 'auto' | 'none' = 'none'
+            let highlightX = -100
+
+            // ANIMATION CORE - Optimized for first two buttons and better readability
+            // Width of the focus plateau (Phase 2): 0.35 to 0.65 (30% of card duration)
+            if (i === 0 && localP < 0.65) {
+                // FIRST CARD EXCEPTION: Stay focused from the start until it's time to exit
                 opacity = 1
                 y = 0
+                z = 0
+                rotateX = 0
                 scale = 1
-            }
+                pointerEvents = 'auto'
+                highlightX = 100
+            } else if (localP < 0.35) {
+                // PHASE 1: ENTERING (0.0 to 0.35)
+                const t = localP / 0.35
+                const e = easeOutQuart(t)
 
-            // First card special case: Start visible
-            if (i === 0 && progress < step) {
+                opacity = t
+                y = 100 * (1 - e)
+                z = -600 * (1 - e)
+                rotateX = 35 * (1 - e)
+                scale = 0.7 + (0.3 * e)
+                highlightX = -100 + (200 * e)
+            } else if (localP > 0.65) {
+                // PHASE 3: EXITING (0.65 to 1.0)
+                const t = (localP - 0.65) / 0.35
+                const e = easeInCubic(t)
+
+                opacity = 1 - t
+                y = -120 * e
+                z = 400 * e
+                rotateX = -20 * e
+                scale = 1 + (0.15 * e)
+                highlightX = 100 + (200 * e)
+            } else {
+                // PHASE 2: CENTER FOCUS (0.35 to 0.65)
                 opacity = 1
-                y = Math.min(0, y) // Don't go below
-                scale = Math.max(1, scale)
+                y = 0
+                z = 0
+                rotateX = 0
+                scale = 1
+                pointerEvents = 'auto'
+                highlightX = 100
             }
 
-            // Apply via CSS OM directly (fastest)
+            // Special handling for section entry: Button 1 must be active immediately
+            if (i === 0 && progress < 0.1) {
+                opacity = 1; y = 0; z = 0; rotateX = 0; scale = 1; pointerEvents = 'auto';
+            }
+
+            // APPLY MAIN CARD TRANSFORMS
             card.style.opacity = opacity.toString()
-            card.style.transform = `translate3d(0, ${y}px, 0) scale(${scale})`
-            card.style.zIndex = Math.round(opacity * 10).toString()
+            card.style.transform = `translate3d(0, ${y}px, ${z}px) rotateX(${rotateX}deg) scale(${scale})`
+            card.style.zIndex = pointerEvents === 'auto' ? '50' : Math.round(opacity * 10).toString()
+            card.style.pointerEvents = pointerEvents
+
+            // APPLY STAGGERED CHILD ANIMATIONS (Inner Depth)
+            if (content) {
+                const contentT = Math.max(0, Math.min(1, (localP - 0.1) / 0.8))
+                content.style.opacity = (opacity * Math.min(1, contentT * 2)).toString()
+                content.style.transform = `translateY(${y * 0.2}px)`
+            }
+            if (icon) {
+                icon.style.transform = `scale(${scale}) translateY(${y * -0.1}px)`
+                icon.style.filter = `drop-shadow(0 ${Math.abs(y) * 0.1}px ${20 + Math.abs(z) * 0.05}px rgba(0,0,0,0.2))`
+            }
+            if (highlight) {
+                highlight.style.transform = `translateX(${highlightX}%) skewX(-20deg)`
+                // Make highlights brighter for the first two cards to emphasize premium
+                const intensity = (i < 2) ? 0.6 : 0.4
+                highlight.style.opacity = (opacity * intensity).toString()
+            }
         })
 
     }, [])
+
 
     return (
         <section
@@ -240,7 +254,7 @@ export function PinnedButtonsParallax() {
             className="relative w-full h-[500vh] bg-white text-dark"
         >
             <div
-                className="sticky top-0 w-full h-[100dvh] flex items-center justify-center overflow-hidden pointer-events-none touch-pan-y"
+                className="sticky top-0 w-full h-[100dvh] flex items-center justify-center overflow-hidden touch-pan-y"
             >
                 {/* Lazy Video Background */}
                 <LazyVideo />
@@ -249,7 +263,7 @@ export function PinnedButtonsParallax() {
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-transparent via-white/20 to-white/60 pointer-events-none z-0" />
 
                 {/* Stage */}
-                <div className="relative w-full max-w-md h-[320px] md:h-[400px] flex items-center justify-center">
+                <div className="relative w-full max-w-md h-[320px] md:h-[400px] flex items-center justify-center [perspective:1000px]">
                     {cards.map((card, index) => (
                         <a
                             key={card.id}
@@ -264,27 +278,30 @@ export function PinnedButtonsParallax() {
                                 }
                             }}
                             className={cn(
-                                "absolute inset-0 m-auto pointer-events-auto",
+                                "absolute inset-0 m-auto overflow-hidden",
                                 "w-[85vw] max-w-[360px] md:max-w-[420px] h-[300px] md:h-[400px]",
-                                "bg-white/20 backdrop-blur-md border", // Reduced blur for performance
+                                "bg-white/20 backdrop-blur-md border",
                                 card.borderColor,
                                 "rounded-[3rem] shadow-[0_8px_32px_0_rgba(255,255,255,0.2)]",
                                 "hover:shadow-[0_0_50px_rgba(255,255,255,0.4)] hover:bg-white/30 hover:border-white/80",
                                 "flex flex-col items-center justify-center text-center p-8",
                                 "cursor-pointer group transition-shadow duration-500 ease-out",
-                                "will-change-transform" // Hint to browser
+                                "will-change-transform"
                             )}
-                            style={{ opacity: 0 }} // Start hidden (JS controls it)
+                            style={{ opacity: 0 }}
                         >
+                            {/* Cinematic Glass Highlight Traveler */}
+                            <div className="glass-highlight absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-20 pointer-events-none z-20" style={{ transform: 'translateX(-100%)' }} />
+
                             {/* Inner Cloud Gradient */}
                             <div className={cn(
                                 "absolute inset-0 rounded-[3rem] bg-gradient-to-b from-white/40 to-transparent opacity-50 pointer-events-none",
                                 card.color
                             )} />
 
-                            <div className="relative z-10 flex flex-col items-center gap-6">
+                            <div className="card-content relative z-10 flex flex-col items-center gap-6">
                                 <div className={cn(
-                                    "w-24 h-24 rounded-full flex items-center justify-center bg-white/80 backdrop-blur-sm shadow-xl mb-2",
+                                    "card-icon w-24 h-24 rounded-full flex items-center justify-center bg-white/80 backdrop-blur-sm shadow-xl mb-2",
                                     "group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 ease-out",
                                     "text-illa-pink ring-4 ring-white/30"
                                 )}>
