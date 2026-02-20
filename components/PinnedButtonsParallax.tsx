@@ -166,21 +166,28 @@ export function PinnedButtonsParallax() {
 
             let opacity = 0
             let y = 100
-            let z = -600
-            let rotateX = 35
-            let scale = 0.7
+            let z = -1000 // Deepen entry for dramatic push
+            let rotateX = 60 // Steeper initial flip
+            let rotateZ = (i % 2 === 0 ? -1 : 1) * 10 // Asymmetric falling leaf tilt
+            let translateX = (i % 2 === 0 ? -1 : 1) * 80 // Sweeping in from the sides
+            let scale = 0.6 // Slightly smaller at start
             let pointerEvents: 'auto' | 'none' = 'none'
             let highlightX = -100
 
-            // ANIMATION CORE - Optimized for first two buttons and better readability
-            // Width of the focus plateau (Phase 2): 0.35 to 0.65 (30% of card duration)
+            // Icon blooming state
+            let iconScale = 0.5
+
+            // ANIMATION CORE - Asymmetric Cascading Deck
             if (i === 0 && localP < 0.65) {
                 // FIRST CARD EXCEPTION: Stay focused from the start until it's time to exit
                 opacity = 1
                 y = 0
                 z = 0
                 rotateX = 0
+                rotateZ = 0
+                translateX = 0
                 scale = 1
+                iconScale = 1
                 pointerEvents = 'auto'
                 highlightX = 100
             } else if (localP < 0.35) {
@@ -190,9 +197,12 @@ export function PinnedButtonsParallax() {
 
                 opacity = t
                 y = 100 * (1 - e)
-                z = -600 * (1 - e)
-                rotateX = 35 * (1 - e)
-                scale = 0.7 + (0.3 * e)
+                z = -1000 * (1 - e)
+                translateX = ((i % 2 === 0 ? -1 : 1) * 80) * (1 - e)
+                rotateX = 60 * (1 - e)
+                rotateZ = ((i % 2 === 0 ? -1 : 1) * 10) * (1 - e)
+                scale = 0.6 + (0.4 * e)
+                iconScale = 0.5 + (0.5 * e) // Bloom the icon
                 highlightX = -100 + (200 * e)
             } else if (localP > 0.65) {
                 // PHASE 3: EXITING (0.65 to 1.0)
@@ -202,8 +212,12 @@ export function PinnedButtonsParallax() {
                 opacity = 1 - t
                 y = -120 * e
                 z = 400 * e
+                // Exit smoothly slightly upwards and vanishing
+                translateX = 0
                 rotateX = -20 * e
+                rotateZ = 0
                 scale = 1 + (0.15 * e)
+                iconScale = 1 + (0.1 * e)
                 highlightX = 100 + (200 * e)
             } else {
                 // PHASE 2: CENTER FOCUS (0.35 to 0.65)
@@ -211,19 +225,22 @@ export function PinnedButtonsParallax() {
                 y = 0
                 z = 0
                 rotateX = 0
+                rotateZ = 0
+                translateX = 0
                 scale = 1
+                iconScale = 1
                 pointerEvents = 'auto'
                 highlightX = 100
             }
 
             // Special handling for section entry: Button 1 must be active immediately
             if (i === 0 && progress < 0.1) {
-                opacity = 1; y = 0; z = 0; rotateX = 0; scale = 1; pointerEvents = 'auto';
+                opacity = 1; y = 0; z = 0; rotateX = 0; rotateZ = 0; translateX = 0; scale = 1; iconScale = 1; pointerEvents = 'auto';
             }
 
-            // APPLY MAIN CARD TRANSFORMS
+            // APPLY MAIN CARD TRANSFORMS (Added TranslateX & RotateZ)
             card.style.opacity = opacity.toString()
-            card.style.transform = `translate3d(0, ${y}px, ${z}px) rotateX(${rotateX}deg) scale(${scale})`
+            card.style.transform = `translate3d(${translateX}px, ${y}px, ${z}px) rotateX(${rotateX}deg) rotateZ(${rotateZ}deg) scale(${scale})`
             card.style.zIndex = pointerEvents === 'auto' ? '50' : Math.round(opacity * 10).toString()
             card.style.pointerEvents = pointerEvents
 
@@ -234,7 +251,8 @@ export function PinnedButtonsParallax() {
                 content.style.transform = `translateY(${y * 0.2}px)`
             }
             if (icon) {
-                icon.style.transform = `scale(${scale}) translateY(${y * -0.1}px)`
+                // Apply blooming scale
+                icon.style.transform = `scale(${scale * iconScale}) translateY(${y * -0.1}px)`
                 icon.style.filter = `drop-shadow(0 ${Math.abs(y) * 0.1}px ${20 + Math.abs(z) * 0.05}px rgba(0,0,0,0.2))`
             }
             if (highlight) {
@@ -279,12 +297,12 @@ export function PinnedButtonsParallax() {
                             }}
                             className={cn(
                                 "absolute inset-0 m-auto overflow-hidden",
-                                "w-[85vw] max-w-[360px] md:max-w-[420px] h-[300px] md:h-[400px]",
+                                "w-[85vw] max-w-[360px] md:max-w-[420px] h-[360px] md:h-[400px]",
                                 "bg-white/20 backdrop-blur-md border",
                                 card.borderColor,
                                 "rounded-[3rem] shadow-[0_8px_32px_0_rgba(255,255,255,0.2)]",
                                 "hover:shadow-[0_0_50px_rgba(255,255,255,0.4)] hover:bg-white/30 hover:border-white/80",
-                                "flex flex-col items-center justify-center text-center p-8",
+                                "flex flex-col items-center justify-center text-center p-6 md:p-8",
                                 "cursor-pointer group transition-shadow duration-500 ease-out",
                                 "will-change-transform"
                             )}
@@ -299,17 +317,17 @@ export function PinnedButtonsParallax() {
                                 card.color
                             )} />
 
-                            <div className="card-content relative z-10 flex flex-col items-center gap-6">
+                            <div className="card-content relative z-10 flex flex-col items-center gap-4 md:gap-6">
                                 <div className={cn(
-                                    "card-icon w-24 h-24 rounded-full flex items-center justify-center bg-white/80 backdrop-blur-sm shadow-xl mb-2",
+                                    "card-icon w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center bg-white/80 backdrop-blur-sm shadow-xl mb-0 md:mb-2",
                                     "group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 ease-out",
                                     "text-illa-pink ring-4 ring-white/30"
                                 )}>
-                                    <card.icon size={40} strokeWidth={1.5} />
+                                    <card.icon size={32} className="md:w-[40px] md:h-[40px]" strokeWidth={1.5} />
                                 </div>
 
                                 <div className="space-y-2">
-                                    <h3 className="font-bold text-4xl font-script text-dark drop-shadow-sm">{card.title}</h3>
+                                    <h3 className="font-bold text-3xl md:text-4xl font-script text-dark drop-shadow-sm">{card.title}</h3>
                                     <p className="text-dark/80 font-medium leading-relaxed max-w-[280px] mx-auto text-sm tracking-wide">
                                         {card.description}
                                     </p>

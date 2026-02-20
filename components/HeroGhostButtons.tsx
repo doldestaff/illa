@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence, useTransform, MotionValue } from 'framer-motion'
-import { MessageCircle, MapPin, Info, Phone, ShoppingBag, Store } from 'lucide-react'
+import { MessageCircle, MapPin, Info, Phone, ShoppingBag, Store, ChevronDown } from 'lucide-react'
 
 interface HeroGhostButtonsProps {
     progress: MotionValue<number>
@@ -122,6 +122,11 @@ function MobileButtons({ progress }: { progress: MotionValue<number> }) {
                             </a>
                         )
                     })}
+
+                    {/* Animated Scroll Arrow shown when the last button comes into view */}
+                    <div className="mt-4 flex flex-col items-center gap-1 animate-bounce text-white/70">
+                        <ChevronDown size={28} strokeWidth={1.5} />
+                    </div>
                 </motion.div>
 
             </div>

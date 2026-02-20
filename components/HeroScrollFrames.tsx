@@ -36,7 +36,21 @@ export function HeroScrollFrames() {
     }
 
     // --- Render ---
-    if (isMobile === null) return <div className="h-screen w-full bg-illa-pink" />
+    if (isMobile === null) return (
+        <div className="h-[100dvh] w-full bg-[#111] relative overflow-hidden">
+            {/* SSR skeleton fallback to prevent pink flash */}
+            <img
+                src="/hero/mobile/frames/hero-1-mobile_002.webp"
+                className="absolute inset-0 w-full h-full object-cover md:hidden"
+                alt="Illa Loading"
+            />
+            <img
+                src="/hero/desktop/frames/hero-1-desktop_002.webp"
+                className="absolute inset-0 w-full h-full object-cover hidden md:block"
+                alt="Illa Loading"
+            />
+        </div>
+    )
 
     // Config
     const MOBILE_HEIGHT_vh = 350
@@ -54,12 +68,12 @@ export function HeroScrollFrames() {
             className="relative w-full z-10"
             style={{ height: `${SCROLL_HEIGHT_vh}vh` }}
         >
-            <div className="sticky top-0 w-full h-[100dvh] overflow-hidden bg-illa-pink">
+            <div className="sticky top-0 w-full h-[100dvh] overflow-hidden bg-[#111]">
 
                 {/* New Unified Engine */}
                 <HeroEngine
                     manifestUrl={`/hero/manifest.${isMobile ? 'mobile' : 'desktop'}.json`}
-                    posterUrl={`/hero/${isMobile ? 'mobile' : 'desktop'}/frames/hero-1-${isMobile ? 'mobile' : 'desktop'}_008.webp`}
+                    posterUrl={`/hero/${isMobile ? 'mobile' : 'desktop'}/frames/hero-1-${isMobile ? 'mobile' : 'desktop'}_002.webp`}
                     scrollMode="viewport"
                     scrollSectionHeightVh={SCROLL_HEIGHT_vh}
                     onProgress={handleProgress}
