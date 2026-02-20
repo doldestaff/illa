@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import type { VipPayload } from '@/lib/gamification-types'
-import { motion } from 'framer-motion'
+import { motion, useScroll, useTransform } from 'framer-motion'
 import { CreditCard, QrCode, Copy, Check, Users, Loader2, Crown, Clock, Share2, Sparkles } from 'lucide-react'
 
 interface Props {
@@ -76,6 +76,21 @@ export default function VipCard({ referralCode, referralCount, vipPayload, onLoa
     const [codeCopied, setCodeCopied] = useState(false)
     const [refCopied, setRefCopied] = useState(false)
 
+    // --- Scroll Reactive Lighting Setup ---
+    const cardRef = useRef<HTMLDivElement>(null)
+    const { scrollYProgress } = useScroll({
+        target: cardRef,
+        offset: ["start end", "end start"]
+    })
+
+    // Map scroll progress to glare movement (diagonally across the QR box)
+    const glareX = useTransform(scrollYProgress, [0, 1], ['-150%', '250%'])
+    const glareY = useTransform(scrollYProgress, [0, 1], ['-100%', '200%'])
+
+    // Map scroll progress to border highlight intensity and position
+    const borderHighlightRotation = useTransform(scrollYProgress, [0, 1], ['0deg', '180deg'])
+
+
     useEffect(() => {
         if (!vip && !loading) {
             setLoading(true)
@@ -101,7 +116,7 @@ export default function VipCard({ referralCode, referralCount, vipPayload, onLoa
     const origin = typeof window !== 'undefined' ? window.location.origin : ''
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6" ref={cardRef}>
             {/* Title */}
             <div className="flex items-center gap-2">
                 <Crown size={20} className="text-illa-yellow" fill="currentColor" />
@@ -136,16 +151,38 @@ export default function VipCard({ referralCode, referralCount, vipPayload, onLoa
                     </div>
 
                     <div className="flex flex-col md:flex-row items-center gap-6">
-                        {/* QR Code Container */}
-                        <div className="bg-white p-3 rounded-2xl shadow-xl shadow-black/20 flex-shrink-0 rotate-1 transition-transform group-hover:rotate-0">
-                            {loading || !vip ? (
-                                <div className="w-[120px] h-[120px] flex items-center justify-center bg-gray-50 rounded-xl">
-                                    <Loader2 size={24} className="animate-spin text-dark/30" />
-                                </div>
-                            ) : (
-                                <QrCodeCanvas value={`${origin}/vip/redeem?code=${vip.short_code}`} size={120} />
-                            )}
-                        </div>
+                        {/* 
+                            CINEMATIC QR CODE CONTAINER 
+                            Replacing static white box with a premium scroll-reactive glossy box
+                        */}
+                        <motion.div
+                            className="bg-white p-3 rounded-2xl shadow-2xl shadow-black/40 flex-shrink-0 relative overflow-hidden group/qr transition-transform hover:scale-105 duration-500 ease-out cursor-pointer"
+                            whileHover={{ y: -5, rotateX: 5, rotateY: -5, z: 20 }}
+                            whileTap={{ scale: 0.95 }}
+                            style={{
+                                perspective: 1000,
+                                transformStyle: "preserve-3d"
+                            }}
+                        >
+                            {/* Scroll-Reactive Glare Layer */}
+                            <motion.div
+                                className="absolute inset-0 pointer-events-none z-20 mix-blend-overlay bg-gradient-to-r from-transparent via-white/80 to-transparent w-[150%] h-[150%] -rotate-45"
+                                style={{ x: glareX, y: glareY }}
+                            />
+
+                            {/* Additional subtle pulse glow on hover */}
+                            <div className="absolute inset-0 rounded-2xl ring-2 ring-white/0 group-hover/qr:ring-illa-yellow/50 transition-all duration-500 z-10 pointer-events-none" />
+
+                            <div className="relative z-0">
+                                {loading || !vip ? (
+                                    <div className="w-[120px] h-[120px] flex items-center justify-center bg-gray-50 rounded-xl">
+                                        <Loader2 size={24} className="animate-spin text-dark/30" />
+                                    </div>
+                                ) : (
+                                    <QrCodeCanvas value={`${origin}/vip/redeem?code=${vip.short_code}`} size={120} />
+                                )}
+                            </div>
+                        </motion.div>
 
                         {/* Code & Actions */}
                         <div className="flex-1 w-full space-y-4">

@@ -10,6 +10,7 @@ import { AuthModal } from './AuthModal'
 import { AboutModal } from './AboutModal'
 import { createSupabaseBrowser } from '@/lib/supabaseClient'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
+import { useLenis } from 'lenis/react'
 
 function LoginParamListener({ onLoginParam }: { onLoginParam: () => void }) {
     const searchParams = useSearchParams()
@@ -33,6 +34,9 @@ function NavbarInner() {
     const [user, setUser] = useState<SupabaseUser | null>(null)
     const router = useRouter()
 
+    // --- Lenis Scroll Lock Integration ---
+    const lenis = useLenis()
+
     useEffect(() => {
         const supabase = createSupabaseBrowser()
 
@@ -50,13 +54,18 @@ function NavbarInner() {
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden'
+            // Prevent background scrolling while menu is open (Lenis sync)
+            if (lenis) lenis.stop()
         } else {
             document.body.style.overflow = ''
+            // Resume background scrolling
+            if (lenis) lenis.start()
         }
         return () => {
             document.body.style.overflow = ''
+            if (lenis) lenis.start() // Safety reset
         }
-    }, [isOpen])
+    }, [isOpen, lenis])
 
     const externalLinks = {
         franchise: 'https://wa.me/5582997755961?text=Ol%C3%A1%20gostaria%20de%20saber%20mais%20sobre%20as%20franquias',

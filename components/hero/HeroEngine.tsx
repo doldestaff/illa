@@ -304,7 +304,8 @@ export function HeroEngine({
             if (!manifest || state.current.frameCount === 0) return
 
             // Load a small batch of initial frames to ensure smooth start
-            const priorityFrames = [0, 1, 2, 3, 4]
+            // PERF FIX: On mobile, only load the very minimum upfront to unblock CPU
+            const priorityFrames = state.current.isMobile ? [0, 1, 2] : [0, 1, 2, 3, 4]
             const toLoad = new Set([startIndex || 0, ...priorityFrames])
 
             // Wait for at least the starting frame to load before we even attempt to draw
