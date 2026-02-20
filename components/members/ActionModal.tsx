@@ -74,6 +74,14 @@ export default function ActionModal({ isOpen, onClose, title, themeGradient = "f
                     {/* Container - Bottom aligned on mobile, Center on desktop */}
                     <div className="fixed inset-0 z-[61] flex flex-col justify-end md:justify-center items-center pointer-events-none">
 
+                        {/* Premium Entrance Glow (Behind Modal) */}
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.5 }}
+                            animate={{ opacity: [0, 0.5, 0], scale: [0.8, 1.3, 1.5] }}
+                            transition={{ duration: 1.5, ease: "easeOut" }}
+                            className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150vw] h-[150vw] md:w-[60vw] md:h-[60vw] bg-gradient-to-r ${themeGradient} rounded-full blur-[100px] pointer-events-none mix-blend-screen opacity-50`}
+                        />
+
                         <motion.div
                             variants={isMobile ? mobileVariants : desktopVariants}
                             initial="hidden"
@@ -106,7 +114,7 @@ export default function ActionModal({ isOpen, onClose, title, themeGradient = "f
 
                             {/* Header */}
                             <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-white/[0.02]">
-                                <h3 className={`text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r ${themeGradient} tracking-tight`}>
+                                <h3 className={`text-xl font-bold tracking-tight ${themeGradient.includes('white') ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]' : `bg-clip-text text-transparent bg-gradient-to-r ${themeGradient}`}`}>
                                     {title}
                                 </h3>
 

@@ -6,7 +6,10 @@ import Link from 'next/link'
 import type { MemberProfile } from '@/lib/gamification-types'
 import { useRef, useState } from 'react'
 import InventoryModal from './InventoryModal'
+import { useRouter } from 'next/navigation'
+import { createSupabaseBrowser } from '@/lib/supabaseClient'
 import { NotificationBell } from '../notifications/NotificationBell'
+import { Loader2, Camera } from 'lucide-react'
 
 interface Props {
     profile: MemberProfile
@@ -31,8 +34,12 @@ const SHIMMER_Animation = {
 export default function DashboardHeader({ profile, avatarUrl, dropsCount, sorvetesCount }: Props) {
     const ref = useRef<HTMLDivElement>(null)
     const { scrollY } = useScroll()
+    const router = useRouter()
     const [showInventory, setShowInventory] = useState(false)
     const [inventoryTab, setInventoryTab] = useState<'sorvetes' | 'drops'>('sorvetes')
+    const [uploadingAvatar, setUploadingAvatar] = useState(false)
+    const [localAvatarUrl, setLocalAvatarUrl] = useState<string | null>(avatarUrl)
+    const fileInputRef = useRef<HTMLInputElement>(null)
 
     // Parallax only on desktop (mobile scrolls naturally with content)
     const scale = useTransform(scrollY, [0, 200], [1, 0.95])
@@ -56,6 +63,43 @@ export default function DashboardHeader({ profile, avatarUrl, dropsCount, sorvet
     const openInventory = (tab: 'sorvetes' | 'drops') => {
         setInventoryTab(tab)
         setShowInventory(true)
+    }
+
+    const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+
+        const MAX_FILE_SIZE = 3 * 1024 * 1024
+        const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+
+        if (!ALLOWED_TYPES.includes(file.type) || file.size > MAX_FILE_SIZE) {
+            alert('Por favor, envie uma imagem válida (JPG, PNG, WebP) de até 3MB.')
+            return
+        }
+
+        setUploadingAvatar(true)
+        const supabase = createSupabaseBrowser()
+        const ext = file.name.split('.').pop() ?? 'png'
+        const path = `${profile.id}/avatar-${Date.now()}.${ext}`
+
+        // Upload to Storage
+        const { error: uploadError } = await supabase.storage
+            .from('avatars')
+            .upload(path, file, { upsert: true, contentType: file.type })
+
+        if (!uploadError) {
+            // Update Profile DB Record
+            await supabase.from('profiles').upsert({ id: profile.id, avatar_path: path })
+
+            // Get new signed URL to update UI immediately
+            const { data: signed } = await supabase.storage.from('avatars').createSignedUrl(path, 3600)
+            if (signed?.signedUrl) {
+                setLocalAvatarUrl(signed.signedUrl)
+            }
+        }
+
+        setUploadingAvatar(false)
+        if (fileInputRef.current) fileInputRef.current.value = ''
     }
 
     return (
@@ -99,22 +143,46 @@ export default function DashboardHeader({ profile, avatarUrl, dropsCount, sorvet
                     />
 
                     <div className="relative z-10 flex items-center gap-5 mt-4">
-                        {/* 3. 3D Avatar Container */}
-                        <div className="relative group/avatar cursor-pointer">
+                        {/* 3. 3D Avatar Container - Now with Upload Action */}
+                        <div
+                            className="relative group/avatar cursor-pointer"
+                            onClick={() => fileInputRef.current?.click()}
+                        >
                             <div className="absolute -inset-1 bg-gradient-to-br from-illa-pink to-illa-yellow rounded-full opacity-60 blur-md group-hover/avatar:opacity-100 group-hover/avatar:blur-lg transition duration-500"></div>
                             <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-white/50 bg-black/20 ring-4 ring-white/20 shadow-2xl transform transition-transform group-hover/avatar:scale-105 duration-300">
-                                {profile.avatar_path && avatarUrl ? (
-                                    <img
-                                        src={avatarUrl}
-                                        alt={profile.full_name || 'User'}
-                                        className="w-full h-full object-cover"
-                                    />
+                                {uploadingAvatar ? (
+                                    <div className="w-full h-full bg-black/60 flex items-center justify-center">
+                                        <Loader2 size={24} className="text-illa-pink animate-spin" />
+                                    </div>
+                                ) : profile.avatar_path && localAvatarUrl ? (
+                                    <>
+                                        <img
+                                            src={localAvatarUrl}
+                                            alt={profile.full_name || 'User'}
+                                            className="w-full h-full object-cover"
+                                        />
+                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center">
+                                            <Camera size={20} className="text-white drop-shadow-md" />
+                                        </div>
+                                    </>
                                 ) : (
-                                    <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center text-white/50">
+                                    <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center text-white/50 relative">
                                         <User size={32} />
+                                        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center">
+                                            <Camera size={20} className="text-white drop-shadow-md" />
+                                        </div>
                                     </div>
                                 )}
                             </div>
+
+                            {/* Hidden File Input */}
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/jpeg,image/png,image/webp"
+                                className="hidden"
+                                onChange={handleAvatarUpload}
+                            />
 
                             {/* Floating Level Badge */}
                             <div className="absolute -bottom-2 -right-2 bg-gradient-to-r from-illa-yellow to-amber-500 text-black text-[10px] font-black px-2.5 py-1 rounded-full shadow-lg border-2 border-white flex items-center gap-0.5 z-20 transform group-hover/avatar:rotate-12 transition-transform">
@@ -246,13 +314,13 @@ export default function DashboardHeader({ profile, avatarUrl, dropsCount, sorvet
                                     <p>Ganhe <span className="text-amber-600 font-bold">+50 XP</span></p>
                                 </div>
                             </div>
-                            <Link
-                                href="/members/profile"
-                                className="flex items-center gap-1 text-xs font-bold bg-gray-900 text-white px-4 py-2 rounded-xl hover:bg-illa-yellow hover:text-gray-900 transition-all shadow-lg hover:shadow-illa-yellow/20 active:scale-95"
+                            <button
+                                onClick={() => router.push('/members/profile')}
+                                className="flex items-center gap-1 text-xs font-bold bg-gray-900 text-white px-4 py-2 rounded-xl hover:bg-illa-yellow hover:text-gray-900 transition-all shadow-lg hover:shadow-illa-yellow/20 active:scale-95 z-50 pointer-events-auto"
                             >
                                 Completar
                                 <ChevronRight size={12} />
-                            </Link>
+                            </button>
                         </motion.div>
                     )}
                 </div>

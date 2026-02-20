@@ -9,7 +9,8 @@ const actions = [
         id: 'invite',
         label: 'Indique e Ganhe',
         icon: User,
-        color: 'from-blue-500 to-indigo-600',
+        color: 'from-white via-gray-100 to-gray-300',
+        iconColor: 'text-zinc-900',
         delay: 0,
     },
     {
@@ -51,7 +52,7 @@ export default function DashboardActionGrid({ onAction }: Props) {
 
                         {/* Icon Container */}
                         <div className={`w-10 h-10 mb-3 rounded-full bg-gradient-to-br ${action.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                            <action.icon size={20} className="text-white" />
+                            <action.icon size={20} className={action.iconColor || "text-white"} />
                         </div>
 
                         {/* Label */}

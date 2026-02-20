@@ -435,10 +435,10 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                                                 activeModal === 'invite' ? 'Indique e Ganhe' : ''
                                 }
                                 themeGradient={
-                                    activeModal === 'history' ? 'from-blue-500 to-indigo-600' :
+                                    activeModal === 'history' ? 'from-blue-500 to-cyan-500' :
                                         activeModal === 'scanner' ? 'from-illa-pink to-rose-500' :
                                             activeModal === 'sorvetes' ? 'from-amber-400 to-orange-500' :
-                                                activeModal === 'invite' ? 'from-fuchsia-500 to-purple-600' :
+                                                activeModal === 'invite' ? 'from-white to-gray-200' :
                                                     'from-white to-gray-400'
                                 }
                             >

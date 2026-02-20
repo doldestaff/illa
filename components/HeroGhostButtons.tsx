@@ -58,15 +58,18 @@ function DesktopGhostButton({ btn, i, total, progress }: { btn: (typeof buttons)
 }
 
 function DesktopButtons({ progress }: { progress: MotionValue<number> }) {
-    // Fade out entirely at the end of the scroll (0.85 -> 0.95)
-    const fadeOpacity = useTransform(progress, [0.85, 0.95], [1, 0])
+    // Map the raw [0.15, 0.8] range to [0, 1] to preserve sequence animations untouched
+    const buttonSequenceProgress = useTransform(progress, [0.15, 0.8], [0, 1])
+
+    // Fade out entirely at the very end of the scroll (0.98 -> 1)
+    const fadeOpacity = useTransform(progress, [0.98, 1], [1, 0])
 
     return (
         <motion.div style={{ opacity: fadeOpacity }} className="absolute bottom-8 left-0 right-0 z-20 flex justify-center pointer-events-none transition-all duration-300">
             <div className="w-full max-w-6xl px-4 pointer-events-auto">
                 <div className="flex justify-center gap-4 items-center">
                     {buttons.map((btn, i) => (
-                        <DesktopGhostButton key={btn.label} btn={btn} i={i} total={buttons.length} progress={progress} />
+                        <DesktopGhostButton key={btn.label} btn={btn} i={i} total={buttons.length} progress={buttonSequenceProgress} />
                     ))}
                 </div>
             </div>
@@ -75,14 +78,14 @@ function DesktopButtons({ progress }: { progress: MotionValue<number> }) {
 }
 
 function MobileButtons({ progress }: { progress: MotionValue<number> }) {
-    // We map the 0..1 progress to a physical vertical translation of a container.
-    // Let's assume the container needs to move up by say 250px to show all buttons.
-    const scrollY = useTransform(progress, [0, 1], [0, -220])
-    // Fade out arrow quickly when user starts scrolling
+    // The buttons scroll physically upwards between 15% and 80% of the overall view progress
+    const scrollY = useTransform(progress, [0.15, 0.80], [0, -220])
+
+    // Arrow fades early once user slightly scrolls away from top
     const arrowOpacity = useTransform(progress, [0, 0.05], [1, 0])
 
-    // Fade out the entire module at the end of the scroll (e.g. 0.85 -> 0.95)
-    const fadeOpacity = useTransform(progress, [0.85, 0.95], [1, 0])
+    // Fade out the entire module perfectly cleanly at the end of the scroll (e.g. 0.98 -> 1)
+    const fadeOpacity = useTransform(progress, [0.98, 1], [1, 0])
 
     return (
         <motion.div style={{ opacity: fadeOpacity }}>

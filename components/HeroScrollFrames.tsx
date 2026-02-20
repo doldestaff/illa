@@ -27,12 +27,8 @@ export function HeroScrollFrames() {
     }, [])
 
     const handleProgress = (progress: number) => {
-        // Ghost Button Logic (Visible roughly from 15% to 80% of scroll)
-        // Map 0.15 -> 0, 0.8 -> 1
-        const start = 0.15
-        const end = 0.8
-        const p = Math.max(0, Math.min(1, (progress - start) / (end - start)))
-        buttonProgress.set(p)
+        // Ghost Button progress is now fully handled in the child component using the global 0..1 scroll value
+        buttonProgress.set(progress)
     }
 
     // --- Render ---
