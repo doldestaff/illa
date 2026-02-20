@@ -74,61 +74,33 @@ function DesktopButtons({ progress }: { progress: MotionValue<number> }) {
 function MobileGhostButton({ btn, i, total, progress }: { btn: (typeof buttons)[0], i: number, total: number, progress: MotionValue<number> }) {
     const step = 1 / (total - 1)
     const myTarget = i * step
-    const visibleRange = step * 2.5
 
+    // Wider visibility window: stays opaque longer so it's clearly seen
     const rawOpacity = useTransform(progress, (p) => {
         const dist = Math.abs(p - myTarget)
-        if (dist < visibleRange) {
-            const normalizedDist = dist / visibleRange
-            return Math.pow(Math.cos(normalizedDist * Math.PI / 2), 1.8)
-        }
-        return 0
+        // Flatter, wider curve: stays near 1.0 longer, then drops
+        return Math.exp(-(dist * dist) * 10)
     })
 
-    // Core physics: Non-linear magnetic center
-    // Items move incredibly fast on the edges, but "slow down" to let you read them in the center.
+    // Elegant magnetic center: Slows down dramatically near the center, accelerates rapidly away
     const yOffset = useTransform(progress, (p) => {
         const dist = p - myTarget;
         const sign = Math.sign(dist);
         const absDist = Math.abs(dist);
-        // Blend of linear (smooth tracking) and cubic (hyper-acceleration at edges)
-        const travel = (absDist * 400) + (Math.pow(absDist, 3) * 8000);
-        return sign * travel * -1; // -1 so scrolling down moves items UP
+        // Blends a very subtle linear track with a powerful cubic push
+        const travel = (absDist * 80) + (Math.pow(absDist, 2.5) * 2500);
+        return sign * travel * -1;
     });
 
-    // Exponential scale decay: Huge at 0 dist, shrinks fast
+    // Scale pops distinctly to 1.15 in center, sits at 0.9 off-center
     const scale = useTransform(progress, (p) => {
         const dist = Math.abs(p - myTarget);
-        // Cap max dist impact so scale doesn't go negative
-        const clampedDist = Math.min(dist, 1.0);
-        return 1.25 - Math.pow(clampedDist * 1.8, 2) * 0.6;
-    });
-
-    // 3D Tilt: Tilts sharply up/down as it leaves center
-    const rotateX = useTransform(progress, (p) => (p - myTarget) * -100);
-
-    // Dynamic Depth of Field (Blur items out of focus)
-    const blurAmount = useTransform(progress, (p) => {
-        const dist = Math.abs(p - myTarget);
-        // Only start blurring after it leaves the immediate center
-        const blur = Math.max(0, (dist * 10) - 1.5) * 3;
-        return Math.min(blur, 16); // Cap at 16px blur
-    });
-    const filter = useTransform(blurAmount, (b) => `blur(${b}px)`);
-
-    // Premium Aesthetics: Centered item glows and gets a brighter border
-    const borderColor = useTransform(rawOpacity, (o) => {
-        const intensity = Math.pow(o, 3);
-        return `rgba(255,255,255,${0.1 + intensity * 0.6})`;
-    });
-
-    const boxShadow = useTransform(rawOpacity, (o) => {
-        const intensity = Math.pow(o, 4); // Only glows when practically centered
-        return `0 ${intensity * 12}px ${intensity * 32}px rgba(255, 255, 255, ${intensity * 0.15}), inset 0 0 ${intensity * 20}px rgba(255,255,255,${intensity * 0.3})`;
+        return 0.9 + (0.25 * Math.exp(-(dist * dist) * 15));
     });
 
     const opacity = useTransform(rawOpacity, (o) => Math.max(0.01, o))
     const zIndex = useTransform(opacity, (o) => Math.round(o * 100))
+    // Keep it in the DOM slightly longer for smooth fade out
     const display = useTransform(opacity, (o) => o > 0.02 ? 'flex' : 'none')
 
     const isAction = btn.label === 'QUEM SOMOS'
@@ -148,31 +120,28 @@ function MobileGhostButton({ btn, i, total, progress }: { btn: (typeof buttons)[
                 opacity,
                 scale,
                 y: yOffset,
-                rotateX,
-                filter,
-                borderColor,
-                boxShadow,
                 x: '-50%',
                 left: '50%',
-                top: '50%', // Start perfectly centered vertically and horizontally
+                top: '50%',
                 marginTop: '-1.5rem',
                 zIndex,
-                display,
-                transformPerspective: 1000 // Creates the 3D depth for rotateX
+                display
+                // REMOVED transformPerspective and rotateX to prevent 3D composite thrashing over Canvas
             }}
             className="
                 absolute
                 flex items-center justify-center gap-3 
-                w-[85vw] max-w-[320px] py-4
-                bg-white/10 backdrop-blur-2xl 
-                border-2 rounded-2xl 
-                text-white text-lg font-bold tracking-wide
+                w-[65vw] max-w-[260px] py-3
+                bg-white hover:bg-white/90
+                border border-white/50 rounded-2xl 
+                text-rose-600 text-base font-bold tracking-wide
                 cursor-pointer pointer-events-auto
+                shadow-xl shadow-black/10
                 will-change-transform
-                hover:bg-white/20 hover:scale-[1.3] active:scale-95 transition-all duration-300
+                active:scale-95 transition-all duration-300
             "
         >
-            <btn.icon size={24} />
+            <btn.icon size={20} />
             <span className="drop-shadow-md">{btn.label}</span>
         </motion.a>
     )

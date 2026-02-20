@@ -59,13 +59,13 @@ export function HeroScrollFrames() {
                 {/* New Unified Engine */}
                 <HeroEngine
                     manifestUrl={`/hero/manifest.${isMobile ? 'mobile' : 'desktop'}.json`}
-                    posterUrl={`/hero/${isMobile ? 'mobile' : 'desktop'}/frames/hero-1-${isMobile ? 'mobile' : 'desktop'}_002.webp`}
+                    posterUrl={`/hero/${isMobile ? 'mobile' : 'desktop'}/frames/hero-1-${isMobile ? 'mobile' : 'desktop'}_008.webp`}
                     scrollMode="viewport"
                     scrollSectionHeightVh={SCROLL_HEIGHT_vh}
                     onProgress={handleProgress}
                     debug={typeof window !== 'undefined' && window.location.search.includes('debugHero')}
                     className="z-10"
-                    startIndex={2}
+                    startIndex={6}
                 />
 
                 <div className="absolute inset-0 pointer-events-none z-20">
