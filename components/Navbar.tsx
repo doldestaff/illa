@@ -113,11 +113,13 @@ function NavbarInner() {
     // Fade in between 220vh and 280vh of scroll (right after ghost buttons finish moving)
     const mobileOpacity = useTransform(scrollY, [vh * 2.2, vh * 2.8], [0, 1])
     const mobileY = useTransform(scrollY, [vh * 2.2, vh * 2.8], [-20, 0])
+    // Always call hooks unconditionally (React rules of hooks)
+    const mobilePointerEvents = useTransform(mobileOpacity, (val) => val > 0.5 ? 'auto' as const : 'none' as const)
 
     // Fall back to always visible on desktop
     const finalOpacity = isMobile ? mobileOpacity : 1
     const finalY = isMobile ? mobileY : 0
-    const pointerEvents = isMobile ? useTransform(mobileOpacity, (val) => val > 0.5 ? 'auto' : 'none') : 'auto'
+    const finalPointerEvents = isMobile ? mobilePointerEvents : ('auto' as const)
 
     return (
         <>
@@ -126,7 +128,7 @@ function NavbarInner() {
             </Suspense>
 
             <motion.nav
-                style={{ opacity: finalOpacity, y: finalY, pointerEvents }}
+                style={{ opacity: finalOpacity, y: finalY, pointerEvents: finalPointerEvents }}
                 className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
             >
                 <div
