@@ -333,8 +333,6 @@ export function HeroEngine({
         const maxFrame = state.current.frameCount - 1
         const idx = Math.max(0, Math.min(maxFrame, Math.round(frameIndex)))
 
-        state.current.targetFrameIndex = idx
-
         if (!force && state.current.lastFrameIndex === idx) return
 
         const frame = state.current.cache.get(idx)
