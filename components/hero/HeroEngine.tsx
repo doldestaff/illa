@@ -32,10 +32,9 @@ interface Manifest {
     frames: string[]
 }
 
-// --- LRU Cache ---
+// --- O(1) LRU Cache using Map insertion order ---
 class FrameCache {
     private cache = new Map<number, ImageBitmap | HTMLImageElement>()
-    private accessHistory: number[] = []
     limit = 60
 
     setLimit(n: number) {
@@ -44,29 +43,30 @@ class FrameCache {
     }
 
     private prune() {
+        // Map iterates in insertion order → first key = LRU
+        const iter = this.cache.keys()
         while (this.cache.size > this.limit) {
-            const lru = this.accessHistory.shift()
-            if (lru !== undefined) {
-                const img = this.cache.get(lru)
-                if (img && img instanceof ImageBitmap) img.close()
-                this.cache.delete(lru)
-            }
+            const lru = iter.next().value
+            if (lru === undefined) break
+            const img = this.cache.get(lru)
+            if (img && img instanceof ImageBitmap) img.close()
+            this.cache.delete(lru)
         }
     }
 
     get(index: number) {
-        const pos = this.accessHistory.indexOf(index)
-        if (pos > -1) {
-            this.accessHistory.splice(pos, 1)
-            this.accessHistory.push(index)
+        const frame = this.cache.get(index)
+        if (frame) {
+            // Promote to newest: delete + re-set maintains Map insertion order — O(1)
+            this.cache.delete(index)
+            this.cache.set(index, frame)
         }
-        return this.cache.get(index)
+        return frame
     }
 
     add(index: number, frame: ImageBitmap | HTMLImageElement) {
         if (this.cache.has(index)) return
         this.cache.set(index, frame)
-        this.accessHistory.push(index)
         this.prune()
     }
 
@@ -114,7 +114,7 @@ export function HeroEngine({
     // --- 1. Load Manifest or Set Manual ---
     useEffect(() => {
         let active = true
-        console.log('[HeroEngine] Init. ManifestUrl:', manifestUrl, 'Manual:', !!manualFrames)
+        // Init — no console.log in production
 
         if (manualFrames) {
             state.current.isManual = true
@@ -370,8 +370,8 @@ export function HeroEngine({
         const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true })
         if (!ctx) return
 
-        const isMobileBackground = state.current.isMobile && scrollMode === 'document'
-        const dpr = Math.min(window.devicePixelRatio || 1, isMobileBackground ? 1.0 : 1.25) // Cap at 1.0 on mobile background to save GPU fill-rate
+        // Cap DPR at 1.0 on ANY mobile to reduce canvas size and GPU fill-rate
+        const dpr = Math.min(window.devicePixelRatio || 1, state.current.isMobile ? 1.0 : 1.5)
         const w = state.current.appWidth
         const h = state.current.appHeight
         const targetW = Math.floor(w * dpr)
@@ -413,6 +413,28 @@ export function HeroEngine({
         if (!manifest && !state.current.isManual) return
 
         let ticking = false
+        // Lerp state for smooth frame interpolation
+        let smoothedFrame = startIndex || 0
+        let lerpRafId: number | null = null
+
+        const lerpLoop = () => {
+            const target = state.current.targetFrameIndex
+            const diff = target - smoothedFrame
+            // Converge faster for small diffs, slower for large jumps
+            const lerpFactor = Math.abs(diff) < 2 ? 0.5 : 0.3
+            smoothedFrame += diff * lerpFactor
+
+            // Only draw if we haven't converged
+            if (Math.abs(diff) > 0.3) {
+                draw(smoothedFrame)
+                lerpRafId = requestAnimationFrame(lerpLoop)
+            } else {
+                // Snap to target when close enough
+                smoothedFrame = target
+                draw(target)
+                lerpRafId = null
+            }
+        }
 
         const handleScroll = () => {
             if (!ticking) {
@@ -421,22 +443,13 @@ export function HeroEngine({
                     let progress = 0
 
                     if (scrollMode === 'viewport') {
-                        // Using documentElement for consistent mobile behavior
-                        const docH = Math.max(
-                            document.body.scrollHeight, document.documentElement.scrollHeight,
-                            document.body.offsetHeight, document.documentElement.offsetHeight,
-                            document.body.clientHeight, document.documentElement.clientHeight
-                        )
-
-                        // We are sticky, so we assume scroll starts at top (0)
+                        // No forced reflow — use cached appHeight and known section height
                         const vh = state.current.appHeight || window.innerHeight
                         const totalH = vh * ((scrollSectionHeightVh || 500) / 100)
-
-                        // Limit tracking to the height of the hero section
                         const scrollable = totalH - vh
                         progress = scrollable > 0 ? Math.max(0, Math.min(1, scrollY / scrollable)) : 0
                     } else {
-                        // Document mode
+                        // Document mode — only 2 reads needed
                         const docH = Math.max(
                             document.body.scrollHeight, document.documentElement.scrollHeight
                         )
@@ -446,16 +459,18 @@ export function HeroEngine({
 
                     if (onProgress) onProgress(progress)
 
-                    // Critical fix: map progress correctly to the frame range
-                    // Note: Instead of always starting at `startIndex`, we map 0->`startIndex` and 1->`end`
                     const start = startIndex || 0
                     const end = state.current.frameCount - 1
-
-                    // We need to ensure that when progress is 0, we are exactly at `startIndex`
-                    // And when progress is 1, we are exactly at `end`
                     const targetFrame = start + (progress * (end - start))
 
-                    draw(targetFrame)
+                    // Set target for lerp loop instead of drawing directly
+                    state.current.targetFrameIndex = Math.round(targetFrame)
+
+                    // Start lerp loop if not already running
+                    if (!lerpRafId) {
+                        lerpRafId = requestAnimationFrame(lerpLoop)
+                    }
+
                     ticking = false
                 })
                 ticking = true
@@ -473,7 +488,10 @@ export function HeroEngine({
             handleScroll();
         });
 
-        return () => window.removeEventListener('scroll', handleScroll)
+        return () => {
+            window.removeEventListener('scroll', handleScroll)
+            if (lerpRafId) cancelAnimationFrame(lerpRafId)
+        }
     }, [manifest, scrollMode, scrollSectionHeightVh, startIndex, onProgress])
 
     return (

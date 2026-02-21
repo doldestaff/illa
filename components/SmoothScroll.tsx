@@ -45,12 +45,12 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
             ref={lenisRef}
             root
             options={isMobile ? {
-                // Mobile: less aggressive smooth to avoid double-smooth with HeroEngine native scroll
-                lerp: 0.15,
-                duration: 1.0,
+                // Mobile: snappy response, no syncTouch to avoid double-interpolation with HeroEngine
+                lerp: 0.2,
+                duration: 0.8,
                 smoothWheel: true,
                 touchMultiplier: 1.8,
-                syncTouch: true,
+                syncTouch: false,
             } : {
                 // Desktop: full cinematic smooth
                 lerp: 0.1,
