@@ -11,6 +11,7 @@ import { AboutModal } from './AboutModal'
 import { createSupabaseBrowser } from '@/lib/supabaseClient'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import { useLenis } from 'lenis/react'
+import { motion, useScroll, useTransform } from 'framer-motion'
 
 function LoginParamListener({ onLoginParam }: { onLoginParam: () => void }) {
     const searchParams = useSearchParams()
@@ -94,21 +95,48 @@ function NavbarInner() {
         return () => window.removeEventListener('open-about-modal', handleOpenAbout)
     }, [])
 
+    // --- Mobile Delayed Reveal Logic ---
+    const [isMobile, setIsMobile] = useState(false)
+    const [vh, setVh] = useState(0)
+    const { scrollY } = useScroll()
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.matchMedia('(max-width: 768px)').matches)
+            setVh(window.innerHeight)
+        }
+        checkMobile()
+        window.addEventListener('resize', checkMobile)
+        return () => window.removeEventListener('resize', checkMobile)
+    }, [])
+
+    // Fade in between 220vh and 280vh of scroll (right after ghost buttons finish moving)
+    const mobileOpacity = useTransform(scrollY, [vh * 2.2, vh * 2.8], [0, 1])
+    const mobileY = useTransform(scrollY, [vh * 2.2, vh * 2.8], [-20, 0])
+
+    // Fall back to always visible on desktop
+    const finalOpacity = isMobile ? mobileOpacity : 1
+    const finalY = isMobile ? mobileY : 0
+    const pointerEvents = isMobile ? useTransform(mobileOpacity, (val) => val > 0.5 ? 'auto' : 'none') : 'auto'
+
     return (
         <>
             <Suspense fallback={null}>
                 <LoginParamListener onLoginParam={() => setShowAuthModal(true)} />
             </Suspense>
 
-            <nav className="fixed top-0 left-0 right-0 z-50 pointer-events-none transition-all duration-300">
+            <motion.nav
+                style={{ opacity: finalOpacity, y: finalY, pointerEvents }}
+                className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+            >
                 <div
-                    className="container mx-auto px-4 flex items-center justify-between pointer-events-auto"
+                    className="container mx-auto px-4 flex items-center justify-between"
                     style={{
                         paddingTop: 'max(1rem, env(safe-area-inset-top))',
                         paddingBottom: '1rem'
                     }}
                 >
-                    <Link href="/" className="flex items-center gap-3 group relative z-50">
+                    <Link href="/" className="flex items-center gap-3 group relative z-50 pointer-events-auto">
                         <div className="relative w-[200px] h-[60px] md:w-[450px] md:h-[135px] transition-transform group-hover:scale-105 filter drop-shadow-md -ml-2">
                             <Image
                                 src="/brand/logo.png"
@@ -311,7 +339,7 @@ function NavbarInner() {
                         </div>
                     </div>
                 </div>
-            </nav >
+            </motion.nav>
 
             <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
             <AboutModal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
