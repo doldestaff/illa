@@ -3,9 +3,8 @@ import { Open_Sans, Pacifico } from 'next/font/google'
 import './globals.css'
 import { SmoothScroll } from '@/components/SmoothScroll'
 import { cn } from '@/lib/utils'
-
-
 import { CinematicToastProvider } from '@/components/notifications/CinematicToastProvider'
+import { PageTransitionLoader } from '@/components/PageTransitionLoader'
 
 const openSans = Open_Sans({
   subsets: ['latin'],
@@ -39,6 +38,7 @@ export default function RootLayout({
           'antialiased font-sans bg-white text-dark'
         )}
       >
+        <PageTransitionLoader />
         <SmoothScroll>
           <CinematicToastProvider>
             {children}

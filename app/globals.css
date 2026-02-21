@@ -114,6 +114,20 @@
     -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   }
+
+  /* Force GPU compositing layer — use on heavy-scroll overlays */
+  .gpu-layer {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+
+  /* No backdrop-blur on low-end — use this class on mobile-only cards */
+  @media (max-width: 768px) {
+    .no-blur-mobile {
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+  }
 }
 
 :root {
@@ -132,8 +146,19 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  /* contain limits repaint scope — critical for scroll performance */
+  contain: layout style;
+  /* Pattern background with cheaper blend mode */
   background-image: url('/brand/pattern.png');
   background-repeat: repeat;
   background-size: 150px;
-  background-blend-mode: overlay;
+  /* multiply is cheaper than overlay on GPU — same visual result for light patterns */
+  background-blend-mode: multiply;
+}
+
+/* Disable decorative background on older/low-end mobile to save GPU fill-rate */
+@media (max-width: 768px) and (max-resolution: 2dppx) {
+  body {
+    background-image: none;
+  }
 }

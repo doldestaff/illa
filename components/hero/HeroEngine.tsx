@@ -120,26 +120,21 @@ export function HeroEngine({
             state.current.isManual = true
             state.current.frameCount = manualFrames.frameCount
             setManifest({ frameCount: manualFrames.frameCount, frames: [] })
-            console.log('[HeroEngine] Manual configuration set.')
             return
         }
 
         if (manifestUrl) {
             const load = async () => {
                 try {
-                    console.log('[HeroEngine] Fetching manifest:', manifestUrl)
                     const res = await fetch(manifestUrl)
                     if (!res.ok) throw new Error(`Manifest 404: ${res.status}`)
                     const data = await res.json()
 
                     if (active) {
-                        console.log('[HeroEngine] Manifest loaded:', data)
                         setManifest(data)
                         state.current.frameCount = data.frameCount
                         state.current.frames = data.frames
                         state.current.isManual = false
-                    } else {
-                        console.log('[HeroEngine] Ignoring stale manifest:', manifestUrl)
                     }
                 } catch (e) {
                     if (active) console.error('[HeroEngine] Manifest Error:', e)
@@ -161,8 +156,8 @@ export function HeroEngine({
                 const h = window.visualViewport ? window.visualViewport.height : window.innerHeight
                 const w = window.visualViewport ? window.visualViewport.width : window.innerWidth
 
-                // Only update if dimensions actually changed significantly
-                if (Math.abs(state.current.appHeight - h) < 1 &&
+                // Only update if dimensions actually changed significantly (prevent URL bar hide jitter)
+                if (Math.abs(state.current.appHeight - h) < 60 &&
                     Math.abs(state.current.appWidth - w) < 1) return
 
                 state.current.appHeight = h
@@ -170,7 +165,11 @@ export function HeroEngine({
 
                 // Mobile detection for perf
                 state.current.isMobile = w < 768
-                state.current.cache.setLimit(state.current.isMobile ? 60 : 80)
+
+                // PERFORMANCE: Background areas like members dash have 82 frames.
+                // We MUST set the cache equal or slightly larger to prevent reload-thrashing looping.
+                const isBackgroundMode = scrollMode === 'document'
+                state.current.cache.setLimit(state.current.isMobile ? (isBackgroundMode ? 90 : 60) : 100)
 
                 if (containerRef.current) {
                     containerRef.current.style.setProperty('--app-h', `${h}px`)
@@ -178,7 +177,7 @@ export function HeroEngine({
 
                 // Force redraw on resize
                 scheduleDraw()
-            }, 100) // Debounce 100ms
+            }, 150) // Debounce 150ms for stability
         }
 
         window.addEventListener('resize', handleResize)
@@ -190,7 +189,10 @@ export function HeroEngine({
         state.current.appHeight = h
         state.current.appWidth = w
         state.current.isMobile = w < 768
-        state.current.cache.setLimit(state.current.isMobile ? 60 : 80)
+
+        const isBackgroundMode = scrollMode === 'document'
+        state.current.cache.setLimit(state.current.isMobile ? (isBackgroundMode ? 90 : 60) : 100)
+
         if (containerRef.current) containerRef.current.style.setProperty('--app-h', `${h}px`)
 
         return () => {
@@ -198,7 +200,7 @@ export function HeroEngine({
             if (window.visualViewport) window.visualViewport.removeEventListener('resize', handleResize)
             clearTimeout(resizeTimer)
         }
-    }, [])
+    }, [scrollMode])
 
     // Helper to get URL
     const getUrl = useCallback((index: number) => {
@@ -226,8 +228,10 @@ export function HeroEngine({
         if (state.current.inflight.has(index)) return // Already loading
 
         // Concurrency Limiter (prevent browser choke)
-        // Aggressive on mobile
-        const maxInflight = state.current.isMobile ? 5 : 8
+        // Aggressive on mobile background mode
+        const isBackgroundMode = scrollMode === 'document'
+        const maxInflight = state.current.isMobile ? (isBackgroundMode ? 3 : 5) : 8
+
         if (!priority && state.current.inflight.size >= maxInflight) {
             // Priority Check: Abort furthest frame to make room for nearest frame
             let furthestIndex = -1
@@ -296,7 +300,7 @@ export function HeroEngine({
         } finally {
             state.current.inflight.delete(index)
         }
-    }, [manifest, getUrl])
+    }, [manifest, getUrl, scrollMode])
 
     // Initial Load
     useEffect(() => {
@@ -305,7 +309,11 @@ export function HeroEngine({
 
             // Load a small batch of initial frames to ensure smooth start
             // PERF FIX: On mobile, only load the very minimum upfront to unblock CPU
-            const priorityFrames = state.current.isMobile ? [0, 1, 2] : [0, 1, 2, 3, 4]
+            const isBackgroundMode = scrollMode === 'document'
+            const priorityFrames = state.current.isMobile
+                ? (isBackgroundMode ? [0, 1] : [0, 1, 2])
+                : [0, 1, 2, 3, 4]
+
             const toLoad = new Set([startIndex || 0, ...priorityFrames])
 
             // Wait for at least the starting frame to load before we even attempt to draw
@@ -315,7 +323,7 @@ export function HeroEngine({
             scheduleDraw()
         }
         init()
-    }, [manifest, loadFrame, startIndex, scheduleDraw])
+    }, [manifest, loadFrame, startIndex, scheduleDraw, scrollMode])
 
     // --- 4. Draw Logic ---
     const draw = (frameIndex: number, force = false) => {
@@ -332,13 +340,13 @@ export function HeroEngine({
         const frame = state.current.cache.get(idx)
 
         // Lookahead Strategy (Bi-directional based on velocity)
-        // We do this BEFORE returning on missing frame, so we don't halt preloading!
-        const isScrollingBackward = state.current.targetFrameIndex < state.current.lastFrameIndex;
-
-        let lookahead = state.current.isMobile ? 4 : 8
-        if (typeof navigator !== 'undefined' && 'deviceMemory' in navigator && (navigator as any).deviceMemory <= 4) {
-            lookahead = 3
+        // Load fewer frames ahead on mobile to reduce network/CPU contention
+        let lookahead = state.current.isMobile ? (scrollMode === 'document' ? 2 : 3) : 5
+        if (typeof navigator !== 'undefined' && 'deviceMemory' in navigator && (navigator as any).deviceMemory <= 2) {
+            lookahead = 1
         }
+
+        const isScrollingBackward = state.current.targetFrameIndex < state.current.lastFrameIndex
 
         if (isScrollingBackward) {
             for (let i = 1; i <= lookahead; i++) loadFrame(idx - i)
@@ -362,7 +370,8 @@ export function HeroEngine({
         const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true })
         if (!ctx) return
 
-        const dpr = Math.min(window.devicePixelRatio || 1, 1.5)
+        const isMobileBackground = state.current.isMobile && scrollMode === 'document'
+        const dpr = Math.min(window.devicePixelRatio || 1, isMobileBackground ? 1.0 : 1.25) // Cap at 1.0 on mobile background to save GPU fill-rate
         const w = state.current.appWidth
         const h = state.current.appHeight
         const targetW = Math.floor(w * dpr)
@@ -378,6 +387,7 @@ export function HeroEngine({
         // NOTE: We do NOT resetTransform/scale every frame for performance.
         // We assume the context state persists until resize clears it.
         // If we needed to clear, we'd use ctx.clearRect, but we overwrite everything anyway.
+        // If it's a Server Layout change, the canvas will be unmounted.
 
         const iW = (frame instanceof ImageBitmap) ? frame.width : (frame as HTMLImageElement).naturalWidth
         const iH = (frame instanceof ImageBitmap) ? frame.height : (frame as HTMLImageElement).naturalHeight
@@ -498,6 +508,12 @@ export function HeroEngine({
                     "absolute inset-0 block w-full h-full object-cover z-0 transition-opacity duration-700",
                     isLoaded ? "opacity-100" : "opacity-0"
                 )}
+                style={{
+                    // GPU compositing hints for canvas
+                    willChange: 'contents',
+                    // On mobile background mode, pixelated is faster GPU fill-rate
+                    imageRendering: (state.current.isMobile && scrollMode === 'document') ? 'pixelated' : 'auto',
+                }}
             />
         </div>
     )

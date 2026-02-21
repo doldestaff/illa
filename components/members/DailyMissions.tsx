@@ -146,7 +146,7 @@ export default function DailyMissions({ missions, onClaim }: Props) {
 
             {/* All Completed Bonus State */}
             {allCompleted && (
-                <div className="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl p-4 text-white shadow-xl shadow-emerald-500/20 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <div className="bg-[#0f0f11] md:bg-white/5 md:backdrop-blur-xl border border-white/10 rounded-3xl p-6 md:p-8 relative overflow-hidden shadow-xl shadow-emerald-500/20 animate-in fade-in slide-in-from-bottom-4 duration-700">
                     <div className="flex items-center gap-3">
                         <div className="bg-white/20 p-2 rounded-full backdrop-blur-sm">
                             <Sparkles size={20} className="text-white" />

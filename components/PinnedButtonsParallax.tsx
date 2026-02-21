@@ -166,7 +166,7 @@ export function PinnedButtonsParallax() {
 
             let opacity = 0
             let y = 100
-            let z = -1000 // Deepen entry for dramatic push
+            let z = -500 // Reduced depth range for better precision/clipping on mobile
             let rotateX = 60 // Steeper initial flip
             let rotateZ = (i % 2 === 0 ? -1 : 1) * 10 // Asymmetric falling leaf tilt
             let translateX = (i % 2 === 0 ? -1 : 1) * 80 // Sweeping in from the sides
@@ -197,7 +197,7 @@ export function PinnedButtonsParallax() {
 
                 opacity = t
                 y = 100 * (1 - e)
-                z = -1000 * (1 - e)
+                z = -500 * (1 - e)
                 translateX = ((i % 2 === 0 ? -1 : 1) * 80) * (1 - e)
                 rotateX = 60 * (1 - e)
                 rotateZ = ((i % 2 === 0 ? -1 : 1) * 10) * (1 - e)
@@ -211,7 +211,7 @@ export function PinnedButtonsParallax() {
 
                 opacity = 1 - t
                 y = -120 * e
-                z = 400 * e
+                z = 300 * e
                 // Exit smoothly slightly upwards and vanishing
                 translateX = 0
                 rotateX = -20 * e
@@ -251,9 +251,9 @@ export function PinnedButtonsParallax() {
                 content.style.transform = `translateY(${y * 0.2}px)`
             }
             if (icon) {
-                // Apply blooming scale
+                // box-shadow on card container is compositable; drop-shadow filter is not
                 icon.style.transform = `scale(${scale * iconScale}) translateY(${y * -0.1}px)`
-                icon.style.filter = `drop-shadow(0 ${Math.abs(y) * 0.1}px ${20 + Math.abs(z) * 0.05}px rgba(0,0,0,0.2))`
+                // Remove filter: use will-change on the card for GPU compositing instead
             }
             if (highlight) {
                 highlight.style.transform = `translateX(${highlightX}%) skewX(-20deg)`
@@ -269,7 +269,7 @@ export function PinnedButtonsParallax() {
     return (
         <section
             ref={containerRef}
-            className="relative w-full h-[500vh] bg-white text-dark"
+            className="relative w-full h-[400vh] bg-white text-dark"
         >
             <div
                 className="sticky top-0 w-full h-[100dvh] flex items-center justify-center overflow-hidden touch-pan-y"
@@ -298,7 +298,7 @@ export function PinnedButtonsParallax() {
                             className={cn(
                                 "absolute inset-0 m-auto overflow-hidden",
                                 "w-[85vw] max-w-[360px] md:max-w-[420px] h-[360px] md:h-[400px]",
-                                "bg-white/20 backdrop-blur-md border",
+                                "bg-white/20 backdrop-blur-md no-blur-mobile border",
                                 card.borderColor,
                                 "rounded-[3rem] shadow-[0_8px_32px_0_rgba(255,255,255,0.2)]",
                                 "hover:shadow-[0_0_50px_rgba(255,255,255,0.4)] hover:bg-white/30 hover:border-white/80",
@@ -306,7 +306,7 @@ export function PinnedButtonsParallax() {
                                 "cursor-pointer group transition-shadow duration-500 ease-out",
                                 "will-change-transform"
                             )}
-                            style={{ opacity: 0 }}
+                            style={{ opacity: 0, willChange: 'transform, opacity' }}
                         >
                             {/* Cinematic Glass Highlight Traveler */}
                             <div className="glass-highlight absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-20 pointer-events-none z-20" style={{ transform: 'translateX(-100%)' }} />

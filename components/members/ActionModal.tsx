@@ -94,7 +94,8 @@ export default function ActionModal({ isOpen, onClose, title, themeGradient = "f
                             className={`
                                 pointer-events-auto
                                 w-full md:max-w-lg
-                                bg-[#121212]
+                                bg-[#0f0f11] md:bg-[#121212]/90
+                                md:backdrop-blur-xl
                                 border-t border-x md:border border-white/10
                                 rounded-t-[2rem] md:rounded-3xl
                                 shadow-2xl shadow-black/50

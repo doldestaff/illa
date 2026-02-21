@@ -22,8 +22,8 @@ export default function SecretMenu({ items }: Props) {
                     <div
                         key={item.id}
                         className={`relative rounded-2xl border p-4 transition-all ${item.unlocked
-                                ? 'bg-white/80 border-illa-yellow/30 shadow-sm hover:shadow-md'
-                                : 'bg-gray-100/60 border-gray-200/50'
+                            ? 'bg-white/80 border-illa-yellow/30 shadow-sm hover:shadow-md'
+                            : 'bg-gray-100/60 border-gray-200/50'
                             }`}
                     >
                         {!item.unlocked && (
@@ -37,7 +37,7 @@ export default function SecretMenu({ items }: Props) {
 
                         <div className={item.unlocked ? '' : 'blur-[3px] select-none'}>
                             {item.image_url ? (
-                                <div className="w-full h-16 rounded-xl bg-gray-200/50 overflow-hidden mb-2">
+                                <div className="w-full h-16 rounded-xl bg-[#0f0f11] md:bg-gray-200/50 overflow-hidden mb-2">
                                     <img
                                         src={item.image_url}
                                         alt={item.title}

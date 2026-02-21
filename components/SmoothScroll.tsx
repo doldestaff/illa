@@ -1,12 +1,21 @@
 'use client'
 
-import { ReactNode, useEffect, useRef } from 'react'
+import { ReactNode, useEffect, useRef, useState } from 'react'
 import { ReactLenis } from 'lenis/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 export function SmoothScroll({ children }: { children: ReactNode }) {
     const lenisRef = useRef<any>(null)
+    const [isMobile, setIsMobile] = useState(false)
+
+    useEffect(() => {
+        const mq = window.matchMedia('(max-width: 768px)')
+        setIsMobile(mq.matches)
+        const onChange = (e: MediaQueryListEvent) => setIsMobile(e.matches)
+        mq.addEventListener('change', onChange)
+        return () => mq.removeEventListener('change', onChange)
+    }, [])
 
     useEffect(() => {
         // 1. Force GSAP execution order
@@ -35,12 +44,20 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
         <ReactLenis
             ref={lenisRef}
             root
-            options={{
+            options={isMobile ? {
+                // Mobile: less aggressive smooth to avoid double-smooth with HeroEngine native scroll
+                lerp: 0.15,
+                duration: 1.0,
+                smoothWheel: true,
+                touchMultiplier: 1.8,
+                syncTouch: true,
+            } : {
+                // Desktop: full cinematic smooth
                 lerp: 0.1,
                 duration: 1.5,
                 smoothWheel: true,
                 touchMultiplier: 2,
-                syncTouch: true, // Critical for mobile
+                syncTouch: false,
             }}
         >
             {children}

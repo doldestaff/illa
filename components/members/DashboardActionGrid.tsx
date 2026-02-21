@@ -45,7 +45,7 @@ export default function DashboardActionGrid({ onAction }: Props) {
                 >
                     <button
                         onClick={() => onAction(action.id)}
-                        className="w-full group relative flex flex-col items-center justify-center p-4 h-28 rounded-2xl overflow-hidden bg-black/40 backdrop-blur-md border border-white/10 shadow-lg hover:shadow-xl transition-all active:scale-95"
+                        className="w-full group relative flex flex-col items-center justify-center p-4 h-28 rounded-2xl overflow-hidden bg-[#0f0f11] md:bg-black/40 md:backdrop-blur-md border border-white/10 shadow-lg hover:shadow-xl transition-all active:scale-95"
                     >
                         {/* Hover Gradient Background */}
                         <div className={`absolute inset-0 bg-gradient-to-br ${action.color} opacity-0 group-hover:opacity-20 transition-opacity duration-500`} />

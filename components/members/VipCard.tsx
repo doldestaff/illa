@@ -124,7 +124,7 @@ export default function VipCard({ referralCode, referralCount, vipPayload, onLoa
             </div>
 
             {/* Main VIP Card - Holographic Look */}
-            <div className="relative overflow-hidden rounded-[2rem] bg-black/40 backdrop-blur-xl text-white p-6 shadow-2xl border border-white/10 transition-transform hover:scale-[1.01] duration-500 perspective-1000 group">
+            <div className="relative overflow-hidden rounded-[2rem] bg-[#0f0f11] md:bg-black/40 md:backdrop-blur-xl text-white p-6 shadow-2xl border border-white/10 transition-transform hover:scale-[1.01] duration-500 perspective-1000 group">
 
                 {/* Holographic Gradients */}
                 <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/50 z-0" />
