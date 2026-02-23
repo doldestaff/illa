@@ -1,13 +1,13 @@
-import { supabaseServer } from '@/lib/supabaseServer'
 import { NextResponse } from 'next/server'
-
-// Simple Admin Token (matches the one in other admin routes)
-const ADMIN_TOKEN = '6c5e3a7b8f2d1e4a9c0b5d8f3e6a1b4c'
+import { requireAdmin, isRateLimited } from '@/lib/admin-auth'
 
 export async function POST(request: Request) {
-    const token = request.headers.get('x-admin-token')
-    if (token !== ADMIN_TOKEN) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const auth = await requireAdmin()
+    if ('error' in auth) return auth.error
+    const { supabase, user } = auth
+
+    if (isRateLimited(`admin:balance:${user.id}`, 20, 60_000)) {
+        return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 })
     }
 
     try {
@@ -16,8 +16,6 @@ export async function POST(request: Request) {
         if (!target_user_id) {
             return NextResponse.json({ error: 'target_user_id is required' }, { status: 400 })
         }
-
-        const supabase = supabaseServer
 
         const { data, error } = await supabase.rpc('admin_grant_currency', {
             p_target_user_id: target_user_id,
@@ -30,14 +28,6 @@ export async function POST(request: Request) {
             console.error('RPC Error:', error)
             return NextResponse.json({ error: error.message }, { status: 400 })
         }
-
-        // --- ADDED: Send Push Notification ---
-        // We trigger the notification API internally or insert into notifications table
-        // For simplicity and consistency, let's insert into notifications table which triggers the trigger (if configured)
-        // OR directly use the send-notification endpoint logic if we want immediate push
-
-        // Let's create a notification record which should be picked up by realtime or a trigger
-        // Ideally we call the internal helper to send push
 
         const xp = Number(xp_amount) || 0
         const points = Number(points_amount) || 0
@@ -58,16 +48,7 @@ export async function POST(request: Request) {
             data: { xp, points, drops }
         })
 
-        // Also try to send immediate push if they have a subscription
-        // We can do this by fetching their subscription and using web-push, 
-        // OR simply rely on the 'notifications' insert trigger if we set one up (we did for mission claim)
-        // Let's manually trigger the push endpoint for robustness:
-
         try {
-            // Only if we have the helper, but since we are in API route, we can just insert into DB
-            // and if we have a Database Webhook or Cron it would send.
-            // BUT simpler: let's fetch the subscription and send it right here.
-
             const { data: subs } = await supabase
                 .from('push_subscriptions')
                 .select('*')
@@ -77,7 +58,7 @@ export async function POST(request: Request) {
                 // eslint-disable-next-line @typescript-eslint/no-require-imports
                 const webPush = require('web-push')
                 webPush.setVapidDetails(
-                    'mailto:admin@illa.com',
+                    process.env.VAPID_SUBJECT || 'mailto:admin@illasorvetes.com',
                     process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
                     process.env.VAPID_PRIVATE_KEY!
                 )
@@ -89,14 +70,12 @@ export async function POST(request: Request) {
                     data: { url: '/members' }
                 })
 
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                await Promise.all(subs.map(async (sub: any) => {
+                await Promise.all(subs.map(async (sub: { id: string; endpoint: string; p256dh: string; auth: string }) => {
                     try {
-                        const subscription = {
-                            endpoint: sub.endpoint,
-                            keys: { p256dh: sub.p256dh, auth: sub.auth }
-                        }
-                        await webPush.sendNotification(subscription, payload)
+                        await webPush.sendNotification(
+                            { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
+                            payload
+                        )
                     } catch (e) {
                         console.error('Failed to send push to sub', sub.id, e)
                     }
@@ -104,7 +83,6 @@ export async function POST(request: Request) {
             }
         } catch (pushErr) {
             console.error('Push error:', pushErr)
-            // Don't fail the request if push fails
         }
 
         return NextResponse.json(data)

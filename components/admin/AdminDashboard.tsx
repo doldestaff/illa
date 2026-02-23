@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { Plus, Minus, IceCream, RefreshCw, LogOut, BarChart3, Users, Target, CheckCircle, XCircle, Coins, Droplet, Zap, Trash2, Clock } from 'lucide-react'
+import { createSupabaseBrowser } from '@/lib/supabaseClient'
 
 interface UserSorvetes {
     id: string
@@ -24,11 +25,7 @@ interface UserMission {
     claimed: boolean
 }
 
-interface Props {
-    token: string
-}
-
-export default function AdminDashboard({ token }: Props) {
+export default function AdminDashboard() {
     const [users, setUsers] = useState<UserSorvetes[]>([])
     const [loading, setLoading] = useState(true)
     const [actionLoading, setActionLoading] = useState<string | null>(null)
@@ -55,9 +52,7 @@ export default function AdminDashboard({ token }: Props) {
     const fetchUsers = useCallback(async () => {
         setLoading(true)
         try {
-            const res = await fetch('/api/admin/users', {
-                headers: { 'x-admin-token': token },
-            })
+            const res = await fetch('/api/admin/users')
             const data = await res.json()
             if (Array.isArray(data)) {
                 setUsers(data)
@@ -67,7 +62,7 @@ export default function AdminDashboard({ token }: Props) {
         } finally {
             setLoading(false)
         }
-    }, [token])
+    }, [])
 
     useEffect(() => {
         fetchUsers()
@@ -78,10 +73,7 @@ export default function AdminDashboard({ token }: Props) {
         try {
             await fetch('/api/admin/sorvetes', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-admin-token': token,
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ user_id: userId, action }),
             })
             await fetchUsers()
@@ -98,10 +90,7 @@ export default function AdminDashboard({ token }: Props) {
         try {
             await fetch('/api/admin/balance', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-admin-token': token,
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     target_user_id: userId,
                     xp_amount: 0,
@@ -118,8 +107,9 @@ export default function AdminDashboard({ token }: Props) {
         }
     }
 
-    const handleLogout = () => {
-        sessionStorage.removeItem('admin_token')
+    const handleLogout = async () => {
+        const supabase = createSupabaseBrowser()
+        await supabase.auth.signOut()
         window.location.reload()
     }
 
@@ -140,15 +130,13 @@ export default function AdminDashboard({ token }: Props) {
     // === LOJA FETCH ===
     const fetchDiscountStats = useCallback(async () => {
         try {
-            const res = await fetch('/api/admin/discounts/summary', {
-                headers: { 'x-admin-token': token },
-            })
+            const res = await fetch('/api/admin/discounts/summary')
             const data = await res.json()
             setDiscountStats(data)
         } catch {
             // silent
         }
-    }, [token])
+    }, [])
 
     useEffect(() => {
         if (activeTab === 'loja') {
@@ -166,7 +154,7 @@ export default function AdminDashboard({ token }: Props) {
             // just implement the fetch logic if I add the route.
             // For now, let's assume I'll add GET to the same route I just made.
             const res = await fetch(`/api/admin/missions?user_id=${userId}`, {
-                headers: { 'x-admin-token': token }
+                credentials: 'include'
             })
             if (res.ok) {
                 const data = await res.json()
@@ -204,10 +192,7 @@ export default function AdminDashboard({ token }: Props) {
         try {
             const res = await fetch('/api/admin/balance', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-admin-token': token,
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     target_user_id: selectedUserId,
                     xp_amount: Number(balanceForm.xp),
@@ -242,10 +227,7 @@ export default function AdminDashboard({ token }: Props) {
         try {
             const res = await fetch('/api/admin/missions', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-admin-token': token,
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     target_user_id: selectedUserId,
                     title: newMission.title,
@@ -272,9 +254,7 @@ export default function AdminDashboard({ token }: Props) {
 
     const fetchDrops = useCallback(async () => {
         try {
-            const res = await fetch('/api/admin/drops', {
-                headers: { 'x-admin-token': token }
-            })
+            const res = await fetch('/api/admin/drops')
             if (res.ok) {
                 const data = await res.json()
                 setDropsList(data)
@@ -282,7 +262,7 @@ export default function AdminDashboard({ token }: Props) {
         } catch (err) {
             console.error(err)
         }
-    }, [token])
+    }, [])
 
     const handleCreateDrop = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -290,10 +270,7 @@ export default function AdminDashboard({ token }: Props) {
         try {
             const res = await fetch('/api/admin/drops', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-admin-token': token
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newDrop)
             })
             if (res.ok) {
@@ -315,7 +292,6 @@ export default function AdminDashboard({ token }: Props) {
         try {
             const res = await fetch(`/api/admin/drops?id=${id}`, {
                 method: 'DELETE',
-                headers: { 'x-admin-token': token }
             })
             if (res.ok) {
                 fetchDrops()
@@ -1013,49 +989,49 @@ export default function AdminDashboard({ token }: Props) {
 
                                     <div className="p-4 md:p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                                         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-dropsList.map((drop: any) => {
-                                            const isActive = new Date(drop.ends_at) > new Date()
-                                            return (
-                                                <div key={drop.id} className={`group relative rounded-2xl border p-5 transition-all w-full flex flex-col justify-between ${isActive ? 'bg-gradient-to-br from-blue-500/10 to-purple-500/5 border-blue-500/20 hover:border-blue-500/40' : 'bg-white/5 border-white/5 opacity-60 hover:opacity-100'}`}>
-                                                    <div>
-                                                        <div className="flex justify-between items-start mb-3">
-                                                            <div className={`px-2 py-1 rounded-md text-[10px] font-black uppercase tracking-wider ${isActive ? 'bg-green-500/20 text-green-400 border border-green-500/20' : 'bg-gray-500/20 text-gray-400 border border-gray-500/20'}`}>
-                                                                {isActive ? 'ATIVO AGORA' : 'ENCERRADO'}
+                                            dropsList.map((drop: any) => {
+                                                const isActive = new Date(drop.ends_at) > new Date()
+                                                return (
+                                                    <div key={drop.id} className={`group relative rounded-2xl border p-5 transition-all w-full flex flex-col justify-between ${isActive ? 'bg-gradient-to-br from-blue-500/10 to-purple-500/5 border-blue-500/20 hover:border-blue-500/40' : 'bg-white/5 border-white/5 opacity-60 hover:opacity-100'}`}>
+                                                        <div>
+                                                            <div className="flex justify-between items-start mb-3">
+                                                                <div className={`px-2 py-1 rounded-md text-[10px] font-black uppercase tracking-wider ${isActive ? 'bg-green-500/20 text-green-400 border border-green-500/20' : 'bg-gray-500/20 text-gray-400 border border-gray-500/20'}`}>
+                                                                    {isActive ? 'ATIVO AGORA' : 'ENCERRADO'}
+                                                                </div>
+                                                                <button
+                                                                    onClick={() => handleDeleteDrop(drop.id)}
+                                                                    className="text-white/20 hover:text-red-400 transition-colors p-1"
+                                                                    title="Excluir Drop"
+                                                                >
+                                                                    <Trash2 size={14} />
+                                                                </button>
                                                             </div>
-                                                            <button
-                                                                onClick={() => handleDeleteDrop(drop.id)}
-                                                                className="text-white/20 hover:text-red-400 transition-colors p-1"
-                                                                title="Excluir Drop"
-                                                            >
-                                                                <Trash2 size={14} />
-                                                            </button>
+
+                                                            <h4 className="font-bold text-lg leading-tight mb-1">{drop.title}</h4>
+                                                            <p className="text-xs text-white/50 line-clamp-2 h-8">{drop.description || 'Sem descrição'}</p>
+
+                                                            <div className="mt-4 flex items-center gap-3">
+                                                                <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border ${drop.reward_type === 'xp' ? 'bg-purple-500/10 border-purple-500/20 text-purple-300' : 'bg-yellow-500/10 border-yellow-500/20 text-yellow-300'}`}>
+                                                                    {drop.reward_type === 'xp' ? <Zap size={14} /> : <Coins size={14} />}
+                                                                    <span className="font-bold text-sm">+{drop.reward_value}</span>
+                                                                </div>
+                                                                <div className="text-[10px] text-white/40 flex items-center gap-1">
+                                                                    <Clock size={12} />
+                                                                    {isActive
+                                                                        ? `Encerra em ${Math.max(0, Math.ceil((new Date(drop.ends_at).getTime() - new Date().getTime()) / (1000 * 60)))} min`
+                                                                        : `Encerrado em ${new Date(drop.ends_at).toLocaleDateString()}`
+                                                                    }
+                                                                </div>
+                                                            </div>
                                                         </div>
 
-                                                        <h4 className="font-bold text-lg leading-tight mb-1">{drop.title}</h4>
-                                                        <p className="text-xs text-white/50 line-clamp-2 h-8">{drop.description || 'Sem descrição'}</p>
-
-                                                        <div className="mt-4 flex items-center gap-3">
-                                                            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border ${drop.reward_type === 'xp' ? 'bg-purple-500/10 border-purple-500/20 text-purple-300' : 'bg-yellow-500/10 border-yellow-500/20 text-yellow-300'}`}>
-                                                                {drop.reward_type === 'xp' ? <Zap size={14} /> : <Coins size={14} />}
-                                                                <span className="font-bold text-sm">+{drop.reward_value}</span>
-                                                            </div>
-                                                            <div className="text-[10px] text-white/40 flex items-center gap-1">
-                                                                <Clock size={12} />
-                                                                {isActive
-                                                                    ? `Encerra em ${Math.max(0, Math.ceil((new Date(drop.ends_at).getTime() - new Date().getTime()) / (1000 * 60)))} min`
-                                                                    : `Encerrado em ${new Date(drop.ends_at).toLocaleDateString()}`
-                                                                }
-                                                            </div>
-                                                        </div>
+                                                        {/* Decorative Elements */}
+                                                        {isActive && (
+                                                            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl -z-10 group-hover:bg-blue-500/20 transition-all" />
+                                                        )}
                                                     </div>
-
-                                                    {/* Decorative Elements */}
-                                                    {isActive && (
-                                                        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl -z-10 group-hover:bg-blue-500/20 transition-all" />
-                                                    )}
-                                                </div>
-                                            )
-                                        })}
+                                                )
+                                            })}
 
                                         {dropsList.length === 0 && (
                                             <div className="col-span-full py-12 text-center text-white/20 border-2 border-dashed border-white/5 rounded-2xl flex flex-col items-center justify-center">

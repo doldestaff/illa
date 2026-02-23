@@ -1,15 +1,14 @@
 import { NextResponse } from 'next/server'
-import { createSupabaseServer } from '@/lib/supabaseServerClient'
+import { requireAdmin, isRateLimited } from '@/lib/admin-auth'
 import { sendNotification } from '@/lib/notifications'
 
 export async function POST(request: Request) {
-    const supabase = await createSupabaseServer()
+    const auth = await requireAdmin()
+    if ('error' in auth) return auth.error
+    const { supabase, user } = auth
 
-    // Check admin
-    const { data: { user } } = await supabase.auth.getUser()
-
-    if (!user) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (isRateLimited(`admin:notify:${user.id}`, 30, 60_000)) {
+        return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 })
     }
 
     try {
@@ -34,9 +33,9 @@ export async function POST(request: Request) {
         }
 
         return NextResponse.json({ success: true, notification: notif })
-    } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    catch (error: any) {
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Unknown error'
         console.error('Send error', error)
-        return NextResponse.json({ error: error.message }, { status: 500 })
+        return NextResponse.json({ error: message }, { status: 500 })
     }
 }

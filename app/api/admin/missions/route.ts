@@ -1,13 +1,10 @@
 import { NextResponse } from 'next/server'
-import { createSupabaseServer } from '@/lib/supabaseServerClient'
-
-const ADMIN_TOKEN = '6c5e3a7b8f2d1e4a9c0b5d8f3e6a1b4c'
+import { requireAdmin, isRateLimited } from '@/lib/admin-auth'
 
 export async function GET(request: Request) {
-    const token = request.headers.get('x-admin-token')
-    if (token !== ADMIN_TOKEN) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const auth = await requireAdmin()
+    if ('error' in auth) return auth.error
+    const { supabase } = auth
 
     const { searchParams } = new URL(request.url)
     const userId = searchParams.get('user_id')
@@ -17,10 +14,6 @@ export async function GET(request: Request) {
     }
 
     try {
-        const supabase = await createSupabaseServer()
-
-        // Fetch instances for this user for TODAY (or all active? prompt implies "quais missões cada usuário fez")
-        // Let's filter by today's period key to match the daily dashboard view
         const todayKey = new Date().toISOString().split('T')[0]
 
         const { data, error } = await supabase
@@ -40,22 +33,21 @@ export async function GET(request: Request) {
             .eq('user_id', userId)
             .eq('period_key', todayKey)
 
-        if (error) {
-            return NextResponse.json({ error: error.message }, { status: 400 })
-        }
+        if (error) return NextResponse.json({ error: error.message }, { status: 400 })
 
-        // Format for frontend
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const formatted = data.map((mi: any) => ({
-            instance_id: mi.id,
-            title: mi.missions?.title,
-            reward_xp: mi.missions?.reward_xp,
-            reward_points: mi.missions?.reward_points,
-            progress: mi.progress,
-            target: mi.missions?.target,
-            completed: !!mi.completed_at,
-            claimed: !!mi.claimed_at
-        }))
+        const formatted = (data || []).map((mi: Record<string, unknown>) => {
+            const missions = mi.missions as Record<string, unknown> | null
+            return {
+                instance_id: mi.id,
+                title: missions?.title,
+                reward_xp: missions?.reward_xp,
+                reward_points: missions?.reward_points,
+                progress: mi.progress,
+                target: missions?.target,
+                completed: !!mi.completed_at,
+                claimed: !!mi.claimed_at
+            }
+        })
 
         return NextResponse.json(formatted)
     } catch {
@@ -64,9 +56,12 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-    const token = request.headers.get('x-admin-token')
-    if (token !== ADMIN_TOKEN) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const auth = await requireAdmin()
+    if ('error' in auth) return auth.error
+    const { supabase, user } = auth
+
+    if (isRateLimited(`admin:missions:${user.id}`, 15, 60_000)) {
+        return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 })
     }
 
     try {
@@ -76,8 +71,6 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'target_user_id and title are required' }, { status: 400 })
         }
 
-        const supabase = await createSupabaseServer()
-
         const { data, error } = await supabase.rpc('admin_create_custom_mission', {
             p_target_user_id: target_user_id,
             p_title: title,
@@ -85,16 +78,9 @@ export async function POST(request: Request) {
             p_points: points || 0
         })
 
-        if (error) {
-            console.error('RPC Error:', error)
-            return NextResponse.json({ error: error.message }, { status: 400 })
-        }
-
+        if (error) return NextResponse.json({ error: error.message }, { status: 400 })
         return NextResponse.json(data)
-    }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    catch (err: any) {
-        console.error('Server Error:', err)
+    } catch {
         return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
     }
 }

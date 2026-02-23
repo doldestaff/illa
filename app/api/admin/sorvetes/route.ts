@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server'
-import { createSupabaseServer } from '@/lib/supabaseServerClient'
-
-const ADMIN_TOKEN = '6c5e3a7b8f2d1e4a9c0b5d8f3e6a1b4c'
+import { requireAdmin, isRateLimited } from '@/lib/admin-auth'
 
 export async function POST(request: Request) {
-    const token = request.headers.get('x-admin-token')
-    if (token !== ADMIN_TOKEN) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const auth = await requireAdmin()
+    if ('error' in auth) return auth.error
+    const { supabase, user } = auth
+
+    if (isRateLimited(`admin:sorvetes:${user.id}`, 20, 60_000)) {
+        return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 })
     }
 
     try {
@@ -16,17 +17,12 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'user_id and action (add|subtract) required' }, { status: 400 })
         }
 
-        const supabase = await createSupabaseServer()
-
         const { data, error } = await supabase.rpc('admin_manage_sorvetes', {
             p_user_id: user_id,
             p_action: action,
         })
 
-        if (error) {
-            return NextResponse.json({ error: error.message }, { status: 400 })
-        }
-
+        if (error) return NextResponse.json({ error: error.message }, { status: 400 })
         return NextResponse.json(data)
     } catch {
         return NextResponse.json({ error: 'Invalid request' }, { status: 400 })

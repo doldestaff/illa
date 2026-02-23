@@ -1,40 +1,27 @@
-import { supabaseServer } from '@/lib/supabaseServer'
 import { NextResponse } from 'next/server'
+import { requireAdmin, isRateLimited } from '@/lib/admin-auth'
 
-const ADMIN_TOKEN = '6c5e3a7b8f2d1e4a9c0b5d8f3e6a1b4c'
-
-// Middleware helper to check admin token
-const checkAuth = (req: Request) => {
-    const token = req.headers.get('x-admin-token')
-    return token === ADMIN_TOKEN
-}
-
-// GET: List all drops
-export async function GET(request: Request) {
-    if (!checkAuth(request)) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+export async function GET() {
+    const auth = await requireAdmin()
+    if ('error' in auth) return auth.error
+    const { supabase } = auth
 
     try {
-        const supabase = supabaseServer
         const { data, error } = await supabase.rpc('admin_list_all_drops')
-
-        if (error) {
-            console.error('RPC Error:', error)
-            return NextResponse.json({ error: error.message }, { status: 400 })
-        }
-
+        if (error) return NextResponse.json({ error: error.message }, { status: 400 })
         return NextResponse.json(data || [])
-    } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    catch (err: any) {
-        return NextResponse.json({ error: err.message }, { status: 500 })
+    } catch {
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }
 }
 
-// POST: Create a new drop
 export async function POST(request: Request) {
-    if (!checkAuth(request)) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const auth = await requireAdmin()
+    if ('error' in auth) return auth.error
+    const { supabase, user } = auth
+
+    if (isRateLimited(`admin:drops:create:${user.id}`, 10, 60_000)) {
+        return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 })
     }
 
     try {
@@ -44,7 +31,6 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
         }
 
-        const supabase = supabaseServer
         const { data, error } = await supabase.rpc('admin_create_drop', {
             p_title: title,
             p_description: description || '',
@@ -53,45 +39,31 @@ export async function POST(request: Request) {
             p_duration_minutes: Number(duration_minutes)
         })
 
-        if (error) {
-            console.error('RPC Error:', error)
-            return NextResponse.json({ error: error.message }, { status: 400 })
-        }
-
+        if (error) return NextResponse.json({ error: error.message }, { status: 400 })
         return NextResponse.json(data)
-    } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    catch (err: any) {
-        return NextResponse.json({ error: err.message }, { status: 500 })
+    } catch {
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }
 }
 
-// DELETE: Remove a drop
 export async function DELETE(request: Request) {
-    if (!checkAuth(request)) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const auth = await requireAdmin()
+    if ('error' in auth) return auth.error
+    const { supabase, user } = auth
+
+    if (isRateLimited(`admin:drops:delete:${user.id}`, 10, 60_000)) {
+        return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 })
     }
 
     try {
         const { searchParams } = new URL(request.url)
         const id = searchParams.get('id')
+        if (!id) return NextResponse.json({ error: 'Drop ID required' }, { status: 400 })
 
-        if (!id) {
-            return NextResponse.json({ error: 'Drop ID required' }, { status: 400 })
-        }
-
-        const supabase = supabaseServer
-        const { data, error } = await supabase.rpc('admin_delete_drop', {
-            p_drop_id: id
-        })
-
-        if (error) {
-            console.error('RPC Error:', error)
-            return NextResponse.json({ error: error.message }, { status: 400 })
-        }
-
+        const { data, error } = await supabase.rpc('admin_delete_drop', { p_drop_id: id })
+        if (error) return NextResponse.json({ error: error.message }, { status: 400 })
         return NextResponse.json(data)
-    } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    catch (err: any) {
-        return NextResponse.json({ error: err.message }, { status: 500 })
+    } catch {
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }
 }
