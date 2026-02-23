@@ -44,7 +44,7 @@ const cards = [
         title: 'Nossas Lojas',
         description: 'Encontre a unidade Illa mais próxima.',
         icon: MapPin,
-        href: 'https://maps.app.goo.gl/cUzZ9QYTDXnjqyWU8',
+        href: '#locations',
         label: 'Ver no mapa',
     },
     {
@@ -103,7 +103,7 @@ export function PinnedButtonsParallax() {
     const cardsRef = useRef<(HTMLAnchorElement | null)[]>([])
     const dotsRef = useRef<(HTMLDivElement | null)[]>([])
 
-    useLenis(() => {
+    const lenis = useLenis(() => {
         if (!containerRef.current) return
 
         const rect = containerRef.current.getBoundingClientRect()
@@ -244,6 +244,9 @@ export function PinnedButtonsParallax() {
                                 if ('action' in card && card.action) {
                                     e.preventDefault()
                                     window.dispatchEvent(new CustomEvent(card.action))
+                                } else if (card.href.startsWith('#')) {
+                                    e.preventDefault()
+                                    lenis?.scrollTo(card.href, { offset: -50 })
                                 }
                             }}
                             className={cn(
