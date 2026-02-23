@@ -123,7 +123,7 @@ export default function OnlineCelebrationManager({ onClaim, pollIntervalMs = 5 *
                 setTimeout(() => {
                     setWindow(null)
                     setClaimed(false)
-                }, 3000)
+                }, 4000) // Extendido de 3s para 4s para ver a celebração
             } else {
                 setError('Moedas já resgatadas!')
                 setTimeout(() => {
@@ -143,52 +143,93 @@ export default function OnlineCelebrationManager({ onClaim, pollIntervalMs = 5 *
         <AnimatePresence>
             {window && window.status === 'open' && (
                 <motion.div
-                    initial={{ y: -80, opacity: 0, scale: 0.9 }}
-                    animate={{ y: 0, opacity: 1, scale: 1 }}
-                    exit={{ y: -80, opacity: 0, scale: 0.9 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                    initial={{ y: -100, opacity: 0, scale: 0.5, rotate: -5 }}
+                    animate={{ y: 0, opacity: 1, scale: 1, rotate: 0 }}
+                    exit={{ y: -100, opacity: 0, scale: 0.8, filter: "blur(10px)" }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 20, mass: 1 }}
                     className="fixed top-6 left-1/2 -translate-x-1/2 z-[100] max-w-[92vw] w-auto"
                 >
-                    <div className="flex items-center gap-3 px-5 py-3.5 rounded-2xl bg-black/85 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+                    {/* The "Fofinho" Container */}
+                    <div className="relative group flex items-center gap-4 px-6 py-4 rounded-[2rem] bg-white/95 backdrop-blur-2xl border-2 border-white/60 shadow-[0_15px_40px_-10px_rgba(229,0,126,0.3)] hover:shadow-[0_20px_50px_-5px_rgba(229,0,126,0.4)] transition-shadow duration-500 overflow-hidden">
+
+                        {/* Shimmer Effect */}
+                        <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:animate-[shimmer_2s_infinite] pointer-events-none" />
+
+                        {/* Background subtle glow */}
+                        <div className="absolute -inset-10 bg-gradient-to-r from-illa-pink/10 to-illa-yellow/10 opacity-50 blur-xl pointer-events-none" />
+
                         {claimed ? (
-                            <>
-                                <PartyPopper size={20} className="text-[#FAFF00] animate-bounce" />
-                                <span className="text-sm font-bold text-white">
-                                    +{window.reward_points} Moeda{window.reward_points > 1 ? 's' : ''} resgatada{window.reward_points > 1 ? 's' : ''}!
+                            <motion.div
+                                initial={{ scale: 0.8, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                className="flex flex-col items-center justify-center gap-2 w-full min-w-[200px]"
+                            >
+                                <motion.div
+                                    animate={{
+                                        scale: [1, 1.2, 1],
+                                        rotate: [0, -10, 10, -5, 5, 0]
+                                    }}
+                                    transition={{ duration: 0.6 }}
+                                >
+                                    <PartyPopper size={32} className="text-illa-pink" />
+                                </motion.div>
+                                <span className="text-lg font-black text-illa-pink tracking-tight drop-shadow-sm">
+                                    {window.reward_points} Moeda{window.reward_points > 1 ? 's' : ''}!
                                 </span>
-                            </>
+                                <span className="text-xs text-black/50 font-medium">Creditado na sua carteira</span>
+                            </motion.div>
                         ) : error ? (
-                            <>
-                                <AlertCircle size={20} className="text-red-400 shrink-0" />
-                                <span className="text-sm font-bold text-red-300">
+                            <motion.div
+                                initial={{ x: [0, -10, 10, -10, 10, 0] }}
+                                transition={{ duration: 0.4 }}
+                                className="flex items-center gap-3 w-full"
+                            >
+                                <AlertCircle size={24} className="text-red-500 shrink-0" />
+                                <span className="text-sm font-bold text-red-600">
                                     {error}
                                 </span>
-                            </>
+                            </motion.div>
                         ) : (
                             <>
-                                <div className="relative">
-                                    <Gift size={20} className="text-[#FAFF00] animate-pulse" />
+                                <div className="relative z-10">
+                                    <motion.div
+                                        animate={{
+                                            rotate: [-5, 5, -5],
+                                            y: [-2, 2, -2]
+                                        }}
+                                        transition={{
+                                            repeat: Infinity,
+                                            duration: 3,
+                                            ease: "easeInOut"
+                                        }}
+                                        className="bg-gradient-to-br from-illa-pink to-pink-500 p-2.5 rounded-2xl shadow-lg shadow-pink-500/30"
+                                    >
+                                        <Gift size={24} className="text-white" />
+                                    </motion.div>
                                 </div>
-                                <div className="flex flex-col gap-0.5">
-                                    <span className="text-sm font-bold text-white">
-                                        🎉 +{window.reward_points} Moeda{window.reward_points > 1 ? 's' : ''} grátis!
+
+                                <div className="flex flex-col gap-0.5 z-10">
+                                    <span className="text-base font-black text-[#111] leading-tight">
+                                        Pegue <span className="text-illa-pink">{window.reward_points} Moeda{window.reward_points > 1 ? 's' : ''}</span>
                                     </span>
-                                    <span className="text-[10px] text-white/50 flex items-center gap-1">
-                                        <Clock size={10} />
-                                        Expira em {timeLeft}
-                                    </span>
+                                    <div className="flex items-center gap-1.5 text-[11px] font-bold text-black/40 bg-black/5 px-2 py-0.5 rounded-full w-fit">
+                                        <Clock size={12} className="text-illa-pink/70" />
+                                        Expira em <span className="text-black/70 font-black">{timeLeft}</span>
+                                    </div>
                                 </div>
+
                                 <button
                                     onClick={handleClaim}
                                     disabled={claiming}
-                                    className="ml-2 px-4 py-1.5 rounded-xl bg-[#FAFF00] text-black text-xs font-black hover:scale-105 active:scale-95 transition-transform disabled:opacity-50 flex items-center gap-1.5"
+                                    className="relative overflow-hidden ml-2 px-5 py-2.5 rounded-[1.25rem] bg-illa-yellow text-black text-sm font-black hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:hover:scale-100 flex items-center gap-2 shadow-lg shadow-yellow-500/30 border border-yellow-200 z-10 group/btn"
                                 >
+                                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300" />
                                     {claiming ? (
-                                        <Loader2 size={14} className="animate-spin" />
+                                        <Loader2 size={16} className="animate-spin relative z-10" />
                                     ) : (
                                         <>
-                                            <Coins size={14} />
-                                            Resgatar
+                                            <Coins size={16} className="relative z-10 text-orange-600" />
+                                            <span className="relative z-10">Resgatar</span>
                                         </>
                                     )}
                                 </button>
