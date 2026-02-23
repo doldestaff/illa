@@ -211,10 +211,10 @@ export default function OnlineCelebrationManager({ onClaim, pollIntervalMs = 5 *
                                     className="text-center mt-3 z-10"
                                 >
                                     <span className="block text-3xl font-black text-transparent bg-clip-text bg-gradient-to-br from-illa-pink to-[#FF4A6B] drop-shadow-sm filter">
-                                        +{window.reward_points} Moedas!
+                                        +{window.reward_points} {window.reward_points === 1 ? 'Moeda' : 'Moedas'}!
                                     </span>
                                     <span className="text-[10px] font-black text-black/50 uppercase tracking-[0.2em] mt-1 block">
-                                        Coletadas
+                                        {window.reward_points === 1 ? 'Coletada' : 'Coletadas'}
                                     </span>
                                 </motion.div>
                             </motion.div>

@@ -139,17 +139,22 @@ export default function VipCard({ referralCode, referralCount, vipPayload, onLoa
 
                 <div className="relative z-10">
                     <div className="flex items-center justify-between mb-6">
-                        <div className="flex items-center gap-2.5">
-                            <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/10 shadow-inner">
-                                <CreditCard size={20} className="text-illa-yellow" />
+                        <div className="flex items-center gap-3">
+                            {/* Premium Icon Container */}
+                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-md flex items-center justify-center border border-white/10 ring-1 ring-inset ring-illa-yellow/20 shadow-[inset_0_2px_10px_rgba(255,255,255,0.1),0_4px_15px_rgba(0,0,0,0.5)]">
+                                <CreditCard size={22} className="text-illa-yellow drop-shadow-[0_2px_4px_rgba(255,237,0,0.4)]" />
                             </div>
-                            <div>
-                                <h3 className="font-bold text-lg tracking-tight">ILLA Exclusive</h3>
-                                <p className="text-[10px] text-white/50 uppercase tracking-widest font-semibold">Member Pass</p>
+                            <div className="flex flex-col justify-center">
+                                {/* Metallic Gold Typography */}
+                                <h3 className="font-extrabold text-xl tracking-tight bg-clip-text text-transparent bg-gradient-to-br from-white via-[#FFF8D6] to-[#E5C100] drop-shadow-sm leading-none mb-1">
+                                    ILLA Exclusive
+                                </h3>
+                                <div className="flex items-center gap-1.5 opacity-60">
+                                    <Sparkles size={10} className="text-illa-yellow" />
+                                    <p className="text-[9px] uppercase tracking-[0.3em] font-black leading-none">Member Pass</p>
+                                </div>
                             </div>
                         </div>
-                        {/* Glossy Logo Placeholder */}
-                        <div className="text-xl font-script text-white/20 -rotate-12 select-none">Illa</div>
                     </div>
 
                     <div className="flex flex-col md:flex-row items-center gap-6">
