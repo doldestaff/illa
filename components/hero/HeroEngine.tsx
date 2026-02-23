@@ -511,12 +511,13 @@ export function HeroEngine({
                 </div>
             )}
 
-            {/* Poster: desktop-only graceful fallback — hidden on mobile to prevent cross-fade bridge */}
-            {!isMobileHero && posterUrl && (
+            {/* Poster: graceful fallback to prevent initial black screen — transition removed on mobile to prevent cross-fade bridge */}
+            {posterUrl && (
                 <img
                     src={posterUrl}
                     className={cn(
-                        "absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ease-out z-10",
+                        "absolute inset-0 w-full h-full object-cover z-10",
+                        isMobileHero ? "transition-none" : "transition-opacity duration-500 ease-out",
                         isLoaded ? "opacity-0 pointer-events-none" : "opacity-100"
                     )}
                     alt="Illa Loading"
