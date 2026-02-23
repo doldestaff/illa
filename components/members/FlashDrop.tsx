@@ -76,7 +76,13 @@ export default function FlashDrop({ drop, onClaim }: Props) {
                         />
 
                         {/* 2. Floating Cute Stars */}
-                        {[...Array(5)].map((_, i) => (
+                        {[
+                            { top: '30%', left: '20%', duration: 4.5, delay: 0.5, size: 16 },
+                            { top: '65%', left: '80%', duration: 3.8, delay: 1.0, size: 22 },
+                            { top: '25%', left: '70%', duration: 4.2, delay: 1.5, size: 18 },
+                            { top: '75%', left: '25%', duration: 3.5, delay: 2.0, size: 14 },
+                            { top: '45%', left: '85%', duration: 4.8, delay: 2.5, size: 20 }
+                        ].map((star, i) => (
                             <motion.div
                                 key={i}
                                 initial={{ y: 0, opacity: 0 }}
@@ -87,16 +93,16 @@ export default function FlashDrop({ drop, onClaim }: Props) {
                                     rotate: [0, 45, -45, 0]
                                 }}
                                 transition={{
-                                    duration: 3 + Math.random() * 2,
+                                    duration: star.duration,
                                     repeat: Infinity,
-                                    delay: i * 0.5,
+                                    delay: star.delay,
                                     ease: "easeInOut"
                                 }}
                                 className="absolute text-illa-pink/40"
                                 style={{
-                                    top: `${20 + Math.random() * 60}%`,
-                                    left: `${15 + Math.random() * 70}%`,
-                                    fontSize: `${14 + Math.random() * 10}px`
+                                    top: star.top,
+                                    left: star.left,
+                                    fontSize: `${star.size}px`
                                 }}
                             >
                                 ✨
@@ -244,8 +250,8 @@ export default function FlashDrop({ drop, onClaim }: Props) {
                                 onClick={handleClaim}
                                 disabled={claimed || claiming}
                                 className={`w-full py-4 rounded-xl font-bold text-sm uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 mt-auto ${claimed
-                                        ? 'bg-emerald-100 text-emerald-600 border border-emerald-200 cursor-default'
-                                        : 'bg-illa-pink text-white hover:bg-pink-600 shadow-pink-500/30 hover:shadow-pink-500/40'
+                                    ? 'bg-emerald-100 text-emerald-600 border border-emerald-200 cursor-default'
+                                    : 'bg-illa-pink text-white hover:bg-pink-600 shadow-pink-500/30 hover:shadow-pink-500/40'
                                     }`}
                             >
                                 {claiming ? (

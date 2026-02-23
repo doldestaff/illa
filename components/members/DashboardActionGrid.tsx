@@ -51,7 +51,7 @@ export default function DashboardActionGrid({ onAction }: Props) {
                         <motion.div
                             initial={{ backgroundPosition: '-200% 0' }}
                             animate={{ backgroundPosition: '200% 0' }}
-                            transition={{ repeat: Infinity, duration: 4, ease: "linear", repeatDelay: Math.random() * 2 + 1 }}
+                            transition={{ repeat: Infinity, duration: 4, ease: "linear", repeatDelay: 1 + (i * 0.5) }}
                             className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 pointer-events-none"
                             style={{ backgroundSize: '200% 100%' }}
                         />

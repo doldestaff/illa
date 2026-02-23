@@ -11,34 +11,43 @@ export default function AdminPage() {
     const [isAdmin, setIsAdmin] = useState(false)
     const [checking, setChecking] = useState(true)
 
-    // Check if user is already logged in and is admin
-    const checkAdminStatus = useCallback(async () => {
-        const supabase = createSupabaseBrowser()
-        const { data: { user } } = await supabase.auth.getUser()
-
-        if (!user) {
-            setChecking(false)
-            return
-        }
-
-        setIsAuthed(true)
-
-        // Check admin_users table
-        const { data: adminRow } = await supabase
-            .from('admin_users')
-            .select('user_id')
-            .eq('user_id', user.id)
-            .maybeSingle()
-
-        if (adminRow) {
-            setIsAdmin(true)
-        }
-        setChecking(false)
-    }, [])
-
     useEffect(() => {
-        checkAdminStatus()
-    }, [checkAdminStatus])
+        let mounted = true
+
+        async function verify() {
+            const supabase = createSupabaseBrowser()
+            const { data: { user } } = await supabase.auth.getUser()
+
+            if (!mounted) return
+
+            if (!user) {
+                setChecking(false)
+                return
+            }
+
+            setIsAuthed(true)
+
+            // Check admin_users table
+            const { data: adminRow } = await supabase
+                .from('admin_users')
+                .select('user_id')
+                .eq('user_id', user.id)
+                .maybeSingle()
+
+            if (!mounted) return
+
+            if (adminRow) {
+                setIsAdmin(true)
+            }
+            setChecking(false)
+        }
+
+        verify()
+
+        return () => {
+            mounted = false
+        }
+    }, [])
 
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')

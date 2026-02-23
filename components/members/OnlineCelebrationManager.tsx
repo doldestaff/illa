@@ -167,19 +167,26 @@ export default function OnlineCelebrationManager({ onClaim, pollIntervalMs = 5 *
                                 className="flex flex-col items-center justify-center gap-2 w-full min-w-[200px] py-1 relative"
                             >
                                 {/* Premium Burst Particles */}
-                                {[...Array(6)].map((_, i) => (
+                                {[
+                                    { x: -50, y: -60, scale: 1.2, color: '#FF007F' },
+                                    { x: 50, y: -40, scale: 0.8, color: '#FFD700' },
+                                    { x: -40, y: 50, scale: 1.5, color: '#4ADE80' },
+                                    { x: 60, y: 50, scale: 1.1, color: '#FF007F' },
+                                    { x: 0, y: -70, scale: 0.9, color: '#FFD700' },
+                                    { x: 0, y: 60, scale: 1.3, color: '#4ADE80' }
+                                ].map((particle, i) => (
                                     <motion.div
                                         key={i}
                                         initial={{ opacity: 1, scale: 0, x: 0, y: 0 }}
                                         animate={{
                                             opacity: 0,
-                                            scale: Math.random() * 1.5 + 0.5,
-                                            x: (Math.random() - 0.5) * 120,
-                                            y: (Math.random() - 0.5) * 120
+                                            scale: particle.scale,
+                                            x: particle.x,
+                                            y: particle.y
                                         }}
                                         transition={{ duration: 1.2, ease: 'easeOut' }}
                                         className="absolute w-2 h-2 rounded-full pointer-events-none"
-                                        style={{ backgroundColor: ['#FF007F', '#FFD700', '#4ADE80'][i % 3] }}
+                                        style={{ backgroundColor: particle.color }}
                                     />
                                 ))}
 

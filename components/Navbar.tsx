@@ -82,7 +82,8 @@ function NavbarInner() {
 
     // Dismiss nav loader when route actually changes
     useEffect(() => {
-        setIsNavigating(false)
+        const t = setTimeout(() => setIsNavigating(false), 0)
+        return () => clearTimeout(t)
     }, [pathname])
 
     const handleAuthClick = () => {

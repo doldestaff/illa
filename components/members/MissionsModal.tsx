@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Target, Sparkles } from 'lucide-react'
+import { X, Target } from 'lucide-react'
 import type { MissionInstance } from '@/lib/gamification-types'
 import MissionCard from './MissionCard'
 import { useEffect } from 'react'
@@ -74,34 +74,53 @@ export default function MissionsModal({ isOpen, onClose, missions, claimingId, c
                             {/* Scrollable Content */}
                             <div data-lenis-prevent className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-black/10 scrollbar-track-transparent relative z-10">
                                 <div className="space-y-4">
-                                    {missions.map((mission, index) => {
-                                        const isClaimed = claimedIds.has(mission.instance_id) || mission.claimed
-                                        const isCompleted = mission.progress >= mission.target
-                                        const canClaim = isCompleted && !isClaimed
+                                    {[...missions]
+                                        .sort((a, b) => {
+                                            const aClaimed = claimedIds.has(a.instance_id) || a.claimed;
+                                            const bClaimed = claimedIds.has(b.instance_id) || b.claimed;
+                                            const aCompleted = a.progress >= a.target;
+                                            const bCompleted = b.progress >= b.target;
+                                            const aCanClaim = aCompleted && !aClaimed;
+                                            const bCanClaim = bCompleted && !bClaimed;
 
-                                        return (
-                                            <motion.div
-                                                key={mission.instance_id}
-                                                initial={{ opacity: 0, x: -20 }}
-                                                animate={{ opacity: 1, x: 0 }}
-                                                transition={{ delay: index * 0.05 }}
-                                            >
-                                                <MissionCard
-                                                    mission={mission}
-                                                    isClaimed={isClaimed}
-                                                    canClaim={canClaim}
-                                                    claiming={claimingId === mission.instance_id}
-                                                    onClaim={onClaim}
-                                                    colorTheme={['pink', 'yellow', 'white'][index % 3] as 'pink' | 'yellow' | 'white'}
-                                                />
-                                            </motion.div>
-                                        )
-                                    })}
+                                            // 1. Claimables first
+                                            if (aCanClaim && !bCanClaim) return -1;
+                                            if (!aCanClaim && bCanClaim) return 1;
+
+                                            // 2. In progress middle
+                                            if (!aClaimed && bClaimed) return -1;
+                                            if (aClaimed && !bClaimed) return 1;
+
+                                            // 3. Keep original order within the same group
+                                            return 0;
+                                        })
+                                        .map((mission, index) => {
+                                            const isClaimed = claimedIds.has(mission.instance_id) || mission.claimed
+                                            const isCompleted = mission.progress >= mission.target
+                                            const canClaim = isCompleted && !isClaimed
+
+                                            return (
+                                                <motion.div
+                                                    key={mission.instance_id}
+                                                    initial={{ opacity: 0, x: -20 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    transition={{ delay: index * 0.05 }}
+                                                >
+                                                    <MissionCard
+                                                        mission={mission}
+                                                        isClaimed={isClaimed}
+                                                        canClaim={canClaim}
+                                                        claiming={claimingId === mission.instance_id}
+                                                        onClaim={onClaim}
+                                                    />
+                                                </motion.div>
+                                            )
+                                        })}
                                 </div>
                             </div>
 
                             {/* Footer Gradient Fade */}
-                            <div className="h-8 bg-gradient-to-t from-white to-transparent pointer-events-none -mt-8 relative z-20" />
+                            <div className="h-8 bg-gradient-to-t from-[#f8f9fa] to-transparent pointer-events-none -mt-8 relative z-20" />
                         </motion.div>
                     </div>
                 </>
