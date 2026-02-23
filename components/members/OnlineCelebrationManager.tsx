@@ -191,48 +191,64 @@ export default function OnlineCelebrationManager({ onClaim, pollIntervalMs = 5 *
                             </motion.div>
                         ) : (
                             <>
-                                <div className="relative z-10">
+                                {/* CSS Coin from Dashboard with Animation */}
+                                <div className="relative z-10 mr-1">
                                     <motion.div
                                         animate={{
-                                            rotate: [-5, 5, -5],
-                                            y: [-2, 2, -2]
+                                            rotateY: [0, 180, 360],
+                                            y: [-4, 4, -4]
                                         }}
                                         transition={{
-                                            repeat: Infinity,
-                                            duration: 3,
-                                            ease: "easeInOut"
+                                            rotateY: { repeat: Infinity, duration: 4, ease: "linear" },
+                                            y: { repeat: Infinity, duration: 2, ease: "easeInOut" }
                                         }}
-                                        className="bg-gradient-to-br from-illa-pink to-pink-500 p-2.5 rounded-2xl shadow-lg shadow-pink-500/30"
+                                        className="relative flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-[#FCD34D] to-[#F59E0B] shadow-[0_4px_12px_rgba(245,158,11,0.5)] border-2 border-[#FCD34D]/80"
                                     >
-                                        <Gift size={24} className="text-white" />
+                                        <div className="absolute inset-x-0 top-0 h-1/2 bg-white/30 rounded-t-full pointer-events-none" />
+                                        <span className="text-[#78350F] font-black text-2xl leading-none pt-[2px] drop-shadow-sm">$</span>
+
+                                        {/* Sparkle effects around the coin */}
+                                        <motion.div
+                                            animate={{ opacity: [0, 1, 0], scale: [0.5, 1.2, 0.5] }}
+                                            transition={{ repeat: Infinity, duration: 2, delay: 0.5 }}
+                                            className="absolute -top-1 -right-1 w-2 h-2 bg-white rounded-full blur-[1px]"
+                                        />
+                                        <motion.div
+                                            animate={{ opacity: [0, 1, 0], scale: [0.5, 1.2, 0.5] }}
+                                            transition={{ repeat: Infinity, duration: 2.5, delay: 1 }}
+                                            className="absolute -bottom-1 -left-1 w-1.5 h-1.5 bg-white rounded-full blur-[1px]"
+                                        />
                                     </motion.div>
                                 </div>
 
-                                <div className="flex flex-col gap-0.5 z-10">
-                                    <span className="text-base font-black text-[#111] leading-tight">
-                                        Pegue <span className="text-illa-pink">{window.reward_points} Moeda{window.reward_points > 1 ? 's' : ''}</span>
+                                <div className="flex flex-col gap-0.5 z-10 flex-1 min-w-[130px]">
+                                    <span className="text-base font-black text-[#111] leading-tight mt-1">
+                                        Você ganhou
+                                        <br />
+                                        <span className="text-illa-pink text-lg tracking-tight">{window.reward_points} Moeda{window.reward_points > 1 ? 's' : ''}</span>
                                     </span>
-                                    <div className="flex items-center gap-1.5 text-[11px] font-bold text-black/40 bg-black/5 px-2 py-0.5 rounded-full w-fit">
+                                    <div className="flex items-center gap-1.5 text-[11px] font-bold text-black/40 mt-0.5 bg-black/5 px-2 py-0.5 rounded-full w-fit">
                                         <Clock size={12} className="text-illa-pink/70" />
                                         Expira em <span className="text-black/70 font-black">{timeLeft}</span>
                                     </div>
                                 </div>
 
-                                <button
+                                <motion.button
                                     onClick={handleClaim}
                                     disabled={claiming}
-                                    className="relative overflow-hidden ml-2 px-5 py-2.5 rounded-[1.25rem] bg-illa-yellow text-black text-sm font-black hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:hover:scale-100 flex items-center gap-2 shadow-lg shadow-yellow-500/30 border border-yellow-200 z-10 group/btn"
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.92, y: 2 }}
+                                    className="relative overflow-hidden ml-2 px-6 py-3 rounded-full bg-gradient-to-b from-illa-yellow to-[#E5C100] text-black text-sm font-black shadow-[0_8px_20px_-5px_rgba(250,255,0,0.5),inset_0_-3px_0_rgba(200,160,0,0.5)] border border-yellow-200 z-10 group/btn"
                                 >
-                                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300" />
+                                    <div className="absolute inset-0 bg-white/30 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300" />
                                     {claiming ? (
-                                        <Loader2 size={16} className="animate-spin relative z-10" />
+                                        <Loader2 size={18} className="animate-spin relative z-10" />
                                     ) : (
-                                        <>
-                                            <Coins size={16} className="relative z-10 text-orange-600" />
-                                            <span className="relative z-10">Resgatar</span>
-                                        </>
+                                        <div className="relative z-10 flex items-center gap-2 tracking-wide">
+                                            Resgatar
+                                        </div>
                                     )}
-                                </button>
+                                </motion.button>
                             </>
                         )}
                     </div>
