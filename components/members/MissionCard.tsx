@@ -4,6 +4,7 @@ import { motion, useMotionTemplate, useMotionValue } from 'framer-motion'
 import { CheckCircle, Circle, Sparkles, Loader2, Coins } from 'lucide-react'
 import type { MissionInstance } from '@/lib/gamification-types'
 import { MouseEvent } from 'react'
+import GlobalCoin from '@/components/ui/GlobalCoin'
 
 interface MissionCardProps {
     mission: MissionInstance
@@ -33,31 +34,31 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
 
     const themeStyles = {
         pink: {
-            bgClaim: 'bg-white/10 border-white/20 shadow-[0_8px_32px_rgba(229,1,125,0.15)] ring-1 ring-white/30',
-            bgIdle: 'bg-white/5 border-white/10 hover:border-white/20 shadow-[0_4px_16px_rgba(0,0,0,0.1)]',
-            glow: 'from-white/20 to-white/5',
-            btn: 'bg-white/90 hover:bg-white text-gray-900 shadow-[0_4px_12px_rgba(255,255,255,0.2)]',
-            progress: 'from-illa-pink via-pink-400 to-pink-600 shadow-[0_0_12px_rgba(229,1,125,0.5)]',
-            text: 'text-white',
-            pulse: 'bg-white shadow-[0_0_8px_#ffffff]'
+            bgClaim: 'bg-white/90 border-pink-200/50 shadow-[0_8px_32px_rgba(229,1,125,0.08)] ring-1 ring-pink-100',
+            bgIdle: 'bg-white/60 border-black/5 hover:border-pink-200/30 shadow-[0_4px_16px_rgba(0,0,0,0.03)]',
+            glow: 'from-pink-100/40 to-white/10',
+            btn: 'bg-gradient-to-r from-illa-pink to-pink-500 hover:from-pink-500 hover:to-pink-600 text-white shadow-[0_4px_12px_rgba(229,1,125,0.25)] border-pink-400',
+            progress: 'from-illa-pink via-pink-400 to-pink-600 shadow-[0_0_12px_rgba(229,1,125,0.3)]',
+            text: 'text-gray-900',
+            pulse: 'bg-illa-pink shadow-[0_0_8px_rgba(229,1,125,0.5)]'
         },
         yellow: {
-            bgClaim: 'bg-white/10 border-white/20 shadow-[0_8px_32px_rgba(255,237,0,0.15)] ring-1 ring-white/30',
-            bgIdle: 'bg-white/5 border-white/10 hover:border-white/20 shadow-[0_4px_16px_rgba(0,0,0,0.1)]',
-            glow: 'from-white/20 to-white/5',
-            btn: 'bg-white/90 hover:bg-white text-gray-900 shadow-[0_4px_12px_rgba(255,255,255,0.2)]',
-            progress: 'from-orange-400 via-illa-yellow to-yellow-200 shadow-[0_0_12px_rgba(255,237,0,0.5)]',
-            text: 'text-white',
-            pulse: 'bg-white shadow-[0_0_8px_#ffffff]'
+            bgClaim: 'bg-white/90 border-yellow-200/50 shadow-[0_8px_32px_rgba(255,237,0,0.08)] ring-1 ring-yellow-100',
+            bgIdle: 'bg-white/60 border-black/5 hover:border-yellow-200/30 shadow-[0_4px_16px_rgba(0,0,0,0.03)]',
+            glow: 'from-yellow-100/40 to-white/10',
+            btn: 'bg-gradient-to-r from-illa-yellow to-[#E5C100] hover:from-[#E5C100] hover:to-yellow-500 text-black shadow-[0_4px_12px_rgba(255,237,0,0.25)] border-yellow-300',
+            progress: 'from-orange-400 via-illa-yellow to-yellow-200 shadow-[0_0_12px_rgba(255,237,0,0.3)]',
+            text: 'text-gray-900',
+            pulse: 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]'
         },
         white: {
-            bgClaim: 'bg-white/10 border-white/20 shadow-[0_8px_32px_rgba(255,255,255,0.1)] ring-1 ring-white/30',
-            bgIdle: 'bg-white/5 border-white/10 hover:border-white/20 shadow-[0_4px_16px_rgba(0,0,0,0.1)]',
-            glow: 'from-white/20 to-white/5',
-            btn: 'bg-white/90 hover:bg-white text-gray-900 shadow-[0_4px_12px_rgba(255,255,255,0.2)]',
-            progress: 'from-gray-400 via-gray-200 to-white shadow-[0_0_12px_rgba(255,255,255,0.5)]',
-            text: 'text-white',
-            pulse: 'bg-white shadow-[0_0_8px_#ffffff]'
+            bgClaim: 'bg-white/90 border-gray-200 shadow-[0_8px_32px_rgba(0,0,0,0.04)] ring-1 ring-black/5',
+            bgIdle: 'bg-white/60 border-black/5 hover:border-gray-200 shadow-[0_4px_16px_rgba(0,0,0,0.03)]',
+            glow: 'from-gray-100/50 to-white/10',
+            btn: 'bg-gray-900 hover:bg-black text-white shadow-[0_4px_12px_rgba(0,0,0,0.15)] border-gray-800',
+            progress: 'from-gray-600 via-gray-400 to-gray-300 shadow-[0_0_12px_rgba(0,0,0,0.1)]',
+            text: 'text-gray-900',
+            pulse: 'bg-gray-900 shadow-[0_0_8px_rgba(0,0,0,0.3)]'
         }
     }
 
@@ -95,12 +96,12 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                             {isCompleted && !isClaimed && (
                                 <span className={`flex h-2 w-2 rounded-full animate-pulse ${currentTheme.pulse}`} />
                             )}
-                            <h3 className={`font-bold text-[15px] leading-tight tracking-tight shadow-black/20 trancate ${isClaimed ? 'text-white/40' : 'text-white drop-shadow-md'}`}>
+                            <h3 className={`font-bold text-[15px] leading-tight tracking-tight trancate ${isClaimed ? 'text-gray-400' : currentTheme.text}`}>
                                 {mission.title}
                             </h3>
                         </div>
                         {mission.description && (
-                            <p className="text-xs text-white/50 leading-relaxed line-clamp-2 min-h-[2.5em]">
+                            <p className="text-xs text-gray-500 font-medium leading-relaxed line-clamp-2 min-h-[2.5em]">
                                 {mission.description}
                             </p>
                         )}
@@ -109,7 +110,7 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                     {/* Status Badge / Button */}
                     <div className="shrink-0 pt-1">
                         {isClaimed ? (
-                            <div className="flex items-center gap-1.5 text-emerald-400 font-bold text-[10px] bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20 shadow-[0_0_10px_rgba(52,211,153,0.1)]">
+                            <div className="flex items-center gap-1.5 text-emerald-600 font-bold text-[10px] bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20 shadow-[0_0_10px_rgba(52,211,153,0.1)]">
                                 <CheckCircle size={12} strokeWidth={3} />
                                 <span>FEITO</span>
                             </div>
@@ -132,7 +133,7 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                                 )}
                             </motion.button>
                         ) : (
-                            <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/20 shadow-inner">
+                            <div className="w-8 h-8 rounded-full bg-black/5 border border-black/10 flex items-center justify-center text-gray-400 shadow-inner">
                                 <Circle size={14} strokeWidth={2.5} />
                             </div>
                         )}
@@ -150,9 +151,9 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                             </span>
                         )}
                         {mission.reward_points > 0 && (
-                            <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-md border ${isClaimed ? 'bg-white/5 text-white/30 border-white/5' : 'bg-illa-pink/10 text-illa-pink border-illa-pink/20'}`}>
-                                <Coins size={10} className={isClaimed ? '' : "text-illa-yellow"} />
-                                +{mission.reward_points} Moedas
+                            <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold pl-1 pr-2 py-0.5 rounded-md border ${isClaimed ? 'bg-white/5 text-white/30 border-white/5 grayscale' : 'bg-illa-pink/5 text-illa-pink border-illa-pink/20 shadow-sm shadow-illa-pink/10'}`}>
+                                <GlobalCoin size="sm" />
+                                <span className={isClaimed ? '' : 'text-[#78350F]'}>+{mission.reward_points} Moedas</span>
                             </span>
                         )}
                     </div>
@@ -160,20 +161,20 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                     {/* Neon Liquid Progress Bar */}
                     <div className="relative">
                         <div className="flex justify-between text-[10px] font-bold mb-1.5 tracking-wider uppercase">
-                            <span className={`${isCompleted ? 'text-emerald-400' : 'text-white/60'}`}>PROGRESSO</span>
-                            <span className={`${isCompleted ? 'text-emerald-400' : 'text-white'}`}>
-                                {mission.progress} <span className="text-white/30 px-0.5">/</span> {mission.target}
+                            <span className={`${isCompleted ? 'text-emerald-500' : 'text-gray-500'}`}>PROGRESSO</span>
+                            <span className={`${isCompleted ? 'text-emerald-600' : 'text-gray-800'}`}>
+                                {mission.progress} <span className="text-gray-400 px-0.5">/</span> {mission.target}
                             </span>
                         </div>
-                        <div className="h-1.5 bg-white/10 rounded-full overflow-hidden shadow-inner flex items-center">
+                        <div className="h-2 bg-black/5 rounded-full overflow-hidden shadow-inner flex items-center ring-1 ring-black/5 p-0.5">
                             <motion.div
                                 initial={{ width: 0 }}
                                 animate={{ width: `${percent}%` }}
                                 transition={{ duration: 1.2, ease: "easeOut" }}
                                 className={`h-full rounded-full relative transition-all duration-1000 ${isClaimed
-                                    ? 'bg-white/20'
+                                    ? 'bg-gray-300'
                                     : isCompleted
-                                        ? 'bg-gradient-to-r from-emerald-400 to-teal-400 shadow-[0_0_12px_rgba(52,211,153,0.6)]'
+                                        ? 'bg-gradient-to-r from-emerald-400 to-teal-400 shadow-[0_0_12px_rgba(52,211,153,0.4)]'
                                         : `bg-gradient-to-r ${currentTheme.progress}`
                                     }`}
                             >

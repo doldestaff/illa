@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Plus, Minus, IceCream, RefreshCw, LogOut, BarChart3, Users, Target, CheckCircle, XCircle, Coins, Droplet, Zap, Trash2, Clock } from 'lucide-react'
 import { createSupabaseBrowser } from '@/lib/supabaseClient'
+import GlobalCoin from '@/components/ui/GlobalCoin'
 
 interface UserSorvetes {
     id: string
@@ -595,7 +596,7 @@ export default function AdminDashboard() {
                             <div className="flex items-center gap-4 mb-8">
                                 <div className="p-3 bg-green-500/20 rounded-2xl text-green-400">
                                     <div className="relative">
-                                        <Coins size={32} />
+                                        <GlobalCoin size="md" />
                                         <div className="absolute -top-1 -right-1">
                                             <Plus size={12} className="text-white bg-green-600 rounded-full p-0.5" />
                                         </div>
@@ -696,7 +697,7 @@ export default function AdminDashboard() {
                                                         <label className="block text-xs font-bold uppercase text-gray-400 mb-2">Moedas (Adicionar/Remover)</label>
                                                         <div className="relative group/input">
                                                             <div className="absolute left-3 top-1/2 -translate-y-1/2 text-yellow-400 transition-transform group-focus-within/input:scale-110">
-                                                                <Coins size={18} />
+                                                                <GlobalCoin size="sm" />
                                                             </div>
                                                             <input
                                                                 type="number"
@@ -1011,8 +1012,8 @@ export default function AdminDashboard() {
                                                             <p className="text-xs text-white/50 line-clamp-2 h-8">{drop.description || 'Sem descrição'}</p>
 
                                                             <div className="mt-4 flex items-center gap-3">
-                                                                <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border ${drop.reward_type === 'xp' ? 'bg-purple-500/10 border-purple-500/20 text-purple-300' : 'bg-yellow-500/10 border-yellow-500/20 text-yellow-300'}`}>
-                                                                    {drop.reward_type === 'xp' ? <Zap size={14} /> : <Coins size={14} />}
+                                                                <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border ${drop.reward_type === 'xp' ? 'bg-purple-500/10 border-purple-500/20 text-purple-300' : 'bg-[#F59E0B]/10 border-[#F59E0B]/20 text-[#F59E0B]'}`}>
+                                                                    {drop.reward_type === 'xp' ? <Zap size={14} /> : <GlobalCoin size="sm" />}
                                                                     <span className="font-bold text-sm">+{drop.reward_value}</span>
                                                                 </div>
                                                                 <div className="text-[10px] text-white/40 flex items-center gap-1">

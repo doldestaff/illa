@@ -3,6 +3,7 @@
 import type { MemberProfile } from '@/lib/gamification-types'
 import { User, Star, Flame, Coins, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
+import GlobalCoin from '@/components/ui/GlobalCoin'
 
 interface Props {
     profile: MemberProfile
@@ -72,13 +73,22 @@ export default function HudHeader({ profile, avatarUrl }: Props) {
                         )}
                     </div>
 
-                    <div className="flex items-center gap-3 text-sm font-medium text-white/60 mt-1.5">
-                        <div className="flex items-center gap-1.5 text-white/80">
-                            <div className="p-1 rounded bg-illa-pink/20 text-illa-pink">
-                                <Coins size={12} className="text-[#FAFF00]" />
+                    <div className="mt-2.5 flex items-center">
+                        <div className="relative inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gradient-to-b from-white/10 to-black/10 border border-white/20 backdrop-blur-md shadow-[0_4px_16px_rgba(0,0,0,0.1),inset_0_1px_1px_rgba(255,255,255,0.2)] overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-r from-illa-yellow/15 to-transparent pointer-events-none" />
+
+                            <div className="relative z-10">
+                                <GlobalCoin size="sm" />
                             </div>
-                            <span className="font-semibold text-white">{profile.points.toLocaleString()}</span>
-                            <span className="text-xs font-normal opacity-70">pontos</span>
+
+                            <div className="relative z-10 flex items-baseline gap-1.5 pr-1">
+                                <span className="text-sm font-black text-white tracking-tight drop-shadow-sm tabular-nums">
+                                    {profile.points.toLocaleString()}
+                                </span>
+                                <span className="text-[9px] font-black uppercase tracking-wider text-[#FCD34D] drop-shadow-sm">
+                                    Moedas
+                                </span>
+                            </div>
                         </div>
                     </div>
 

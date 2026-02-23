@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import type { CelebrationWindow, CelebrationClaimResult } from '@/lib/gamification-types'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Gift, Coins, Clock, Loader2, PartyPopper, AlertCircle } from 'lucide-react'
+import { Gift, Coins, Clock, Loader2, PartyPopper, AlertCircle, IceCream } from 'lucide-react'
+import GlobalCoin from '@/components/ui/GlobalCoin'
 
 interface Props {
     onClaim: (result: CelebrationClaimResult) => void
@@ -160,23 +161,55 @@ export default function OnlineCelebrationManager({ onClaim, pollIntervalMs = 5 *
 
                         {claimed ? (
                             <motion.div
-                                initial={{ scale: 0.8, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
-                                className="flex flex-col items-center justify-center gap-2 w-full min-w-[200px]"
+                                initial={{ scale: 0.5, opacity: 0, rotate: -10 }}
+                                animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                                transition={{ type: 'spring', bounce: 0.6, duration: 0.8 }}
+                                className="flex flex-col items-center justify-center gap-2 w-full min-w-[200px] py-1 relative"
                             >
+                                {/* Premium Burst Particles */}
+                                {[...Array(6)].map((_, i) => (
+                                    <motion.div
+                                        key={i}
+                                        initial={{ opacity: 1, scale: 0, x: 0, y: 0 }}
+                                        animate={{
+                                            opacity: 0,
+                                            scale: Math.random() * 1.5 + 0.5,
+                                            x: (Math.random() - 0.5) * 120,
+                                            y: (Math.random() - 0.5) * 120
+                                        }}
+                                        transition={{ duration: 1.2, ease: 'easeOut' }}
+                                        className="absolute w-2 h-2 rounded-full pointer-events-none"
+                                        style={{ backgroundColor: ['#FF007F', '#FFD700', '#4ADE80'][i % 3] }}
+                                    />
+                                ))}
+
                                 <motion.div
                                     animate={{
-                                        scale: [1, 1.2, 1],
-                                        rotate: [0, -10, 10, -5, 5, 0]
+                                        scale: [1, 1.1, 1],
+                                        rotate: [0, -5, 5, -3, 3, 0]
                                     }}
-                                    transition={{ duration: 0.6 }}
+                                    transition={{ duration: 0.8 }}
+                                    className="relative flex items-center justify-center z-20"
                                 >
-                                    <PartyPopper size={32} className="text-illa-pink" />
+                                    <div className="absolute inset-0 bg-gradient-to-tr from-illa-pink to-amber-400 blur-xl opacity-50 animate-pulse rounded-full" />
+                                    <div className="relative z-10 w-16 h-16 flex items-center justify-center">
+                                        <GlobalCoin size="lg" animate />
+                                    </div>
                                 </motion.div>
-                                <span className="text-lg font-black text-illa-pink tracking-tight drop-shadow-sm">
-                                    {window.reward_points} Moeda{window.reward_points > 1 ? 's' : ''}!
-                                </span>
-                                <span className="text-xs text-black/50 font-medium">Creditado na sua carteira</span>
+
+                                <motion.div
+                                    initial={{ y: 10, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    transition={{ delay: 0.3 }}
+                                    className="text-center mt-3 z-10"
+                                >
+                                    <span className="block text-3xl font-black text-transparent bg-clip-text bg-gradient-to-br from-illa-pink to-[#FF4A6B] drop-shadow-sm filter">
+                                        +{window.reward_points} Moedas!
+                                    </span>
+                                    <span className="text-[10px] font-black text-black/50 uppercase tracking-[0.2em] mt-1 block">
+                                        Coletadas
+                                    </span>
+                                </motion.div>
                             </motion.div>
                         ) : error ? (
                             <motion.div
@@ -192,32 +225,17 @@ export default function OnlineCelebrationManager({ onClaim, pollIntervalMs = 5 *
                         ) : (
                             <>
                                 {/* CSS Coin from Dashboard with Animation */}
-                                <div className="relative z-10 mr-1">
+                                <div className="relative z-10 mr-1 flex items-center p-1">
                                     <motion.div
                                         animate={{
-                                            rotateY: [0, 180, 360],
                                             y: [-4, 4, -4]
                                         }}
                                         transition={{
-                                            rotateY: { repeat: Infinity, duration: 4, ease: "linear" },
                                             y: { repeat: Infinity, duration: 2, ease: "easeInOut" }
                                         }}
-                                        className="relative flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-[#FCD34D] to-[#F59E0B] shadow-[0_4px_12px_rgba(245,158,11,0.5)] border-2 border-[#FCD34D]/80"
+                                        className="relative z-20"
                                     >
-                                        <div className="absolute inset-x-0 top-0 h-1/2 bg-white/30 rounded-t-full pointer-events-none" />
-                                        <span className="text-[#78350F] font-black text-2xl leading-none pt-[2px] drop-shadow-sm">$</span>
-
-                                        {/* Sparkle effects around the coin */}
-                                        <motion.div
-                                            animate={{ opacity: [0, 1, 0], scale: [0.5, 1.2, 0.5] }}
-                                            transition={{ repeat: Infinity, duration: 2, delay: 0.5 }}
-                                            className="absolute -top-1 -right-1 w-2 h-2 bg-white rounded-full blur-[1px]"
-                                        />
-                                        <motion.div
-                                            animate={{ opacity: [0, 1, 0], scale: [0.5, 1.2, 0.5] }}
-                                            transition={{ repeat: Infinity, duration: 2.5, delay: 1 }}
-                                            className="absolute -bottom-1 -left-1 w-1.5 h-1.5 bg-white rounded-full blur-[1px]"
-                                        />
+                                        <GlobalCoin size="lg" />
                                     </motion.div>
                                 </div>
 
@@ -245,7 +263,7 @@ export default function OnlineCelebrationManager({ onClaim, pollIntervalMs = 5 *
                                         <Loader2 size={18} className="animate-spin relative z-10" />
                                     ) : (
                                         <div className="relative z-10 flex items-center gap-2 tracking-wide">
-                                            Resgatar
+                                            Coletar
                                         </div>
                                     )}
                                 </motion.button>

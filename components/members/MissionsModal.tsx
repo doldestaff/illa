@@ -46,30 +46,33 @@ export default function MissionsModal({ isOpen, onClose, missions, claimingId, c
                             animate={{ scale: 1, opacity: 1, y: 0 }}
                             exit={{ scale: 0.95, opacity: 0, y: 10 }}
                             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                            className="bg-[#1a1a1a] border border-white/10 w-full max-w-lg max-h-[85vh] rounded-[2rem] shadow-2xl overflow-hidden pointer-events-auto flex flex-col"
+                            className="bg-white/95 backdrop-blur-2xl border-2 border-white/60 w-full max-w-lg max-h-[85vh] rounded-[2rem] shadow-[0_15px_40px_-5px_rgba(0,0,0,0.2)] overflow-hidden pointer-events-auto flex flex-col relative"
                         >
+                            {/* Ambient background subtle glow */}
+                            <div className="absolute inset-x-0 -top-10 h-32 bg-gradient-to-br from-illa-pink/20 to-transparent blur-2xl pointer-events-none" />
+
                             {/* Header */}
-                            <div className="relative p-6 pb-4 border-b border-white/5 bg-gradient-to-b from-white/5 to-transparent">
+                            <div className="relative p-6 pt-8 pb-4 border-b border-black/5 bg-gradient-to-b from-white/40 to-transparent z-10">
                                 <button
                                     onClick={onClose}
-                                    className="absolute top-5 right-5 p-2 rounded-full bg-white/5 hover:bg-white/10 text-white/50 hover:text-white transition-colors"
+                                    className="absolute top-5 right-5 p-2 rounded-full bg-black/5 hover:bg-black/10 text-black/40 hover:text-black/70 transition-colors"
                                 >
                                     <X size={20} />
                                 </button>
 
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-xl bg-illa-pink/20 flex items-center justify-center border border-illa-pink/30">
-                                        <Target size={20} className="text-illa-pink" />
+                                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-illa-pink to-pink-500 shadow-lg shadow-pink-500/30 flex items-center justify-center border border-pink-400">
+                                        <Target size={24} className="text-white drop-shadow-sm" />
                                     </div>
                                     <div>
-                                        <h2 className="text-xl font-bold text-white">Mural de Missões</h2>
-                                        <p className="text-xs text-white/40">Complete desafios para ganhar recompensas</p>
+                                        <h2 className="text-2xl font-black text-gray-900 tracking-tight">Mural de Missões</h2>
+                                        <p className="text-sm font-medium text-gray-500">Complete desafios para ganhar recompensas</p>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Scrollable Content */}
-                            <div className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+                            <div data-lenis-prevent className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-black/10 scrollbar-track-transparent relative z-10">
                                 <div className="space-y-4">
                                     {missions.map((mission, index) => {
                                         const isClaimed = claimedIds.has(mission.instance_id) || mission.claimed
@@ -98,7 +101,7 @@ export default function MissionsModal({ isOpen, onClose, missions, claimingId, c
                             </div>
 
                             {/* Footer Gradient Fade */}
-                            <div className="h-6 bg-gradient-to-t from-[#1a1a1a] to-transparent pointer-events-none -mt-6 relative z-10" />
+                            <div className="h-8 bg-gradient-to-t from-white to-transparent pointer-events-none -mt-8 relative z-20" />
                         </motion.div>
                     </div>
                 </>
