@@ -21,31 +21,31 @@ const stores: Store[] = [
         id: 'serraria',
         name: 'Illa Sorvetes – Serraria',
         shortName: 'Serraria',
-        address: 'Rua da Alegria, 123 – Serraria, Maceió/AL',
+        address: 'Av. Menino Marcelo, 9731 Galpão F – Serraria, Maceió/AL',
         hours: 'Seg–Sex 10h às 22h • Sáb–Dom 12h às 23h',
-        phone: '+55 82 99999-9991',
-        mapUrl: 'https://maps.app.goo.gl/example1',
-        embedSrc: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15699.646097223795!2d-35.733333!3d-9.666667!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zOcKwMzknNTguOCJTIDM1wrA0NCcwMC4wIlc!5e0!3m2!1sen!2sbr!4v1620000000000!5m2!1sen!2sbr'
+        phone: '+55 82 3436-7444',
+        mapUrl: 'https://maps.app.goo.gl/BiDtkzuWzPgv7c876',
+        embedSrc: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d31470.559890717093!2d-35.73687366044919!3d-9.610763499999992!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x701461352daac6b%3A0x532a5a67ef76620d!2sIlla%20Sorvetes!5e0!3m2!1spt-BR!2sbr!4v1771864551744!5m2!1spt-BR!2sbr'
     },
     {
         id: 'jatiuca',
         name: 'Illa Sorvetes – Jatiúca',
         shortName: 'Jatiúca',
-        address: 'Av. Jatiúca, 456 – Jatiúca, Maceió/AL',
+        address: 'Av. Alm. Álvaro Calheiros, 6 – Jatiúca, Maceió/AL',
         hours: 'Seg–Sex 10h às 22h • Sáb–Dom 12h às 23h',
-        phone: '+55 82 99999-9992',
-        mapUrl: 'https://maps.app.goo.gl/example2',
-        embedSrc: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3408.8!2d-35.705!3d-9.655!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zOcKwMzknMTguMCJTIDM1wrA0MicxOC4wIlc!5e0!3m2!1sen!2sbr!4v1620000000000!5m2!1sen!2sbr'
+        phone: '+55 82 99334-7941',
+        mapUrl: 'https://maps.app.goo.gl/MfZJxYPshKbrTCSZA',
+        embedSrc: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1966.7161145348566!2d-35.701390300000014!3d-9.644059200000001!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x70145b805fa4ab1%3A0x5afdda9656f06c2e!2sIlla%20Sorvetes%20Praia!5e0!3m2!1spt-BR!2sbr!4v1771864621888!5m2!1spt-BR!2sbr'
     },
     {
         id: 'pontaverde',
         name: 'Illa Sorvetes – Ponta Verde',
         shortName: 'Ponta Verde',
-        address: 'Rua da Praia, 789 – Ponta Verde, Maceió/AL',
+        address: 'Rua Domingos Lordsleen, 352 – Ponta da Terra, Maceió/AL',
         hours: 'Seg–Sex 10h às 22h • Sáb–Dom 12h às 23h',
-        phone: '+55 82 99999-9993',
-        mapUrl: 'https://maps.app.goo.gl/example3',
-        embedSrc: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3408.8!2d-35.7!3d-9.66!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zOcKwMzknMzYuMCJTIDM1wrA0MicwMC4wIlc!5e0!3m2!1sen!2sbr!4v1620000000000!5m2!1sen!2sbr'
+        phone: '+55 82 99999-9973',
+        mapUrl: 'https://maps.app.goo.gl/TE7gCrqemUacEi4',
+        embedSrc: 'https://www.google.com/maps/embed?pb=!1m13!1m8!1m3!1d3933.155564798134!2d-35.7196018!3d-9.6677462!3m2!1i1024!2i768!4f13.1!3m2!1m1!2s!5e0!3m2!1spt-BR!2sbr!4v1771864789369!5m2!1spt-BR!2sbr'
     }
 ]
 
