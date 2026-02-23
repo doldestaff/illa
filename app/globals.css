@@ -146,8 +146,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
-  /* contain limits repaint scope — critical for scroll performance */
-  contain: layout style;
+  /* removed contain: layout style as it breaks position fixed portals */
   /* Pattern background with cheaper blend mode */
   background-image: url('/brand/pattern.png');
   background-repeat: repeat;

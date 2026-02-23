@@ -25,6 +25,7 @@ export interface HeroEngineProps {
     onProgress?: (progress: number) => void
     startIndex?: number
     debug?: boolean
+    objectFit?: 'cover' | 'contain'
 }
 
 interface Manifest {
@@ -84,7 +85,8 @@ export function HeroEngine({
     scrollSectionHeightVh = 500,
     onProgress,
     startIndex = 0,
-    debug = false
+    debug = false,
+    objectFit = 'cover'
 }: HeroEngineProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const containerRef = useRef<HTMLDivElement>(null)
@@ -392,11 +394,11 @@ export function HeroEngine({
         const iH = (frame instanceof ImageBitmap) ? frame.height : (frame as HTMLImageElement).naturalHeight
 
         // Cover Math
-        const scale = Math.max(w / iW, h / iH)
+        const scale = objectFit === 'contain' ? Math.min(w / iW, h / iH) : Math.max(w / iW, h / iH)
         const finalW = iW * scale
         const finalH = iH * scale
         const x = (w - finalW) / 2
-        const y = (h - finalH) / 2
+        const y = objectFit === 'contain' ? 0 : (h - finalH) / 2 // Align to top for contain, center for cover
 
         ctx.drawImage(frame, x, y, finalW, finalH)
 
@@ -515,7 +517,7 @@ export function HeroEngine({
                 alt="Illa Loading"
                 style={{
                     // Fallback to ensuring pointer events don't block
-                    pointerEvents: isLoaded ? 'none' : 'auto'
+                    pointerEvents: 'none'
                 }}
             />
 

@@ -18,9 +18,7 @@ import StorePromoCard from './StorePromoCard'
 import VipCard from './VipCard'
 import OnlineCelebrationManager from './OnlineCelebrationManager'
 import DashboardActionGrid from './DashboardActionGrid'
-const ActionModal = dynamic(() => import('./ActionModal'), {
-    loading: () => null,
-})
+import ActionModal from './ActionModal'
 import ScrollBg from './MembersScrollBackground'
 import { createSupabaseBrowser } from '@/lib/supabaseClient'
 import { usePushNotifications } from '@/hooks/usePushNotifications'
@@ -413,7 +411,7 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                     <div className="md:col-span-5 lg:col-span-4 relative">
                         <div className="md:sticky md:top-8 transition-all duration-300">
                             {/* HUD Header (User Stats) */}
-                            <DashboardHeader profile={snapshot.profile} avatarUrl={avatarUrl} dropsCount={snapshot.drops_claimed_count ?? 0} sorvetesCount={sorvetesCount} />
+                            <DashboardHeader profile={snapshot.profile} avatarUrl={avatarUrl} sorvetesCount={sorvetesCount} />
 
                             {/* Desktop/Tablet Only: Quick Action Links could go here later */}
                             <div className="hidden md:block mt-6 text-center">

@@ -68,11 +68,11 @@ export default function ActionModal({ isOpen, onClose, title, themeGradient = "f
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 z-[60] bg-black/80 backdrop-blur-md"
+                        className="fixed inset-0 z-[9998] bg-black/80 backdrop-blur-md"
                     />
 
                     {/* Container - Bottom aligned on mobile, Center on desktop */}
-                    <div className="fixed inset-0 z-[61] flex flex-col justify-end md:justify-center items-center pointer-events-none">
+                    <div className="fixed inset-0 z-[9999] flex flex-col justify-end md:justify-center items-center pointer-events-none">
 
                         {/* Premium Entrance Glow (Behind Modal) */}
                         <motion.div

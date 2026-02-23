@@ -89,6 +89,7 @@ export default function MissionsModal({ isOpen, onClose, missions, claimingId, c
                                                     canClaim={canClaim}
                                                     claiming={claimingId === mission.instance_id}
                                                     onClaim={onClaim}
+                                                    colorTheme={['pink', 'yellow', 'white'][index % 3] as 'pink' | 'yellow' | 'white'}
                                                 />
                                             </motion.div>
                                         )

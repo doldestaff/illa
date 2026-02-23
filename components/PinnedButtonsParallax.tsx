@@ -111,7 +111,15 @@ export function PinnedButtonsParallax() {
         const windowH = window.innerHeight
         const scrollableDist = height - windowH
         const rawProgress = -rect.top / scrollableDist
-        const progress = Math.max(0, Math.min(1, rawProgress))
+
+        // Add a 15% scroll delay at the beginning before animation starts
+        // This keeps the 'Sobre Nós' card completely still when Section 2 first pins.
+        const START_DELAY = 0.15;
+        let progress = 0;
+
+        if (rawProgress > START_DELAY) {
+            progress = Math.max(0, Math.min(1, (rawProgress - START_DELAY) / (1 - START_DELAY)));
+        }
 
         const totalCards = cards.length
         const step = 1 / totalCards

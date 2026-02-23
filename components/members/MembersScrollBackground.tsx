@@ -63,7 +63,7 @@ export default function MembersScrollBackground() {
                         // Minimal priority — only first frame to avoid blocking main thread
                         priorityFrames={[0]}
                         posterUrl="/members-bg/IllaMembers-mobile_001.webp"
-                        className="w-full h-full opacity-60"
+                        className="w-full h-full absolute inset-0 max-w-none opacity-30 object-cover"
                     />
                 </div>
             )}

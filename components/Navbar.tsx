@@ -5,7 +5,7 @@ import { Menu, ShoppingBag, User, LogIn, IceCream, MapPin, Store, Info, Shield, 
 import { cn } from '@/lib/utils'
 import { useState, useEffect, Suspense } from 'react'
 import Image from 'next/image'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { AuthModal } from './AuthModal'
 import { AboutModal } from './AboutModal'
 import { createSupabaseBrowser } from '@/lib/supabaseClient'
@@ -32,7 +32,9 @@ function NavbarInner() {
     const [isOpen, setIsOpen] = useState(false)
     const [showAuthModal, setShowAuthModal] = useState(false)
     const [user, setUser] = useState<SupabaseUser | null>(null)
+    const [isNavigating, setIsNavigating] = useState(false)
     const router = useRouter()
+    const pathname = usePathname()
 
     // --- Lenis Scroll Lock Integration ---
     const lenis = useLenis()
@@ -77,8 +79,15 @@ function NavbarInner() {
         facebook: 'https://www.facebook.com/p/Illasorvetesoficial-100094697327857/'
     }
 
+    // Dismiss nav loader when route actually changes
+    useEffect(() => {
+        setIsNavigating(false)
+    }, [pathname])
+
     const handleAuthClick = () => {
         if (user) {
+            setIsOpen(false)
+            setIsNavigating(true)
             router.push('/members')
         } else {
             setShowAuthModal(true)
@@ -99,6 +108,53 @@ function NavbarInner() {
             <Suspense fallback={null}>
                 <LoginParamListener onLoginParam={() => setShowAuthModal(true)} />
             </Suspense>
+
+            {/* Minha Conta Navigation Loader */}
+            {isNavigating && (
+                <div
+                    className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white"
+                    style={{ animation: 'fadeInLoader 0.15s ease forwards' }}
+                >
+                    <style>{`
+                        @keyframes fadeInLoader {
+                            from { opacity: 0; }
+                            to   { opacity: 1; }
+                        }
+                        @keyframes spinNeon {
+                            to { transform: rotate(360deg); }
+                        }
+                        @keyframes pulseLogoLoader {
+                            0%, 100% { opacity: 1; transform: scale(1); }
+                            50%       { opacity: 0.7; transform: scale(0.97); }
+                        }
+                    `}</style>
+
+                    {/* ILLA Logo pulsing */}
+                    <div
+                        className="relative w-40 h-12 mb-8"
+                        style={{ animation: 'pulseLogoLoader 1.4s ease-in-out infinite' }}
+                    >
+                        <Image
+                            src="/brand/logo.png"
+                            alt="Illa Sorvetes"
+                            fill
+                            className="object-contain"
+                            sizes="160px"
+                            priority
+                        />
+                    </div>
+
+                    {/* Neon spinner */}
+                    <div
+                        className="w-10 h-10 rounded-full border-4 border-illa-pink/20 border-t-illa-pink"
+                        style={{ animation: 'spinNeon 0.9s linear infinite' }}
+                    />
+
+                    <p className="mt-5 text-sm font-semibold tracking-widest text-illa-pink/60 uppercase">
+                        Carregando sua conta…
+                    </p>
+                </div>
+            )}
 
             <nav className="fixed top-0 left-0 right-0 z-50 pointer-events-none transition-all duration-300">
                 <div

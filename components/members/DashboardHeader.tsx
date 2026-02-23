@@ -14,7 +14,6 @@ import { Loader2, Camera } from 'lucide-react'
 interface Props {
     profile: MemberProfile
     avatarUrl: string | null
-    dropsCount: number
     sorvetesCount: number
 }
 
@@ -31,7 +30,7 @@ const SHIMMER_Animation = {
     }
 }
 
-export default function DashboardHeader({ profile, avatarUrl, dropsCount, sorvetesCount }: Props) {
+export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: Props) {
     const ref = useRef<HTMLDivElement>(null)
     const { scrollY } = useScroll()
     const router = useRouter()
@@ -223,10 +222,10 @@ export default function DashboardHeader({ profile, avatarUrl, dropsCount, sorvet
                                 </motion.button>
                             </div>
 
-                            {/* ── Secondary Row: Coins & Drops ── */}
-                            <div className="mt-3 flex items-center gap-3">
+                            {/* ── Secondary Row: Coins ── */}
+                            <div className="mt-3 flex items-center justify-start max-w-[200px]">
                                 {/* Coins (Read Only) */}
-                                <div className="flex-1 relative group/coins cursor-default">
+                                <div className="w-full relative group/coins cursor-default">
                                     <div className="flex items-center gap-3 px-4 py-2 rounded-[1.2rem] bg-black/30 border border-white/10 backdrop-blur-md relative overflow-hidden shadow-lg shadow-black/10 min-h-[3.5rem]">
                                         <div className="absolute left-0 top-0 bottom-0 w-16 bg-[#FCD34D]/10 blur-xl pointer-events-none" />
                                         <div className="relative z-10 flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-[#FCD34D] to-[#F59E0B] shadow-[0_2px_8px_rgba(245,158,11,0.4)] border border-[#FCD34D]/50">
@@ -236,34 +235,12 @@ export default function DashboardHeader({ profile, avatarUrl, dropsCount, sorvet
                                             <span className="text-xl font-black text-white tracking-tight tabular-nums">
                                                 {profile.points.toLocaleString()}
                                             </span>
-                                            <span className="hidden sm:inline text-[10px] font-bold uppercase tracking-[0.15em] text-[#FCD34D]">
+                                            <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#FCD34D]">
                                                 Moedas
                                             </span>
                                         </div>
                                     </div>
                                 </div>
-
-                                {/* Drops Counter (CLICKABLE) */}
-                                <motion.button
-                                    onClick={() => openInventory('drops')}
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    className="flex-1 relative group/drops cursor-pointer"
-                                >
-                                    <div className="flex items-center gap-3 px-4 py-2 rounded-[1.2rem] bg-blue-900/40 border border-blue-500/30 backdrop-blur-md relative overflow-hidden shadow-lg shadow-blue-900/20 min-h-[3.5rem]">
-                                        <div className="relative z-10 flex items-center justify-center w-8 h-8 rounded-full bg-blue-500/20 border border-blue-400/30">
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-blue-300 drop-shadow-[0_0_8px_rgba(96,165,250,0.6)]">
-                                                <path d="M12 2.25c-5.385 5.965-8.25 10.518-8.25 14.12 0 4.293 3.409 7.63 7.828 7.63 1.954 0 3.829-.68 5.3-1.956 2.37-2.057 3.543-5.074 2.871-7.859-1.28-5.32-6.505-10.74-7.749-11.935Z" />
-                                            </svg>
-                                        </div>
-                                        <span className="text-xl font-black text-white tabular-nums drop-shadow-sm">
-                                            {profile.drops || 0}
-                                        </span>
-                                        <span className="hidden sm:inline text-[10px] font-bold uppercase tracking-[0.15em] text-blue-300 ml-auto">
-                                            Drops
-                                        </span>
-                                    </div>
-                                </motion.button>
                             </div>
 
                             {/* XP Progress Bar (Liquid Style) */}

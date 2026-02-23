@@ -109,6 +109,7 @@ export default function DailyMissions({ missions, onClaim }: Props) {
                                         canClaim={canClaim}
                                         claiming={claimingId === mission.instance_id}
                                         onClaim={handleClaim}
+                                        colorTheme={['pink', 'yellow', 'white'][index % 3] as 'pink' | 'yellow' | 'white'}
                                     />
                                 </div>
                             </motion.div>

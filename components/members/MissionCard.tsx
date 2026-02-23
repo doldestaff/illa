@@ -11,9 +11,10 @@ interface MissionCardProps {
     canClaim: boolean
     claiming: boolean
     onClaim: (id: string) => void
+    colorTheme?: 'pink' | 'yellow' | 'white'
 }
 
-export default function MissionCard({ mission, isClaimed, canClaim, claiming, onClaim }: MissionCardProps) {
+export default function MissionCard({ mission, isClaimed, canClaim, claiming, onClaim, colorTheme = 'pink' }: MissionCardProps) {
     const percent = Math.min(100, Math.round((mission.progress / mission.target) * 100))
     const isCompleted = mission.progress >= mission.target
 
@@ -30,6 +31,38 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
     const maskImage = useMotionTemplate`radial-gradient(240px circle at ${mouseX}px ${mouseY}px, white, transparent)`
     const style = { maskImage, WebkitMaskImage: maskImage }
 
+    const themeStyles = {
+        pink: {
+            bgClaim: 'bg-white/10 border-white/20 shadow-[0_8px_32px_rgba(229,1,125,0.15)] ring-1 ring-white/30',
+            bgIdle: 'bg-white/5 border-white/10 hover:border-white/20 shadow-[0_4px_16px_rgba(0,0,0,0.1)]',
+            glow: 'from-white/20 to-white/5',
+            btn: 'bg-white/90 hover:bg-white text-gray-900 shadow-[0_4px_12px_rgba(255,255,255,0.2)]',
+            progress: 'from-illa-pink via-pink-400 to-pink-600 shadow-[0_0_12px_rgba(229,1,125,0.5)]',
+            text: 'text-white',
+            pulse: 'bg-white shadow-[0_0_8px_#ffffff]'
+        },
+        yellow: {
+            bgClaim: 'bg-white/10 border-white/20 shadow-[0_8px_32px_rgba(255,237,0,0.15)] ring-1 ring-white/30',
+            bgIdle: 'bg-white/5 border-white/10 hover:border-white/20 shadow-[0_4px_16px_rgba(0,0,0,0.1)]',
+            glow: 'from-white/20 to-white/5',
+            btn: 'bg-white/90 hover:bg-white text-gray-900 shadow-[0_4px_12px_rgba(255,255,255,0.2)]',
+            progress: 'from-orange-400 via-illa-yellow to-yellow-200 shadow-[0_0_12px_rgba(255,237,0,0.5)]',
+            text: 'text-white',
+            pulse: 'bg-white shadow-[0_0_8px_#ffffff]'
+        },
+        white: {
+            bgClaim: 'bg-white/10 border-white/20 shadow-[0_8px_32px_rgba(255,255,255,0.1)] ring-1 ring-white/30',
+            bgIdle: 'bg-white/5 border-white/10 hover:border-white/20 shadow-[0_4px_16px_rgba(0,0,0,0.1)]',
+            glow: 'from-white/20 to-white/5',
+            btn: 'bg-white/90 hover:bg-white text-gray-900 shadow-[0_4px_12px_rgba(255,255,255,0.2)]',
+            progress: 'from-gray-400 via-gray-200 to-white shadow-[0_0_12px_rgba(255,255,255,0.5)]',
+            text: 'text-white',
+            pulse: 'bg-white shadow-[0_0_8px_#ffffff]'
+        }
+    }
+
+    const currentTheme = themeStyles[colorTheme]
+
     return (
         <motion.div
             onMouseMove={handleMouseMove}
@@ -37,12 +70,12 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
             animate={{ opacity: 1, y: 0 }}
             whileHover={canClaim && !claiming ? { scale: 1.02, y: -4 } : {}}
             whileTap={canClaim && !claiming ? { scale: 0.98 } : {}}
-            className={`relative overflow-hidden rounded-3xl border transition-all duration-500 group h-full flex flex-col justify-between ${isClaimed
+            className={`relative overflow-hidden rounded-[1.5rem] border transition-all duration-500 group h-full flex flex-col justify-between ${isClaimed
                 ? 'bg-white/5 border-white/5 opacity-50 grayscale contrast-75'
                 : canClaim
-                    ? 'bg-gradient-to-br from-gray-900/90 to-black/90 border-illa-pink/50 shadow-[0_8px_32px_rgba(229,1,125,0.25)] ring-1 ring-illa-pink/30'
-                    : 'bg-gradient-to-br from-white/10 to-white/5 border-white/10 hover:border-white/20 shadow-lg shadow-black/20'
-                } backdrop-blur-xl`}
+                    ? currentTheme.bgClaim
+                    : currentTheme.bgIdle
+                } backdrop-blur-3xl`}
         >
             {/* Cinematic Spotlight (Only on active cards) */}
             {!isClaimed && (
@@ -50,7 +83,7 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                     className="pointer-events-none absolute -inset-px opacity-0 transition duration-500 group-hover:opacity-100 mix-blend-overlay"
                     style={style}
                 >
-                    <div className="absolute inset-0 bg-gradient-to-r from-illa-pink to-purple-500 opacity-20" />
+                    <div className={`absolute inset-0 bg-gradient-to-br ${currentTheme.glow} opacity-40`} />
                 </motion.div>
             )}
 
@@ -60,9 +93,9 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                     <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                             {isCompleted && !isClaimed && (
-                                <span className="flex h-2 w-2 rounded-full bg-illa-yellow animate-pulse shadow-[0_0_8px_#FFED00]" />
+                                <span className={`flex h-2 w-2 rounded-full animate-pulse ${currentTheme.pulse}`} />
                             )}
-                            <h3 className={`font-bold text-base leading-tight tracking-tight trancate ${isClaimed ? 'text-white/40' : 'text-white drop-shadow-sm'}`}>
+                            <h3 className={`font-bold text-[15px] leading-tight tracking-tight shadow-black/20 trancate ${isClaimed ? 'text-white/40' : 'text-white drop-shadow-md'}`}>
                                 {mission.title}
                             </h3>
                         </div>
@@ -86,14 +119,14 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                                 disabled={claiming}
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
-                                className="relative overflow-hidden flex items-center gap-2 bg-gradient-to-r from-illa-pink to-purple-600 text-white text-[10px] font-black tracking-wide px-3 py-1.5 rounded-full shadow-[0_4px_12px_rgba(229,1,125,0.4)] border border-white/20 transition-all disabled:opacity-70 disabled:cursor-not-allowed group/btn"
+                                className={`relative overflow-hidden flex items-center justify-center gap-1.5 ${currentTheme.btn} text-[11px] font-black tracking-widest uppercase px-4 py-2 rounded-full border border-white/40 transition-all disabled:opacity-70 disabled:cursor-not-allowed group/btn shadow-xl`}
                             >
-                                <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700 ease-in-out" />
+                                <div className="absolute inset-0 bg-white/40 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700 ease-in-out" />
                                 {claiming ? (
-                                    <Loader2 size={12} className="animate-spin" />
+                                    <Loader2 size={14} className="animate-spin" />
                                 ) : (
                                     <>
-                                        <Sparkles size={12} fill="currentColor" className="animate-pulse" />
+                                        <Sparkles size={13} fill="currentColor" className="animate-pulse" />
                                         RESGATAR
                                     </>
                                 )}
@@ -126,22 +159,22 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
 
                     {/* Neon Liquid Progress Bar */}
                     <div className="relative">
-                        <div className="flex justify-between text-[10px] font-bold mb-1.5 uppercase tracking-wider">
-                            <span className={`${isCompleted ? 'text-emerald-400' : 'text-white/40'}`}>progresso</span>
-                            <span className={`${isCompleted ? 'text-emerald-400' : 'text-white/60'}`}>
-                                {mission.progress} <span className="text-white/30">/</span> {mission.target}
+                        <div className="flex justify-between text-[10px] font-bold mb-1.5 tracking-wider uppercase">
+                            <span className={`${isCompleted ? 'text-emerald-400' : 'text-white/60'}`}>PROGRESSO</span>
+                            <span className={`${isCompleted ? 'text-emerald-400' : 'text-white'}`}>
+                                {mission.progress} <span className="text-white/30 px-0.5">/</span> {mission.target}
                             </span>
                         </div>
-                        <div className="h-2 bg-black/40 rounded-full overflow-hidden shadow-inner ring-1 ring-white/5">
+                        <div className="h-1.5 bg-white/10 rounded-full overflow-hidden shadow-inner flex items-center">
                             <motion.div
                                 initial={{ width: 0 }}
                                 animate={{ width: `${percent}%` }}
                                 transition={{ duration: 1.2, ease: "easeOut" }}
-                                className={`h-full rounded-full relative ${isClaimed
+                                className={`h-full rounded-full relative transition-all duration-1000 ${isClaimed
                                     ? 'bg-white/20'
                                     : isCompleted
                                         ? 'bg-gradient-to-r from-emerald-400 to-teal-400 shadow-[0_0_12px_rgba(52,211,153,0.6)]'
-                                        : 'bg-gradient-to-r from-illa-yellow via-orange-400 to-illa-pink shadow-[0_0_12px_rgba(229,1,125,0.5)]'
+                                        : `bg-gradient-to-r ${currentTheme.progress}`
                                     }`}
                             >
                                 {canClaim && (
