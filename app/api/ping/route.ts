@@ -22,9 +22,9 @@ export async function GET() {
             return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
         }
         return NextResponse.json({ ok: true, data }, { status: 200 });
-    } catch (e: any) {
+    } catch (e: unknown) {
         return NextResponse.json(
-            { ok: false, error: e?.message ?? "unknown" },
+            { ok: false, error: (e as Error)?.message ?? "unknown" },
             { status: 500 }
         );
     }

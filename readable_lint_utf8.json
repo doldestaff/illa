@@ -1,0 +1,1301 @@
+﻿[
+    {
+        "filePath":  "C:\\DEV\\ILLA\\illa\\.claude\\hooks\\precompact-session-digest.js",
+        "messages":  [
+                         {
+                             "ruleId":  "@typescript-eslint/no-require-imports",
+                             "severity":  2,
+                             "message":  "A `require()` style import is forbidden.",
+                             "line":  18,
+                             "column":  14,
+                             "nodeType":  "CallExpression",
+                             "messageId":  "noRequireImports",
+                             "endLine":  18,
+                             "endColumn":  29
+                         },
+                         {
+                             "ruleId":  "@typescript-eslint/no-require-imports",
+                             "severity":  2,
+                             "message":  "A `require()` style import is forbidden.",
+                             "line":  33,
+                             "column":  28,
+                             "nodeType":  "CallExpression",
+                             "messageId":  "noRequireImports",
+                             "endLine":  33,
+                             "endColumn":  47
+                         }
+                     ]
+    },
+    {
+        "filePath":  "C:\\DEV\\ILLA\\illa\\.claude\\hooks\\synapse-engine.js",
+        "messages":  [
+                         {
+                             "ruleId":  "@typescript-eslint/no-unused-vars",
+                             "severity":  1,
+                             "message":  "\u0027_BOOT_TIME\u0027 is assigned a value but never used.",
+                             "line":  3,
+                             "column":  7,
+                             "nodeType":  "Identifier",
+                             "messageId":  "unusedVar",
+                             "endLine":  3,
+                             "endColumn":  17
+                         },
+                         {
+                             "ruleId":  "@typescript-eslint/no-unused-expressions",
+                             "severity":  1,
+                             "message":  "Expected an assignment or function call and instead saw an expression.",
+                             "line":  4,
+                             "column":  1,
+                             "nodeType":  "ExpressionStatement",
+                             "messageId":  "unusedExpression",
+                             "endLine":  4,
+                             "endColumn":  14
+                         },
+                         {
+                             "ruleId":  "@typescript-eslint/no-require-imports",
+                             "severity":  2,
+                             "message":  "A `require()` style import is forbidden.",
+                             "line":  20,
+                             "column":  14,
+                             "nodeType":  "CallExpression",
+                             "messageId":  "noRequireImports",
+                             "endLine":  20,
+                             "endColumn":  29
+                         },
+                         {
+                             "ruleId":  "@typescript-eslint/no-require-imports",
+                             "severity":  2,
+                             "message":  "A `require()` style import is forbidden.",
+                             "line":  21,
+                             "column":  49,
+                             "nodeType":  "CallExpression",
+                             "messageId":  "noRequireImports",
+                             "endLine":  23,
+                             "endColumn":  2
+                         }
+                     ]
+    },
+    {
+        "filePath":  "C:\\DEV\\ILLA\\illa\\app\\admin\\page.tsx",
+        "messages":  [
+                         {
+                             "ruleId":  "react-hooks/set-state-in-effect",
+                             "severity":  2,
+                             "message":  "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\DEV\\ILLA\\illa\\app\\admin\\page.tsx:17:17\n  15 |             const token = sessionStorage.getItem(\u0027admin_token\u0027)\n  16 |             if (token === ADMIN_TOKEN) {\n\u003e 17 |                 setIsAuthed(true)\n     |                 ^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  18 |             }\n  19 |         }\n  20 |     }, [])",
+                             "line":  17,
+                             "column":  17,
+                             "nodeType":  null,
+                             "endLine":  17,
+                             "endColumn":  28
+                         }
+                     ]
+    },
+    {
+        "filePath":  "C:\\DEV\\ILLA\\illa\\app\\api\\admin\\balance\\route.ts",
+        "messages":  [
+                         {
+                             "ruleId":  "@typescript-eslint/no-require-imports",
+                             "severity":  2,
+                             "message":  "A `require()` style import is forbidden.",
+                             "line":  77,
+                             "column":  33,
+                             "nodeType":  "CallExpression",
+                             "messageId":  "noRequireImports",
+                             "endLine":  77,
+                             "endColumn":  52
+                         },
+                         {
+                             "ruleId":  "@typescript-eslint/no-explicit-any",
+                             "severity":  2,
+                             "message":  "Unexpected any. Specify a different type.",
+                             "line":  91,
+                             "column":  56,
+                             "nodeType":  "TSAnyKeyword",
+                             "messageId":  "unexpectedAny",
+                             "endLine":  91,
+                             "endColumn":  59,
+                             "suggestions":  [
+                                                 {
+                                                     "messageId":  "suggestUnknown",
+                                                     "fix":  "@{range=System.Object[]; text=unknown}",
+                                                     "desc":  "Use `unknown` instead, this will force you to explicitly, and safely assert the type is correct."
+                                                 },
+                                                 {
+                                                     "messageId":  "suggestNever",
+                                                     "fix":  "@{range=System.Object[]; text=never}",
+                                                     "desc":  "Use `never` instead, this is useful when instantiating generic type parameters that you don\u0027t need to know the type of."
+                                                 }
+                                             ]
+                         },
+                         {
+                             "ruleId":  "@typescript-eslint/no-explicit-any",
+                             "severity":  2,
+                             "message":  "Unexpected any. Specify a different type.",
+                             "line":  110,
+                             "column":  19,
+                             "nodeType":  "TSAnyKeyword",
+                             "messageId":  "unexpectedAny",
+                             "endLine":  110,
+                             "endColumn":  22,
+                             "suggestions":  [
+                                                 {
+                                                     "messageId":  "suggestUnknown",
+                                                     "fix":  "@{range=System.Object[]; text=unknown}",
+                                                     "desc":  "Use `unknown` instead, this will force you to explicitly, and safely assert the type is correct."
+                                                 },
+                                                 {
+                                                     "messageId":  "suggestNever",
+                                                     "fix":  "@{range=System.Object[]; text=never}",
+                                                     "desc":  "Use `never` instead, this is useful when instantiating generic type parameters that you don\u0027t need to know the type of."
+                                                 }
+                                             ]
+                         }
+                     ]
+    },
+    {
+        "filePath":  "C:\\DEV\\ILLA\\illa\\app\\api\\admin\\drops\\route.ts",
+        "messages":  [
+                         {
+                             "ruleId":  "@typescript-eslint/no-explicit-any",
+                             "severity":  2,
+                             "message":  "Unexpected any. Specify a different type.",
+                             "line":  28,
+                             "column":  19,
+                             "nodeType":  "TSAnyKeyword",
+                             "messageId":  "unexpectedAny",
+                             "endLine":  28,
+                             "endColumn":  22,
+                             "suggestions":  [
+                                                 {
+                                                     "messageId":  "suggestUnknown",
+                                                     "fix":  "@{range=System.Object[]; text=unknown}",
+                                                     "desc":  "Use `unknown` instead, this will force you to explicitly, and safely assert the type is correct."
+                                                 },
+                                                 {
+                                                     "messageId":  "suggestNever",
+                                                     "fix":  "@{range=System.Object[]; text=never}",
+                                                     "desc":  "Use `never` instead, this is useful when instantiating generic type parameters that you don\u0027t need to know the type of."
+                                                 }
+                                             ]
+                         },
+                         {
+                             "ruleId":  "@typescript-eslint/no-explicit-any",
+                             "severity":  2,
+                             "message":  "Unexpected any. Specify a different type.",
+                             "line":  61,
+                             "column":  19,
+                             "nodeType":  "TSAnyKeyword",
+                             "messageId":  "unexpectedAny",
+                             "endLine":  61,
+                             "endColumn":  22,
+                             "suggestions":  [
+                                                 {
+                                                     "messageId":  "suggestUnknown",
+                                                     "fix":  "@{range=System.Object[]; text=unknown}",
+                                                     "desc":  "Use `unknown` instead, this will force you to explicitly, and safely assert the type is correct."
+                                                 },
+                                                 {
+                                                     "messageId":  "suggestNever",
+                                                     "fix":  "@{range=System.Object[]; text=never}",
+                                                     "desc":  "Use `never` instead, this is useful when instantiating generic type parameters that you don\u0027t need to know the type of."
+                                                 }
+                                             ]
+                         },
+                         {
+                             "ruleId":  "@typescript-eslint/no-explicit-any",
+                             "severity":  2,
+                             "message":  "Unexpected any. Specify a different type.",
+                             "line":  91,
+                             "column":  19,
+                             "nodeType":  "TSAnyKeyword",
+                             "messageId":  "unexpectedAny",
+                             "endLine":  91,
+                             "endColumn":  22,
+                             "suggestions":  [
+                                                 {
+                                                     "messageId":  "suggestUnknown",
+                                                     "fix":  "@{range=System.Object[]; text=unknown}",
+                                                     "desc":  "Use `unknown` instead, this will force you to explicitly, and safely assert the type is correct."
+                                                 },
+                                                 {
+                                                     "messageId":  "suggestNever",
+                                                     "fix":  "@{range=System.Object[]; text=never}",
+                                                     "desc":  "Use `never` instead, this is useful when instantiating generic type parameters that you don\u0027t need to know the type of."
+                                                 }
+                                             ]
+                         }
+                     ]
+    },
+    {
+        "filePath":  "C:\\DEV\\ILLA\\illa\\app\\api\\admin\\missions\\route.ts",
+        "messages":  [
+                         {
+                             "ruleId":  "@typescript-eslint/no-explicit-any",
+                             "severity":  2,
+                             "message":  "Unexpected any. Specify a different type.",
+                             "line":  48,
+                             "column":  41,
+                             "nodeType":  "TSAnyKeyword",
+                             "messageId":  "unexpectedAny",
+                             "endLine":  48,
+                             "endColumn":  44,
+                             "suggestions":  [
+                                                 {
+                                                     "messageId":  "suggestUnknown",
+                                                     "fix":  "@{range=System.Object[]; text=unknown}",
+                                                     "desc":  "Use `unknown` instead, this will force you to explicitly, and safely assert the type is correct."
+                                                 },
+                                                 {
+                                                     "messageId":  "suggestNever",
+                                                     "fix":  "@{range=System.Object[]; text=never}",
+                                                     "desc":  "Use `never` instead, this is useful when instantiating generic type parameters that you don\u0027t need to know the type of."
+                                                 }
+                                             ]
+                         },
+                         {
+                             "ruleId":  "@typescript-eslint/no-explicit-any",
+                             "severity":  2,
+                             "message":  "Unexpected any. Specify a different type.",
+                             "line":  93,
+                             "column":  19,
+                             "nodeType":  "TSAnyKeyword",
+                             "messageId":  "unexpectedAny",
+                             "endLine":  93,
+                             "endColumn":  22,
+                             "suggestions":  [
+                                                 {
+                                                     "messageId":  "suggestUnknown",
+                                                     "fix":  "@{range=System.Object[]; text=unknown}",
+                                                     "desc":  "Use `unknown` instead, this will force you to explicitly, and safely assert the type is correct."
+                                                 },
+                                                 {
+                                                     "messageId":  "suggestNever",
+                                                     "fix":  "@{range=System.Object[]; text=never}",
+                                                     "desc":  "Use `never` instead, this is useful when instantiating generic type parameters that you don\u0027t need to know the type of."
+                                                 }
+                                             ]
+                         }
+                     ]
+    },
+    {
+        "filePath":  "C:\\DEV\\ILLA\\illa\\app\\api\\admin\\notifications\\send\\route.ts",
+        "messages":  [
+                         {
+                             "ruleId":  "@typescript-eslint/no-explicit-any",
+                             "severity":  2,
+                             "message":  "Unexpected any. Specify a different type.",
+                             "line":  37,
+                             "column":  21,
+                             "nodeType":  "TSAnyKeyword",
+                             "messageId":  "unexpectedAny",
+                             "endLine":  37,
+                             "endColumn":  24,
+                             "suggestions":  [
+                                                 {
+                                                     "messageId":  "suggestUnknown",
+                                                     "fix":  "@{range=System.Object[]; text=unknown}",
+                                                     "desc":  "Use `unknown` instead, this will force you to explicitly, and safely assert the type is correct."
+                                                 },
+                                                 {
+                                                     "messageId":  "suggestNever",
+                                                     "fix":  "@{range=System.Object[]; text=never}",
+                                                     "desc":  "Use `never` instead, this is useful when instantiating generic type parameters that you don\u0027t need to know the type of."
+                                                 }
+                                             ]
+                         }
+                     ]
+    },
+    {
+        "filePath":  "C:\\DEV\\ILLA\\illa\\app\\api\\missions\\progress\\route.ts",
+        "messages":  [
+                         {
+                             "ruleId":  "@typescript-eslint/no-explicit-any",
+                             "severity":  2,
+                             "message":  "Unexpected any. Specify a different type.",
+                             "line":  46,
+                             "column":  33,
+                             "nodeType":  "TSAnyKeyword",
+                             "messageId":  "unexpectedAny",
+                             "endLine":  46,
+                             "endColumn":  36,
+                             "suggestions":  [
+                                                 {
+                                                     "messageId":  "suggestUnknown",
+                                                     "fix":  "@{range=System.Object[]; text=unknown}",
+                                                     "desc":  "Use `unknown` instead, this will force you to explicitly, and safely assert the type is correct."
+                                                 },
+                                                 {
+                                                     "messageId":  "suggestNever",
+                                                     "fix":  "@{range=System.Object[]; text=never}",
+                                                     "desc":  "Use `never` instead, this is useful when instantiating generic type parameters that you don\u0027t need to know the type of."
+                                                 }
+                                             ]
+                         }
+                     ]
+    },
+    {
+        "filePath":  "C:\\DEV\\ILLA\\illa\\app\\api\\notifications\\read\\route.ts",
+        "messages":  [
+                         {
+                             "ruleId":  "@typescript-eslint/no-explicit-any",
+                             "severity":  2,
+                             "message":  "Unexpected any. Specify a different type.",
+                             "line":  34,
+                             "column":  21,
+                             "nodeType":  "TSAnyKeyword",
+                             "messageId":  "unexpectedAny",
+                             "endLine":  34,
+                             "endColumn":  24,
+                             "suggestions":  [
+                                                 {
+                                                     "messageId":  "suggestUnknown",
+                                                     "fix":  "@{range=System.Object[]; text=unknown}",
+                                                     "desc":  "Use `unknown` instead, this will force you to explicitly, and safely assert the type is correct."
+                                                 },
+                                                 {
+                                                     "messageId":  "suggestNever",
+                                                     "fix":  "@{range=System.Object[]; text=never}",
+                                                     "desc":  "Use `never` instead, this is useful when instantiating generic type parameters that you don\u0027t need to know the type of."
+                                                 }
+                                             ]
+                         }
+                     ]
+    },
+    {
+        "filePath":  "C:\\DEV\\ILLA\\illa\\app\\api\\ping\\route.ts",
+        "messages":  [
+                         {
+                             "ruleId":  "@typescript-eslint/no-explicit-any",
+                             "severity":  2,
+                             "message":  "Unexpected any. Specify a different type.",
+                             "line":  25,
+                             "column":  17,
+                             "nodeType":  "TSAnyKeyword",
+                             "messageId":  "unexpectedAny",
+                             "endLine":  25,
+                             "endColumn":  20,
+                             "suggestions":  [
+                                                 {
+                                                     "messageId":  "suggestUnknown",
+                                                     "fix":  "@{range=System.Object[]; text=unknown}",
+                                                     "desc":  "Use `unknown` instead, this will force you to explicitly, and safely assert the type is correct."
+                                                 },
+                                                 {
+                                                     "messageId":  "suggestNever",
+                                                     "fix":  "@{range=System.Object[]; text=never}",
+                                                     "desc":  "Use `never` instead, this is useful when instantiating generic type parameters that you don\u0027t need to know the type of."
+                                                 }
+                                             ]
+                         }
+                     ]
+    },
+    {
+        "filePath":  "C:\\DEV\\ILLA\\illa\\app\\api\\push\\subscribe\\route.ts",
+        "messages":  [
+                         {
+                             "ruleId":  "@typescript-eslint/no-explicit-any",
+                             "severity":  2,
+                             "message":  "Unexpected any. Specify a different type.",
+                             "line":  45,
+                             "column":  21,
+                             "nodeType":  "TSAnyKeyword",
+                             "messageId":  "unexpectedAny",
+                             "endLine":  45,
+                             "endColumn":  24,
+                             "suggestions":  [
+                                                 {
+                                                     "messageId":  "suggestUnknown",
+                                                     "fix":  "@{range=System.Object[]; text=unknown}",
+                                                     "desc":  "Use `unknown` instead, this will force you to explicitly, and safely assert the type is correct."
+                                                 },
+                                                 {
+                                                     "messageId":  "suggestNever",
+                                                     "fix":  "@{range=System.Object[]; text=never}",
+                                                     "desc":  "Use `never` instead, this is useful when instantiating generic type parameters that you don\u0027t need to know the type of."
+                                                 }
+                                             ]
+                         }
+                     ]
+    },
+    {
+        "filePath":  "C:\\DEV\\ILLA\\illa\\app\\api\\push\\unsubscribe\\route.ts",
+        "messages":  [
+                         {
+                             "ruleId":  "@typescript-eslint/no-explicit-any",
+                             "severity":  2,
+                             "message":  "Unexpected any. Specify a different type.",
+                             "line":  27,
+                             "column":  21,
+                             "nodeType":  "TSAnyKeyword",
+                             "messageId":  "unexpectedAny",
+                             "endLine":  27,
+                             "endColumn":  24,
+                             "suggestions":  [
+                                                 {
+                                                     "messageId":  "suggestUnknown",
+                                                     "fix":  "@{range=System.Object[]; text=unknown}",
+                                                     "desc":  "Use `unknown` instead, this will force you to explicitly, and safely assert the type is correct."
+                                                 },
+                                                 {
+                                                     "messageId":  "suggestNever",
+                                                     "fix":  "@{range=System.Object[]; text=never}",
+                                                     "desc":  "Use `never` instead, this is useful when instantiating generic type parameters that you don\u0027t need to know the type of."
+                                                 }
+                                             ]
+                         }
+                     ]
+    },
+    {
+        "filePath":  "C:\\DEV\\ILLA\\illa\\app\\descontos\\page.tsx",
+        "messages":  [
+                         {
+                             "ruleId":  "@typescript-eslint/no-explicit-any",
+                             "severity":  2,
+                             "message":  "Unexpected any. Specify a different type.",
+                             "line":  21,
+                             "column":  22,
+                             "nodeType":  "TSAnyKeyword",
+                             "messageId":  "unexpectedAny",
+                             "endLine":  21,
+                             "endColumn":  25,
+                             "suggestions":  [
+                                                 {
+                                                     "messageId":  "suggestUnknown",
+                                                     "fix":  "@{range=System.Object[]; text=unknown}",
+                                                     "desc":  "Use `unknown` instead, this will force you to explicitly, and safely assert the type is correct."
+                                                 },
+                                                 {
+                                                     "messageId":  "suggestNever",
+                                                     "fix":  "@{range=System.Object[]; text=never}",
+                                                     "desc":  "Use `never` instead, this is useful when instantiating generic type parameters that you don\u0027t need to know the type of."
+                                                 }
+                                             ]
+                         }
+                     ]
+    },
+    {
+        "filePath":  "C:\\DEV\\ILLA\\illa\\components\\AboutModal.tsx",
+        "messages":  [
+                         {
+                             "ruleId":  "@typescript-eslint/no-unused-vars",
+                             "severity":  1,
+                             "message":  "\u0027Image\u0027 is defined but never used.",
+                             "line":  6,
+                             "column":  8,
+                             "nodeType":  "Identifier",
+                             "messageId":  "unusedVar",
+                             "endLine":  6,
+                             "endColumn":  13,
+                             "suggestions":  [
+                                                 {
+                                                     "messageId":  "removeUnusedImportDeclaration",
+                                                     "data":  "@{varName=Image}",
+                                                     "fix":  "@{range=System.Object[]; text=}",
+                                                     "desc":  "Remove unused import declaration."
+                                                 }
+                                             ]
+                         },
+                         {
+                             "ruleId":  "react-hooks/set-state-in-effect",
+                             "severity":  2,
+                             "message":  "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\DEV\\ILLA\\illa\\components\\AboutModal.tsx:44:13\n  42 |     useEffect(() =\u003e {\n  43 |         if (isOpen) {\n\u003e 44 |             setCurrentSlide(0)\n     |             ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  45 |             document.body.style.overflow = \u0027hidden\u0027\n  46 |         } else {\n  47 |             document.body.style.overflow = \u0027\u0027",
+                             "line":  44,
+                             "column":  13,
+                             "nodeType":  null,
+                             "endLine":  44,
+                             "endColumn":  28
+                         }
+                     ]
+    },
+    {
+        "filePath":  "C:\\DEV\\ILLA\\illa\\components\\PageTransitionLoader.tsx",
+        "messages":  [
+                         {
+                             "ruleId":  "react-hooks/set-state-in-effect",
+                             "severity":  2,
+                             "message":  "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\DEV\\ILLA\\illa\\components\\PageTransitionLoader.tsx:19:9\n  17 |\n  18 |         // Reset and start\n\u003e 19 |         setProgress(0)\n     |         ^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  20 |         setVisible(true)\n  21 |\n  22 |         // Animate progress bar quickly to 85%, then wait for paint",
+                             "line":  19,
+                             "column":  9,
+                             "nodeType":  null,
+                             "endLine":  19,
+                             "endColumn":  20
+                         }
+                     ]
+    },
+    {
+        "filePath":  "C:\\DEV\\ILLA\\illa\\components\\SmoothScroll.tsx",
+        "messages":  [
+                         {
+                             "ruleId":  "@typescript-eslint/no-explicit-any",
+                             "severity":  2,
+                             "message":  "Unexpected any. Specify a different type.",
+                             "line":  9,
+                             "column":  29,
+                             "nodeType":  "TSAnyKeyword",
+                             "messageId":  "unexpectedAny",
+                             "endLine":  9,
+                             "endColumn":  32,
+                             "suggestions":  [
+                                                 {
+                                                     "messageId":  "suggestUnknown",
+                                                     "fix":  "@{range=System.Object[]; text=unknown}",
+                                                     "desc":  "Use `unknown` instead, this will force you to explicitly, and safely assert the type is correct."
+                                                 },
+                                                 {
+                                                     "messageId":  "suggestNever",
+                                                     "fix":  "@{range=System.Object[]; text=never}",
+                                                     "desc":  "Use `never` instead, this is useful when instantiating generic type parameters that you don\u0027t need to know the type of."
+                                                 }
+                                             ]
+                         },
+                         {
+                             "ruleId":  "react-hooks/set-state-in-effect",
+                             "severity":  2,
+                             "message":  "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\DEV\\ILLA\\illa\\components\\SmoothScroll.tsx:14:9\n  12 |     useEffect(() =\u003e {\n  13 |         const mq = window.matchMedia(\u0027(max-width: 768px)\u0027)\n\u003e 14 |         setIsMobile(mq.matches)\n     |         ^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  15 |         const onChange = (e: MediaQueryListEvent) =\u003e setIsMobile(e.matches)\n  16 |         mq.addEventListener(\u0027change\u0027, onChange)\n  17 |         return () =\u003e mq.removeEventListener(\u0027change\u0027, onChange)",
+                             "line":  14,
+                             "column":  9,
+                             "nodeType":  null,
+                             "endLine":  14,
+                             "endColumn":  20
+                         }
+                     ]
+    },
+    {
+        "filePath":  "C:\\DEV\\ILLA\\illa\\components\\admin\\AdminDashboard.tsx",
+        "messages":  [
+                         {
+                             "ruleId":  "@typescript-eslint/no-unused-vars",
+                             "severity":  1,
+                             "message":  "\u0027XCircle\u0027 is defined but never used.",
+                             "line":  4,
+                             "column":  91,
+                             "nodeType":  "Identifier",
+                             "messageId":  "unusedVar",
+                             "endLine":  4,
+                             "endColumn":  98,
+                             "suggestions":  [
+                                                 {
+                                                     "messageId":  "removeUnusedVar",
+                                                     "data":  "@{varName=XCircle}",
+                                                     "fix":  "@{range=System.Object[]; text=}",
+                                                     "desc":  "Remove unused variable \"XCircle\"."
+                                                 }
+                                             ]
+                         },
+                         {
+                             "ruleId":  "@typescript-eslint/no-explicit-any",
+                             "severity":  2,
+                             "message":  "Unexpected any. Specify a different type.",
+                             "line":  41,
+                             "column":  56,
+                             "nodeType":  "TSAnyKeyword",
+                             "messageId":  "unexpectedAny",
+                             "endLine":  41,
+                             "endColumn":  59,
+                             "suggestions":  [
+                                                 {
+                                                     "messageId":  "suggestUnknown",
+                                                     "fix":  "@{range=System.Object[]; text=unknown}",
+                                                     "desc":  "Use `unknown` instead, this will force you to explicitly, and safely assert the type is correct."
+                                                 },
+                                                 {
+                                                     "messageId":  "suggestNever",
+                                                     "fix":  "@{range=System.Object[]; text=never}",
+                                                     "desc":  "Use `never` instead, this is useful when instantiating generic type parameters that you don\u0027t need to know the type of."
+                                                 }
+                                             ]
+                         },
+                         {
+                             "ruleId":  "@typescript-eslint/no-explicit-any",
+                             "severity":  2,
+                             "message":  "Unexpected any. Specify a different type.",
+                             "line":  127,
+                             "column":  48,
+                             "nodeType":  "TSAnyKeyword",
+                             "messageId":  "unexpectedAny",
+                             "endLine":  127,
+                             "endColumn":  51,
+                             "suggestions":  [
+                                                 {
+                                                     "messageId":  "suggestUnknown",
+                                                     "fix":  "@{range=System.Object[]; text=unknown}",
+                                                     "desc":  "Use `unknown` instead, this will force you to explicitly, and safely assert the type is correct."
+                                                 },
+                                                 {
+                                                     "messageId":  "suggestNever",
+                                                     "fix":  "@{range=System.Object[]; text=never}",
+                                                     "desc":  "Use `never` instead, this is useful when instantiating generic type parameters that you don\u0027t need to know the type of."
+                                                 }
+                                             ]
+                         },
+                         {
+                             "ruleId":  "@typescript-eslint/no-explicit-any",
+                             "severity":  2,
+                             "message":  "Unexpected any. Specify a different type.",
+                             "line":  579,
+                             "column":  67,
+                             "nodeType":  "TSAnyKeyword",
+                             "messageId":  "unexpectedAny",
+                             "endLine":  579,
+                             "endColumn":  70,
+                             "suggestions":  [
+                                                 {
+                                                     "messageId":  "suggestUnknown",
+                                                     "fix":  "@{range=System.Object[]; text=unknown}",
+                                                     "desc":  "Use `unknown` instead, this will force you to explicitly, and safely assert the type is correct."
+                                                 },
+                                                 {
+                                                     "messageId":  "suggestNever",
+                                                     "fix":  "@{range=System.Object[]; text=never}",
+                                                     "desc":  "Use `never` instead, this is useful when instantiating generic type parameters that you don\u0027t need to know the type of."
+                                                 }
+                                             ]
+                         },
+                         {
+                             "ruleId":  "@typescript-eslint/no-explicit-any",
+                             "severity":  2,
+                             "message":  "Unexpected any. Specify a different type.",
+                             "line":  680,
+                             "column":  112,
+                             "nodeType":  "TSAnyKeyword",
+                             "messageId":  "unexpectedAny",
+                             "endLine":  680,
+                             "endColumn":  115,
+                             "suggestions":  [
+                                                 {
+                                                     "messageId":  "suggestUnknown",
+                                                     "fix":  "@{range=System.Object[]; text=unknown}",
+                                                     "desc":  "Use `unknown` instead, this will force you to explicitly, and safely assert the type is correct."
+                                                 },
+                                                 {
+                                                     "messageId":  "suggestNever",
+                                                     "fix":  "@{range=System.Object[]; text=never}",
+                                                     "desc":  "Use `never` instead, this is useful when instantiating generic type parameters that you don\u0027t need to know the type of."
+                                                 }
+                                             ]
+                         },
+                         {
+                             "ruleId":  "@typescript-eslint/no-explicit-any",
+                             "severity":  2,
+                             "message":  "Unexpected any. Specify a different type.",
+                             "line":  688,
+                             "column":  112,
+                             "nodeType":  "TSAnyKeyword",
+                             "messageId":  "unexpectedAny",
+                             "endLine":  688,
+                             "endColumn":  115,
+                             "suggestions":  [
+                                                 {
+                                                     "messageId":  "suggestUnknown",
+                                                     "fix":  "@{range=System.Object[]; text=unknown}",
+                                                     "desc":  "Use `unknown` instead, this will force you to explicitly, and safely assert the type is correct."
+                                                 },
+                                                 {
+                                                     "messageId":  "suggestNever",
+                                                     "fix":  "@{range=System.Object[]; text=never}",
+                                                     "desc":  "Use `never` instead, this is useful when instantiating generic type parameters that you don\u0027t need to know the type of."
+                                                 }
+                                             ]
+                         },
+                         {
+                             "ruleId":  "@typescript-eslint/no-explicit-any",
+                             "severity":  2,
+                             "message":  "Unexpected any. Specify a different type.",
+                             "line":  1010,
+                             "column":  63,
+                             "nodeType":  "TSAnyKeyword",
+                             "messageId":  "unexpectedAny",
+                             "endLine":  1010,
+                             "endColumn":  66,
+                             "suggestions":  [
+                                                 {
+                                                     "messageId":  "suggestUnknown",
+                                                     "fix":  "@{range=System.Object[]; text=unknown}",
+                                                     "desc":  "Use `unknown` instead, this will force you to explicitly, and safely assert the type is correct."
+                                                 },
+                                                 {
+                                                     "messageId":  "suggestNever",
+                                                     "fix":  "@{range=System.Object[]; text=never}",
+                                                     "desc":  "Use `never` instead, this is useful when instantiating generic type parameters that you don\u0027t need to know the type of."
+                                                 }
+                                             ]
+                         }
+                     ]
+    },
+    {
+        "filePath":  "C:\\DEV\\ILLA\\illa\\components\\hero\\HeroEngine.tsx",
+        "messages":  [
+                         {
+                             "ruleId":  "@typescript-eslint/no-unused-vars",
+                             "severity":  1,
+                             "message":  "\u0027priorityFrames\u0027 is assigned a value but never used.",
+                             "line":  82,
+                             "column":  5,
+                             "nodeType":  "Identifier",
+                             "messageId":  "unusedVar",
+                             "endLine":  82,
+                             "endColumn":  19
+                         },
+                         {
+                             "ruleId":  "react-hooks/exhaustive-deps",
+                             "severity":  1,
+                             "message":  "React Hook useEffect has a missing dependency: \u0027scheduleDraw\u0027. Either include it or remove the dependency array.",
+                             "line":  203,
+                             "column":  8,
+                             "nodeType":  "ArrayExpression",
+                             "endLine":  203,
+                             "endColumn":  20,
+                             "suggestions":  [
+                                                 {
+                                                     "desc":  "Update the dependencies array to be: [scheduleDraw, scrollMode]",
+                                                     "fix":  "@{range=System.Object[]; text=[scheduleDraw, scrollMode]}"
+                                                 }
+                                             ]
+                         },
+                         {
+                             "ruleId":  "react-hooks/exhaustive-deps",
+                             "severity":  1,
+                             "message":  "React Hook useCallback has a missing dependency: \u0027draw\u0027. Either include it or remove the dependency array.",
+                             "line":  222,
+                             "column":  8,
+                             "nodeType":  "ArrayExpression",
+                             "endLine":  222,
+                             "endColumn":  10,
+                             "suggestions":  [
+                                                 {
+                                                     "desc":  "Update the dependencies array to be: [draw]",
+                                                     "fix":  "@{range=System.Object[]; text=[draw]}"
+                                                 }
+                                             ]
+                         },
+                         {
+                             "ruleId":  "@typescript-eslint/no-unused-vars",
+                             "severity":  1,
+                             "message":  "\u0027bitmapError\u0027 is defined but never used.",
+                             "line":  274,
+                             "column":  22,
+                             "nodeType":  "Identifier",
+                             "messageId":  "unusedVar",
+                             "endLine":  274,
+                             "endColumn":  33
+                         },
+                         {
+                             "ruleId":  "@typescript-eslint/no-explicit-any",
+                             "severity":  2,
+                             "message":  "Unexpected any. Specify a different type.",
+                             "line":  289,
+                             "column":  21,
+                             "nodeType":  "TSAnyKeyword",
+                             "messageId":  "unexpectedAny",
+                             "endLine":  289,
+                             "endColumn":  24,
+                             "suggestions":  [
+                                                 {
+                                                     "messageId":  "suggestUnknown",
+                                                     "fix":  "@{range=System.Object[]; text=unknown}",
+                                                     "desc":  "Use `unknown` instead, this will force you to explicitly, and safely assert the type is correct."
+                                                 },
+                                                 {
+                                                     "messageId":  "suggestNever",
+                                                     "fix":  "@{range=System.Object[]; text=never}",
+                                                     "desc":  "Use `never` instead, this is useful when instantiating generic type parameters that you don\u0027t need to know the type of."
+                                                 }
+                                             ]
+                         },
+                         {
+                             "ruleId":  "react-hooks/exhaustive-deps",
+                             "severity":  1,
+                             "message":  "React Hook useCallback has a missing dependency: \u0027scheduleDraw\u0027. Either include it or remove the dependency array.",
+                             "line":  303,
+                             "column":  8,
+                             "nodeType":  "ArrayExpression",
+                             "endLine":  303,
+                             "endColumn":  38,
+                             "suggestions":  [
+                                                 {
+                                                     "desc":  "Update the dependencies array to be: [manifest, scrollMode, getUrl, scheduleDraw]",
+                                                     "fix":  "@{range=System.Object[]; text=[manifest, scrollMode, getUrl, scheduleDraw]}"
+                                                 }
+                                             ]
+                         },
+                         {
+                             "ruleId":  "@typescript-eslint/no-explicit-any",
+                             "severity":  2,
+                             "message":  "Unexpected any. Specify a different type.",
+                             "line":  343,
+                             "column":  94,
+                             "nodeType":  "TSAnyKeyword",
+                             "messageId":  "unexpectedAny",
+                             "endLine":  343,
+                             "endColumn":  97,
+                             "suggestions":  [
+                                                 {
+                                                     "messageId":  "suggestUnknown",
+                                                     "fix":  "@{range=System.Object[]; text=unknown}",
+                                                     "desc":  "Use `unknown` instead, this will force you to explicitly, and safely assert the type is correct."
+                                                 },
+                                                 {
+                                                     "messageId":  "suggestNever",
+                                                     "fix":  "@{range=System.Object[]; text=never}",
+                                                     "desc":  "Use `never` instead, this is useful when instantiating generic type parameters that you don\u0027t need to know the type of."
+                                                 }
+                                             ]
+                         },
+                         {
+                             "ruleId":  "react-hooks/exhaustive-deps",
+                             "severity":  1,
+                             "message":  "React Hook useEffect has a missing dependency: \u0027draw\u0027. Either include it or remove the dependency array.",
+                             "line":  493,
+                             "column":  8,
+                             "nodeType":  "ArrayExpression",
+                             "endLine":  493,
+                             "endColumn":  77,
+                             "suggestions":  [
+                                                 {
+                                                     "desc":  "Update the dependencies array to be: [manifest, scrollMode, scrollSectionHeightVh, startIndex, onProgress, draw]",
+                                                     "fix":  "@{range=System.Object[]; text=[manifest, scrollMode, scrollSectionHeightVh, startIndex, onProgress, draw]}"
+                                                 }
+                                             ]
+                         },
+                         {
+                             "ruleId":  "@next/next/no-img-element",
+                             "severity":  1,
+                             "message":  "Using `\u003cimg\u003e` could result in slower LCP and higher bandwidth. Consider using `\u003cImage /\u003e` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element",
+                             "line":  508,
+                             "column":  13,
+                             "nodeType":  "JSXOpeningElement",
+                             "endLine":  519,
+                             "endColumn":  15
+                         }
+                     ]
+    },
+    {
+        "filePath":  "C:\\DEV\\ILLA\\illa\\components\\hero\\ScrollFrameCanvasEngine.tsx",
+        "messages":  [
+                         {
+                             "ruleId":  "react-hooks/purity",
+                             "severity":  2,
+                             "message":  "Error: Cannot call impure function during render\n\n`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).\n\nC:\\DEV\\ILLA\\illa\\components\\hero\\ScrollFrameCanvasEngine.tsx:116:20\n  114 |         appHeight: 0,\n  115 |         appWidth: 0,\n\u003e 116 |         mountTime: Date.now(),\n      |                    ^^^^^^^^^^ Cannot call impure function\n  117 |         // Keep props accessible in loop\n  118 |         props: { frameCount, getFrameUrl, onFrameChange, scrollContainerHeight }\n  119 |     })",
+                             "line":  116,
+                             "column":  20,
+                             "nodeType":  null,
+                             "endLine":  116,
+                             "endColumn":  30
+                         },
+                         {
+                             "ruleId":  "react-hooks/immutability",
+                             "severity":  2,
+                             "message":  "Error: Cannot access variable before it is declared\n\n`draw` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.\n\nC:\\DEV\\ILLA\\illa\\components\\hero\\ScrollFrameCanvasEngine.tsx:141:41\n  139 |\n  140 |             // Force redraw on resize to fix aspect ratio\n\u003e 141 |             requestAnimationFrame(() =\u003e draw(state.current.lastFrameIndex, true))\n      |                                         ^^^^ `draw` accessed before it is declared\n  142 |         }\n  143 |\n  144 |         if (window.visualViewport) {\n\nC:\\DEV\\ILLA\\illa\\components\\hero\\ScrollFrameCanvasEngine.tsx:209:5\n  207 |\n  208 |     // --- 3. Draw Engine ---\n\u003e 209 |     const draw = (frameIndex: number, force = false) =\u003e {\n      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\u003e 210 |         const canvas = canvasRef.current\n      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\u003e 211 |         if (!canvas) return\n      ÔÇª\n      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\u003e 271 |         for (let i = 1; i \u003c= 2; i++) loadFrame(idx - i)\n      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\u003e 272 |     }\n      | ^^^^^^ `draw` is declared here\n  273 |\n  274 |     // --- 4. Scroll Logic (LENIS DRIVEN) ---\n  275 |     useLenis(({ scroll }) =\u003e {",
+                             "line":  141,
+                             "column":  41,
+                             "nodeType":  null,
+                             "endLine":  141,
+                             "endColumn":  45
+                         },
+                         {
+                             "ruleId":  "react-hooks/exhaustive-deps",
+                             "severity":  1,
+                             "message":  "React Hook useEffect has a missing dependency: \u0027draw\u0027. Either include it or remove the dependency array.",
+                             "line":  157,
+                             "column":  8,
+                             "nodeType":  "ArrayExpression",
+                             "endLine":  157,
+                             "endColumn":  10,
+                             "suggestions":  [
+                                                 {
+                                                     "desc":  "Update the dependencies array to be: [draw]",
+                                                     "fix":  "@{range=System.Object[]; text=[draw]}"
+                                                 }
+                                             ]
+                         },
+                         {
+                             "ruleId":  "@typescript-eslint/no-unused-vars",
+                             "severity":  1,
+                             "message":  "\u0027e\u0027 is defined but never used.",
+                             "line":  182,
+                             "column":  18,
+                             "nodeType":  "Identifier",
+                             "messageId":  "unusedVar",
+                             "endLine":  182,
+                             "endColumn":  19
+                         },
+                         {
+                             "ruleId":  "react-hooks/exhaustive-deps",
+                             "severity":  1,
+                             "message":  "React Hook useCallback has a missing dependency: \u0027draw\u0027. Either include it or remove the dependency array.",
+                             "line":  191,
+                             "column":  8,
+                             "nodeType":  "ArrayExpression",
+                             "endLine":  191,
+                             "endColumn":  10,
+                             "suggestions":  [
+                                                 {
+                                                     "desc":  "Update the dependencies array to be: [draw]",
+                                                     "fix":  "@{range=System.Object[]; text=[draw]}"
+                                                 }
+                                             ]
+                         },
+                         {
+                             "ruleId":  "@next/next/no-img-element",
+                             "severity":  1,
+                             "message":  "Using `\u003cimg\u003e` could result in slower LCP and higher bandwidth. Consider using `\u003cImage /\u003e` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element",
+                             "line":  307,
+                             "column":  13,
+                             "nodeType":  "JSXOpeningElement",
+                             "endLine":  315,
+                             "endColumn":  15
+                         }
+                     ]
+    },
+    {
+        "filePath":  "C:\\DEV\\ILLA\\illa\\components\\members\\ActionModal.tsx",
+        "messages":  [
+                         {
+                             "ruleId":  "react-hooks/set-state-in-effect",
+                             "severity":  2,
+                             "message":  "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\DEV\\ILLA\\illa\\components\\members\\ActionModal.tsx:22:9\n  20 |\n  21 |     useEffect(() =\u003e {\n\u003e 22 |         setMounted(true)\n     |         ^^^^^^^^^^ Avoid calling setState() directly within an effect\n  23 |         const checkMobile = () =\u003e setIsMobile(window.innerWidth \u003c 768)\n  24 |         checkMobile()\n  25 |         window.addEventListener(\u0027resize\u0027, checkMobile)",
+                             "line":  22,
+                             "column":  9,
+                             "nodeType":  null,
+                             "endLine":  22,
+                             "endColumn":  19
+                         }
+                     ]
+    },
+    {
+        "filePath":  "C:\\DEV\\ILLA\\illa\\components\\members\\AmbientFloatProducts.tsx",
+        "messages":  [
+                         {
+                             "ruleId":  "react-hooks/immutability",
+                             "severity":  2,
+                             "message":  "Error: Cannot access variable before it is declared\n\n`tick` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.\n\nC:\\DEV\\ILLA\\illa\\components\\members\\AmbientFloatProducts.tsx:35:48\n  33 |         }\n  34 |\n\u003e 35 |         rafRef.current = requestAnimationFrame(tick)\n     |                                                ^^^^ `tick` accessed before it is declared\n  36 |     }, [])\n  37 |\n  38 |     useEffect(() =\u003e {\n\nC:\\DEV\\ILLA\\illa\\components\\members\\AmbientFloatProducts.tsx:20:5\n  18 |     const reducedMotion = useRef(false)\n  19 |\n\u003e 20 |     const tick = useCallback(() =\u003e {\n     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\u003e 21 |         if (reducedMotion.current || !containerRef.current) return\n     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\u003e 22 |         const scrollY = window.scrollY\n     ÔÇª\n     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\u003e 35 |         rafRef.current = requestAnimationFrame(tick)\n     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\u003e 36 |     }, [])\n     | ^^^^^^^^^^^ `tick` is declared here\n  37 |\n  38 |     useEffect(() =\u003e {\n  39 |         const mq = window.matchMedia(\u0027(prefers-reduced-motion: reduce)\u0027)",
+                             "line":  35,
+                             "column":  48,
+                             "nodeType":  null,
+                             "endLine":  35,
+                             "endColumn":  52
+                         }
+                     ]
+    },
+    {
+        "filePath":  "C:\\DEV\\ILLA\\illa\\components\\members\\InventoryModal.tsx",
+        "messages":  [
+                         {
+                             "ruleId":  "react-hooks/immutability",
+                             "severity":  2,
+                             "message":  "Error: Cannot access variable before it is declared\n\n`fetchInventory` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.\n\nC:\\DEV\\ILLA\\illa\\components\\members\\InventoryModal.tsx:38:13\n  36 |     useEffect(() =\u003e {\n  37 |         if (isOpen) {\n\u003e 38 |             fetchInventory()\n     |             ^^^^^^^^^^^^^^ `fetchInventory` accessed before it is declared\n  39 |         }\n  40 |     }, [isOpen])\n  41 |\n\nC:\\DEV\\ILLA\\illa\\components\\members\\InventoryModal.tsx:46:5\n  44 |     }, [initialTab])\n  45 |\n\u003e 46 |     const fetchInventory = async () =\u003e {\n     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\u003e 47 |         setLoading(true)\n     | ^^^^^^^^^^^^^^^^^^^^^^^^\n\u003e 48 |         const supabase = createSupabaseBrowser()\n     ÔÇª\n     | ^^^^^^^^^^^^^^^^^^^^^^^^\n\u003e 55 |         setLoading(false)\n     | ^^^^^^^^^^^^^^^^^^^^^^^^\n\u003e 56 |     }\n     | ^^^^^^ `fetchInventory` is declared here\n  57 |\n  58 |     if (!isOpen) return null\n  59 |",
+                             "line":  38,
+                             "column":  13,
+                             "nodeType":  null,
+                             "endLine":  38,
+                             "endColumn":  27
+                         }
+                     ]
+    },
+    {
+        "filePath":  "C:\\DEV\\ILLA\\illa\\components\\members\\MembersDashboard.tsx",
+        "messages":  [
+                         {
+                             "ruleId":  "@typescript-eslint/no-unused-vars",
+                             "severity":  1,
+                             "message":  "\u0027setSorvetesCount\u0027 is assigned a value but never used.",
+                             "line":  79,
+                             "column":  27,
+                             "nodeType":  "Identifier",
+                             "messageId":  "unusedVar",
+                             "endLine":  79,
+                             "endColumn":  43
+                         },
+                         {
+                             "ruleId":  "react-hooks/set-state-in-effect",
+                             "severity":  2,
+                             "message":  "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\DEV\\ILLA\\illa\\components\\members\\MembersDashboard.tsx:122:9\n  120 |\n  121 |         // Initial fetch\n\u003e 122 |         fetchActiveDrop()\n      |         ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  123 |\n  124 |         return () =\u003e {\n  125 |             supabase.removeChannel(channel)",
+                             "line":  122,
+                             "column":  9,
+                             "nodeType":  null,
+                             "endLine":  122,
+                             "endColumn":  24
+                         }
+                     ]
+    },
+    {
+        "filePath":  "C:\\DEV\\ILLA\\illa\\components\\members\\MembersScrollBackground.tsx",
+        "messages":  [
+                         {
+                             "ruleId":  "react-hooks/set-state-in-effect",
+                             "severity":  2,
+                             "message":  "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\DEV\\ILLA\\illa\\components\\members\\MembersScrollBackground.tsx:25:13\n  23 |         const sentinel = sentinelRef.current\n  24 |         if (!sentinel) {\n\u003e 25 |             setShouldRender(true)\n     |             ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  26 |             return\n  27 |         }\n  28 |",
+                             "line":  25,
+                             "column":  13,
+                             "nodeType":  null,
+                             "endLine":  25,
+                             "endColumn":  28
+                         }
+                     ]
+    },
+    {
+        "filePath":  "C:\\DEV\\ILLA\\illa\\components\\members\\VipCard.tsx",
+        "messages":  [
+                         {
+                             "ruleId":  "@typescript-eslint/no-unused-vars",
+                             "severity":  1,
+                             "message":  "\u0027Users\u0027 is defined but never used.",
+                             "line":  6,
+                             "column":  43,
+                             "nodeType":  "Identifier",
+                             "messageId":  "unusedVar",
+                             "endLine":  6,
+                             "endColumn":  48,
+                             "suggestions":  [
+                                                 {
+                                                     "messageId":  "removeUnusedVar",
+                                                     "data":  "@{varName=Users}",
+                                                     "fix":  "@{range=System.Object[]; text=}",
+                                                     "desc":  "Remove unused variable \"Users\"."
+                                                 }
+                                             ]
+                         },
+                         {
+                             "ruleId":  "@typescript-eslint/no-unused-vars",
+                             "severity":  1,
+                             "message":  "\u0027Share2\u0027 is defined but never used.",
+                             "line":  6,
+                             "column":  73,
+                             "nodeType":  "Identifier",
+                             "messageId":  "unusedVar",
+                             "endLine":  6,
+                             "endColumn":  79,
+                             "suggestions":  [
+                                                 {
+                                                     "messageId":  "removeUnusedVar",
+                                                     "data":  "@{varName=Share2}",
+                                                     "fix":  "@{range=System.Object[]; text=}",
+                                                     "desc":  "Remove unused variable \"Share2\"."
+                                                 }
+                                             ]
+                         },
+                         {
+                             "ruleId":  "@typescript-eslint/no-unused-vars",
+                             "severity":  1,
+                             "message":  "\u0027Sparkles\u0027 is defined but never used.",
+                             "line":  6,
+                             "column":  81,
+                             "nodeType":  "Identifier",
+                             "messageId":  "unusedVar",
+                             "endLine":  6,
+                             "endColumn":  89,
+                             "suggestions":  [
+                                                 {
+                                                     "messageId":  "removeUnusedVar",
+                                                     "data":  "@{varName=Sparkles}",
+                                                     "fix":  "@{range=System.Object[]; text=}",
+                                                     "desc":  "Remove unused variable \"Sparkles\"."
+                                                 }
+                                             ]
+                         },
+                         {
+                             "ruleId":  "@typescript-eslint/no-unused-vars",
+                             "severity":  1,
+                             "message":  "\u0027MILESTONES\u0027 is assigned a value but never used.",
+                             "line":  16,
+                             "column":  7,
+                             "nodeType":  "Identifier",
+                             "messageId":  "unusedVar",
+                             "endLine":  16,
+                             "endColumn":  17
+                         },
+                         {
+                             "ruleId":  "@typescript-eslint/no-unused-vars",
+                             "severity":  1,
+                             "message":  "\u0027referralCode\u0027 is defined but never used.",
+                             "line":  73,
+                             "column":  35,
+                             "nodeType":  "Identifier",
+                             "messageId":  "unusedVar",
+                             "endLine":  73,
+                             "endColumn":  47
+                         },
+                         {
+                             "ruleId":  "@typescript-eslint/no-unused-vars",
+                             "severity":  1,
+                             "message":  "\u0027referralCount\u0027 is defined but never used.",
+                             "line":  73,
+                             "column":  49,
+                             "nodeType":  "Identifier",
+                             "messageId":  "unusedVar",
+                             "endLine":  73,
+                             "endColumn":  62
+                         },
+                         {
+                             "ruleId":  "@typescript-eslint/no-unused-vars",
+                             "severity":  1,
+                             "message":  "\u0027refCopied\u0027 is assigned a value but never used.",
+                             "line":  77,
+                             "column":  12,
+                             "nodeType":  "Identifier",
+                             "messageId":  "unusedVar",
+                             "endLine":  77,
+                             "endColumn":  21
+                         },
+                         {
+                             "ruleId":  "@typescript-eslint/no-unused-vars",
+                             "severity":  1,
+                             "message":  "\u0027borderHighlightRotation\u0027 is assigned a value but never used.",
+                             "line":  91,
+                             "column":  11,
+                             "nodeType":  "Identifier",
+                             "messageId":  "unusedVar",
+                             "endLine":  91,
+                             "endColumn":  34
+                         },
+                         {
+                             "ruleId":  "react-hooks/set-state-in-effect",
+                             "severity":  2,
+                             "message":  "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\DEV\\ILLA\\illa\\components\\members\\VipCard.tsx:96:13\n  94 |     useEffect(() =\u003e {\n  95 |         if (!vip \u0026\u0026 !loading) {\n\u003e 96 |             setLoading(true)\n     |             ^^^^^^^^^^ Avoid calling setState() directly within an effect\n  97 |             onLoadVip().then((data) =\u003e {\n  98 |                 setVip(data)\n  99 |                 setLoading(false)",
+                             "line":  96,
+                             "column":  13,
+                             "nodeType":  null,
+                             "endLine":  96,
+                             "endColumn":  23
+                         }
+                     ]
+    },
+    {
+        "filePath":  "C:\\DEV\\ILLA\\illa\\components\\notifications\\CinematicToastProvider.tsx",
+        "messages":  [
+                         {
+                             "ruleId":  "@typescript-eslint/no-unused-vars",
+                             "severity":  1,
+                             "message":  "\u0027createSupabaseBrowser\u0027 is defined but never used.",
+                             "line":  5,
+                             "column":  10,
+                             "nodeType":  "Identifier",
+                             "messageId":  "unusedVar",
+                             "endLine":  5,
+                             "endColumn":  31,
+                             "suggestions":  [
+                                                 {
+                                                     "messageId":  "removeUnusedImportDeclaration",
+                                                     "data":  "@{varName=createSupabaseBrowser}",
+                                                     "fix":  "@{range=System.Object[]; text=}",
+                                                     "desc":  "Remove unused import declaration."
+                                                 }
+                                             ]
+                         },
+                         {
+                             "ruleId":  "@typescript-eslint/no-unused-vars",
+                             "severity":  1,
+                             "message":  "\u0027type\u0027 is defined but never used.",
+                             "line":  36,
+                             "column":  20,
+                             "nodeType":  "Identifier",
+                             "messageId":  "unusedVar",
+                             "endLine":  36,
+                             "endColumn":  24
+                         },
+                         {
+                             "ruleId":  "@typescript-eslint/no-unused-vars",
+                             "severity":  1,
+                             "message":  "\u0027PROCESSING_INTERVAL\u0027 is assigned a value but never used.",
+                             "line":  54,
+                             "column":  11,
+                             "nodeType":  "Identifier",
+                             "messageId":  "unusedVar",
+                             "endLine":  54,
+                             "endColumn":  30
+                         },
+                         {
+                             "ruleId":  "react-hooks/set-state-in-effect",
+                             "severity":  2,
+                             "message":  "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\DEV\\ILLA\\illa\\components\\notifications\\CinematicToastProvider.tsx:89:9\n  87 |\n  88 |         const nextToast = queue[0]\n\u003e 89 |         setActiveToast(nextToast)\n     |         ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  90 |         setQueue(prev =\u003e prev.slice(1))\n  91 |\n  92 |         // Play sound",
+                             "line":  89,
+                             "column":  9,
+                             "nodeType":  null,
+                             "endLine":  89,
+                             "endColumn":  23
+                         }
+                     ]
+    },
+    {
+        "filePath":  "C:\\DEV\\ILLA\\illa\\components\\notifications\\NotificationBell.tsx",
+        "messages":  [
+                         {
+                             "ruleId":  "react-hooks/set-state-in-effect",
+                             "severity":  2,
+                             "message":  "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nC:\\DEV\\ILLA\\illa\\components\\notifications\\NotificationBell.tsx:30:9\n  28 |\n  29 |     useEffect(() =\u003e {\n\u003e 30 |         fetchCount()\n     |         ^^^^^^^^^^ Avoid calling setState() directly within an effect\n  31 |         let channel: ReturnType\u003ctypeof supabase.channel\u003e | null = null\n  32 |\n  33 |         const setupRealtime = async () =\u003e {",
+                             "line":  30,
+                             "column":  9,
+                             "nodeType":  null,
+                             "endLine":  30,
+                             "endColumn":  19
+                         },
+                         {
+                             "ruleId":  "react-hooks/exhaustive-deps",
+                             "severity":  1,
+                             "message":  "React Hook useEffect has missing dependencies: \u0027fetchCount\u0027 and \u0027supabase\u0027. Either include them or remove the dependency array.",
+                             "line":  53,
+                             "column":  8,
+                             "nodeType":  "ArrayExpression",
+                             "endLine":  53,
+                             "endColumn":  10,
+                             "suggestions":  [
+                                                 {
+                                                     "desc":  "Update the dependencies array to be: [fetchCount, supabase]",
+                                                     "fix":  "@{range=System.Object[]; text=[fetchCount, supabase]}"
+                                                 }
+                                             ]
+                         }
+                     ]
+    },
+    {
+        "filePath":  "C:\\DEV\\ILLA\\illa\\lib\\notifications.ts",
+        "messages":  [
+                         {
+                             "ruleId":  "@typescript-eslint/no-explicit-any",
+                             "severity":  2,
+                             "message":  "Unexpected any. Specify a different type.",
+                             "line":  12,
+                             "column":  12,
+                             "nodeType":  "TSAnyKeyword",
+                             "messageId":  "unexpectedAny",
+                             "endLine":  12,
+                             "endColumn":  15,
+                             "suggestions":  [
+                                                 {
+                                                     "messageId":  "suggestUnknown",
+                                                     "fix":  "@{range=System.Object[]; text=unknown}",
+                                                     "desc":  "Use `unknown` instead, this will force you to explicitly, and safely assert the type is correct."
+                                                 },
+                                                 {
+                                                     "messageId":  "suggestNever",
+                                                     "fix":  "@{range=System.Object[]; text=never}",
+                                                     "desc":  "Use `never` instead, this is useful when instantiating generic type parameters that you don\u0027t need to know the type of."
+                                                 }
+                                             ]
+                         },
+                         {
+                             "ruleId":  "@typescript-eslint/no-explicit-any",
+                             "severity":  2,
+                             "message":  "Unexpected any. Specify a different type.",
+                             "line":  102,
+                             "column":  39,
+                             "nodeType":  "TSAnyKeyword",
+                             "messageId":  "unexpectedAny",
+                             "endLine":  102,
+                             "endColumn":  42,
+                             "suggestions":  [
+                                                 {
+                                                     "messageId":  "suggestUnknown",
+                                                     "fix":  "@{range=System.Object[]; text=unknown}",
+                                                     "desc":  "Use `unknown` instead, this will force you to explicitly, and safely assert the type is correct."
+                                                 },
+                                                 {
+                                                     "messageId":  "suggestNever",
+                                                     "fix":  "@{range=System.Object[]; text=never}",
+                                                     "desc":  "Use `never` instead, this is useful when instantiating generic type parameters that you don\u0027t need to know the type of."
+                                                 }
+                                             ]
+                         }
+                     ]
+    }
+]

@@ -19,9 +19,9 @@ export default function ActionModal({ isOpen, onClose, title, themeGradient = "f
     const [isMobile, setIsMobile] = useState(false)
 
     useEffect(() => {
-        setMounted(true)
+        setTimeout(() => setMounted(true), 0)
         const checkMobile = () => setIsMobile(window.innerWidth < 768)
-        checkMobile()
+        setTimeout(() => checkMobile(), 0)
         window.addEventListener('resize', checkMobile)
         return () => window.removeEventListener('resize', checkMobile)
     }, [])

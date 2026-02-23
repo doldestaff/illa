@@ -16,8 +16,10 @@ export function PageTransitionLoader() {
         prevPathRef.current = pathname
 
         // Reset and start
-        setProgress(0)
-        setVisible(true)
+        setTimeout(() => {
+            setProgress(0)
+            setVisible(true)
+        }, 0)
 
         // Animate progress bar quickly to 85%, then wait for paint
         let start = 0

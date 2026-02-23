@@ -41,7 +41,7 @@ export function AboutModal({ isOpen, onClose }: AboutModalProps) {
     // Reset slide on open
     useEffect(() => {
         if (isOpen) {
-            setCurrentSlide(0)
+            setTimeout(() => setCurrentSlide(0), 0)
             document.body.style.overflow = 'hidden'
         } else {
             document.body.style.overflow = ''

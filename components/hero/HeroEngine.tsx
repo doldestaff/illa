@@ -286,8 +286,8 @@ export function HeroEngine({
             if (priority || Math.abs(state.current.targetFrameIndex - index) <= 1) {
                 scheduleDraw()
             }
-        } catch (e: any) {
-            if (e.name === 'AbortError') return // Ignore aborted fetches
+        } catch (e: unknown) {
+            if ((e as Error).name === 'AbortError') return // Ignore aborted fetches
             // Fallback for Safari/Older browsers or error
             const img = new Image()
             img.src = url
@@ -340,6 +340,7 @@ export function HeroEngine({
         // Lookahead Strategy (Bi-directional based on velocity)
         // Load fewer frames ahead on mobile to reduce network/CPU contention
         let lookahead = state.current.isMobile ? (scrollMode === 'document' ? 2 : 3) : 5
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if (typeof navigator !== 'undefined' && 'deviceMemory' in navigator && (navigator as any).deviceMemory <= 2) {
             lookahead = 1
         }

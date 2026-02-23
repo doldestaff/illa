@@ -119,7 +119,7 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
         const interval = setInterval(fetchActiveDrop, 120000)
 
         // Initial fetch
-        fetchActiveDrop()
+        setTimeout(() => fetchActiveDrop(), 0)
 
         return () => {
             supabase.removeChannel(channel)

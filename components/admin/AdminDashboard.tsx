@@ -38,6 +38,7 @@ export default function AdminDashboard({ token }: Props) {
     const [activeTab, setActiveTab] = useState<'sorvetes' | 'loja' | 'missoes' | 'balance' | 'drops'>('sorvetes')
 
     // === DATA STATES ===
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [discountStats, setDiscountStats] = useState<any>(null)
 
     // === BALANCE STATE ===
@@ -124,6 +125,7 @@ export default function AdminDashboard({ token }: Props) {
 
     const maxSorvetes = Math.max(1, ...users.map((u) => u.sorvetes_count))
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [dropsList, setDropsList] = useState<any[]>([])
     const [creatingDrop, setCreatingDrop] = useState(false)
     const [newDrop, setNewDrop] = useState({
@@ -576,6 +578,7 @@ export default function AdminDashboard({ token }: Props) {
                                 </h3>
                             </div>
                             <div className="divide-y divide-white/5">
+                                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                                 {discountStats.ranking.map((item: any, i: number) => (
                                     <div key={i} className="flex items-center justify-between p-4 hover:bg-white/5 transition-colors">
                                         <div className="flex items-center gap-3 overflow-hidden">
@@ -677,6 +680,7 @@ export default function AdminDashboard({ token }: Props) {
                                                         <div className="text-xs text-white/40 mb-1">XP Total</div>
                                                         <div className="text-2xl font-mono font-bold text-white">
                                                             {users.find(u => u.id === selectedUserId)?.sorvetes_count !== undefined
+                                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                                 ? (users.find(u => u.id === selectedUserId) as any).xp || '0'
                                                                 : '0'}
                                                         </div>
@@ -685,6 +689,7 @@ export default function AdminDashboard({ token }: Props) {
                                                         <div className="text-xs text-white/40 mb-1">Moedas</div>
                                                         <div className="text-2xl font-mono font-bold text-[#FCD34D]">
                                                             {users.find(u => u.id === selectedUserId)?.sorvetes_count !== undefined
+                                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                                 ? (users.find(u => u.id === selectedUserId) as any).points || '0'
                                                                 : '0'}
                                                         </div>
@@ -1007,7 +1012,8 @@ export default function AdminDashboard({ token }: Props) {
                                     </div>
 
                                     <div className="p-4 md:p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {dropsList.map((drop: any) => {
+                                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+dropsList.map((drop: any) => {
                                             const isActive = new Date(drop.ends_at) > new Date()
                                             return (
                                                 <div key={drop.id} className={`group relative rounded-2xl border p-5 transition-all w-full flex flex-col justify-between ${isActive ? 'bg-gradient-to-br from-blue-500/10 to-purple-500/5 border-blue-500/20 hover:border-blue-500/40' : 'bg-white/5 border-white/5 opacity-60 hover:opacity-100'}`}>

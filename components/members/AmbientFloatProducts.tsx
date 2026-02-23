@@ -17,7 +17,7 @@ export default function AmbientFloatProducts() {
     const rafRef = useRef<number>(0)
     const reducedMotion = useRef(false)
 
-    const tick = useCallback(() => {
+    const tick = useCallback(function tickCb() {
         if (reducedMotion.current || !containerRef.current) return
         const scrollY = window.scrollY
         const children = containerRef.current.children
@@ -32,7 +32,7 @@ export default function AmbientFloatProducts() {
             el.style.transform = `translate3d(0, ${-offsetY}px, 0) rotate(${rotDeg}deg) scale(${s})`
         }
 
-        rafRef.current = requestAnimationFrame(tick)
+        rafRef.current = requestAnimationFrame(tickCb)
     }, [])
 
     useEffect(() => {

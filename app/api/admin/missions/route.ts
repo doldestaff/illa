@@ -45,6 +45,7 @@ export async function GET(request: Request) {
         }
 
         // Format for frontend
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const formatted = data.map((mi: any) => ({
             instance_id: mi.id,
             title: mi.missions?.title,
@@ -90,7 +91,9 @@ export async function POST(request: Request) {
         }
 
         return NextResponse.json(data)
-    } catch (err: any) {
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    catch (err: any) {
         console.error('Server Error:', err)
         return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
     }

@@ -113,7 +113,6 @@ export function ScrollFrameCanvasEngine({
         lastFrameIndex: -1,
         appHeight: 0,
         appWidth: 0,
-        mountTime: Date.now(),
         // Keep props accessible in loop
         props: { frameCount, getFrameUrl, onFrameChange, scrollContainerHeight }
     })
@@ -123,41 +122,8 @@ export function ScrollFrameCanvasEngine({
         state.current.props = { frameCount, getFrameUrl, onFrameChange, scrollContainerHeight }
     }, [frameCount, getFrameUrl, onFrameChange, scrollContainerHeight])
 
-    // --- 1. Viewport Management (Android Stable Bar) ---
-    useEffect(() => {
-        const handleResize = () => {
-            // VisualViewport is more reliable on mobile for actual visible area
-            const h = window.visualViewport ? window.visualViewport.height : window.innerHeight
-            const w = window.visualViewport ? window.visualViewport.width : window.innerWidth
-
-            state.current.appHeight = h
-            state.current.appWidth = w
-
-            if (containerRef.current) {
-                containerRef.current.style.setProperty('--app-h', `${h}px`)
-            }
-
-            // Force redraw on resize to fix aspect ratio
-            requestAnimationFrame(() => draw(state.current.lastFrameIndex, true))
-        }
-
-        if (window.visualViewport) {
-            window.visualViewport.addEventListener('resize', handleResize)
-        }
-        window.addEventListener('resize', handleResize)
-
-        handleResize() // Initial
-
-        return () => {
-            if (window.visualViewport) {
-                window.visualViewport.removeEventListener('resize', handleResize)
-            }
-            window.removeEventListener('resize', handleResize)
-        }
-    }, [])
-
-    // --- 2. Loader ---
-    const loadFrame = useCallback(async (index: number, priority = false) => {
+    // --- 1. Loader (Top-Level to avoid circular dependencies) ---
+    const loadFrame = useCallback(async (index: number, priority = false, drawFn?: (frameIndex: number, force?: boolean) => void) => {
         if (index < 0 || index >= state.current.props.frameCount) return
         if (state.current.cache.has(index)) return
 
@@ -177,7 +143,7 @@ export function ScrollFrameCanvasEngine({
 
             // If priority or current frame, draw immediately
             if (priority || Math.abs(state.current.lastFrameIndex - index) <= 1) {
-                requestAnimationFrame(() => draw(state.current.lastFrameIndex, true))
+                if (drawFn) requestAnimationFrame(() => drawFn(state.current.lastFrameIndex, true))
             }
         } catch (e) {
             // Fallback
@@ -185,28 +151,13 @@ export function ScrollFrameCanvasEngine({
             img.src = url
             img.onload = () => {
                 state.current.cache.add(index, img)
-                if (priority) requestAnimationFrame(() => draw(state.current.lastFrameIndex, true))
+                if (priority && drawFn) requestAnimationFrame(() => drawFn(state.current.lastFrameIndex, true))
             }
         }
     }, [])
 
-    // Initial Load
-    useEffect(() => {
-        const init = async () => {
-            // Always load frame 0 (poster match) + priority frames
-            const toLoad = new Set([0, ...priorityFrames])
-
-            // Execute parallel
-            await Promise.all(Array.from(toLoad).map(i => loadFrame(i, true)))
-
-            setIsLoaded(true)
-        }
-        init()
-    }, [priorityFrames, loadFrame])
-
-
-    // --- 3. Draw Engine ---
-    const draw = (frameIndex: number, force = false) => {
+    // --- 2. Draw Engine ---
+    const draw = useCallback((frameIndex: number, force = false) => {
         const canvas = canvasRef.current
         if (!canvas) return
 
@@ -269,7 +220,57 @@ export function ScrollFrameCanvasEngine({
         // Load roughly 6 frames ahead, 2 behind
         for (let i = 1; i <= 6; i++) loadFrame(idx + i)
         for (let i = 1; i <= 2; i++) loadFrame(idx - i)
-    }
+    }, [loadFrame, debug])
+
+    // --- 3. Viewport Management (Android Stable Bar) ---
+    useEffect(() => {
+        const handleResize = () => {
+            // VisualViewport is more reliable on mobile for actual visible area
+            const h = window.visualViewport ? window.visualViewport.height : window.innerHeight
+            const w = window.visualViewport ? window.visualViewport.width : window.innerWidth
+
+            state.current.appHeight = h
+            state.current.appWidth = w
+
+            if (containerRef.current) {
+                containerRef.current.style.setProperty('--app-h', `${h}px`)
+            }
+
+            // Force redraw on resize to fix aspect ratio
+            requestAnimationFrame(() => draw(state.current.lastFrameIndex, true))
+        }
+
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', handleResize)
+        }
+        window.addEventListener('resize', handleResize)
+
+        handleResize() // Initial
+
+        return () => {
+            if (window.visualViewport) {
+                window.visualViewport.removeEventListener('resize', handleResize)
+            }
+            window.removeEventListener('resize', handleResize)
+        }
+    }, [draw])
+
+    // Initial Load
+    useEffect(() => {
+        const init = async () => {
+            // Always load frame 0 (poster match) + priority frames
+            const toLoad = new Set([0, ...priorityFrames])
+
+            // Execute parallel
+            await Promise.all(Array.from(toLoad).map(i => loadFrame(i, true, draw)))
+
+            setIsLoaded(true)
+        }
+        init()
+    }, [priorityFrames, loadFrame, draw])
+
+
+    // --- (Removed original Draw Engine since it was hoisted) ---
 
     // --- 4. Scroll Logic (LENIS DRIVEN) ---
     useLenis(({ scroll }) => {
@@ -285,7 +286,7 @@ export function ScrollFrameCanvasEngine({
         const targetFrame = progress * (state.current.props.frameCount - 1)
 
         draw(targetFrame)
-    }, [loadFrame]) // Dep is stable
+    }, [loadFrame, draw]) // Dep is stable
 
     return (
         <div

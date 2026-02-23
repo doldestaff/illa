@@ -9,7 +9,7 @@ interface SendNotificationParams {
     body: string
     kind: NotificationKind
     priority?: number
-    data?: any
+    data?: any // eslint-disable-line @typescript-eslint/no-explicit-any
     supabase: SupabaseClient
 }
 
@@ -86,7 +86,7 @@ export async function sendNotification({
                         data: {
                             url: '/members/notifications',
                             notification_id: notif.id,
-                            ...data
+                            ...(data as any) // eslint-disable-line @typescript-eslint/no-explicit-any
                         }
                     })
 
@@ -99,8 +99,8 @@ export async function sendNotification({
                                     auth: sub.auth
                                 }
                             }, payload)
-                        } catch (err: any) {
-                            if (err.statusCode === 410 || err.statusCode === 404) {
+                        } catch (err: unknown) {
+                            if ((err as any).statusCode === 410 || (err as any).statusCode === 404) { // eslint-disable-line @typescript-eslint/no-explicit-any
                                 await supabase
                                     .from('push_subscriptions')
                                     .delete()

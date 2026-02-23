@@ -33,17 +33,7 @@ export default function InventoryModal({ isOpen, onClose, initialTab = 'sorvetes
     const [data, setData] = useState<InventoryData>({ sorvetes: [], drops: [] })
     const [loading, setLoading] = useState(true)
 
-    useEffect(() => {
-        if (isOpen) {
-            fetchInventory()
-        }
-    }, [isOpen])
-
-    useEffect(() => {
-        setActiveTab(initialTab)
-    }, [initialTab])
-
-    const fetchInventory = async () => {
+    async function fetchInventory() {
         setLoading(true)
         const supabase = createSupabaseBrowser()
         const { data: result, error } = await supabase.rpc('get_member_inventory')
@@ -54,6 +44,16 @@ export default function InventoryModal({ isOpen, onClose, initialTab = 'sorvetes
         }
         setLoading(false)
     }
+
+    useEffect(() => {
+        if (isOpen) {
+            fetchInventory()
+        }
+    }, [isOpen])
+
+    useEffect(() => {
+        setActiveTab(initialTab)
+    }, [initialTab])
 
     if (!isOpen) return null
 

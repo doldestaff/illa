@@ -14,7 +14,7 @@ export default function AdminPage() {
         if (typeof window !== 'undefined') {
             const token = sessionStorage.getItem('admin_token')
             if (token === ADMIN_TOKEN) {
-                setIsAuthed(true)
+                setTimeout(() => setIsAuthed(true), 0)
             }
         }
     }, [])

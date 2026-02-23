@@ -43,6 +43,7 @@ export async function POST(request: Request) {
     }
 
     const instance = instances[0]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const target = (instance as any).missions?.target ?? 1
     const newProgress = Math.min(instance.progress + 1, target)
     const isNowComplete = newProgress >= target

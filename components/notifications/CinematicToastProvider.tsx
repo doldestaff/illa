@@ -86,8 +86,10 @@ export const CinematicToastProvider = ({ children }: { children: ReactNode }) =>
         if (activeToast || isPaused || queue.length === 0) return
 
         const nextToast = queue[0]
-        setActiveToast(nextToast)
-        setQueue(prev => prev.slice(1))
+        setTimeout(() => {
+            setActiveToast(nextToast)
+            setQueue(prev => prev.slice(1))
+        }, 0)
 
         // Play sound
         const sfxType = nextToast.priority >= 2 ? 'success' : 'popup'

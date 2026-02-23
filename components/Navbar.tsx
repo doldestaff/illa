@@ -11,7 +11,6 @@ import { AboutModal } from './AboutModal'
 import { createSupabaseBrowser } from '@/lib/supabaseClient'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import { useLenis } from 'lenis/react'
-import { motion, useScroll, useTransform } from 'framer-motion'
 
 function LoginParamListener({ onLoginParam }: { onLoginParam: () => void }) {
     const searchParams = useSearchParams()
@@ -95,42 +94,13 @@ function NavbarInner() {
         return () => window.removeEventListener('open-about-modal', handleOpenAbout)
     }, [])
 
-    // --- Mobile Delayed Reveal Logic ---
-    const [isMobile, setIsMobile] = useState(false)
-    const [vh, setVh] = useState(0)
-    const { scrollY } = useScroll()
-
-    useEffect(() => {
-        const checkMobile = () => {
-            setIsMobile(window.matchMedia('(max-width: 768px)').matches)
-            setVh(window.innerHeight)
-        }
-        checkMobile()
-        window.addEventListener('resize', checkMobile)
-        return () => window.removeEventListener('resize', checkMobile)
-    }, [])
-
-    // Fade in between 220vh and 280vh of scroll (right after ghost buttons finish moving)
-    const mobileOpacity = useTransform(scrollY, [vh * 2.2, vh * 2.8], [0, 1])
-    const mobileY = useTransform(scrollY, [vh * 2.2, vh * 2.8], [-20, 0])
-    // Always call hooks unconditionally (React rules of hooks)
-    const mobilePointerEvents = useTransform(mobileOpacity, (val) => val > 0.5 ? 'auto' as const : 'none' as const)
-
-    // Fall back to always visible on desktop
-    const finalOpacity = isMobile ? mobileOpacity : 1
-    const finalY = isMobile ? mobileY : 0
-    const finalPointerEvents = isMobile ? mobilePointerEvents : ('auto' as const)
-
     return (
         <>
             <Suspense fallback={null}>
                 <LoginParamListener onLoginParam={() => setShowAuthModal(true)} />
             </Suspense>
 
-            <motion.nav
-                style={{ opacity: finalOpacity, y: finalY, pointerEvents: finalPointerEvents }}
-                className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
-            >
+            <nav className="fixed top-0 left-0 right-0 z-50 pointer-events-none transition-all duration-300">
                 <div
                     className="container mx-auto px-4 flex items-center justify-between"
                     style={{
@@ -200,7 +170,7 @@ function NavbarInner() {
                     <button
                         onClick={() => setIsOpen(!isOpen)}
                         className={cn(
-                            "md:hidden relative z-50 w-12 h-12 flex items-center justify-center rounded-full transition-all duration-300 shadow-sm",
+                            "md:hidden relative z-50 w-12 h-12 flex items-center justify-center rounded-full transition-all duration-300 shadow-sm pointer-events-auto",
                             isOpen
                                 ? "bg-white text-illa-pink rotate-90 shadow-lg ring-2 ring-illa-pink/20"
                                 : "bg-white/90 backdrop-blur-md text-dark hover:shadow-md hover:scale-105 active:scale-95"
@@ -229,7 +199,7 @@ function NavbarInner() {
                     {/* Mobile Menu Overlay */}
                     <div
                         className={cn(
-                            "fixed inset-0 bg-white/95 backdrop-blur-xl z-40 flex flex-col transition-all duration-500 md:hidden",
+                            "fixed inset-0 bg-white/95 backdrop-blur-xl z-40 flex flex-col transition-all duration-500 md:hidden pointer-events-auto",
                             isOpen ? "opacity-100 visible translate-y-0" : "opacity-0 invisible pointer-events-none -translate-y-4"
                         )}
                         style={{
@@ -341,7 +311,7 @@ function NavbarInner() {
                         </div>
                     </div>
                 </div>
-            </motion.nav>
+            </nav>
 
             <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
             <AboutModal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />

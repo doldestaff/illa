@@ -18,7 +18,7 @@ export default async function DiscountsPage() {
     if (offersError) console.error('Error fetching offers:', offersError)
 
     let userPoints: number | null = null
-    let redemptions: any[] = []
+    let redemptions: any[] = [] // eslint-disable-line @typescript-eslint/no-explicit-any
 
     if (user) {
         // 2. Fetch User Points

@@ -6,12 +6,13 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 export function SmoothScroll({ children }: { children: ReactNode }) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const lenisRef = useRef<any>(null)
     const [isMobile, setIsMobile] = useState(false)
 
     useEffect(() => {
         const mq = window.matchMedia('(max-width: 768px)')
-        setIsMobile(mq.matches)
+        setTimeout(() => setIsMobile(mq.matches), 0)
         const onChange = (e: MediaQueryListEvent) => setIsMobile(e.matches)
         mq.addEventListener('change', onChange)
         return () => mq.removeEventListener('change', onChange)

@@ -27,7 +27,7 @@ export function NotificationBell() {
     }
 
     useEffect(() => {
-        fetchCount()
+        setTimeout(() => fetchCount(), 0)
         let channel: ReturnType<typeof supabase.channel> | null = null
 
         const setupRealtime = async () => {

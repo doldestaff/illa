@@ -10,7 +10,7 @@ export default function MembersScrollBackground() {
 
     useEffect(() => {
         const check = () => setIsMobile(window.innerWidth < 768)
-        check()
+        setTimeout(() => check(), 0)
         window.addEventListener('resize', check)
         return () => window.removeEventListener('resize', check)
     }, [])
@@ -22,14 +22,14 @@ export default function MembersScrollBackground() {
 
         const sentinel = sentinelRef.current
         if (!sentinel) {
-            setShouldRender(true)
+            setTimeout(() => setShouldRender(true), 0)
             return
         }
 
         const observer = new IntersectionObserver(
             ([entry]) => {
                 if (entry.isIntersecting) {
-                    setShouldRender(true)
+                    setTimeout(() => setShouldRender(true), 0)
                     observer.disconnect() // Only need to trigger once
                 }
             },

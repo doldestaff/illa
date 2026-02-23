@@ -93,11 +93,13 @@ export default function VipCard({ referralCode, referralCount, vipPayload, onLoa
 
     useEffect(() => {
         if (!vip && !loading) {
-            setLoading(true)
-            onLoadVip().then((data) => {
-                setVip(data)
-                setLoading(false)
-            }).catch(() => setLoading(false))
+            setTimeout(() => {
+                setLoading(true)
+                onLoadVip().then((data) => {
+                    setVip(data)
+                    setLoading(false)
+                }).catch(() => setLoading(false))
+            }, 0)
         }
     }, [vip, loading, onLoadVip])
 

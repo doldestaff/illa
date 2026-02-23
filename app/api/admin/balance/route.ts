@@ -74,6 +74,7 @@ export async function POST(request: Request) {
                 .eq('user_id', target_user_id)
 
             if (subs && subs.length > 0) {
+                // eslint-disable-next-line @typescript-eslint/no-require-imports
                 const webPush = require('web-push')
                 webPush.setVapidDetails(
                     'mailto:admin@illa.com',
@@ -88,6 +89,7 @@ export async function POST(request: Request) {
                     data: { url: '/members' }
                 })
 
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 await Promise.all(subs.map(async (sub: any) => {
                     try {
                         const subscription = {
@@ -107,7 +109,7 @@ export async function POST(request: Request) {
 
         return NextResponse.json(data)
 
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.error('Server Error:', err)
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
     }

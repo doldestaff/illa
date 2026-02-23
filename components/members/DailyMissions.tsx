@@ -132,15 +132,21 @@ export default function DailyMissions({ missions, onClaim }: Props) {
                 {/* Fade Gradients & Scroll Hints */}
 
 
-                {/* Animated Scroll Arrow */}
-                {/* Animated Scroll Arrow - Interactive */}
+                {/* Animated Scroll Arrow - Strategic Hint */}
                 <motion.div
                     onClick={() => setIsModalOpen(true)}
-                    className="absolute bottom-12 right-2 md:hidden bg-illa-pink text-white p-2 rounded-full shadow-[0_0_15px_rgba(229,1,125,0.5)] z-30 cursor-pointer active:scale-90 transition-transform"
-                    animate={{ x: [0, 8, 0] }}
+                    className="absolute top-1/2 -translate-y-1/2 right-2 md:hidden bg-illa-pink text-white flex items-center justify-center w-12 h-12 rounded-full shadow-[0_0_20px_rgba(229,1,125,0.8)] z-30 cursor-pointer active:scale-90"
+                    animate={{
+                        x: [0, 6, 0],
+                        boxShadow: [
+                            "0 0 15px rgba(229,1,125,0.6)",
+                            "0 0 30px rgba(229,1,125,0.9)",
+                            "0 0 15px rgba(229,1,125,0.6)"
+                        ]
+                    }}
                     transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
                 >
-                    <ArrowRight size={18} />
+                    <ArrowRight size={24} strokeWidth={3} />
                 </motion.div>
             </div>
 

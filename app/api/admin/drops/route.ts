@@ -25,7 +25,8 @@ export async function GET(request: Request) {
         }
 
         return NextResponse.json(data || [])
-    } catch (err: any) {
+    } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    catch (err: any) {
         return NextResponse.json({ error: err.message }, { status: 500 })
     }
 }
@@ -58,7 +59,8 @@ export async function POST(request: Request) {
         }
 
         return NextResponse.json(data)
-    } catch (err: any) {
+    } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    catch (err: any) {
         return NextResponse.json({ error: err.message }, { status: 500 })
     }
 }
@@ -88,7 +90,8 @@ export async function DELETE(request: Request) {
         }
 
         return NextResponse.json(data)
-    } catch (err: any) {
+    } /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    catch (err: any) {
         return NextResponse.json({ error: err.message }, { status: 500 })
     }
 }
