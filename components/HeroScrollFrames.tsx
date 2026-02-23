@@ -73,6 +73,7 @@ export function HeroScrollFrames() {
                     scrollMode="viewport"
                     scrollSectionHeightVh={SCROLL_HEIGHT_vh}
                     onProgress={handleProgress}
+                    startIndex={2}
                     debug={typeof window !== 'undefined' && window.location.search.includes('debugHero')}
                     className="z-10"
                 />
