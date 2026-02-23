@@ -112,14 +112,8 @@ export function PinnedButtonsParallax() {
         const scrollableDist = height - windowH
         const rawProgress = -rect.top / scrollableDist
 
-        // Add a 15% scroll delay at the beginning before animation starts
-        // This keeps the 'Sobre Nós' card completely still when Section 2 first pins.
-        const START_DELAY = 0.15;
-        let progress = 0;
-
-        if (rawProgress > START_DELAY) {
-            progress = Math.max(0, Math.min(1, (rawProgress - START_DELAY) / (1 - START_DELAY)));
-        }
+        // No delay — cards start appearing immediately as user enters Section 2
+        const progress = Math.max(0, Math.min(1, rawProgress));
 
         const totalCards = cards.length
         const step = 1 / totalCards
@@ -152,15 +146,9 @@ export function PinnedButtonsParallax() {
             let pointerEvents: 'auto' | 'none' = 'none'
             let highlightX = -100
             let iconScale = 0.5
-            let glowIntensity = 0 // <-- NEON INTENSITY
+            let glowIntensity = 0
 
-            const isFirstActive = i === 0 && localP < 0.65
-
-            if (isFirstActive) {
-                opacity = 1; y = 0; z = 0; rotateX = 0; rotateZ = 0
-                translateX = 0; scale = 1; iconScale = 1; pointerEvents = 'auto'
-                highlightX = 100; glowIntensity = 1
-            } else if (localP < 0.35) {
+            if (localP < 0.35) {
                 const t = localP / 0.35
                 const e = easeOutQuart(t)
                 opacity = t
@@ -192,13 +180,6 @@ export function PinnedButtonsParallax() {
                 translateX = 0; scale = 1; iconScale = 1
                 pointerEvents = 'auto'
                 highlightX = 100
-                glowIntensity = 1
-            }
-
-            // Override for section entry
-            if (i === 0 && progress < 0.1) {
-                opacity = 1; y = 0; z = 0; rotateX = 0; rotateZ = 0
-                translateX = 0; scale = 1; iconScale = 1; pointerEvents = 'auto'
                 glowIntensity = 1
             }
 

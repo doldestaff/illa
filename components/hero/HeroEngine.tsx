@@ -95,6 +95,8 @@ export function HeroEngine({
     const [manifest, setManifest] = useState<Manifest | null>(null)
     const [isLoaded, setIsLoaded] = useState(false)
     const [debugText, setDebugText] = useState('')
+    // On mobile we skip the poster fade entirely — canvas is always shown
+    const [isMobileHero, setIsMobileHero] = useState(false)
     // Refs for Loop
     const state = useRef({
         cache: new FrameCache(),
@@ -191,6 +193,7 @@ export function HeroEngine({
         state.current.appHeight = h
         state.current.appWidth = w
         state.current.isMobile = w < 768
+        setIsMobileHero(w < 768)
 
         const isBackgroundMode = scrollMode === 'document'
         state.current.cache.setLimit(state.current.isMobile ? (isBackgroundMode ? 90 : 60) : 100)
@@ -508,30 +511,29 @@ export function HeroEngine({
                 </div>
             )}
 
-            <img
-                src={posterUrl}
-                className={cn(
-                    "absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-out z-10",
-                    isLoaded ? "opacity-0" : "opacity-100"
-                )}
-                alt="Illa Loading"
-                style={{
-                    // Fallback to ensuring pointer events don't block
-                    pointerEvents: 'none'
-                }}
-            />
+            {/* Poster: desktop-only graceful fallback — hidden on mobile to prevent cross-fade bridge */}
+            {!isMobileHero && posterUrl && (
+                <img
+                    src={posterUrl}
+                    className={cn(
+                        "absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ease-out z-10",
+                        isLoaded ? "opacity-0 pointer-events-none" : "opacity-100"
+                    )}
+                    alt="Illa Loading"
+                    style={{ pointerEvents: 'none' }}
+                />
+            )}
 
             <canvas
                 ref={canvasRef}
-                className={cn(
-                    "absolute inset-0 block w-full h-full object-cover z-0 transition-opacity duration-700",
-                    isLoaded ? "opacity-100" : "opacity-0"
-                )}
+                className="absolute inset-0 block w-full h-full object-cover z-0"
                 style={{
-                    // GPU compositing hints for canvas
                     willChange: 'contents',
-                    // On mobile background mode, pixelated is faster GPU fill-rate
                     imageRendering: (state.current.isMobile && scrollMode === 'document') ? 'pixelated' : 'auto',
+                    // Mobile: always visible from frame 0, no fade-in
+                    // Desktop: fade in once poster has been shown
+                    opacity: isMobileHero ? 1 : (isLoaded ? 1 : 0),
+                    transition: isMobileHero ? 'none' : 'opacity 500ms ease-out',
                 }}
             />
         </div>
