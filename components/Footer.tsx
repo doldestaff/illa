@@ -120,7 +120,7 @@ export function Footer() {
                                 onClick={() => router.push('?login=1')}
                                 className="w-full flex items-center justify-center gap-2 bg-illa-pink text-white font-bold py-3.5 px-6 rounded-xl hover:bg-white hover:text-illa-pink transition-all text-sm uppercase tracking-wider shadow-lg shadow-pink-500/20 hover:shadow-pink-500/40 active:scale-95 group"
                             >
-                                Inscrever-se
+                                Cadastre-se
                                 <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                             </button>
                         </div>
