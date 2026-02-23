@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence, useTransform, MotionValue } from 'framer-motion'
 import { MessageCircle, MapPin, Info, Phone, ShoppingBag, Store, ChevronDown } from 'lucide-react'
+import { useLenis } from 'lenis/react'
 
 interface HeroGhostButtonsProps {
     progress: MotionValue<number>
@@ -11,8 +12,8 @@ interface HeroGhostButtonsProps {
 const buttons = [
     { label: 'PEDIR NO WHATSAPP', icon: MessageCircle, link: 'https://api.whatsapp.com/send/?phone=558287286990&text=Oi%C3%AA%21+Vim+do+site+da+Illa%21' },
     { label: 'IFOOD', icon: ShoppingBag, link: 'https://www.ifood.com.br/delivery/maceio-al/illa-sorvetes---sorveteria-serraria-serraria/403679e8-d45f-4f93-8fc9-c5e0e6f2dd04' },
-    { label: 'LOCALIZAÇÃO', icon: MapPin, link: 'https://maps.app.goo.gl/cUzZ9QYTDXnjqyWU8' },
-    { label: 'FRANQUIAS', icon: Store, link: 'https://wa.me/5582997755961?text=Ol%C3%A1%20gostaria%20de%20saber%20mais%20sobre%20as%20franquias' },
+    { label: 'LOCALIZAÇÃO', icon: MapPin, link: '#locations' },
+    { label: 'FRANQUIAS', icon: Store, link: '#' },
 ]
 
 function DesktopGhostButton({ btn, i, total, progress }: { btn: (typeof buttons)[0], i: number, total: number, progress: MotionValue<number> }) {
@@ -24,7 +25,10 @@ function DesktopGhostButton({ btn, i, total, progress }: { btn: (typeof buttons)
     const scale = useTransform(progress, [start, start + 0.1], [0.8, 1])
     const display = useTransform(progress, p => p >= start ? 'flex' : 'none')
 
-    const isAction = btn.label === 'QUEM SOMOS' || btn.label === 'CONTATO'
+    const lenis = useLenis()
+
+    // These labels are treated as internal actions (scroll or modal)
+    const isAction = btn.label === 'QUEM SOMOS' || btn.label === 'CONTATO' || btn.label === 'FRANQUIAS' || btn.label === 'LOCALIZAÇÃO'
 
     return (
         <motion.a
@@ -35,6 +39,17 @@ function DesktopGhostButton({ btn, i, total, progress }: { btn: (typeof buttons)
                 if (btn.label === 'QUEM SOMOS') {
                     e.preventDefault()
                     window.dispatchEvent(new CustomEvent('open-about-modal'))
+                } else if (btn.label === 'FRANQUIAS') {
+                    e.preventDefault()
+                    window.dispatchEvent(new CustomEvent('open-dev-modal'))
+                } else if (btn.label === 'LOCALIZAÇÃO') {
+                    e.preventDefault()
+                    if (lenis) {
+                        lenis.scrollTo('#locations', { offset: -50 })
+                    } else {
+                        const el = document.getElementById('locations')
+                        el?.scrollIntoView({ behavior: 'smooth' })
+                    }
                 }
             }}
             style={{ opacity, x, scale, display }}
@@ -87,6 +102,8 @@ function MobileButtons({ progress }: { progress: MotionValue<number> }) {
     // Fade out the entire module perfectly cleanly at the end of the scroll (e.g. 0.98 -> 1)
     const fadeOpacity = useTransform(progress, [0.98, 1], [1, 0])
 
+    const lenis = useLenis()
+
     return (
         <motion.div style={{ opacity: fadeOpacity }}>
             <motion.div
@@ -104,7 +121,8 @@ function MobileButtons({ progress }: { progress: MotionValue<number> }) {
                         className="absolute top-[180px] flex flex-col gap-6 items-center pointer-events-auto w-full"
                     >
                         {buttons.map((btn, i) => {
-                            const isAction = btn.label === 'QUEM SOMOS' || btn.label === 'CONTATO'
+                            // These labels are treated as internal actions (scroll or modal)
+                            const isAction = btn.label === 'QUEM SOMOS' || btn.label === 'CONTATO' || btn.label === 'FRANQUIAS' || btn.label === 'LOCALIZAÇÃO'
 
                             return (
                                 <a
@@ -116,6 +134,17 @@ function MobileButtons({ progress }: { progress: MotionValue<number> }) {
                                         if (btn.label === 'QUEM SOMOS') {
                                             e.preventDefault()
                                             window.dispatchEvent(new CustomEvent('open-about-modal'))
+                                        } else if (btn.label === 'FRANQUIAS') {
+                                            e.preventDefault()
+                                            window.dispatchEvent(new CustomEvent('open-dev-modal'))
+                                        } else if (btn.label === 'LOCALIZAÇÃO') {
+                                            e.preventDefault()
+                                            if (lenis) {
+                                                lenis.scrollTo('#locations', { offset: -50 })
+                                            } else {
+                                                const el = document.getElementById('locations')
+                                                el?.scrollIntoView({ behavior: 'smooth' })
+                                            }
                                         }
                                     }}
                                     className="

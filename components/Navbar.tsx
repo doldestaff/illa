@@ -8,6 +8,7 @@ import Image from 'next/image'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { AuthModal } from './AuthModal'
 import { AboutModal } from './AboutModal'
+import { DevelopmentModal } from './DevelopmentModal'
 import { createSupabaseBrowser } from '@/lib/supabaseClient'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import { useLenis } from 'lenis/react'
@@ -94,13 +95,21 @@ function NavbarInner() {
         }
     }
 
-    // About Modal Logic
+    // About & Development Modal Logic
     const [isAboutOpen, setIsAboutOpen] = useState(false)
+    const [isDevOpen, setIsDevOpen] = useState(false)
 
     useEffect(() => {
         const handleOpenAbout = () => setIsAboutOpen(true)
+        const handleOpenDev = () => setIsDevOpen(true)
+
         window.addEventListener('open-about-modal', handleOpenAbout)
-        return () => window.removeEventListener('open-about-modal', handleOpenAbout)
+        window.addEventListener('open-dev-modal', handleOpenDev)
+
+        return () => {
+            window.removeEventListener('open-about-modal', handleOpenAbout)
+            window.removeEventListener('open-dev-modal', handleOpenDev)
+        }
     }, [])
 
     return (
@@ -384,6 +393,7 @@ function NavbarInner() {
 
             <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
             <AboutModal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
+            <DevelopmentModal isOpen={isDevOpen} onClose={() => setIsDevOpen(false)} />
         </>
     )
 }
