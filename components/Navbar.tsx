@@ -291,9 +291,22 @@ function NavbarInner() {
                             </button>
 
                             <a
-                                href={externalLinks.maps}
-                                target="_blank"
-                                rel="noreferrer"
+                                href="#locations"
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    setIsOpen(false)
+                                    // Small delay to let menu close before scrolling
+                                    setTimeout(() => {
+                                        const el = document.getElementById('locations')
+                                        if (el) {
+                                            if (lenis) {
+                                                lenis.scrollTo(el, { offset: -80 })
+                                            } else {
+                                                el.scrollIntoView({ behavior: 'smooth' })
+                                            }
+                                        }
+                                    }, 300)
+                                }}
                                 className={cn(
                                     "w-full bg-gray-50 hover:bg-white border border-transparent hover:border-illa-pink/20",
                                     "py-3 rounded-xl flex items-center justify-center gap-3",

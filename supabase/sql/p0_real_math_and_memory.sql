@@ -188,7 +188,8 @@ v_code := upper(
     )
 ) || '-' || upper(substr(md5(random()::text || now()::text), 1, 4));
 v_expires := now() + interval '30 days';
--- Deduct points
+-- Deduct points (bypass guard trigger for trusted RPC)
+PERFORM set_config('app.bypass_reward_guard', 'true', true);
 UPDATE profiles
 SET points = COALESCE(points, 0) - v_cost
 WHERE id = v_uid
@@ -267,12 +268,12 @@ IF FOUND THEN RETURN jsonb_build_object(
     'open'
 );
 END IF;
--- Cooldown: no new window if last one (claimed or not) was created < 5 min ago
+-- Cooldown: no new window if last one (claimed or not) was created < 30s ago
 IF EXISTS (
     SELECT 1
     FROM celebration_windows
     WHERE user_id = v_uid
-        AND created_at > now() - interval '5 minutes'
+        AND created_at > now() - interval '30 seconds'
 ) THEN RETURN jsonb_build_object('status', 'cooldown');
 END IF;
 -- Create new window
@@ -317,7 +318,8 @@ END IF;
 UPDATE celebration_windows
 SET claimed_at = now()
 WHERE id = p_window_id;
--- Award points
+-- Award points (bypass guard trigger for trusted RPC)
+PERFORM set_config('app.bypass_reward_guard', 'true', true);
 UPDATE profiles
 SET points = COALESCE(points, 0) + v_window.reward_points
 WHERE id = v_uid
@@ -373,7 +375,8 @@ WHERE id = v_instance.mission_id;
 UPDATE mission_instances
 SET claimed_at = now()
 WHERE id = p_instance_id;
--- Award XP and points
+-- Award XP and points (bypass guard trigger for trusted RPC)
+PERFORM set_config('app.bypass_reward_guard', 'true', true);
 UPDATE profiles
 SET xp = COALESCE(xp, 0) + v_mission.reward_xp,
     points = COALESCE(points, 0) + v_mission.reward_points
@@ -454,6 +457,8 @@ IF v_claim_count >= v_drop.max_claims_per_user THEN RAISE EXCEPTION 'Already cla
 END IF;
 INSERT INTO drop_claims (drop_id, user_id)
 VALUES (p_drop_id, v_uid);
+-- Bypass guard trigger for trusted RPC
+PERFORM set_config('app.bypass_reward_guard', 'true', true);
 IF v_drop.reward_type = 'xp' THEN
 UPDATE profiles
 SET xp = COALESCE(xp, 0) + v_drop.reward_value

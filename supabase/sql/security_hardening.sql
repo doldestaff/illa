@@ -82,10 +82,12 @@ UPDATE USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
 END IF;
 END $$;
 -- Prevent client from directly writing xp/points via a trigger guard
-CREATE OR REPLACE FUNCTION public.guard_reward_columns() RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER AS $$ BEGIN -- Only allow xp/points changes from SECURITY DEFINER functions
-    -- Check if the caller is a regular authenticated user (not a SECURITY DEFINER context)
-    IF current_setting('role', true) = 'authenticated' THEN -- If xp or points changed, block it
-    IF NEW.xp IS DISTINCT
+-- SECURITY DEFINER RPCs set 'app.bypass_reward_guard' = 'true' before updates.
+CREATE OR REPLACE FUNCTION public.guard_reward_columns() RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER AS $$ BEGIN -- Allow if called from a trusted SECURITY DEFINER RPC (bypass flag set)
+    IF current_setting('app.bypass_reward_guard', true) = 'true' THEN RETURN NEW;
+END IF;
+-- Block direct xp/points modifications from authenticated users
+IF current_setting('role', true) = 'authenticated' THEN IF NEW.xp IS DISTINCT
 FROM OLD.xp
     OR NEW.points IS DISTINCT
 FROM OLD.points THEN RAISE EXCEPTION 'Direct modification of xp/points is not allowed. Use the reward system.';
@@ -212,6 +214,7 @@ END $$;
 -- ──────────────────────────────────────────────
 -- Admin routes need authenticated users to read their own row
 -- to verify they are admin.
+DROP POLICY IF EXISTS admin_self_read ON public.admin_users;
 CREATE POLICY admin_self_read ON public.admin_users FOR
 SELECT USING (auth.uid() = user_id);
 -- ──────────────────────────────────────────────
