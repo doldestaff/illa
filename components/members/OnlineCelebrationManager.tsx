@@ -18,20 +18,20 @@ interface Props {
 function GamifiedCloud({ children, isClaimed }: { children: React.ReactNode, isClaimed?: boolean }) {
     return (
         <div
-            className="relative w-[260px] max-w-[92vw] mx-auto"
+            className="relative w-[220px] max-w-[92vw] mx-auto"
             style={{ filter: `drop-shadow(0 ${isClaimed ? '16px 40px' : '12px 32px'} rgba(229,0,126,${isClaimed ? '0.35' : '0.25'}))` }}
         >
             {/* Top Cloud Bumps (Fluffy top) */}
-            <div className="absolute -top-4 left-[25px] w-[55px] h-[55px] bg-white rounded-full z-0" />
-            <div className="absolute -top-11 left-1/2 -translate-x-1/2 w-[100px] h-[100px] bg-white rounded-full z-0" />
-            <div className="absolute -top-5 right-[25px] w-[65px] h-[65px] bg-white rounded-full z-0" />
+            <div className="absolute -top-4 left-[15px] w-[50px] h-[50px] bg-white rounded-full z-0" />
+            <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-[90px] h-[90px] bg-white rounded-full z-0" />
+            <div className="absolute -top-5 right-[15px] w-[55px] h-[55px] bg-white rounded-full z-0" />
 
             {/* Side Bumps (Pulled in) */}
-            <div className="absolute top-[20px] -left-2 w-[40px] h-[55px] bg-white rounded-full z-0" />
-            <div className="absolute top-[25px] -right-2 w-[40px] h-[60px] bg-white rounded-full z-0" />
+            <div className="absolute top-[20px] -left-1 w-[35px] h-[50px] bg-white rounded-full z-0" />
+            <div className="absolute top-[25px] -right-1 w-[35px] h-[55px] bg-white rounded-full z-0" />
 
             {/* Main Body (Compact Ice Cream Cup) */}
-            <div className="relative bg-white rounded-t-[32px] rounded-b-[16px] px-4 pt-3 pb-2 z-10 flex flex-col items-center justify-center min-h-[90px] shadow-[inset_0_-6px_0_rgba(241,245,249,0.9)]">
+            <div className="relative bg-white rounded-t-[32px] rounded-b-[16px] px-3 pt-3 pb-2 z-10 flex flex-col items-center justify-center min-h-[80px] shadow-[inset_0_-6px_0_rgba(241,245,249,0.9)]">
                 {children}
             </div>
         </div>
