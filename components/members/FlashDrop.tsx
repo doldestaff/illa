@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import type { ActiveDrop } from '@/lib/gamification-types'
+import type { ActiveDrop, SurpriseDrop } from '@/lib/gamification-types'
 import { IceCream, Clock, PackageCheck, Loader2, Gift, HelpCircle, X, Zap, Radio, AlertCircle } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { RARITY_STYLES, SURPRISE_DROPS_CATALOG } from '@/lib/surprise-drops-catalog'
 
 interface Props {
     drop: ActiveDrop | null
@@ -15,6 +16,43 @@ export default function FlashDrop({ drop, onClaim }: Props) {
     const [claiming, setClaiming] = useState(false)
     const [claimed, setClaimed] = useState(drop?.already_claimed ?? false)
     const [showWizard, setShowWizard] = useState(false)
+
+    // === SURPRISE DROPS ===
+    const [surpriseDrop, setSurpriseDrop] = useState<SurpriseDrop | null>(null)
+    const [dismissingSurprise, setDismissingSurprise] = useState(false)
+
+    // Poll for surprise drops every 30s
+    useEffect(() => {
+        const checkSurprise = async () => {
+            try {
+                const res = await fetch('/api/drops/surprise')
+                if (res.ok) {
+                    const data = await res.json()
+                    if (data.drops && data.drops.length > 0) {
+                        setSurpriseDrop(data.drops[0])
+                    }
+                }
+            } catch { /* silent */ }
+        }
+        checkSurprise()
+        const interval = setInterval(checkSurprise, 30_000)
+        return () => clearInterval(interval)
+    }, [])
+
+    const handleDismissSurprise = async () => {
+        if (!surpriseDrop || dismissingSurprise) return
+        setDismissingSurprise(true)
+        try {
+            await fetch('/api/drops/surprise', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ drop_id: surpriseDrop.id }),
+            })
+            setSurpriseDrop(null)
+        } catch { /* silent */ } finally {
+            setDismissingSurprise(false)
+        }
+    }
 
     // Calculate time left
     const calculateTimeLeft = useCallback(() => {
@@ -306,6 +344,103 @@ export default function FlashDrop({ drop, onClaim }: Props) {
                         </motion.div>
                     </motion.div>
                 )}
+            </AnimatePresence>
+
+            {/* === SURPRISE DROP NOTIFICATION OVERLAY === */}
+            <AnimatePresence>
+                {surpriseDrop && (() => {
+                    const preset = SURPRISE_DROPS_CATALOG.find(p => p.id === surpriseDrop.preset_id)
+                    const rarity = RARITY_STYLES[preset?.rarity || 'common']
+                    return (
+                        <motion.div
+                            key="surprise-overlay"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-md flex items-center justify-center p-6"
+                        >
+                            <motion.div
+                                initial={{ scale: 0.5, y: 40, opacity: 0 }}
+                                animate={{ scale: 1, y: 0, opacity: 1 }}
+                                exit={{ scale: 0.8, y: 40, opacity: 0 }}
+                                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                                className={`relative max-w-[340px] w-full rounded-[2rem] bg-[#0f0f11] border border-white/10 p-8 text-center shadow-2xl ${rarity.glow}`}
+                            >
+                                {/* Glow Background */}
+                                <div className="absolute -inset-4 rounded-[3rem] bg-gradient-to-br from-amber-500/20 via-transparent to-pink-500/10 blur-2xl pointer-events-none" />
+
+                                {/* Emoji */}
+                                <motion.div
+                                    initial={{ scale: 0, rotate: -20 }}
+                                    animate={{ scale: 1, rotate: 0 }}
+                                    transition={{ delay: 0.2, type: 'spring', bounce: 0.5 }}
+                                    className="text-6xl mb-4 relative z-10"
+                                >
+                                    {surpriseDrop.emoji}
+                                </motion.div>
+
+                                {/* Rarity Badge */}
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.3 }}
+                                    className="relative z-10"
+                                >
+                                    <span className={`inline-block text-[9px] font-black uppercase tracking-[0.3em] px-3 py-1 rounded-full border ${rarity.bg} ${rarity.text} border-white/10 mb-3`}>
+                                        {rarity.label}
+                                    </span>
+                                </motion.div>
+
+                                {/* Title */}
+                                <motion.h3
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.35 }}
+                                    className="text-2xl font-black text-white mb-2 relative z-10 leading-tight"
+                                >
+                                    {surpriseDrop.title}
+                                </motion.h3>
+
+                                {/* Description */}
+                                <motion.p
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ delay: 0.45 }}
+                                    className="text-sm text-white/60 leading-relaxed mb-4 relative z-10 max-w-[260px] mx-auto"
+                                >
+                                    {surpriseDrop.description}
+                                </motion.p>
+
+                                {/* Reward Value */}
+                                {surpriseDrop.reward_value > 0 && (
+                                    <motion.div
+                                        initial={{ opacity: 0, scale: 0.5 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        transition={{ delay: 0.5 }}
+                                        className="relative z-10 mb-5"
+                                    >
+                                        <span className={`inline-block text-lg font-black px-4 py-2 rounded-xl ${surpriseDrop.reward_type === 'xp' ? 'bg-purple-500/20 text-purple-300' : 'bg-amber-500/20 text-amber-300'}`}>
+                                            +{surpriseDrop.reward_value} {surpriseDrop.reward_type === 'xp' ? 'XP' : 'Moedas'}
+                                        </span>
+                                    </motion.div>
+                                )}
+
+                                {/* Dismiss Button */}
+                                <motion.button
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.6 }}
+                                    onClick={handleDismissSurprise}
+                                    disabled={dismissingSurprise}
+                                    className="relative z-10 w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-black text-sm uppercase tracking-wider transition-all shadow-lg shadow-amber-900/30 disabled:opacity-50 flex items-center justify-center gap-2"
+                                >
+                                    {dismissingSurprise ? <Loader2 size={16} className="animate-spin" /> : <Gift size={16} />}
+                                    Entendi!
+                                </motion.button>
+                            </motion.div>
+                        </motion.div>
+                    )
+                })()}
             </AnimatePresence>
         </div>
     )

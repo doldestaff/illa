@@ -39,6 +39,18 @@ export interface ActiveDrop {
     already_claimed: boolean
 }
 
+export interface SurpriseDrop {
+    id: string
+    preset_id: number
+    title: string
+    description: string | null
+    category: string
+    emoji: string
+    reward_type: string
+    reward_value: number
+    created_at: string
+}
+
 export interface SecretMenuItem {
     id: string
     title: string

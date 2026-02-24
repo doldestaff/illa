@@ -60,6 +60,14 @@ export default function AdminPage() {
         setLoading(true)
         setError('')
 
+        // Admin email whitelist
+        const allowedAdminEmails = ['orkutpirata@gmail.com']
+        if (!allowedAdminEmails.includes(email.toLowerCase())) {
+            setError('Acesso não autorizado para este email.')
+            setLoading(false)
+            return
+        }
+
         try {
             const supabase = createSupabaseBrowser()
             const { error: signInError } = await supabase.auth.signInWithPassword({

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import type { CelebrationWindow, CelebrationClaimResult } from '@/lib/gamification-types'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Gift, Coins, Clock, Loader2, PartyPopper, AlertCircle, IceCream } from 'lucide-react'
+import { Gift, Coins, Clock, Loader2, PartyPopper, AlertCircle, IceCream, ChevronRight } from 'lucide-react'
 import GlobalCoin from '@/components/ui/GlobalCoin'
 
 interface Props {
@@ -148,135 +148,178 @@ export default function OnlineCelebrationManager({ onClaim, pollIntervalMs = 5 *
                     animate={{ y: 0, opacity: 1, scale: 1, rotate: 0 }}
                     exit={{ y: -100, opacity: 0, scale: 0.8, filter: "blur(10px)" }}
                     transition={{ type: 'spring', stiffness: 400, damping: 20, mass: 1 }}
-                    className="fixed top-6 left-1/2 -translate-x-1/2 z-[100] max-w-[92vw] w-auto"
+                    className="fixed top-8 left-1/2 -translate-x-1/2 z-[100] max-w-[92vw] w-auto pointer-events-auto"
                 >
-                    {/* The "Fofinho" Container */}
-                    <div className="relative group flex items-center gap-4 px-6 py-4 rounded-[2rem] bg-white/95 backdrop-blur-2xl border-2 border-white/60 shadow-[0_15px_40px_-10px_rgba(229,0,126,0.3)] hover:shadow-[0_20px_50px_-5px_rgba(229,0,126,0.4)] transition-shadow duration-500 overflow-hidden">
+                    {/* 
+                      THE PREMIUM CLOUD WRAPPER 
+                      Uses a combination of a central pill + 3 absolute overlapping circles.
+                      Because they are all solid white, they fuse seamlessly.
+                      The parent uses CSS `drop-shadow` to cast a unified shadow around the entire complex shape.
+                    */}
+                    <motion.div
+                        animate={{ y: [0, -6, 0] }}
+                        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                        className="relative group my-8 w-[340px] max-w-[90vw] mx-auto filter drop-shadow-[0_15px_30px_rgba(229,0,126,0.25)] hover:drop-shadow-[0_20px_40px_rgba(229,0,126,0.35)] transition-all duration-700"
+                    >
+                        {/* --- Cloud Geometry (Solid White) --- */}
+                        <div className="absolute -top-4 left-[10%] w-[4.5rem] h-[4.5rem] bg-white rounded-full" />
+                        <div className="absolute -top-11 left-1/2 -translate-x-1/2 w-[7.5rem] h-[7.5rem] bg-white rounded-full" />
+                        <div className="absolute -top-6 right-[10%] w-[5.5rem] h-[5.5rem] bg-white rounded-full" />
 
-                        {/* Shimmer Effect */}
-                        <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:animate-[shimmer_2s_infinite] pointer-events-none" />
+                        {/* Bottom Humps */}
+                        <div className="absolute -bottom-5 left-[12%] w-[4rem] h-[4rem] bg-white rounded-full" />
+                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-[6.5rem] h-[6.5rem] bg-white rounded-full" />
+                        <div className="absolute -bottom-4 right-[12%] w-[4.5rem] h-[4.5rem] bg-white rounded-full" />
 
-                        {/* Background subtle glow */}
-                        <div className="absolute -inset-10 bg-gradient-to-r from-illa-pink/10 to-illa-yellow/10 opacity-50 blur-xl pointer-events-none" />
+                        {/* Left Humps */}
+                        <div className="absolute top-1/2 -translate-y-1/2 -left-6 w-[5.5rem] h-[5.5rem] bg-white rounded-full" />
+                        <div className="absolute top-[15%] -left-3 w-[4rem] h-[4rem] bg-white rounded-full" />
+                        <div className="absolute bottom-[15%] -left-3 w-[4.5rem] h-[4.5rem] bg-white rounded-full" />
 
-                        {claimed ? (
-                            <motion.div
-                                initial={{ scale: 0.5, opacity: 0, rotate: -10 }}
-                                animate={{ scale: 1, opacity: 1, rotate: 0 }}
-                                transition={{ type: 'spring', bounce: 0.6, duration: 0.8 }}
-                                className="flex flex-col items-center justify-center gap-2 w-full min-w-[200px] py-1 relative"
-                            >
-                                {/* Premium Burst Particles */}
-                                {[
-                                    { x: -50, y: -60, scale: 1.2, color: '#FF007F' },
-                                    { x: 50, y: -40, scale: 0.8, color: '#FFD700' },
-                                    { x: -40, y: 50, scale: 1.5, color: '#4ADE80' },
-                                    { x: 60, y: 50, scale: 1.1, color: '#FF007F' },
-                                    { x: 0, y: -70, scale: 0.9, color: '#FFD700' },
-                                    { x: 0, y: 60, scale: 1.3, color: '#4ADE80' }
-                                ].map((particle, i) => (
+                        {/* Right Humps */}
+                        <div className="absolute top-1/2 -translate-y-1/2 -right-6 w-[5.5rem] h-[5.5rem] bg-white rounded-full" />
+                        <div className="absolute top-[15%] -right-3 w-[4rem] h-[4rem] bg-white rounded-full" />
+                        <div className="absolute bottom-[15%] -right-3 w-[4.5rem] h-[4.5rem] bg-white rounded-full" />
+
+                        {/* Core Base Rectangle */}
+                        <div className="absolute inset-0 bg-white rounded-[2.5rem]" />
+
+                        {/* --- Content Wrapper --- */}
+                        <div className="relative z-10 px-8 py-7 flex flex-col items-center justify-center min-h-[160px]">
+                            <AnimatePresence mode="wait">
+                                {claimed ? (
                                     <motion.div
-                                        key={i}
-                                        initial={{ opacity: 1, scale: 0, x: 0, y: 0 }}
-                                        animate={{
-                                            opacity: 0,
-                                            scale: particle.scale,
-                                            x: particle.x,
-                                            y: particle.y
-                                        }}
-                                        transition={{ duration: 1.2, ease: 'easeOut' }}
-                                        className="absolute w-2 h-2 rounded-full pointer-events-none"
-                                        style={{ backgroundColor: particle.color }}
-                                    />
-                                ))}
-
-                                <motion.div
-                                    animate={{
-                                        scale: [1, 1.1, 1],
-                                        rotate: [0, -5, 5, -3, 3, 0]
-                                    }}
-                                    transition={{ duration: 0.8 }}
-                                    className="relative flex items-center justify-center z-20"
-                                >
-                                    <div className="absolute inset-0 bg-gradient-to-tr from-illa-pink to-amber-400 blur-xl opacity-50 animate-pulse rounded-full" />
-                                    <div className="relative z-10 w-16 h-16 flex items-center justify-center">
-                                        <GlobalCoin size="lg" animate />
-                                    </div>
-                                </motion.div>
-
-                                <motion.div
-                                    initial={{ y: 10, opacity: 0 }}
-                                    animate={{ y: 0, opacity: 1 }}
-                                    transition={{ delay: 0.3 }}
-                                    className="text-center mt-3 z-10"
-                                >
-                                    <span className="block text-3xl font-black text-transparent bg-clip-text bg-gradient-to-br from-illa-pink to-[#FF4A6B] drop-shadow-sm filter">
-                                        +{window.reward_points} {window.reward_points === 1 ? 'Moeda' : 'Moedas'}!
-                                    </span>
-                                    <span className="text-[10px] font-black text-black/50 uppercase tracking-[0.2em] mt-1 block">
-                                        {window.reward_points === 1 ? 'Coletada' : 'Coletadas'}
-                                    </span>
-                                </motion.div>
-                            </motion.div>
-                        ) : error ? (
-                            <motion.div
-                                initial={{ x: [0, -10, 10, -10, 10, 0] }}
-                                transition={{ duration: 0.4 }}
-                                className="flex items-center gap-3 w-full"
-                            >
-                                <AlertCircle size={24} className="text-red-500 shrink-0" />
-                                <span className="text-sm font-bold text-red-600">
-                                    {error}
-                                </span>
-                            </motion.div>
-                        ) : (
-                            <>
-                                {/* CSS Coin from Dashboard with Animation */}
-                                <div className="relative z-10 mr-1 flex items-center p-1">
-                                    <motion.div
-                                        animate={{
-                                            y: [-4, 4, -4]
-                                        }}
-                                        transition={{
-                                            y: { repeat: Infinity, duration: 2, ease: "easeInOut" }
-                                        }}
-                                        className="relative z-20"
+                                        key="claimed"
+                                        initial={{ scale: 0.3, opacity: 0, y: 30, filter: "blur(10px)" }}
+                                        animate={{ scale: 1, opacity: 1, y: 0, filter: "blur(0px)" }}
+                                        transition={{ type: 'spring', bounce: 0.7, duration: 0.8 }}
+                                        className="flex flex-col items-center justify-center w-full relative"
                                     >
-                                        <GlobalCoin size="lg" />
+                                        {/* Premium Burst Particles (Screen blended over white) */}
+                                        {[
+                                            { x: -50, y: -60, scale: 1.2, color: '#FF007F' },
+                                            { x: 50, y: -40, scale: 0.8, color: '#FFD700' },
+                                            { x: -40, y: 50, scale: 1.5, color: '#4ADE80' },
+                                            { x: 60, y: 50, scale: 1.1, color: '#FF007F' },
+                                            { x: 0, y: -70, scale: 0.9, color: '#FFD700' },
+                                            { x: 0, y: 60, scale: 1.3, color: '#4ADE80' }
+                                        ].map((particle, i) => (
+                                            <motion.div
+                                                key={i}
+                                                initial={{ opacity: 1, scale: 0, x: 0, y: 0 }}
+                                                animate={{
+                                                    opacity: 0,
+                                                    scale: particle.scale,
+                                                    x: particle.x,
+                                                    y: particle.y
+                                                }}
+                                                transition={{ duration: 1.2, ease: 'easeOut' }}
+                                                className="absolute w-2 h-2 rounded-full pointer-events-none mix-blend-multiply"
+                                                style={{ backgroundColor: particle.color }}
+                                            />
+                                        ))}
+
+                                        <motion.div
+                                            animate={{
+                                                scale: [1, 1.15, 1],
+                                                rotate: [0, -8, 8, -4, 4, 0]
+                                            }}
+                                            transition={{ duration: 0.9, ease: 'easeOut' }}
+                                            className="relative flex items-center justify-center z-20"
+                                        >
+                                            <div className="absolute inset-0 bg-gradient-to-tr from-illa-pink to-amber-400 blur-2xl opacity-40 animate-pulse rounded-full" />
+                                            <div className="relative z-10 w-24 h-24 flex items-center justify-center drop-shadow-xl -mt-16 mb-2">
+                                                <GlobalCoin size="lg" animate />
+                                            </div>
+                                        </motion.div>
+
+                                        <motion.div
+                                            initial={{ y: 20, opacity: 0 }}
+                                            animate={{ y: 0, opacity: 1 }}
+                                            transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 20 }}
+                                            className="text-center z-10"
+                                        >
+                                            <span className="block text-[42px] font-black text-transparent bg-clip-text bg-gradient-to-br from-illa-pink via-[#FF4A6B] to-orange-500 filter leading-none tracking-tight">
+                                                +{window.reward_points}
+                                            </span>
+                                            <span className="text-[14px] font-black text-transparent bg-clip-text bg-gradient-to-br from-illa-pink to-orange-500 uppercase tracking-widest mt-1 block">
+                                                {window.reward_points === 1 ? 'Moeda!' : 'Moedas!'}
+                                            </span>
+                                            <span className="text-[10px] font-bold text-black/30 uppercase tracking-[0.4em] mt-2 block">
+                                                {window.reward_points === 1 ? 'Coletada' : 'Coletadas'}
+                                            </span>
+                                        </motion.div>
                                     </motion.div>
-                                </div>
-
-                                <div className="flex flex-col gap-0.5 z-10 flex-1 min-w-[130px]">
-                                    <span className="text-base font-black text-[#111] leading-tight mt-1">
-                                        Você ganhou
-                                        <br />
-                                        <span className="text-illa-pink text-lg tracking-tight">{window.reward_points} Moeda{window.reward_points > 1 ? 's' : ''}</span>
-                                    </span>
-                                    <div className="flex items-center gap-1.5 text-[11px] font-bold text-black/40 mt-0.5 bg-black/5 px-2 py-0.5 rounded-full w-fit">
-                                        <Clock size={12} className="text-illa-pink/70" />
-                                        Expira em <span className="text-black/70 font-black">{timeLeft}</span>
-                                    </div>
-                                </div>
-
-                                <motion.button
-                                    onClick={handleClaim}
-                                    disabled={claiming}
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.92, y: 2 }}
-                                    className="relative overflow-hidden ml-2 px-6 py-3 rounded-full bg-gradient-to-b from-illa-yellow to-[#E5C100] text-black text-sm font-black shadow-[0_8px_20px_-5px_rgba(250,255,0,0.5),inset_0_-3px_0_rgba(200,160,0,0.5)] border border-yellow-200 z-10 group/btn"
-                                >
-                                    <div className="absolute inset-0 bg-white/30 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300" />
-                                    {claiming ? (
-                                        <Loader2 size={18} className="animate-spin relative z-10" />
-                                    ) : (
-                                        <div className="relative z-10 flex items-center gap-2 tracking-wide">
-                                            Coletar
+                                ) : error ? (
+                                    <motion.div
+                                        key="error"
+                                        initial={{ x: [0, -10, 10, -10, 10, 0] }}
+                                        transition={{ duration: 0.4 }}
+                                        exit={{ scale: 0.8, opacity: 0 }}
+                                        className="flex flex-col items-center justify-center gap-2 w-full py-4 text-center"
+                                    >
+                                        <AlertCircle size={32} className="text-red-500 shrink-0 drop-shadow-sm mb-1" />
+                                        <span className="text-sm font-black text-red-600 tracking-wide uppercase">
+                                            {error}
+                                        </span>
+                                    </motion.div>
+                                ) : (
+                                    <motion.div
+                                        key="unclaimed"
+                                        initial={{ opacity: 0, scale: 0.9 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ scale: 0, opacity: 0, rotate: -15, filter: "blur(10px)", y: 20 }}
+                                        transition={{ duration: 0.35, ease: "easeIn" }}
+                                        className="w-full h-full flex flex-col pt-2"
+                                    >
+                                        {/* Unclaimed state perfectly crafted for the cloud proportions */}
+                                        <div className="flex items-center justify-center gap-4 w-full px-2">
+                                            <motion.div
+                                                animate={{ y: [-4, 4, -4] }}
+                                                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                                                className="relative z-20 shrink-0 drop-shadow-lg"
+                                            >
+                                                <GlobalCoin size="lg" />
+                                            </motion.div>
+                                            <div className="flex flex-col gap-0.5 z-10 text-left">
+                                                <span className="text-[17px] font-black text-[#111] leading-tight">
+                                                    Você ganhou
+                                                    <br />
+                                                    <span className="text-transparent bg-clip-text bg-gradient-to-br from-illa-pink to-orange-500 text-xl tracking-tight leading-none">
+                                                        {window.reward_points} Moeda{window.reward_points > 1 ? 's' : ''}
+                                                    </span>
+                                                </span>
+                                            </div>
                                         </div>
-                                    )}
-                                </motion.button>
-                            </>
-                        )}
-                    </div>
+
+                                        <div className="flex justify-center mt-3">
+                                            <div className="flex items-center gap-1.5 text-[10px] font-bold text-black/50 bg-black/5 px-2.5 py-1 rounded-full w-fit">
+                                                <Clock size={12} className="text-illa-pink/80" />
+                                                Expira em <span className="text-black/80 font-black">{timeLeft}</span>
+                                            </div>
+                                        </div>
+
+                                        <motion.button
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.9 }}
+                                            onClick={handleClaim}
+                                            disabled={claiming}
+                                            className="w-full mt-5 relative overflow-hidden bg-gradient-to-r from-illa-pink to-orange-500 rounded-xl px-4 py-3 shadow-[0_8px_20px_-5px_rgba(229,0,126,0.3)] transition-all focus:outline-none focus:ring-4 focus:ring-illa-pink/30 group disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            <div className="absolute inset-0 bg-white/20 translate-y-[-100%] group-hover:translate-y-[100%] transition-transform duration-500" />
+                                            {claiming ? (
+                                                <div className="w-5 h-5 border-2 border-white/50 border-t-white rounded-full animate-spin mx-auto" />
+                                            ) : (
+                                                <span className="relative z-10 text-white font-black text-[15px] flex items-center justify-center gap-1.5 uppercase tracking-wide">
+                                                    Coletar <ChevronRight size={18} className="group-hover:translate-x-1.5 transition-transform" />
+                                                </span>
+                                            )}
+                                        </motion.button>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+                    </motion.div>
                 </motion.div>
             )}
         </AnimatePresence>

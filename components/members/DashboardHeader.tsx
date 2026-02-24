@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion'
-import { User, Star, Coins, IceCream, ChevronRight, Home, Droplet } from 'lucide-react'
+import { User, Star, Coins, IceCream, ChevronRight, Home, Droplet, LogOut } from 'lucide-react'
 import Link from 'next/link'
 import type { MemberProfile } from '@/lib/gamification-types'
 import { useRef, useState } from 'react'
@@ -63,6 +63,17 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
     const openInventory = (tab: 'sorvetes' | 'drops') => {
         setInventoryTab(tab)
         setShowInventory(true)
+    }
+
+    const handleLogout = async () => {
+        try {
+            const supabase = createSupabaseBrowser()
+            await supabase.auth.signOut()
+            router.push('/')
+            router.refresh()
+        } catch (error) {
+            console.error('Logout error:', error)
+        }
     }
 
     const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -130,8 +141,15 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                             <Home size={18} />
                         </Link>
                     </div>
-                    <div className="absolute top-6 right-6 z-50">
+                    <div className="absolute top-6 right-6 z-50 flex items-center gap-2 md:gap-3">
                         <NotificationBell />
+                        <button
+                            onClick={handleLogout}
+                            className="p-2 text-white/50 hover:text-white hover:bg-red-500/20 hover:border-red-500/30 rounded-full transition-all flex items-center justify-center backdrop-blur-md bg-black/10 border border-white/10 hover:scale-110 active:scale-95"
+                            title="Desconectar"
+                        >
+                            <LogOut size={18} />
+                        </button>
                     </div>
 
                     {/* 2. Glass Shine Effect */}
