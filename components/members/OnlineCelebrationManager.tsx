@@ -48,17 +48,13 @@ function JoyCloud({ children }: { children: React.ReactNode }) {
             ))}
 
             {/* ── Cloud top bumps ── */}
-            <div className="absolute -top-4   left-[15px] w-[48px] h-[48px] bg-white rounded-full z-0" />
-            <div className="absolute -top-10  left-1/2 -translate-x-1/2 w-[88px] h-[88px] bg-white rounded-full z-0" />
-            <div className="absolute -top-5   right-[15px] w-[54px] h-[54px] bg-white rounded-full z-0" />
-
-            {/* ── Side bumps ── */}
-            <div className="absolute top-[20px] -left-1 w-[34px] h-[50px] bg-white rounded-full z-0" />
-            <div className="absolute top-[25px] -right-1 w-[34px] h-[55px] bg-white rounded-full z-0" />
+            <div className="absolute -top-6   left-[10%] w-[60px] h-[60px] bg-white rounded-full z-0" />
+            <div className="absolute -top-12  left-1/2 -translate-x-1/2 w-[110px] h-[110px] bg-white rounded-full z-0" />
+            <div className="absolute -top-6   right-[10%] w-[65px] h-[65px] bg-white rounded-full z-0" />
 
             {/* ── Inner rainbow shimmer on body ── */}
             <div
-                className="relative bg-white rounded-t-[32px] rounded-b-[16px] px-3 pt-3 pb-2 z-10 flex flex-col items-center justify-center min-h-[80px]"
+                className="relative bg-white rounded-[2.5rem] px-3 pt-3 pb-2 z-10 flex flex-col items-center justify-center min-h-[80px]"
                 style={{ boxShadow: 'inset 0 -6px 0 rgba(241,245,249,0.9)' }}
             >
                 {/* rainbow shimmer */}
@@ -97,12 +93,10 @@ function GamifiedCloud({ children }: { children: React.ReactNode }) {
             className="relative w-[220px] max-w-[92vw] mx-auto"
             style={{ filter: 'drop-shadow(0 12px 32px rgba(229,0,126,0.25))' }}
         >
-            <div className="absolute -top-4 left-[15px] w-[50px] h-[50px] bg-white rounded-full z-0" />
-            <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-[90px] h-[90px] bg-white rounded-full z-0" />
-            <div className="absolute -top-5 right-[15px] w-[55px] h-[55px] bg-white rounded-full z-0" />
-            <div className="absolute top-[20px] -left-1 w-[35px] h-[50px] bg-white rounded-full z-0" />
-            <div className="absolute top-[25px] -right-1 w-[35px] h-[55px] bg-white rounded-full z-0" />
-            <div className="relative bg-white rounded-t-[32px] rounded-b-[16px] px-3 pt-3 pb-2 z-10 flex flex-col items-center justify-center min-h-[80px] shadow-[inset_0_-6px_0_rgba(241,245,249,0.9)]">
+            <div className="absolute -top-6 left-[10%] w-[60px] h-[60px] bg-white rounded-full z-0" />
+            <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-[110px] h-[110px] bg-white rounded-full z-0" />
+            <div className="absolute -top-6 right-[10%] w-[65px] h-[65px] bg-white rounded-full z-0" />
+            <div className="relative bg-white rounded-[2.5rem] px-3 pt-3 pb-2 z-10 flex flex-col items-center justify-center min-h-[80px] shadow-[inset_0_-6px_0_rgba(241,245,249,0.9)]">
                 {children}
             </div>
         </div>

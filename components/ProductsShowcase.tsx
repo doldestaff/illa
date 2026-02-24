@@ -39,12 +39,12 @@ function ShowcaseMarquee() {
                     key={`${product.id}-${index}`}
                     className={`group relative flex-shrink-0 w-[280px] h-[400px] rounded-[2.5rem] ${product.color} p-8 flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-illa-pink/20 cursor-pointer`}
                 >
-                    <div className="relative w-full h-[60%] mb-6">
+                    <div className="relative w-full h-[75%] mb-2 mt-2">
                         <Image
                             src={product.image}
                             alt={product.name}
                             fill
-                            className="object-contain drop-shadow-lg group-hover:drop-shadow-2xl transition-all duration-500 group-hover:scale-110"
+                            className="object-contain drop-shadow-lg group-hover:drop-shadow-2xl transition-all duration-500 scale-[1.2] group-hover:scale-[1.3]"
                             sizes="280px"
                         />
                     </div>
