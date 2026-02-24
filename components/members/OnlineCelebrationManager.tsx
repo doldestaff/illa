@@ -30,7 +30,7 @@ function JoyCloud({ children }: { children: React.ReactNode }) {
         <div
             className="relative w-[220px] max-w-[92vw] mx-auto"
             style={{
-                filter: 'drop-shadow(0 0 30px rgba(229,0,126,0.55)) drop-shadow(0 0 60px rgba(255,160,0,0.35)) drop-shadow(0 18px 50px rgba(229,0,126,0.4))'
+                filter: 'drop-shadow(0 0 30px rgba(255,215,0,0.6)) drop-shadow(0 0 60px rgba(255,160,0,0.5)) drop-shadow(0 18px 50px rgba(255,215,0,0.4))'
             }}
         >
             {/* ── Animated splat emoji halo ── */}
@@ -58,7 +58,7 @@ function JoyCloud({ children }: { children: React.ReactNode }) {
 
             {/* ── Inner rainbow shimmer on body ── */}
             <div
-                className="relative bg-white rounded-t-[32px] rounded-b-[16px] px-3 pt-3 pb-2 z-10 flex flex-col items-center justify-center min-h-[80px] overflow-hidden"
+                className="relative bg-white rounded-t-[32px] rounded-b-[16px] px-3 pt-3 pb-2 z-10 flex flex-col items-center justify-center min-h-[80px]"
                 style={{ boxShadow: 'inset 0 -6px 0 rgba(241,245,249,0.9)' }}
             >
                 {/* rainbow shimmer */}
@@ -67,8 +67,9 @@ function JoyCloud({ children }: { children: React.ReactNode }) {
                     animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
                     transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
                     style={{
-                        background: 'linear-gradient(120deg, transparent 30%, rgba(229,0,126,0.06) 50%, rgba(255,160,0,0.06) 70%, transparent 90%)',
+                        background: 'linear-gradient(120deg, transparent 30%, rgba(255,215,0,0.1) 50%, rgba(255,160,0,0.1) 70%, transparent 90%)',
                         backgroundSize: '200% 200%',
+                        borderRadius: 'inherit'
                     }}
                 />
                 {children}
