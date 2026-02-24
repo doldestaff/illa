@@ -54,6 +54,10 @@ export default function ProfileEditor({ user }: ProfileEditorProps) {
             return
         }
 
+        // Show instant local preview before uploading
+        const localPreview = URL.createObjectURL(file)
+        setAvatarUrl(localPreview)
+
         setUploading(true)
         setError('')
 
@@ -67,6 +71,7 @@ export default function ProfileEditor({ user }: ProfileEditorProps) {
 
         if (uploadError) {
             setError(`Erro no upload: ${uploadError.message}`)
+            setAvatarUrl(user.avatarUrl) // revert preview on error
             setUploading(false)
             return
         }
@@ -80,11 +85,14 @@ export default function ProfileEditor({ user }: ProfileEditorProps) {
             .createSignedUrl(path, 3600)
 
         if (signed?.signedUrl) {
+            // Revoke the temporary object url to avoid memory leak
+            URL.revokeObjectURL(localPreview)
             setAvatarUrl(signed.signedUrl)
         }
 
         setUploading(false)
         if (fileRef.current) fileRef.current.value = ''
+        router.refresh()
     }
 
     const handleSave = async () => {

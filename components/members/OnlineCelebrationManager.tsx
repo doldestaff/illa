@@ -13,25 +13,64 @@ interface Props {
     initialDelayMs?: number
 }
 
-// ─── Gamified Cloud Wrapper (Cup Shape) ──────────────────────────────────────
+// ─── Joyful Star-Burst Cloud (Claimed State) ─────────────────────────────────
+const STAR_BURSTS = [
+    { emoji: '✨', x: -70, y: -60, delay: 0, size: 22, rot: 15 },
+    { emoji: '🌟', x: 70, y: -55, delay: 0.1, size: 18, rot: -20 },
+    { emoji: '💫', x: -80, y: 20, delay: 0.15, size: 20, rot: 10 },
+    { emoji: '✨', x: 80, y: 25, delay: 0.2, size: 16, rot: -10 },
+    { emoji: '🌟', x: -30, y: -80, delay: 0.05, size: 14, rot: 5 },
+    { emoji: '💛', x: 35, y: -75, delay: 0.12, size: 12, rot: -5 },
+    { emoji: '🎉', x: -55, y: 65, delay: 0.25, size: 18, rot: 20 },
+    { emoji: '🎊', x: 55, y: 65, delay: 0.18, size: 16, rot: -15 },
+]
 
-function GamifiedCloud({ children, isClaimed }: { children: React.ReactNode, isClaimed?: boolean }) {
+function JoyCloud({ children }: { children: React.ReactNode }) {
     return (
         <div
             className="relative w-[220px] max-w-[92vw] mx-auto"
-            style={{ filter: `drop-shadow(0 ${isClaimed ? '16px 40px' : '12px 32px'} rgba(229,0,126,${isClaimed ? '0.35' : '0.25'}))` }}
+            style={{
+                filter: 'drop-shadow(0 0 30px rgba(229,0,126,0.55)) drop-shadow(0 0 60px rgba(255,160,0,0.35)) drop-shadow(0 18px 50px rgba(229,0,126,0.4))'
+            }}
         >
-            {/* Top Cloud Bumps (Fluffy top) */}
-            <div className="absolute -top-4 left-[15px] w-[50px] h-[50px] bg-white rounded-full z-0" />
-            <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-[90px] h-[90px] bg-white rounded-full z-0" />
-            <div className="absolute -top-5 right-[15px] w-[55px] h-[55px] bg-white rounded-full z-0" />
+            {/* ── Animated splat emoji halo ── */}
+            {STAR_BURSTS.map((s, i) => (
+                <motion.span
+                    key={i}
+                    initial={{ opacity: 0, scale: 0, x: 0, y: 0, rotate: 0 }}
+                    animate={{ opacity: [0, 1, 1, 0], scale: [0, 1.3, 1, 0.8], x: s.x, y: s.y, rotate: s.rot }}
+                    transition={{ duration: 1.8, delay: s.delay, ease: 'easeOut', times: [0, 0.2, 0.7, 1] }}
+                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 select-none pointer-events-none z-20"
+                    style={{ fontSize: s.size }}
+                >
+                    {s.emoji}
+                </motion.span>
+            ))}
 
-            {/* Side Bumps (Pulled in) */}
-            <div className="absolute top-[20px] -left-1 w-[35px] h-[50px] bg-white rounded-full z-0" />
-            <div className="absolute top-[25px] -right-1 w-[35px] h-[55px] bg-white rounded-full z-0" />
+            {/* ── Cloud top bumps ── */}
+            <div className="absolute -top-4   left-[15px] w-[48px] h-[48px] bg-white rounded-full z-0" />
+            <div className="absolute -top-10  left-1/2 -translate-x-1/2 w-[88px] h-[88px] bg-white rounded-full z-0" />
+            <div className="absolute -top-5   right-[15px] w-[54px] h-[54px] bg-white rounded-full z-0" />
 
-            {/* Main Body (Compact Ice Cream Cup) */}
-            <div className="relative bg-white rounded-t-[32px] rounded-b-[16px] px-3 pt-3 pb-2 z-10 flex flex-col items-center justify-center min-h-[80px] shadow-[inset_0_-6px_0_rgba(241,245,249,0.9)]">
+            {/* ── Side bumps ── */}
+            <div className="absolute top-[20px] -left-1 w-[34px] h-[50px] bg-white rounded-full z-0" />
+            <div className="absolute top-[25px] -right-1 w-[34px] h-[55px] bg-white rounded-full z-0" />
+
+            {/* ── Inner rainbow shimmer on body ── */}
+            <div
+                className="relative bg-white rounded-t-[32px] rounded-b-[16px] px-3 pt-3 pb-2 z-10 flex flex-col items-center justify-center min-h-[80px] overflow-hidden"
+                style={{ boxShadow: 'inset 0 -6px 0 rgba(241,245,249,0.9)' }}
+            >
+                {/* rainbow shimmer */}
+                <motion.div
+                    className="absolute inset-0 pointer-events-none z-0"
+                    animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+                    style={{
+                        background: 'linear-gradient(120deg, transparent 30%, rgba(229,0,126,0.06) 50%, rgba(255,160,0,0.06) 70%, transparent 90%)',
+                        backgroundSize: '200% 200%',
+                    }}
+                />
                 {children}
             </div>
         </div>
@@ -42,15 +81,30 @@ function PostClaimContainer({ children }: { children: React.ReactNode }) {
     return (
         <motion.div
             animate={{ y: [0, -8, 0] }}
-            transition={{
-                y: { duration: 3.5, repeat: Infinity, ease: 'easeInOut' },
-            }}
+            transition={{ y: { duration: 3.5, repeat: Infinity, ease: 'easeInOut' } }}
             className="w-full"
         >
-            <GamifiedCloud isClaimed>
-                {children}
-            </GamifiedCloud>
+            <JoyCloud>{children}</JoyCloud>
         </motion.div>
+    )
+}
+
+// ─── Plain Cloud for pre-claim / error states ─────────────────────────────────
+function GamifiedCloud({ children }: { children: React.ReactNode }) {
+    return (
+        <div
+            className="relative w-[220px] max-w-[92vw] mx-auto"
+            style={{ filter: 'drop-shadow(0 12px 32px rgba(229,0,126,0.25))' }}
+        >
+            <div className="absolute -top-4 left-[15px] w-[50px] h-[50px] bg-white rounded-full z-0" />
+            <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-[90px] h-[90px] bg-white rounded-full z-0" />
+            <div className="absolute -top-5 right-[15px] w-[55px] h-[55px] bg-white rounded-full z-0" />
+            <div className="absolute top-[20px] -left-1 w-[35px] h-[50px] bg-white rounded-full z-0" />
+            <div className="absolute top-[25px] -right-1 w-[35px] h-[55px] bg-white rounded-full z-0" />
+            <div className="relative bg-white rounded-t-[32px] rounded-b-[16px] px-3 pt-3 pb-2 z-10 flex flex-col items-center justify-center min-h-[80px] shadow-[inset_0_-6px_0_rgba(241,245,249,0.9)]">
+                {children}
+            </div>
+        </div>
     )
 }
 
