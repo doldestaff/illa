@@ -2,8 +2,8 @@
 
 import { useState, useCallback, useRef } from 'react'
 import type { MissionInstance } from '@/lib/gamification-types'
-import { Target, Sparkles, ArrowRight, LayoutGrid } from 'lucide-react'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { Target, Sparkles, ArrowRight, LayoutGrid, CheckCircle2 } from 'lucide-react'
+import { motion, useScroll, AnimatePresence } from 'framer-motion'
 import MissionCard from './MissionCard'
 import MissionsModal from './MissionsModal'
 
@@ -15,6 +15,7 @@ interface Props {
 export default function DailyMissions({ missions, onClaim }: Props) {
     const [claimingId, setClaimingId] = useState<string | null>(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
+    const [showPopup, setShowPopup] = useState(false)
     const [claimedIds, setClaimedIds] = useState<Set<string>>(
         new Set(missions.filter((m) => m.claimed).map((m) => m.instance_id))
     )
@@ -31,6 +32,8 @@ export default function DailyMissions({ missions, onClaim }: Props) {
             const result = await onClaim(instanceId)
             if (result.success) {
                 setClaimedIds((prev) => new Set([...prev, instanceId]))
+                setShowPopup(true)
+                setTimeout(() => setShowPopup(false), 3000)
             }
         } catch (err) {
             console.error('Claim failed:', err)
@@ -175,6 +178,45 @@ export default function DailyMissions({ missions, onClaim }: Props) {
                 claimedIds={claimedIds}
                 onClaim={handleClaim}
             />
+
+            {/* Mission Completion Centered Popup */}
+            <AnimatePresence>
+                {showPopup && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[300] bg-black/40 backdrop-blur-sm flex items-center justify-center pointer-events-none p-4"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.5, y: 50, opacity: 0 }}
+                            animate={{ scale: 1, y: 0, opacity: 1 }}
+                            exit={{ scale: 0.8, y: 20, opacity: 0 }}
+                            transition={{ type: 'spring', bounce: 0.5, duration: 0.6 }}
+                            className="bg-white px-8 py-8 rounded-[2rem] shadow-2xl flex flex-col items-center gap-3 text-center relative overflow-hidden max-w-[300px] w-full border-b-[8px] border-slate-100"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-tr from-illa-pink/5 to-orange-400/5 opacity-50" />
+
+                            <motion.div
+                                animate={{ scale: [1, 1.2, 1], rotate: [0, -10, 10, -5, 5, 0] }}
+                                transition={{ duration: 0.6, ease: 'easeOut' }}
+                                className="w-16 h-16 bg-gradient-to-tr from-illa-pink to-orange-400 rounded-full flex items-center justify-center shadow-lg relative z-10"
+                            >
+                                <CheckCircle2 className="text-white" size={36} strokeWidth={3} />
+                            </motion.div>
+
+                            <div className="relative z-10 mt-2">
+                                <h3 className="text-[28px] leading-tight font-black text-transparent bg-clip-text bg-gradient-to-r from-illa-pink to-orange-500 uppercase tracking-tight">
+                                    Missão<br />Concluída!
+                                </h3>
+                                <p className="font-bold text-black/40 text-sm mt-3 uppercase tracking-widest">
+                                    Moedas adicionadas
+                                </p>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     )
 }

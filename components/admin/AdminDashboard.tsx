@@ -661,7 +661,7 @@ export default function AdminDashboard() {
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[600px]">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[450px] md:h-[600px]">
                                 {/* User Selection List */}
                                 <div className="md:col-span-1 bg-white/5 border border-white/10 rounded-2xl overflow-hidden flex flex-col">
                                     <div className="p-4 border-b border-white/10 bg-white/5 sticky top-0 z-10 backdrop-blur-md">
@@ -672,7 +672,7 @@ export default function AdminDashboard() {
                                             className="w-full mt-2 bg-black/20 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-green-500/50 transition-colors"
                                         />
                                     </div>
-                                    <div className="divide-y divide-white/5 overflow-y-auto flex-1">
+                                    <div className="divide-y divide-white/5 overflow-y-auto flex-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-white/20 [&::-webkit-scrollbar-thumb]:rounded-full px-1">
                                         {users.map(u => (
                                             <button
                                                 key={u.id}
@@ -1136,7 +1136,7 @@ export default function AdminDashboard() {
                                             className="w-full bg-black/20 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-sm text-white focus:border-amber-500/50 focus:outline-none transition-colors"
                                         />
                                     </div>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[200px] overflow-y-auto pr-1">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[350px] overflow-y-auto pr-1">
                                         {users.filter(u => {
                                             const q = surpriseSearch.toLowerCase()
                                             return !q || (u.full_name || '').toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q)
@@ -1145,8 +1145,8 @@ export default function AdminDashboard() {
                                                 key={u.id}
                                                 onClick={() => setSurpriseTargetUser(u.id)}
                                                 className={`flex items-center gap-3 p-3 rounded-xl border text-left transition-all text-sm ${surpriseTargetUser === u.id
-                                                        ? 'bg-amber-500/20 border-amber-500/40 text-amber-200'
-                                                        : 'bg-white/5 border-white/5 text-white/70 hover:border-white/20'
+                                                    ? 'bg-amber-500/20 border-amber-500/40 text-amber-200'
+                                                    : 'bg-white/5 border-white/5 text-white/70 hover:border-white/20'
                                                     }`}
                                             >
                                                 <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs font-bold">

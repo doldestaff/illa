@@ -173,7 +173,7 @@ export function HeroEngine({
                 // PERFORMANCE: Background areas like members dash have 82 frames.
                 // We MUST set the cache equal or slightly larger to prevent reload-thrashing looping.
                 const isBackgroundMode = scrollMode === 'document'
-                state.current.cache.setLimit(state.current.isMobile ? (isBackgroundMode ? 90 : 60) : 100)
+                state.current.cache.setLimit(state.current.isMobile ? (isBackgroundMode ? 90 : 100) : 100)
 
                 if (containerRef.current) {
                     containerRef.current.style.setProperty('--app-h', `${h}px`)
@@ -196,7 +196,7 @@ export function HeroEngine({
         setIsMobileHero(w < 768)
 
         const isBackgroundMode = scrollMode === 'document'
-        state.current.cache.setLimit(state.current.isMobile ? (isBackgroundMode ? 90 : 60) : 100)
+        state.current.cache.setLimit(state.current.isMobile ? (isBackgroundMode ? 90 : 100) : 100)
 
         if (containerRef.current) containerRef.current.style.setProperty('--app-h', `${h}px`)
 
@@ -235,7 +235,7 @@ export function HeroEngine({
         // Concurrency Limiter (prevent browser choke)
         // Aggressive on mobile background mode
         const isBackgroundMode = scrollMode === 'document'
-        const maxInflight = state.current.isMobile ? (isBackgroundMode ? 3 : 5) : 8
+        const maxInflight = state.current.isMobile ? (isBackgroundMode ? 3 : 8) : 8
 
         if (!priority && state.current.inflight.size >= maxInflight) {
             // Priority Check: Abort furthest frame to make room for nearest frame
@@ -344,7 +344,7 @@ export function HeroEngine({
 
         // Lookahead Strategy (Bi-directional based on velocity)
         // Load fewer frames ahead on mobile to reduce network/CPU contention
-        let lookahead = state.current.isMobile ? (scrollMode === 'document' ? 2 : 3) : 5
+        let lookahead = state.current.isMobile ? (scrollMode === 'document' ? 2 : 10) : 10
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if (typeof navigator !== 'undefined' && 'deviceMemory' in navigator && (navigator as any).deviceMemory <= 2) {
             lookahead = 1
@@ -360,9 +360,39 @@ export function HeroEngine({
             for (let i = 1; i <= Math.floor(lookahead / 2); i++) loadFrame(idx - i)
         }
 
-        // If frame is missing, triggers priority load but KEEP OLD FRAME (don't clear canvas)
+        // If frame is missing, find nearest cached frame and show that while we load the target
         if (!frame) {
-            loadFrame(idx, true) // Priority load
+            loadFrame(idx, true) // Priority load target
+            // Scan outward for nearest cached frame to prevent canvas freeze
+            let nearest: ImageBitmap | HTMLImageElement | undefined
+            for (let dist = 1; dist <= 10; dist++) {
+                nearest = state.current.cache.get(idx - dist) || state.current.cache.get(idx + dist)
+                if (nearest) break
+            }
+            if (!nearest) return // Nothing to show yet
+            // Draw the nearest frame as a bridge
+            const ctx = canvasRef.current?.getContext('2d', { alpha: false, desynchronized: true })
+            if (ctx && canvasRef.current) {
+                const dpr = Math.min(window.devicePixelRatio || 1, state.current.isMobile ? 1.0 : 1.5)
+                const w = state.current.appWidth
+                const h = state.current.appHeight
+                const targetW = Math.floor(w * dpr)
+                const targetH = Math.floor(h * dpr)
+                if (canvasRef.current.width !== targetW || canvasRef.current.height !== targetH) {
+                    canvasRef.current.width = targetW
+                    canvasRef.current.height = targetH
+                    ctx.scale(dpr, dpr)
+                }
+                const iW = (nearest instanceof ImageBitmap) ? nearest.width : (nearest as HTMLImageElement).naturalWidth
+                const iH = (nearest instanceof ImageBitmap) ? nearest.height : (nearest as HTMLImageElement).naturalHeight
+                const scale = objectFit === 'contain' ? Math.min(w / iW, h / iH) : Math.max(w / iW, h / iH)
+                const finalW = iW * scale
+                const finalH = iH * scale
+                const x = (w - finalW) / 2
+                const y = objectFit === 'contain' ? 0 : (h - finalH) / 2
+                ctx.drawImage(nearest, x, y, finalW, finalH)
+                if (!isLoaded) setIsLoaded(true)
+            }
             return
         }
 
@@ -425,7 +455,9 @@ export function HeroEngine({
             const target = state.current.targetFrameIndex
             const diff = target - smoothedFrame
             // Converge faster for small diffs, slower for large jumps
-            const lerpFactor = Math.abs(diff) < 2 ? 0.5 : 0.3
+            // On mobile use gentler lerp to prevent jumping ahead of cache
+            const isMob = state.current.isMobile
+            const lerpFactor = Math.abs(diff) < 2 ? (isMob ? 0.25 : 0.5) : (isMob ? 0.15 : 0.3)
             smoothedFrame += diff * lerpFactor
 
             // Only draw if we haven't converged
@@ -497,6 +529,74 @@ export function HeroEngine({
             if (lerpRafId) cancelAnimationFrame(lerpRafId)
         }
     }, [manifest, scrollMode, scrollSectionHeightVh, startIndex, onProgress])
+
+    // --- 6. Background Preloader ---
+    useEffect(() => {
+        if (!isLoaded || (!manifest && !state.current.isManual)) return
+        if (typeof window === 'undefined') return
+
+        let active = true
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let idleCallbackId: any = null
+
+        const preloadFrames = () => {
+            const totalFrames = state.current.frameCount
+            const frameIndices = Array.from({ length: totalFrames }, (_, i) => i)
+
+            const loadNextBatch = () => {
+                if (!active) return
+
+                const missingFrames = frameIndices.filter(i =>
+                    !state.current.cache.has(i) && !state.current.inflight.has(i)
+                )
+
+                if (missingFrames.length === 0) {
+                    if (debug) console.log('[HeroEngine] All frames preloaded.')
+                    return
+                }
+
+                // If active scrolling is using network, yield
+                if (state.current.inflight.size > 2) {
+                    idleCallbackId = setTimeout(loadNextBatch, 300)
+                    return
+                }
+
+                // Load 3 frames at a time silently
+                const batch = missingFrames.slice(0, 3)
+                batch.forEach(i => loadFrame(i, false))
+
+                idleCallbackId = setTimeout(loadNextBatch, 100)
+            }
+
+            // Start preloading quickly after initial sequence settles
+            if ('requestIdleCallback' in window) {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                idleCallbackId = window.requestIdleCallback(() => setTimeout(loadNextBatch, 300))
+            } else {
+                idleCallbackId = setTimeout(loadNextBatch, 300)
+            }
+        }
+
+        preloadFrames()
+
+        return () => {
+            active = false
+            if (idleCallbackId !== null) {
+                try {
+                    if ('cancelIdleCallback' in window && typeof idleCallbackId !== 'string' && typeof idleCallbackId !== 'number' && !idleCallbackId?._idleTimeout) {
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        // @ts-ignore
+                        window.cancelIdleCallback(idleCallbackId)
+                    } else {
+                        clearTimeout(idleCallbackId)
+                    }
+                } catch (e) {
+                    clearTimeout(idleCallbackId)
+                }
+            }
+        }
+    }, [isLoaded, manifest, loadFrame, debug, state])
 
     return (
         <div ref={containerRef} className={cn("absolute inset-0 w-full h-full overflow-hidden", className)}>

@@ -151,7 +151,7 @@ export default function VipCard({ referralCode, referralCount, vipPayload, onLoa
                                 </h3>
                                 <div className="flex items-center gap-1.5 opacity-60">
                                     <Sparkles size={10} className="text-illa-yellow" />
-                                    <p className="text-[9px] uppercase tracking-[0.3em] font-black leading-none">Member Pass</p>
+                                    <p className="text-[9px] uppercase tracking-[0.3em] font-black leading-none">Digital Card</p>
                                 </div>
                             </div>
                         </div>

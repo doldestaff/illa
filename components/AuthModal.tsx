@@ -179,7 +179,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                 overflow-hidden
                                 pointer-events-auto
                                 relative
-                                max-h-[90vh] overflow-y-auto
+                                max-h-[calc(100vh-2rem)] overflow-y-auto
                                 md:max-h-none md:overflow-visible md:h-auto
                             "
                         >

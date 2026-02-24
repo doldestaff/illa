@@ -284,7 +284,7 @@ export function PinnedButtonsParallax() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <h3 className="font-bold text-3xl md:text-4xl font-script bg-clip-text text-transparent bg-gradient-to-br from-[#0B0B0D] via-[#2A2A2E] to-[#E5017D]/40 drop-shadow-[0_2px_2px_rgba(255,255,255,0.5)]">
+                                    <h3 className="font-bold text-3xl md:text-4xl font-script bg-clip-text text-transparent bg-gradient-to-br from-white via-white/95 to-white/70 drop-shadow-sm">
                                         {card.title}
                                     </h3>
                                     <p className="text-[#2D2D30] font-medium leading-relaxed max-w-[270px] mx-auto text-sm tracking-wide opacity-80 transition-opacity group-hover:opacity-100">

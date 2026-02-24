@@ -14,7 +14,7 @@ export default async function ProfilePage() {
 
     const { data: profile } = await supabase
         .from('profiles')
-        .select('full_name, whatsapp, email, avatar_path, birth_date')
+        .select('full_name, whatsapp, email, avatar_path, birth_date, address, city, state')
         .eq('id', user.id)
         .single()
 
@@ -36,6 +36,9 @@ export default async function ProfilePage() {
                 whatsapp: profile?.whatsapp ?? '',
                 avatarUrl,
                 birthDate: profile?.birth_date ?? null,
+                address: profile?.address ?? '',
+                city: profile?.city ?? '',
+                state: profile?.state ?? '',
             }}
         />
     )

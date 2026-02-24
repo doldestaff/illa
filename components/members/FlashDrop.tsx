@@ -16,6 +16,7 @@ export default function FlashDrop({ drop, onClaim }: Props) {
     const [claiming, setClaiming] = useState(false)
     const [claimed, setClaimed] = useState(drop?.already_claimed ?? false)
     const [showWizard, setShowWizard] = useState(false)
+    const [wizardStep, setWizardStep] = useState<'guide' | 'notifications'>('guide')
 
     // === SURPRISE DROPS ===
     const [surpriseDrop, setSurpriseDrop] = useState<SurpriseDrop | null>(null)
@@ -187,16 +188,40 @@ export default function FlashDrop({ drop, onClaim }: Props) {
                                     className="flex items-center justify-center"
                                 >
                                     <h3 className="text-lg font-bold text-gray-800 tracking-wide font-script">
-                                        Preparando surpresas
+                                        Scanneando novos drops...
                                     </h3>
                                 </motion.div>
 
-                                <p className="text-sm font-medium text-gray-500 flex items-center justify-center gap-1">
-                                    <span>Fique de olho</span>
-                                    <motion.span animate={{ y: [0, -3, 0] }} transition={{ duration: 1, repeat: Infinity, delay: 0 }}>.</motion.span>
-                                    <motion.span animate={{ y: [0, -3, 0] }} transition={{ duration: 1, repeat: Infinity, delay: 0.1 }}>.</motion.span>
-                                    <motion.span animate={{ y: [0, -3, 0] }} transition={{ duration: 1, repeat: Infinity, delay: 0.2 }}>.</motion.span>
-                                </p>
+                                <button
+                                    onClick={() => {
+                                        setWizardStep('guide')
+                                        setShowWizard(true)
+                                    }}
+                                    className="group/hint flex flex-col items-center gap-3"
+                                >
+                                    <p className="text-sm font-bold text-gray-500 flex items-center justify-center gap-1 group-hover/hint:text-illa-pink transition-colors">
+                                        <span className="relative">
+                                            Fique de olho
+                                            <motion.span
+                                                className="absolute -bottom-1 left-0 w-full h-0.5 bg-illa-pink/30 rounded-full"
+                                                animate={{ scaleX: [0, 1, 0] }}
+                                                transition={{ duration: 2, repeat: Infinity }}
+                                            />
+                                        </span>
+                                        <motion.span animate={{ y: [0, -3, 0] }} transition={{ duration: 1, repeat: Infinity, delay: 0 }}>.</motion.span>
+                                        <motion.span animate={{ y: [0, -3, 0] }} transition={{ duration: 1, repeat: Infinity, delay: 0.1 }}>.</motion.span>
+                                        <motion.span animate={{ y: [0, -3, 0] }} transition={{ duration: 1, repeat: Infinity, delay: 0.2 }}>.</motion.span>
+                                    </p>
+
+                                    <motion.div
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        className="bg-white/80 backdrop-blur-sm border border-pink-100 rounded-full px-4 py-2 flex items-center gap-2 shadow-sm hover:shadow-md transition-all mt-1"
+                                    >
+                                        <Radio size={14} className="text-illa-pink animate-pulse" />
+                                        <span className="text-[11px] font-black text-illa-pink uppercase tracking-wider">Ativar Notificações</span>
+                                    </motion.div>
+                                </button>
                             </div>
                         </div>
                     </motion.div>
@@ -323,24 +348,100 @@ export default function FlashDrop({ drop, onClaim }: Props) {
                             initial={{ scale: 0.9, y: 20, opacity: 0 }}
                             animate={{ scale: 1, y: 0, opacity: 1 }}
                             exit={{ scale: 0.9, y: 10, opacity: 0 }}
-                            className="w-full bg-white border border-pink-100 shadow-2xl shadow-pink-100 rounded-3xl p-6 text-center space-y-4"
+                            className="w-full max-w-[320px] bg-white border border-pink-100 shadow-2xl shadow-pink-100 rounded-[2rem] p-8 text-center space-y-6 relative overflow-hidden"
                             onClick={(e) => e.stopPropagation()}
                         >
-                            <div className="w-16 h-16 mx-auto rounded-full bg-pink-50 flex items-center justify-center animate-bounce">
-                                <AlertCircle size={32} className="text-illa-pink" />
-                            </div>
-                            <div>
-                                <h3 className="text-xl font-bold text-gray-800 font-script">Como Funciona?</h3>
-                                <p className="text-sm text-gray-500 mt-2 max-w-[220px] mx-auto leading-relaxed">
-                                    Fique de olho nesta caixinha. Quando um mimo aparecer, você terá poucos minutos para resgatar antes que fuja!
-                                </p>
-                            </div>
-                            <button
-                                onClick={() => setShowWizard(false)}
-                                className="w-full py-3 bg-gray-100 text-gray-700 hover:bg-gray-200 font-bold rounded-xl transition-colors"
-                            >
-                                Entendi, vou vigiar!
-                            </button>
+                            {/* Decorative background glow */}
+                            <div className="absolute -top-24 -left-24 w-48 h-48 bg-pink-100/50 rounded-full blur-3xl pointer-events-none" />
+
+                            <AnimatePresence mode="wait">
+                                {wizardStep === 'guide' ? (
+                                    <motion.div
+                                        key="guide"
+                                        initial={{ opacity: 0, x: 20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: -20 }}
+                                        className="space-y-6"
+                                    >
+                                        <div className="w-20 h-20 mx-auto rounded-full bg-pink-50 flex items-center justify-center relative overflow-hidden">
+                                            <motion.div
+                                                animate={{
+                                                    scale: [1, 1.2, 1],
+                                                    opacity: [0.3, 0, 0.3]
+                                                }}
+                                                transition={{ duration: 2, repeat: Infinity }}
+                                                className="absolute inset-0 bg-illa-pink rounded-full"
+                                            />
+                                            <Gift size={36} className="text-illa-pink relative z-10" strokeWidth={2.5} />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-2xl font-black text-gray-800 font-script leading-tight">Como o Scanner Funciona?</h3>
+                                            <p className="text-sm font-medium text-gray-500 mt-3 leading-relaxed">
+                                                Fique sempre de olho nesta caixinha! Os <span className="text-illa-pink font-bold">Drops Surpresa</span> aparecem sem aviso e por tempo limitado.
+                                                <br /><br />
+                                                Quando um mimo aparecer, corra: você terá poucos minutos para resgatar antes que ele fuja!
+                                            </p>
+                                        </div>
+                                        <motion.button
+                                            whileHover={{ scale: 1.02 }}
+                                            whileTap={{ scale: 0.98 }}
+                                            onClick={() => setWizardStep('notifications')}
+                                            className="w-full py-4 bg-illa-pink text-white font-black rounded-2xl shadow-lg shadow-pink-500/20 transition-all uppercase tracking-wider text-sm"
+                                        >
+                                            Entendi, vou vigiar!
+                                        </motion.button>
+                                    </motion.div>
+                                ) : (
+                                    <motion.div
+                                        key="notifications"
+                                        initial={{ opacity: 0, x: 20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: -20 }}
+                                        className="space-y-6"
+                                    >
+                                        <div className="w-20 h-20 mx-auto rounded-full bg-blue-50 flex items-center justify-center relative">
+                                            <motion.div
+                                                animate={{ rotate: [0, 15, -15, 0] }}
+                                                transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
+                                            >
+                                                <Zap size={36} className="text-blue-500" strokeWidth={2.5} />
+                                            </motion.div>
+                                            <motion.div
+                                                animate={{ scale: [1, 1.5], opacity: [0.5, 0] }}
+                                                transition={{ duration: 1.5, repeat: Infinity }}
+                                                className="absolute inset-0 border-2 border-blue-200 rounded-full"
+                                            />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-2xl font-black text-gray-800 font-script leading-tight">Ative as Notificações!</h3>
+                                            <p className="text-sm font-medium text-gray-500 mt-3 leading-relaxed">
+                                                Não quer perder nenhum drop surpresa?
+                                                <br /><br />
+                                                Ative as notificações para ser avisado <span className="text-blue-500 font-bold">na mesma hora</span> quando um novo drop estiver disponível no celular!
+                                            </p>
+                                        </div>
+                                        <div className="space-y-3">
+                                            <motion.button
+                                                whileHover={{ scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
+                                                onClick={() => {
+                                                    // This would normally trigger browser notification request
+                                                    setShowWizard(false)
+                                                }}
+                                                className="w-full py-4 bg-blue-500 text-white font-black rounded-2xl shadow-lg shadow-blue-500/20 transition-all uppercase tracking-wider text-sm flex items-center justify-center gap-2"
+                                            >
+                                                <Radio size={18} /> ATIVAR AGORA
+                                            </motion.button>
+                                            <button
+                                                onClick={() => setShowWizard(false)}
+                                                className="w-full py-2 text-xs font-bold text-gray-400 hover:text-gray-600 transition-colors uppercase tracking-widest"
+                                            >
+                                                Talvez depois
+                                            </button>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </motion.div>
                     </motion.div>
                 )}

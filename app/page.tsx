@@ -9,6 +9,7 @@ const PinnedButtonsParallax = dynamic(() => import('@/components/PinnedButtonsPa
 const ProductsShowcase = dynamic(() => import('@/components/ProductsShowcase').then(mod => mod.ProductsShowcase))
 const SocialProof = dynamic(() => import('@/components/SocialProof').then(mod => mod.SocialProof))
 const StoreLocations = dynamic(() => import('@/components/StoreLocations').then(mod => mod.StoreLocations))
+const InstagramFeed = dynamic(() => import('@/components/InstagramFeed').then(mod => mod.InstagramFeed))
 
 export default function Home() {
   return (
@@ -24,6 +25,7 @@ export default function Home() {
         <ProductsShowcase />
       </div>
       <SocialProof />
+      <InstagramFeed />
       <StoreLocations />
 
       <Footer />

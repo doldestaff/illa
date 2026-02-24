@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { User, Mail, Phone, Save, LogOut, ArrowLeft, Loader2, Check, Camera, Calendar } from 'lucide-react'
+import { User, Mail, Phone, Save, LogOut, ArrowLeft, Loader2, Check, Camera, Calendar, MapPin, Building, Map } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { createSupabaseBrowser } from '@/lib/supabaseClient'
 import Link from 'next/link'
@@ -16,6 +16,9 @@ interface ProfileEditorProps {
         whatsapp: string
         avatarUrl: string | null
         birthDate: string | null
+        address: string
+        city: string
+        state: string
     }
 }
 
@@ -26,6 +29,9 @@ export default function ProfileEditor({ user }: ProfileEditorProps) {
     const [fullName, setFullName] = useState(user.fullName)
     const [whatsapp, setWhatsapp] = useState(user.whatsapp)
     const [birthDate, setBirthDate] = useState(user.birthDate ?? '')
+    const [address, setAddress] = useState(user.address)
+    const [city, setCity] = useState(user.city)
+    const [state, setState] = useState(user.state)
     const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl)
     const [saving, setSaving] = useState(false)
     const [saved, setSaved] = useState(false)
@@ -95,6 +101,9 @@ export default function ProfileEditor({ user }: ProfileEditorProps) {
                 full_name: fullName,
                 whatsapp,
                 email: user.email,
+                address,
+                city,
+                state,
             })
 
         if (updateError) {
@@ -262,6 +271,57 @@ export default function ProfileEditor({ user }: ProfileEditorProps) {
                                 placeholder="(00) 00000-0000"
                                 className="w-full bg-white/5 border border-white/5 focus:border-illa-pink/50 rounded-xl py-3.5 pl-11 pr-4 outline-none focus:ring-4 focus:ring-illa-pink/10 transition-all font-medium text-white placeholder:text-white/20"
                             />
+                        </div>
+                    </div>
+
+                    {/* Endereço */}
+                    <div>
+                        <label className="text-xs font-semibold text-white/30 uppercase tracking-wider mb-2 block">
+                            Endereço
+                        </label>
+                        <div className="relative group">
+                            <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-illa-pink transition-colors" size={18} />
+                            <input
+                                type="text"
+                                value={address}
+                                onChange={(e) => setAddress(e.target.value)}
+                                placeholder="Seu endereço completo"
+                                className="w-full bg-white/5 border border-white/5 focus:border-illa-pink/50 rounded-xl py-3.5 pl-11 pr-4 outline-none focus:ring-4 focus:ring-illa-pink/10 transition-all font-medium text-white placeholder:text-white/20"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Cidade e Estado */}
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="text-xs font-semibold text-white/30 uppercase tracking-wider mb-2 block">
+                                Cidade
+                            </label>
+                            <div className="relative group">
+                                <Building className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-illa-pink transition-colors" size={18} />
+                                <input
+                                    type="text"
+                                    value={city}
+                                    onChange={(e) => setCity(e.target.value)}
+                                    placeholder="Cidade"
+                                    className="w-full bg-white/5 border border-white/5 focus:border-illa-pink/50 rounded-xl py-3.5 pl-11 pr-4 outline-none focus:ring-4 focus:ring-illa-pink/10 transition-all font-medium text-white placeholder:text-white/20"
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <label className="text-xs font-semibold text-white/30 uppercase tracking-wider mb-2 block">
+                                Estado
+                            </label>
+                            <div className="relative group">
+                                <Map className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-illa-pink transition-colors" size={18} />
+                                <input
+                                    type="text"
+                                    value={state}
+                                    onChange={(e) => setState(e.target.value)}
+                                    placeholder="UF (ex: AL)"
+                                    className="w-full bg-white/5 border border-white/5 focus:border-illa-pink/50 rounded-xl py-3.5 pl-11 pr-4 outline-none focus:ring-4 focus:ring-illa-pink/10 transition-all font-medium text-white placeholder:text-white/20"
+                                />
+                            </div>
                         </div>
                     </div>
 
