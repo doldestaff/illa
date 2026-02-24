@@ -361,7 +361,7 @@ export default function FlashDrop({ drop, onClaim }: Props) {
                                         initial={{ opacity: 0, x: 20 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         exit={{ opacity: 0, x: -20 }}
-                                        className="flex flex-col flex-1 justify-between gap-6"
+                                        className="flex flex-col flex-1 justify-center items-center gap-6 my-auto"
                                     >
                                         <div className="w-20 h-20 md:w-24 md:h-24 mx-auto mt-2 rounded-full bg-pink-50 flex flex-shrink-0 items-center justify-center relative overflow-hidden">
                                             <motion.div
@@ -397,7 +397,7 @@ export default function FlashDrop({ drop, onClaim }: Props) {
                                         initial={{ opacity: 0, x: 20 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         exit={{ opacity: 0, x: -20 }}
-                                        className="flex flex-col flex-1 justify-between gap-6"
+                                        className="flex flex-col flex-1 justify-center items-center gap-6 my-auto"
                                     >
                                         <div className="w-20 h-20 md:w-24 md:h-24 mx-auto mt-2 rounded-full bg-blue-50 flex flex-shrink-0 items-center justify-center relative">
                                             <motion.div
@@ -420,7 +420,7 @@ export default function FlashDrop({ drop, onClaim }: Props) {
                                                 Ative as notificações para ser avisado <span className="text-blue-500 font-bold">na mesma hora</span> quando um novo drop estiver logado no celular!
                                             </p>
                                         </div>
-                                        <div className="space-y-3 mt-2 flex-shrink-0">
+                                        <div className="space-y-3 mt-4 flex-shrink-0 w-full">
                                             <motion.button
                                                 whileHover={{ scale: 1.02 }}
                                                 whileTap={{ scale: 0.98 }}
