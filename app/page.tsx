@@ -19,9 +19,8 @@ export default function Home() {
 
       <HeroScrollFrames />
 
-      {/* PERF: Defer parsing of this heavy tree */}
-      {/* content-visibility tells the browser to NOT render (paint/layout) these sections until scrolled near */}
-      <div style={{ contentVisibility: 'auto', containIntrinsicSize: '1000px' }}>
+      {/* Sections below the hero */}
+      <div>
         <PinnedButtonsParallax />
         <div id="products">
           <ProductsShowcase />
