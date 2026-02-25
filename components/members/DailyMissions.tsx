@@ -1,11 +1,59 @@
 'use client'
 
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import type { MissionInstance } from '@/lib/gamification-types'
 import { Target, Sparkles, ArrowRight, LayoutGrid, CheckCircle2 } from 'lucide-react'
-import { motion, useScroll, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import MissionCard from './MissionCard'
 import MissionsModal from './MissionsModal'
+
+function InteractiveMarquee({ children }: { children: React.ReactNode }) {
+    const containerRef = useRef<HTMLDivElement>(null)
+    const [isInteracting, setIsInteracting] = useState(false)
+
+    useEffect(() => {
+        const container = containerRef.current
+        if (!container) return
+
+        let animationId: number
+        let lastTime = performance.now()
+        const speed = 0.5 // Adjust speed
+
+        const scroll = (currentTime: number) => {
+            const deltaTime = currentTime - lastTime
+            lastTime = currentTime
+
+            if (!isInteracting) {
+                if (container.scrollLeft >= container.scrollWidth / 2) {
+                    container.scrollLeft = 0
+                }
+                container.scrollLeft += speed * (deltaTime / 16)
+            }
+            animationId = requestAnimationFrame(scroll)
+        }
+
+        animationId = requestAnimationFrame(scroll)
+        return () => cancelAnimationFrame(animationId)
+    }, [isInteracting])
+
+    return (
+        <div
+            ref={containerRef}
+            className="flex overflow-x-auto gap-5 pb-8 scrollbar-hide py-4 snap-mandatory snap-x md:snap-none"
+            onMouseEnter={() => setIsInteracting(true)}
+            onMouseLeave={() => setIsInteracting(false)}
+            onTouchStart={() => setIsInteracting(true)}
+            onTouchEnd={() => {
+                setTimeout(() => setIsInteracting(false), 1000)
+            }}
+            onScroll={() => setIsInteracting(true)} // Pause on scroll
+            onScrollEnd={() => setTimeout(() => setIsInteracting(false), 1000)}
+        >
+            {children}
+            {children}
+        </div>
+    )
+}
 
 interface Props {
     missions: MissionInstance[]
@@ -19,8 +67,6 @@ export default function DailyMissions({ missions, onClaim }: Props) {
     const [claimedIds, setClaimedIds] = useState<Set<string>>(
         new Set(missions.filter((m) => m.claimed).map((m) => m.instance_id))
     )
-    const containerRef = useRef<HTMLDivElement>(null)
-    const { scrollXProgress } = useScroll({ container: containerRef })
 
     const completedCount = missions.filter((m) => m.completed).length
     const totalCount = missions.length
@@ -44,8 +90,12 @@ export default function DailyMissions({ missions, onClaim }: Props) {
 
     if (missions.length === 0) return null
 
-    // Determine featured missions for the mural (top 3)
+    // Determine featured missions for the mural
     const previewMissions = missions.slice(0, 3)
+    const hasMore = missions.length > 3
+
+    // Duplicated array for seamless infinite marquee loop (desktop)
+    const marqueeMissions = [...previewMissions, ...previewMissions]
 
     return (
         <div className="space-y-6 py-6 relative">
@@ -86,26 +136,24 @@ export default function DailyMissions({ missions, onClaim }: Props) {
                 </div>
             </div>
 
-            {/* Mural Preview - Horizontal Scroll with Depth */}
-            <div className="relative group/mural">
-                <div
-                    ref={containerRef}
-                    className="flex overflow-x-auto gap-5 pb-8 -mx-4 px-4 md:px-0 md:mx-0 scrollbar-hide snap-x snap-mandatory py-4"
-                >
+            {/* Unified Marquee Preview (Desktop & Mobile) */}
+            <div className="relative group/mural overflow-hidden py-4 -mx-4 px-4 w-full max-w-[100vw]">
+                {/* Fade edges */}
+                <div className="absolute left-0 top-0 bottom-0 w-8 md:w-24 bg-gradient-to-r from-[#0f0f11] to-transparent z-10 pointer-events-none" />
+                <div className="absolute right-0 top-0 bottom-0 w-8 md:w-24 bg-gradient-to-l from-[#0f0f11] to-transparent z-10 pointer-events-none" />
+
+                <InteractiveMarquee>
                     {previewMissions.map((mission, index) => {
                         const isClaimed = claimedIds.has(mission.instance_id) || mission.claimed
                         const isCompleted = mission.progress >= mission.target
                         const canClaim = isCompleted && !isClaimed
 
                         return (
-                            <motion.div
-                                key={mission.instance_id}
-                                className="min-w-[85%] sm:min-w-[340px] md:min-w-[360px] snap-center first:pl-2 md:first:pl-0 h-[220px]"
-                                initial={{ opacity: 0, x: 50 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: index * 0.1, duration: 0.5 }}
+                            <div
+                                key={`mission-${mission.instance_id}`}
+                                className="w-[300px] sm:w-[340px] md:w-[360px] h-[220px] shrink-0 snap-center first:pl-2 md:first:pl-0"
                             >
-                                <div className="h-full transform transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl">
+                                <div className="h-full transform transition-all duration-300 md:hover:scale-[1.03] md:hover:-translate-y-2 hover:shadow-2xl hover:shadow-illa-pink/20 cursor-pointer">
                                     <MissionCard
                                         mission={mission}
                                         isClaimed={isClaimed}
@@ -115,15 +163,15 @@ export default function DailyMissions({ missions, onClaim }: Props) {
                                         colorTheme={['pink', 'yellow', 'white'][index % 3] as 'pink' | 'yellow' | 'white'}
                                     />
                                 </div>
-                            </motion.div>
+                            </div>
                         )
                     })}
 
-                    {/* "See All" Card - Glassmorphism */}
-                    {missions.length > 3 && (
+                    {/* "See All" Card */}
+                    {hasMore && (
                         <div
                             onClick={() => setIsModalOpen(true)}
-                            className="min-w-[40%] sm:min-w-[180px] snap-center flex flex-col items-center justify-center gap-4 rounded-3xl border border-dashed border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 active:scale-95 transition-all cursor-pointer backdrop-blur-sm h-[220px] group/more"
+                            className="w-[180px] shrink-0 snap-center flex flex-col items-center justify-center gap-4 rounded-3xl border border-dashed border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 active:scale-95 transition-all cursor-pointer backdrop-blur-sm h-[220px] group/more"
                         >
                             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-white/10 to-transparent flex items-center justify-center group-hover/more:scale-110 transition-transform duration-300 shadow-lg">
                                 <LayoutGrid size={28} className="text-white/40 group-hover/more:text-white transition-colors" />
@@ -131,27 +179,7 @@ export default function DailyMissions({ missions, onClaim }: Props) {
                             <span className="text-sm font-bold text-white/50 group-hover/more:text-white transition-colors uppercase tracking-wider">Ver +{missions.length - 3}</span>
                         </div>
                     )}
-                </div>
-
-                {/* Fade Gradients & Scroll Hints */}
-
-
-                {/* Animated Scroll Arrow - Strategic Hint */}
-                <motion.div
-                    onClick={() => setIsModalOpen(true)}
-                    className="absolute top-1/2 -translate-y-1/2 right-2 md:hidden bg-illa-pink text-white flex items-center justify-center w-12 h-12 rounded-full shadow-[0_0_20px_rgba(229,1,125,0.8)] z-30 cursor-pointer active:scale-90"
-                    animate={{
-                        x: [0, 6, 0],
-                        boxShadow: [
-                            "0 0 15px rgba(229,1,125,0.6)",
-                            "0 0 30px rgba(229,1,125,0.9)",
-                            "0 0 15px rgba(229,1,125,0.6)"
-                        ]
-                    }}
-                    transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-                >
-                    <ArrowRight size={24} strokeWidth={3} />
-                </motion.div>
+                </InteractiveMarquee>
             </div>
 
             {/* All Completed Bonus State */}

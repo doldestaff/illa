@@ -120,19 +120,22 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                 style={{ scale, opacity, y }}
                 className="md:sticky md:top-4 z-40 mb-6 md:mb-8"
             >
-                <div className="relative overflow-hidden rounded-[2.5rem] bg-white/[0.02] backdrop-blur-[50px] border border-white/10 text-white p-6 md:p-10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.4)] ring-1 ring-white/20 group transition-all duration-500 hover:bg-white/[0.05]">
+                <div className="relative rounded-[2.5rem] bg-white/[0.02] backdrop-blur-[50px] border border-white/10 text-white p-6 md:p-10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.4)] ring-1 ring-white/20 group transition-all duration-500 hover:bg-white/[0.05]">
 
-                    {/* 0. Gloss Overlay (Top-Down Reflection) */}
-                    <div className="absolute inset-x-0 top-0 h-2/3 bg-gradient-to-b from-white/15 via-white/5 to-transparent pointer-events-none" />
+                    {/* Background & Effects Wrapper (Contained) */}
+                    <div className="absolute inset-0 overflow-hidden rounded-[2.5rem] pointer-events-none">
+                        {/* 0. Gloss Overlay (Top-Down Reflection) */}
+                        <div className="absolute inset-x-0 top-0 h-2/3 bg-gradient-to-b from-white/15 via-white/5 to-transparent pointer-events-none" />
 
-                    {/* 1. Dynamic 'Vitral' Ambient Background */}
-                    <div className="absolute inset-0 overflow-hidden rounded-[2.5rem]">
-                        {/* Prismatic Orbs - intensified & animated */}
-                        <div className="absolute -top-32 -right-32 w-[35rem] h-[35rem] bg-gradient-to-br from-rose-500/30 via-fuchsia-500/30 to-indigo-500/30 rounded-full blur-[80px] mix-blend-screen animate-pulse duration-[4000ms]" />
-                        <div className="absolute top-20 -left-20 w-[28rem] h-[28rem] bg-gradient-to-tr from-cyan-500/30 via-sky-500/30 to-blue-500/30 rounded-full blur-[60px] mix-blend-screen animate-pulse duration-[5000ms]" />
+                        {/* 1. Dynamic 'Vitral' Ambient Background */}
+                        <div className="absolute inset-0">
+                            {/* Prismatic Orbs - intensified & animated */}
+                            <div className="absolute -top-32 -right-32 w-[35rem] h-[35rem] bg-gradient-to-br from-rose-500/30 via-fuchsia-500/30 to-indigo-500/30 rounded-full blur-[80px] mix-blend-screen animate-pulse duration-[4000ms]" />
+                            <div className="absolute top-20 -left-20 w-[28rem] h-[28rem] bg-gradient-to-tr from-cyan-500/30 via-sky-500/30 to-blue-500/30 rounded-full blur-[60px] mix-blend-screen animate-pulse duration-[5000ms]" />
 
-                        {/* Glass Noise/Texture */}
-                        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-150 contrast-150 mix-blend-overlay" />
+                            {/* Glass Noise/Texture */}
+                            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-150 contrast-150 mix-blend-overlay" />
+                        </div>
                     </div>
 
                     {/* Action Bar (Top) */}
@@ -153,18 +156,20 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                     </div>
 
                     {/* 2. Glass Shine Effect */}
-                    <motion.div
-                        variants={SHIMMER_Animation}
-                        initial="initial"
-                        animate="animate"
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent skew-x-12 pointer-events-none"
-                        style={{ backgroundSize: '200% 100%' }}
-                    />
+                    <div className="absolute inset-0 overflow-hidden rounded-[2.5rem] pointer-events-none">
+                        <motion.div
+                            variants={SHIMMER_Animation}
+                            initial="initial"
+                            animate="animate"
+                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent skew-x-12 pointer-events-none"
+                            style={{ backgroundSize: '200% 100%' }}
+                        />
+                    </div>
 
-                    {/* Main Content Dashboard */}
-                    <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6 mt-8 md:mt-8">
+                    {/* Main Content */}
+                    <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6 mt-8">
 
-                        {/* 3. 3D Magical Avatar */}
+                        {/* Avatar */}
                         <div
                             className="relative flex-shrink-0 group/avatar cursor-pointer mx-auto md:mx-0"
                             onClick={() => fileInputRef.current?.click()}
@@ -174,9 +179,8 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                                 transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
                                 className="absolute -inset-4 bg-[conic-gradient(from_0deg,transparent_0_340deg,rgba(229,1,125,0.5)_360deg)] rounded-full blur-[6px] opacity-60 group-hover/avatar:opacity-100 transition-opacity"
                             />
-                            <div className="absolute -inset-1 bg-gradient-to-br from-illa-pink via-purple-500 to-illa-yellow rounded-full opacity-40 blur-xl group-hover/avatar:opacity-80 group-hover/avatar:blur-2xl transition duration-500"></div>
+                            <div className="absolute -inset-1 bg-gradient-to-br from-illa-pink via-purple-500 to-illa-yellow rounded-full opacity-40 blur-xl group-hover/avatar:opacity-80 group-hover/avatar:blur-2xl transition duration-500" />
 
-                            {/* ENLARGED AVATAR */}
                             <div className="relative w-36 h-36 md:w-44 md:h-44 rounded-full overflow-hidden border-[3px] border-white/30 bg-black/40 shadow-[0_0_30px_rgba(0,0,0,0.5)] transform transition-transform group-hover/avatar:scale-105 duration-300 backdrop-blur-md">
                                 {uploadingAvatar ? (
                                     <div className="w-full h-full bg-black/60 flex items-center justify-center">
@@ -213,14 +217,13 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                         </div>
 
                         {/* Info Section */}
-                        <div className="flex-1 w-full flex flex-col items-center md:items-start text-center md:text-left mt-2 md:mt-0">
+                        <div className="flex-1 min-w-0 w-full flex flex-col items-center md:items-start text-center md:text-left mt-2 md:mt-0">
 
                             {/* Name & Level Badge */}
                             <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4 mb-2">
                                 <h1 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-white/70 tracking-tight drop-shadow-[0_2px_15px_rgba(255,255,255,0.2)]">
                                     {profile.full_name || 'Membro ILLA'}
                                 </h1>
-
                                 <div className="inline-flex items-center justify-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-illa-yellow to-amber-500 shadow-[0_4px_16px_rgba(245,158,11,0.4)] border border-white/50 transform hover:scale-105 transition-transform cursor-default mt-1 md:mt-0">
                                     <Star size={14} fill="black" className="text-black" />
                                     <span className="text-black text-sm font-black tracking-wider drop-shadow-sm">LVL {profile.level}</span>
@@ -229,10 +232,10 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
 
                             <p className="text-white/60 font-medium text-sm md:text-base mb-6 max-w-sm">Explore seu painel gamificado e alcance recompensas exclusivas.</p>
 
-                            {/* Counters (Drops, Moedas, Sorvetes) */}
+                            {/* Counters */}
                             <div className="flex w-full items-center justify-center md:justify-start gap-3 md:gap-4">
 
-                                {/* Drops (Left) */}
+                                {/* Drops */}
                                 <motion.button
                                     onClick={() => openInventory('drops')}
                                     whileHover={{ scale: 1.05 }}
@@ -242,55 +245,47 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                                     <div className="relative z-10 flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-br from-[#38bdf8] to-[#0284c7] shadow-[0_2px_4px_rgba(56,189,248,0.5)] border border-white/20 group-hover/drops:scale-110 transition-transform duration-300">
                                         <Droplet size={14} fill="currentColor" className="text-white drop-shadow-md" strokeWidth={2} />
                                     </div>
-                                    <span className="text-2xl font-black text-white relative z-10 drop-shadow-sm tabular-nums tracking-tight">
-                                        {profile.drops || 0}
-                                    </span>
+                                    <span className="text-2xl font-black text-white relative z-10 drop-shadow-sm tabular-nums tracking-tight">{profile.drops || 0}</span>
                                 </motion.button>
 
-                                {/* Moedas (Center) */}
+                                {/* Moedas */}
                                 <div className="relative flex items-center gap-2.5 px-5 py-2.5 rounded-[1.2rem] bg-white/[0.08] backdrop-blur-md border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.2)] min-w-[140px] cursor-default group/coins">
                                     <div className="relative z-10 group-hover/coins:scale-110 transition-transform duration-300 -ml-1">
                                         <GlobalCoin size="md" />
                                     </div>
                                     <div className="relative z-10 flex flex-col items-start -space-y-1">
-                                        <span className="text-2xl font-black text-white tracking-tight drop-shadow-sm tabular-nums">
-                                            {profile.points.toLocaleString()}
-                                        </span>
-                                        <span className="text-[9px] font-black uppercase tracking-[0.15em] text-[#FCD34D] drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] opacity-90">
-                                            Moedas
-                                        </span>
+                                        <span className="text-2xl font-black text-white tracking-tight drop-shadow-sm tabular-nums">{profile.points.toLocaleString()}</span>
+                                        <span className="text-[9px] font-black uppercase tracking-[0.15em] text-[#FCD34D] drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] opacity-90">Moedas</span>
                                     </div>
                                 </div>
 
-                                {/* Sorvetes (Right) */}
+                                {/* Sorvetes */}
                                 <motion.button
+                                    key={`sorvete-${sorvetesCount}`}
                                     onClick={() => openInventory('sorvetes')}
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    key={`sorvete-${sorvetesCount}`}
                                     className="relative flex items-center justify-center gap-2.5 px-4 py-2 rounded-[1rem] bg-white/[0.08] backdrop-blur-md border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.2)] min-w-[90px] group/sorvete"
                                 >
                                     <div className="relative z-10 flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-br from-illa-pink to-[#c40068] shadow-[0_2px_4px_rgba(229,1,125,0.5)] border border-white/20 group-hover/sorvete:scale-110 transition-transform duration-300">
                                         <IceCream size={14} className="text-white drop-shadow-md" strokeWidth={2.5} />
                                     </div>
-                                    <span className="text-2xl font-black text-white relative z-10 drop-shadow-sm tabular-nums tracking-tight">
-                                        {sorvetesCount}
-                                    </span>
+                                    <span className="text-2xl font-black text-white relative z-10 drop-shadow-sm tabular-nums tracking-tight">{sorvetesCount}</span>
                                 </motion.button>
                             </div>
 
-                            {/* XP Progress Bar (Liquid Style) */}
+                            {/* XP Progress Bar */}
                             <div className="mt-8 relative group/xp w-full max-w-md">
                                 <div className="flex justify-between items-baseline text-[10px] font-bold uppercase tracking-wider text-white/50 mb-1.5 px-1">
                                     <span className="flex items-baseline gap-1">
                                         <span className="text-sm font-black text-white tabular-nums drop-shadow-sm">{xpInto}</span>
-                                        <span>/ {isMaxLevel ? '∞' : xpForNext} XP</span>
+                                        <span>/ {isMaxLevel ? '\u221e' : xpForNext} XP</span>
                                     </span>
                                     <span className="text-white/60 font-medium tracking-normal capitalize">
-                                        {isMaxLevel ? 'Nível máximo!' : `Faltam ${xpToNext} XP`}
+                                        {isMaxLevel ? 'N\u00edvel m\u00e1ximo!' : `Faltam ${xpToNext} XP`}
                                     </span>
                                 </div>
-                                <div className="h-5 md:h-6 bg-black/20 rounded-full overflow-hidden border border-white/10 shadow-[inner_0_2px_8px_rgba(0,0,0,0.3)] relative group/bar backdrop-blur-md">
+                                <div className="h-5 md:h-6 bg-black/20 rounded-full overflow-hidden border border-white/10 relative backdrop-blur-md">
                                     <motion.div
                                         initial={{ width: 0 }}
                                         animate={{ width: `${progressPercent}%` }}
@@ -298,13 +293,11 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                                         className="h-full bg-gradient-to-r from-illa-pink via-purple-500 to-illa-yellow relative"
                                     >
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-white/20" />
-                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-12 animate-[shimmer_2s_infinite] opacity-70 w-[200%]" />
                                         <div className="absolute right-0 top-0 bottom-0 w-3 bg-white blur-[4px] shadow-[0_0_20px_white]" />
                                         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay" />
                                     </motion.div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
 

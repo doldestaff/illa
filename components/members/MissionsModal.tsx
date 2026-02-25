@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, Target } from 'lucide-react'
 import type { MissionInstance } from '@/lib/gamification-types'
 import MissionCard from './MissionCard'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 interface Props {
     isOpen: boolean
@@ -16,17 +17,26 @@ interface Props {
 }
 
 export default function MissionsModal({ isOpen, onClose, missions, claimingId, claimedIds, onClaim }: Props) {
+    const [mounted, setMounted] = useState(false)
+
+    useEffect(() => {
+        setMounted(true)
+    }, [])
+
     // Lock body scroll when open
     useEffect(() => {
+        if (!mounted) return
         if (isOpen) {
             document.body.style.overflow = 'hidden'
         } else {
             document.body.style.overflow = 'unset'
         }
         return () => { document.body.style.overflow = 'unset' }
-    }, [isOpen])
+    }, [isOpen, mounted])
 
-    return (
+    if (!mounted) return null
+
+    return createPortal(
         <AnimatePresence>
             {isOpen && (
                 <>
@@ -125,6 +135,7 @@ export default function MissionsModal({ isOpen, onClose, missions, claimingId, c
                     </div>
                 </>
             )}
-        </AnimatePresence>
+        </AnimatePresence>,
+        document.body
     )
 }

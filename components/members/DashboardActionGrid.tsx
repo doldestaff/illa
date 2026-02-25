@@ -22,7 +22,7 @@ const actions = [
     },
     {
         id: 'sorvetes',
-        label: 'Sorvetes Free', // was Loja
+        label: 'Picolés e Sorvetes Free', // was Loja
         icon: Store,
         color: 'from-amber-400 to-orange-500',
         delay: 0.2,

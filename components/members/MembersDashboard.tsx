@@ -402,7 +402,7 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
             </div>
 
             {/* 2. Main Content Container */}
-            <div className="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-8 lg:px-12 pt-6 pb-20">
+            <div className="relative z-10 w-full max-w-[1536px] mx-auto px-4 md:px-8 lg:px-12 pt-6 pb-20">
 
                 {/* Responsive Grid Layout */}
                 <div className="flex flex-col lg:grid lg:grid-cols-12 gap-6 lg:gap-10">
@@ -429,7 +429,7 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                                 title={
                                     activeModal === 'history' ? 'Histórico de Recompensas' :
                                         activeModal === 'scanner' ? 'Scanner de Drops' :
-                                            activeModal === 'sorvetes' ? 'Sorvetes Free' :
+                                            activeModal === 'sorvetes' ? 'Picolés e Sorvetes Free' :
                                                 activeModal === 'invite' ? 'Indique e Ganhe' : ''
                                 }
                                 themeGradient={
