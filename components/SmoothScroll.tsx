@@ -52,12 +52,12 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
             ref={lenisRef}
             root
             options={isMobile ? {
-                // Mobile: snappy response, syncTouch needed because Lenis root mode hides native overflow
-                lerp: 0.2,
-                duration: 0.8,
+                // Mobile: fully fluid momentum scroll (loose and cinematic)
+                lerp: 0.08,
+                duration: 1.2,
                 smoothWheel: true,
-                touchMultiplier: 1.8,
-                syncTouch: true,
+                touchMultiplier: 1.5,
+                syncTouch: false, // Disabling syncTouch allows Lenis to create that endless glide feel
             } : {
                 // Desktop: full cinematic smooth
                 lerp: 0.1,
