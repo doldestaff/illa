@@ -142,60 +142,51 @@ export function PinnedButtonsParallax() {
             let localP = (progress - start) / duration
             localP = Math.max(0, Math.min(1, localP))
 
-            const easeOutExpo = (t: number) => t === 1 ? 1 : 1 - Math.pow(2, -10 * t)
-            const easeInOutQuint = (t: number) => t < 0.5 ? 16 * t * t * t * t * t : 1 - Math.pow(-2 * t + 2, 5) / 2
+            const dir = i % 2 === 0 ? -1 : 1
 
-            let opacity = 0
-            let y = 140
-            let z = -400
-            let rotateX = 45
-            let rotateZ = (i % 2 === 0 ? -1 : 1) * 8
-            let translateX = (i % 2 === 0 ? -1 : 1) * 60
-            let scale = 0.75
+            // 1. BASE CONTINUOUS FLOW: Cards never stop moving, ensuring fluidity.
+            // Spans the entire duration from 0 -> 1
+            let y = 150 - (300 * localP)
+            let z = -100 + (200 * localP)
+            let rotateX = 15 - (30 * localP)
+            let rotateZ = dir * 4 - (dir * 8 * localP)
+            let translateX = dir * 20 - (dir * 40 * localP)
+            let scale = 0.85 + (0.25 * localP)
+
+            let opacity = 1
+            let highlightX = -100 + (300 * localP)
+            let iconScale = 0.9 + (0.2 * localP)
+            let glowIntensity = 0.5
             let pointerEvents: 'auto' | 'none' = 'none'
-            let highlightX = -100
-            let iconScale = 0.7
-            let glowIntensity = 0
 
-            if (localP < 0.35) {
-                const t = localP / 0.35
-                const e = easeOutExpo(t)
-                opacity = t
-                y = 140 * (1 - e)
-                z = -400 * (1 - e)
-                translateX = (i % 2 === 0 ? -1 : 1) * 60 * (1 - e)
-                rotateX = 45 * (1 - e)
-                rotateZ = (i % 2 === 0 ? -1 : 1) * 8 * (1 - e)
-                scale = 0.75 + 0.25 * e
-                iconScale = 0.7 + 0.3 * e
-                highlightX = -100 + 150 * e
-                glowIntensity = e * 0.5
-            } else if (localP > 0.65) {
-                const t = (localP - 0.65) / 0.35
-                const e = easeInOutQuint(t)
-                opacity = 1 - t
-                y = -150 * e
-                z = 200 * e
-                translateX = (i % 2 === 0 ? 0.3 : -0.3) * 40 * e
-                rotateX = -15 * e
-                rotateZ = (i % 2 === 0 ? 1 : -1) * 4 * e
-                scale = 1 + 0.1 * e
-                iconScale = 1 + 0.05 * e
-                highlightX = 50 + 150 * e
-                glowIntensity = 0.5 * (1 - t)
+            // 2. ADDITIVE EASING AT EDGES: Adds punch to entry and exit without stopping the base flow.
+            if (localP < 0.3) {
+                // ENTRY PHASE (0% to 30%)
+                const e = localP / 0.3
+                const easeOut = 1 - Math.pow(1 - e, 3) // easeOutCubic
+                opacity = easeOut
+                y += 100 * (1 - easeOut) // Drops in from below
+                z -= 300 * (1 - easeOut) // Springs from background
+                rotateX += 30 * (1 - easeOut)
+                translateX += dir * 40 * (1 - easeOut)
+                scale -= 0.15 * (1 - easeOut)
+                glowIntensity = easeOut * 0.5
+            } else if (localP > 0.7) {
+                // EXIT PHASE (70% to 100%)
+                const e = (localP - 0.7) / 0.3
+                const easeIn = e * e * e // easeInCubic
+                opacity = 1 - e
+                y -= 100 * easeIn // Floats up faster
+                z += 200 * easeIn // Zooms past camera
+                rotateX -= 20 * easeIn
+                translateX -= dir * 40 * easeIn
+                scale += 0.1 * easeIn
+                glowIntensity = 0.5 * (1 - e)
             } else {
-                const mt = (localP - 0.35) / 0.3
-                opacity = 1
-                y = -15 * mt
-                z = 20 * mt
-                translateX = 0
-                rotateX = -5 * mt
-                rotateZ = 0
-                scale = 1 + 0.05 * mt
-                iconScale = 1
+                // MOMENTUM CENTER (30% to 70%)
+                // Pointer events only active when clearly readable
                 pointerEvents = 'auto'
-                highlightX = 50 + 50 * mt
-                glowIntensity = 0.5 + 0.2 * Math.sin(mt * Math.PI)
+                glowIntensity = 0.5 + 0.3 * Math.sin(((localP - 0.3) / 0.4) * Math.PI) // Peak neon in center
             }
 
             card.style.opacity = opacity.toString()
@@ -203,6 +194,7 @@ export function PinnedButtonsParallax() {
             card.style.zIndex = pointerEvents === 'auto' ? '50' : Math.round(opacity * 20).toString()
             card.style.pointerEvents = pointerEvents
 
+            // Neon Glow based on continuous intensity
             card.style.borderColor = `rgba(229,1,125,${0.1 + (glowIntensity * 0.3)})`
             card.style.boxShadow = `0 ${8 + (glowIntensity * 10)}px ${30 + (glowIntensity * 20)}px rgba(229,1,125,${glowIntensity * 0.4})`
 

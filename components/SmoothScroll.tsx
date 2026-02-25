@@ -56,8 +56,8 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
                 lerp: 0.08,
                 duration: 1.2,
                 smoothWheel: true,
-                touchMultiplier: 1.5,
-                syncTouch: false, // Disabling syncTouch allows Lenis to create that endless glide feel
+                touchMultiplier: 1.2, // Slightly higher implies more slide per swipe
+                syncTouch: true, // CRITICAL: MUST be true to prevent native scroll from fighting Lenis virtual scroll
             } : {
                 // Desktop: full cinematic smooth
                 lerp: 0.1,
