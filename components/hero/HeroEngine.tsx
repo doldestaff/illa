@@ -469,9 +469,10 @@ export function HeroEngine({
             const target = state.current.targetFrameIndex
             const diff = target - smoothedFrame
             // Converge faster for small diffs, slower for large jumps
-            // On mobile use gentler lerp to prevent jumping ahead of cache
+            // PERF: On mobile with native momentum, aggressive lerping causes severe lag/stutter ("travando").
+            // We use 0.85 to almost perfectly lock frames to scroll position without double-smoothing.
             const isMob = state.current.isMobile
-            const lerpFactor = Math.abs(diff) < 2 ? (isMob ? 0.25 : 0.5) : (isMob ? 0.15 : 0.3)
+            const lerpFactor = isMob ? 0.85 : (Math.abs(diff) < 2 ? 0.5 : 0.3)
             smoothedFrame += diff * lerpFactor
 
             // Only draw if we haven't converged
@@ -493,11 +494,22 @@ export function HeroEngine({
                     let progress = 0
 
                     if (scrollMode === 'viewport') {
-                        // No forced reflow — use cached appHeight and known section height
-                        const vh = state.current.appHeight || window.innerHeight
-                        const totalH = vh * ((scrollSectionHeightVh || 500) / 100)
-                        const scrollable = totalH - vh
-                        progress = scrollable > 0 ? Math.max(0, Math.min(1, scrollY / scrollable)) : 0
+                        // PERF: Calculate progress based on physical DOM bounds (immune to URL bar height changes)
+                        // This perfectly matches the svh locks without mathematical desync.
+                        const sectionEl = containerRef.current?.closest('section')
+                        if (sectionEl) {
+                            const rect = sectionEl.getBoundingClientRect()
+                            const stickyEl = sectionEl.querySelector('.sticky') || containerRef.current
+                            const windowH = stickyEl ? stickyEl.getBoundingClientRect().height : window.innerHeight
+                            const scrollable = rect.height - windowH
+                            progress = scrollable > 0 ? Math.max(0, Math.min(1, -rect.top / scrollable)) : 0
+                        } else {
+                            // Fallback mathematical calc
+                            const vh = state.current.appHeight || window.innerHeight
+                            const totalH = vh * ((scrollSectionHeightVh || 500) / 100)
+                            const scrollable = totalH - vh
+                            progress = scrollable > 0 ? Math.max(0, Math.min(1, scrollY / scrollable)) : 0
+                        }
                     } else {
                         // Document mode — only 2 reads needed
                         const docH = Math.max(
