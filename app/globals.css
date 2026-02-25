@@ -142,6 +142,14 @@ body {
   touch-action: pan-y;
 }
 
+@layer utilities {
+  .h-screen-safe {
+    height: 100vh;
+    height: 100dvh;
+  }
+}
+
+
 body {
   background: var(--background);
   color: var(--foreground);

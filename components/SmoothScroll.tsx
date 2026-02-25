@@ -53,11 +53,11 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
             root
             options={isMobile ? {
                 // Mobile: cinematic smooth scroll with Lenis controlling everything
-                lerp: 0.08,
+                lerp: 0.1,
                 duration: 1.2,
                 smoothWheel: true,
                 touchMultiplier: 1.2,
-                syncTouch: true, // Lenis fully controls touch scroll — prevents native vs virtual fighting
+                // syncTouch is omitted here to prevent severe iOS/Android passive touch-action bugs
             } : {
                 // Desktop: full cinematic smooth
                 lerp: 0.1,

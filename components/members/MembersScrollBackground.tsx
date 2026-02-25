@@ -40,7 +40,7 @@ export default function MembersScrollBackground() {
     if (!isMobile) return null
 
     return (
-        <div className="fixed inset-0 w-full h-[100dvh] pointer-events-none z-[-1] overflow-hidden bg-black">
+        <div className="fixed inset-0 w-full h-screen-safe pointer-events-none z-[-1] overflow-hidden bg-black">
             {/* Pure CSS background - handled entirely by compositor thread */}
             <div className="absolute inset-0 w-full h-full opacity-35 mix-blend-screen overflow-hidden">
                 <Image
