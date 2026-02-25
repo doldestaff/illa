@@ -19,15 +19,32 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
     }, [])
 
     useEffect(() => {
-        // 1. Force GSAP execution order
+        // PERF: On mobile, skip the GSAP ticker RAF pump entirely.
+        // Lenis is passive on mobile (no smoothing), so pumping its RAF
+        // every frame wastes CPU and can cause micro-jank.
+        if (isMobile) {
+            // Just bind ScrollTrigger to native scroll
+            let initTimer: ReturnType<typeof setTimeout>
+            const lenis = lenisRef.current?.lenis
+            if (lenis) {
+                initTimer = setTimeout(() => {
+                    ScrollTrigger.refresh()
+                    lenis.on('scroll', ScrollTrigger.update)
+                }, 1000)
+            }
+            return () => {
+                clearTimeout(initTimer!)
+                if (lenis) lenis.off('scroll', ScrollTrigger.update)
+            }
+        }
+
+        // Desktop: Full GSAP + Lenis integration
         gsap.ticker.remove(gsap.updateRoot)
         gsap.ticker.add((time) => {
             lenisRef.current?.lenis?.raf(time * 1000)
             gsap.updateRoot(time)
         })
 
-        // PERF 2. Bind ScrollTrigger update to Lenis scroll
-        // Defer GSAP heavy init by 1s (or idle) to unblock main thread hydration
         let initTimer: ReturnType<typeof setTimeout>
         const lenis = lenisRef.current?.lenis
 
@@ -45,21 +62,22 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
                 lenis.off('scroll', ScrollTrigger.update)
             }
         }
-    }, [])
+    }, [isMobile])
 
     return (
         <ReactLenis
             ref={lenisRef}
             root
             options={isMobile ? {
-                // Mobile: fully fluid momentum scroll (loose and cinematic)
-                lerp: 0.08,
-                duration: 1.2,
-                smoothWheel: true,
-                touchMultiplier: 1.2, // Slightly higher implies more slide per swipe
-                syncTouch: false, // OFF: Allows native mobile browser WhatsApp-like momentum scrolling
+                // MOBILE: Lenis is 100% PASSIVE — zero smoothing, zero interception.
+                // It stays mounted only as a scroll event bus so useLenis() hooks
+                // in Section 2 (PinnedButtonsParallax) still fire their callbacks.
+                lerp: 1,             // Instant — no position interpolation
+                smoothWheel: false,  // Don't intercept wheel events
+                syncTouch: false,    // Don't intercept touch events
+                // No duration — native scroll physics handle everything
             } : {
-                // Desktop: full cinematic smooth
+                // Desktop: full cinematic smooth scroll
                 lerp: 0.1,
                 duration: 1.5,
                 smoothWheel: true,
@@ -71,3 +89,4 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
         </ReactLenis>
     )
 }
+
