@@ -168,41 +168,37 @@ export function HeroEngine({
         const handleResize = () => {
             clearTimeout(resizeTimer)
             resizeTimer = setTimeout(() => {
-                const h = window.visualViewport ? window.visualViewport.height : window.innerHeight
-                const w = window.visualViewport ? window.visualViewport.width : window.innerWidth
-
+                const w = window.innerWidth
                 const isMob = w < 768
-                const threshold = isMob ? 150 : 60
-                // Only update if dimensions actually changed significantly (prevent URL bar hide jitter)
-                if (Math.abs(state.current.appHeight - h) < threshold &&
-                    Math.abs(state.current.appWidth - w) < 1) return
 
-                state.current.appHeight = h
+                // PERF: On mobile, NEVER update appHeight on resize.
+                // URL bar hide/show changes innerHeight by ~75-120px which
+                // destroys scroll progress math and causes frame jumps.
+                // We lock height to the value captured on initial mount.
+                if (isMob && Math.abs(state.current.appWidth - w) < 1) return
+
+                if (!isMob) {
+                    const h = window.innerHeight
+                    state.current.appHeight = h
+                }
                 state.current.appWidth = w
+                state.current.isMobile = isMob
 
-                // Mobile detection for perf
-                state.current.isMobile = w < 768
-
-                // PERFORMANCE: Background areas like members dash have 82 frames.
-                // We MUST set the cache equal or slightly larger to prevent reload-thrashing looping.
                 const isBackgroundMode = scrollMode === 'document'
-                state.current.cache.setLimit(state.current.isMobile ? (isBackgroundMode ? 90 : 100) : 100)
+                state.current.cache.setLimit(isMob ? (isBackgroundMode ? 90 : 100) : 100)
 
                 if (containerRef.current) {
-                    containerRef.current.style.setProperty('--app-h', `${h}px`)
+                    containerRef.current.style.setProperty('--app-h', `${state.current.appHeight}px`)
                 }
-
-                // Force redraw on resize
                 scheduleDraw()
-            }, 150) // Debounce 150ms for stability
+            }, 150)
         }
 
         window.addEventListener('resize', handleResize)
-        if (window.visualViewport) window.visualViewport.addEventListener('resize', handleResize)
 
-        // Initial call without debounce
-        const h = window.visualViewport ? window.visualViewport.height : window.innerHeight
-        const w = window.visualViewport ? window.visualViewport.width : window.innerWidth
+        // Initial call — lock height once
+        const h = window.innerHeight
+        const w = window.innerWidth
         state.current.appHeight = h
         state.current.appWidth = w
         state.current.isMobile = w < 768
@@ -215,7 +211,6 @@ export function HeroEngine({
 
         return () => {
             window.removeEventListener('resize', handleResize)
-            if (window.visualViewport) window.visualViewport.removeEventListener('resize', handleResize)
             clearTimeout(resizeTimer)
         }
     }, [scrollMode])
@@ -461,26 +456,21 @@ export function HeroEngine({
         if (!manifest && !state.current.isManual) return
 
         let ticking = false
-        // Lerp state for smooth frame interpolation
+        // Lerp state for smooth frame interpolation (desktop only)
         let smoothedFrame = startIndex || 0
         let lerpRafId: number | null = null
 
+        // Desktop lerp loop — gentle smoothing for wheel/trackpad
         const lerpLoop = () => {
             const target = state.current.targetFrameIndex
             const diff = target - smoothedFrame
-            // Converge faster for small diffs, slower for large jumps
-            // PERF: On mobile with native momentum, aggressive lerping causes severe lag/stutter ("travando").
-            // We use 0.85 to almost perfectly lock frames to scroll position without double-smoothing.
-            const isMob = state.current.isMobile
-            const lerpFactor = isMob ? 0.85 : (Math.abs(diff) < 2 ? 0.5 : 0.3)
+            const lerpFactor = Math.abs(diff) < 2 ? 0.5 : 0.3
             smoothedFrame += diff * lerpFactor
 
-            // Only draw if we haven't converged
             if (Math.abs(diff) > 0.3) {
                 draw(smoothedFrame)
                 lerpRafId = requestAnimationFrame(lerpLoop)
             } else {
-                // Snap to target when close enough
                 smoothedFrame = target
                 draw(target)
                 lerpRafId = null
@@ -494,24 +484,12 @@ export function HeroEngine({
                     let progress = 0
 
                     if (scrollMode === 'viewport') {
-                        // PERF: Calculate progress based on physical DOM bounds (immune to URL bar height changes)
-                        // This perfectly matches the svh locks without mathematical desync.
-                        const sectionEl = containerRef.current?.closest('section')
-                        if (sectionEl) {
-                            const rect = sectionEl.getBoundingClientRect()
-                            const stickyEl = sectionEl.querySelector('.sticky') || containerRef.current
-                            const windowH = stickyEl ? stickyEl.getBoundingClientRect().height : window.innerHeight
-                            const scrollable = rect.height - windowH
-                            progress = scrollable > 0 ? Math.max(0, Math.min(1, -rect.top / scrollable)) : 0
-                        } else {
-                            // Fallback mathematical calc
-                            const vh = state.current.appHeight || window.innerHeight
-                            const totalH = vh * ((scrollSectionHeightVh || 500) / 100)
-                            const scrollable = totalH - vh
-                            progress = scrollable > 0 ? Math.max(0, Math.min(1, scrollY / scrollable)) : 0
-                        }
+                        // PERF: Pure math with locked appHeight — ZERO DOM queries, ZERO reflows
+                        const vh = state.current.appHeight || window.innerHeight
+                        const totalH = vh * ((scrollSectionHeightVh || 500) / 100)
+                        const scrollable = totalH - vh
+                        progress = scrollable > 0 ? Math.max(0, Math.min(1, scrollY / scrollable)) : 0
                     } else {
-                        // Document mode — only 2 reads needed
                         const docH = Math.max(
                             document.body.scrollHeight, document.documentElement.scrollHeight
                         )
@@ -524,13 +502,16 @@ export function HeroEngine({
                     const start = startIndex || 0
                     const end = state.current.frameCount - 1
                     const targetFrame = start + (progress * (end - start))
-
-                    // Set target for lerp loop instead of drawing directly
                     state.current.targetFrameIndex = Math.round(targetFrame)
 
-                    // Start lerp loop if not already running
-                    if (!lerpRafId) {
-                        lerpRafId = requestAnimationFrame(lerpLoop)
+                    if (state.current.isMobile) {
+                        // MOBILE: Draw directly — zero lerp, zero lag, 1:1 scroll-to-frame
+                        draw(state.current.targetFrameIndex)
+                    } else {
+                        // DESKTOP: Use gentle lerp for wheel/trackpad smoothness
+                        if (!lerpRafId) {
+                            lerpRafId = requestAnimationFrame(lerpLoop)
+                        }
                     }
 
                     ticking = false
@@ -541,14 +522,12 @@ export function HeroEngine({
 
         window.addEventListener('scroll', handleScroll, { passive: true })
 
-        // --- Critical Fix for Initial Render ---
-        // Force an immediate draw using the start index before any scroll calculation happens
+        // Initial render
         window.requestAnimationFrame(() => {
-            if (onProgress) onProgress(0); // Ensure ghost buttons get initial progress = 0
-            draw(startIndex || 0, true);
-            // Then let the scroll handler update it if we are already scrolled down
-            handleScroll();
-        });
+            if (onProgress) onProgress(0)
+            draw(startIndex || 0, true)
+            handleScroll()
+        })
 
         return () => {
             window.removeEventListener('scroll', handleScroll)

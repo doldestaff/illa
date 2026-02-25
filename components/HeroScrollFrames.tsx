@@ -34,7 +34,7 @@ export function HeroScrollFrames() {
 
     // --- Render ---
     if (isMobile === null) return (
-        <div className="h-[100svh] w-full bg-[#111] relative overflow-hidden">
+        <div className="h-[100dvh] w-full bg-[#111] relative overflow-hidden">
             {/* SSR skeleton — high priority poster to prevent flash */}
             <img
                 src="/hero/mobile/frames/hero-1-mobile_002.webp"
@@ -65,9 +65,9 @@ export function HeroScrollFrames() {
     return (
         <section
             className="relative w-full z-10"
-            style={{ height: `${SCROLL_HEIGHT_vh}svh` }}
+            style={{ height: `${SCROLL_HEIGHT_vh}vh` }}
         >
-            <div className="sticky top-0 w-full h-[100svh] overflow-hidden bg-[#111]">
+            <div className="sticky top-0 w-full h-[100dvh] overflow-hidden bg-[#111]">
 
                 {/* Unified Engine — inline manifest eliminates fetch waterfall */}
                 <HeroEngine
