@@ -19,15 +19,15 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
     }, [])
 
     useEffect(() => {
-        // ALWAYS run GSAP ticker + Lenis RAF pump, even on mobile.
-        // With lerp:1 on mobile, the pump is virtually free (no interpolation math),
-        // but it's REQUIRED for useLenis() callbacks to fire across all components.
+        // 1. Force GSAP execution order
         gsap.ticker.remove(gsap.updateRoot)
         gsap.ticker.add((time) => {
             lenisRef.current?.lenis?.raf(time * 1000)
             gsap.updateRoot(time)
         })
 
+        // PERF 2. Bind ScrollTrigger update to Lenis scroll
+        // Defer GSAP heavy init by 1s (or idle) to unblock main thread hydration
         let initTimer: ReturnType<typeof setTimeout>
         const lenis = lenisRef.current?.lenis
 
@@ -52,15 +52,14 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
             ref={lenisRef}
             root
             options={isMobile ? {
-                // MOBILE: Lenis is 100% PASSIVE — zero smoothing, zero interception.
-                // It stays mounted only as a scroll event bus so useLenis() hooks
-                // in Section 2 (PinnedButtonsParallax) still fire their callbacks.
-                lerp: 1,             // Instant — no position interpolation
-                smoothWheel: false,  // Don't intercept wheel events
-                syncTouch: false,    // Don't intercept touch events
-                // No duration — native scroll physics handle everything
+                // Mobile: cinematic smooth scroll with Lenis controlling everything
+                lerp: 0.08,
+                duration: 1.2,
+                smoothWheel: true,
+                touchMultiplier: 1.2,
+                syncTouch: true, // Lenis fully controls touch scroll — prevents native vs virtual fighting
             } : {
-                // Desktop: full cinematic smooth scroll
+                // Desktop: full cinematic smooth
                 lerp: 0.1,
                 duration: 1.5,
                 smoothWheel: true,
@@ -72,4 +71,3 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
         </ReactLenis>
     )
 }
-
