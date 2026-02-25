@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, useScroll, useTransform, useSpring } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { User, Star, Coins, IceCream, ChevronRight, Home, Droplet, LogOut } from 'lucide-react'
 import Link from 'next/link'
 import type { MemberProfile } from '@/lib/gamification-types'
@@ -32,19 +32,12 @@ const SHIMMER_Animation = {
 }
 
 export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: Props) {
-    const ref = useRef<HTMLDivElement>(null)
-    const { scrollY } = useScroll()
     const router = useRouter()
     const [showInventory, setShowInventory] = useState(false)
     const [inventoryTab, setInventoryTab] = useState<'sorvetes' | 'drops'>('sorvetes')
     const [uploadingAvatar, setUploadingAvatar] = useState(false)
     const [localAvatarUrl, setLocalAvatarUrl] = useState<string | null>(avatarUrl)
     const fileInputRef = useRef<HTMLInputElement>(null)
-
-    // Parallax only on desktop (mobile scrolls naturally with content)
-    const scale = useTransform(scrollY, [0, 200], [1, 0.95])
-    const opacity = useTransform(scrollY, [0, 300], [1, 0.9])
-    const y = useTransform(scrollY, [0, 200], [0, 10])
 
     // XP progress within current level (server-provided)
     const xpInto = profile.xp_into_level
@@ -115,12 +108,10 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
 
     return (
         <>
-            <motion.div
-                ref={ref}
-                style={{ scale, opacity, y }}
+            <div
                 className="md:sticky md:top-4 z-40 mb-6 md:mb-8"
             >
-                <div className="relative rounded-[2.5rem] bg-white/[0.02] backdrop-blur-[50px] border border-white/10 text-white p-6 md:p-10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.4)] ring-1 ring-white/20 group transition-all duration-500 hover:bg-white/[0.05]">
+                <div className="relative rounded-[2.5rem] bg-black/80 md:bg-white/[0.02] md:backdrop-blur-[50px] border border-white/10 text-white p-6 md:p-10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.4)] ring-1 ring-white/20 group transition-all duration-500 hover:bg-white/[0.05]">
 
                     {/* Background & Effects Wrapper (Contained) */}
                     <div className="absolute inset-0 overflow-hidden rounded-[2.5rem] pointer-events-none">
@@ -128,13 +119,10 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                         <div className="absolute inset-x-0 top-0 h-2/3 bg-gradient-to-b from-white/15 via-white/5 to-transparent pointer-events-none" />
 
                         {/* 1. Dynamic 'Vitral' Ambient Background */}
-                        <div className="absolute inset-0">
-                            {/* Prismatic Orbs - intensified & animated */}
-                            <div className="absolute -top-32 -right-32 w-[35rem] h-[35rem] bg-gradient-to-br from-rose-500/30 via-fuchsia-500/30 to-indigo-500/30 rounded-full blur-[80px] mix-blend-screen animate-pulse duration-[4000ms]" />
-                            <div className="absolute top-20 -left-20 w-[28rem] h-[28rem] bg-gradient-to-tr from-cyan-500/30 via-sky-500/30 to-blue-500/30 rounded-full blur-[60px] mix-blend-screen animate-pulse duration-[5000ms]" />
-
-                            {/* Glass Noise/Texture */}
-                            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-150 contrast-150 mix-blend-overlay" />
+                        <div className="absolute inset-0 hidden md:block">
+                            {/* Prismatic Orbs - desktop only (heavy GPU compositing) */}
+                            <div className="absolute -top-32 -right-32 w-[25rem] h-[25rem] bg-gradient-to-br from-rose-500/20 via-fuchsia-500/20 to-indigo-500/20 rounded-full blur-[60px] mix-blend-screen animate-pulse duration-[4000ms]" />
+                            <div className="absolute top-20 -left-20 w-[20rem] h-[20rem] bg-gradient-to-tr from-cyan-500/20 via-sky-500/20 to-blue-500/20 rounded-full blur-[40px] mix-blend-screen animate-pulse duration-[5000ms]" />
                         </div>
                     </div>
 
@@ -174,11 +162,14 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                             className="relative flex-shrink-0 group/avatar cursor-pointer mx-auto md:mx-0"
                             onClick={() => fileInputRef.current?.click()}
                         >
+                            {/* Rotating conic-gradient — desktop only (expensive on mobile GPU) */}
                             <motion.div
                                 animate={{ rotate: 360 }}
                                 transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                                className="absolute -inset-4 bg-[conic-gradient(from_0deg,transparent_0_340deg,rgba(229,1,125,0.5)_360deg)] rounded-full blur-[6px] opacity-60 group-hover/avatar:opacity-100 transition-opacity"
+                                className="hidden md:block absolute -inset-4 bg-[conic-gradient(from_0deg,transparent_0_340deg,rgba(229,1,125,0.5)_360deg)] rounded-full blur-[6px] opacity-60 group-hover/avatar:opacity-100 transition-opacity"
                             />
+                            {/* Mobile: static subtle glow instead */}
+                            <div className="md:hidden absolute -inset-3 bg-illa-pink/20 rounded-full blur-[8px]" />
                             <div className="absolute -inset-1 bg-gradient-to-br from-illa-pink via-purple-500 to-illa-yellow rounded-full opacity-40 blur-xl group-hover/avatar:opacity-80 group-hover/avatar:blur-2xl transition duration-500" />
 
                             <div className="relative w-36 h-36 md:w-44 md:h-44 rounded-full overflow-hidden border-[3px] border-white/30 bg-black/40 shadow-[0_0_30px_rgba(0,0,0,0.5)] transform transition-transform group-hover/avatar:scale-105 duration-300 backdrop-blur-md">
@@ -294,7 +285,7 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                                     >
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-white/20" />
                                         <div className="absolute right-0 top-0 bottom-0 w-3 bg-white blur-[4px] shadow-[0_0_20px_white]" />
-                                        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay" />
+                                        <div className="hidden md:block absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay" />
                                     </motion.div>
                                 </div>
                             </div>
@@ -330,7 +321,7 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                         </motion.div>
                     )}
                 </div>
-            </motion.div>
+            </div>
 
             <InventoryModal
                 isOpen={showInventory}

@@ -40,18 +40,19 @@ export default function DashboardActionGrid({ onAction }: Props) {
                 <motion.div
                     key={action.id}
                     initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: action.delay, duration: 0.5 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.3 }}
+                    transition={{ delay: action.delay, duration: 0.4 }}
                 >
                     <button
                         onClick={() => onAction(action.id)}
                         className="w-full group relative flex flex-col items-center justify-center p-4 h-28 rounded-2xl overflow-hidden bg-white/10 backdrop-blur-md border border-white/20 shadow-lg hover:shadow-xl transition-all active:scale-95"
                     >
-                        {/* Shimmer Light effect */}
+                        {/* Shimmer Light effect — deferred start to avoid competing with initial paint */}
                         <motion.div
                             initial={{ backgroundPosition: '-200% 0' }}
                             animate={{ backgroundPosition: '200% 0' }}
-                            transition={{ repeat: Infinity, duration: 4, ease: "linear", repeatDelay: 1 + (i * 0.5) }}
+                            transition={{ repeat: Infinity, duration: 4, ease: "linear", delay: 1.5 + (i * 0.5), repeatDelay: 1 + (i * 0.5) }}
                             className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 pointer-events-none"
                             style={{ backgroundSize: '200% 100%' }}
                         />

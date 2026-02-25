@@ -10,43 +10,62 @@ import MissionsModal from './MissionsModal'
 function InteractiveMarquee({ children }: { children: React.ReactNode }) {
     const containerRef = useRef<HTMLDivElement>(null)
     const [isInteracting, setIsInteracting] = useState(false)
+    const [isVisible, setIsVisible] = useState(false)
 
+    // Only run RAF loop when marquee is visible in viewport
     useEffect(() => {
         const container = containerRef.current
         if (!container) return
 
+        const observer = new IntersectionObserver(
+            ([entry]) => setIsVisible(entry.isIntersecting),
+            { threshold: 0.1 }
+        )
+        observer.observe(container)
+        return () => observer.disconnect()
+    }, [])
+
+    useEffect(() => {
+        const container = containerRef.current
+        if (!container || !isVisible || isInteracting) return
+
         let animationId: number
         let lastTime = performance.now()
-        const speed = 0.5 // Adjust speed
+        const speed = 0.5
 
         const scroll = (currentTime: number) => {
+            // Pause when tab is hidden (battery-conscious)
+            if (document.hidden) {
+                animationId = requestAnimationFrame(scroll)
+                return
+            }
+
             const deltaTime = currentTime - lastTime
             lastTime = currentTime
 
-            if (!isInteracting) {
-                if (container.scrollLeft >= container.scrollWidth / 2) {
-                    container.scrollLeft = 0
-                }
-                container.scrollLeft += speed * (deltaTime / 16)
+            if (container.scrollLeft >= container.scrollWidth / 2) {
+                container.scrollLeft = 0
             }
+            container.scrollLeft += speed * (deltaTime / 16)
             animationId = requestAnimationFrame(scroll)
         }
 
         animationId = requestAnimationFrame(scroll)
         return () => cancelAnimationFrame(animationId)
-    }, [isInteracting])
+    }, [isVisible, isInteracting])
 
     return (
         <div
             ref={containerRef}
             className="flex overflow-x-auto gap-5 pb-8 scrollbar-hide py-4 snap-mandatory snap-x md:snap-none"
+            style={{ willChange: 'scroll-position' }}
             onMouseEnter={() => setIsInteracting(true)}
             onMouseLeave={() => setIsInteracting(false)}
             onTouchStart={() => setIsInteracting(true)}
             onTouchEnd={() => {
                 setTimeout(() => setIsInteracting(false), 1000)
             }}
-            onScroll={() => setIsInteracting(true)} // Pause on scroll
+            onScroll={() => setIsInteracting(true)}
             onScrollEnd={() => setTimeout(() => setIsInteracting(false), 1000)}
         >
             {children}

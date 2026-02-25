@@ -9,7 +9,7 @@ import type {
     SorvetesRedemption,
     VipPayload,
 } from '@/lib/gamification-types'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { motion } from 'framer-motion'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import DashboardHeader from './DashboardHeader'
@@ -376,21 +376,13 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
         }
     }, [])
 
-    // ── Scroll Background Effect ──
-    const { scrollY } = useScroll()
-    const backgroundColor = useTransform(
-        scrollY,
-        [0, 300, 600],
-        ['#0B0B0D', '#1a0b1a', '#140F00'] // Dark -> Purple-ish -> Dark Gold
-    )
-
     return (
         <div className="min-h-screen relative font-sans text-white overflow-x-hidden selection:bg-illa-pink selection:text-white pb-32">
 
-            {/* 0. Background Layer (Desktop Color Stream) */}
-            <motion.div
+            {/* 0. Background Layer — static (no scroll listener = 60fps) */}
+            <div
                 className="fixed inset-0 z-[-2]"
-                style={{ backgroundColor }}
+                style={{ backgroundColor: '#0B0B0D' }}
             />
 
             {/* 0.5 Mobile Scroll Background (Frames) - Restored */}
@@ -470,12 +462,13 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                     <motion.div
                         className="lg:col-span-7 xl:col-span-8 space-y-6"
                         initial="hidden"
-                        animate="visible"
+                        whileInView="visible"
+                        viewport={{ once: true, amount: 0.05 }}
                         variants={{
                             hidden: { opacity: 0 },
                             visible: {
                                 opacity: 1,
-                                transition: { staggerChildren: 0.12, delayChildren: 0.15 },
+                                transition: { staggerChildren: 0.08, delayChildren: 0.1 },
                             },
                         }}
                     >
