@@ -138,8 +138,7 @@
 html,
 body {
   overscroll-behavior: none;
-  /* Prevent pull-to-refresh on mobile which breaks scrub animations */
-  touch-action: pan-y;
+  /* Explicit touch-action is removed as it severely conflicts with mobile Safari rendering limits on 100vh sticky nodes */
 }
 
 @layer utilities {

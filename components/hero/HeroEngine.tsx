@@ -611,7 +611,7 @@ export function HeroEngine({
     }, [isLoaded, manifest, loadFrame, debug, state])
 
     return (
-        <div ref={containerRef} className={cn("absolute inset-0 w-full h-full overflow-hidden", className)}>
+        <div ref={containerRef} className={cn("absolute inset-0 w-full h-full overflow-hidden", className)} style={{ height: '100%' }}>
             {debug && (
                 <div className="fixed top-24 left-4 z-50 bg-black/80 text-green-400 p-4 text-xs font-mono pointer-events-none rounded border border-green-500/50">
                     <div>Status: {isLoaded ? 'LOADED' : 'LOADING...'}</div>
@@ -624,18 +624,20 @@ export function HeroEngine({
             )}
 
             {/* Poster: graceful fallback to prevent initial black screen — transition removed on mobile to prevent cross-fade bridge */}
-            {posterUrl && (
-                <img
-                    src={posterUrl}
-                    className={cn(
-                        "absolute inset-0 w-full h-full object-cover z-10",
-                        isMobileHero ? "transition-none" : "transition-opacity duration-500 ease-out",
-                        isLoaded ? "opacity-0 pointer-events-none" : "opacity-100"
-                    )}
-                    alt="Illa Loading"
-                    style={{ pointerEvents: 'none' }}
-                />
-            )}
+            {
+                posterUrl && (
+                    <img
+                        src={posterUrl}
+                        className={cn(
+                            "absolute inset-0 w-full h-full object-cover z-10",
+                            isMobileHero ? "transition-none" : "transition-opacity duration-500 ease-out",
+                            isLoaded ? "opacity-0 pointer-events-none" : "opacity-100"
+                        )}
+                        alt="Illa Loading"
+                        style={{ pointerEvents: 'none' }}
+                    />
+                )
+            }
 
             <canvas
                 ref={canvasRef}
@@ -649,6 +651,6 @@ export function HeroEngine({
                     transition: isMobileHero ? 'none' : 'opacity 500ms ease-out',
                 }}
             />
-        </div>
+        </div >
     )
 }

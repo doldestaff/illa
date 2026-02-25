@@ -231,7 +231,7 @@ export function PinnedButtonsParallax() {
             ref={containerRef}
             className="relative w-full h-[400vh] bg-white text-dark"
         >
-            <div className="sticky top-0 w-full h-screen-safe flex items-center justify-center overflow-hidden touch-pan-y">
+            <div className="sticky top-0 w-full h-screen-safe flex items-center justify-center overflow-hidden">
 
                 <LazyVideo />
 
