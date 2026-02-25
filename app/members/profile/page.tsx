@@ -23,7 +23,7 @@ export default async function ProfilePage() {
     if (profile?.avatar_path) {
         const { data: signed } = await supabase.storage
             .from('avatars')
-            .createSignedUrl(profile.avatar_path, 3600)
+            .createSignedUrl(profile.avatar_path, 315360000)
         avatarUrl = signed?.signedUrl ?? null
     }
 

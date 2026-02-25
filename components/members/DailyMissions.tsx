@@ -9,10 +9,12 @@ import MissionsModal from './MissionsModal'
 
 function InteractiveMarquee({ children }: { children: React.ReactNode }) {
     const containerRef = useRef<HTMLDivElement>(null)
-    const [isInteracting, setIsInteracting] = useState(false)
     const [isVisible, setIsVisible] = useState(false)
 
-    // Only run RAF loop when marquee is visible in viewport
+    // Interaction/Scroll state tracked purely in refs to avoid React renders
+    const isInteractingRef = useRef(false)
+    const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
     useEffect(() => {
         const container = containerRef.current
         if (!container) return
@@ -27,15 +29,16 @@ function InteractiveMarquee({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         const container = containerRef.current
-        if (!container || !isVisible || isInteracting) return
+        if (!container || !isVisible) return
 
         let animationId: number
         let lastTime = performance.now()
-        const speed = 0.5
+        const speed = 0.5 // pixels per frame roughly
 
         const scroll = (currentTime: number) => {
-            // Pause when tab is hidden (battery-conscious)
-            if (document.hidden) {
+            // Pause if tab is hidden (battery) or if user is touching/scrolling
+            if (document.hidden || isInteractingRef.current) {
+                lastTime = currentTime // prevent massive jump when resuming
                 animationId = requestAnimationFrame(scroll)
                 return
             }
@@ -43,6 +46,7 @@ function InteractiveMarquee({ children }: { children: React.ReactNode }) {
             const deltaTime = currentTime - lastTime
             lastTime = currentTime
 
+            // Seamless wrap: If scroll passes the halfway point (first duplicated set)
             if (container.scrollLeft >= container.scrollWidth / 2) {
                 container.scrollLeft = 0
             }
@@ -52,24 +56,57 @@ function InteractiveMarquee({ children }: { children: React.ReactNode }) {
 
         animationId = requestAnimationFrame(scroll)
         return () => cancelAnimationFrame(animationId)
-    }, [isVisible, isInteracting])
+    }, [isVisible])
+
+    // Handle high-frequency events directly on the DOM node for max performance
+    useEffect(() => {
+        const container = containerRef.current
+        if (!container) return
+
+        const setInteracting = () => { isInteractingRef.current = true }
+
+        // Debounced scroll end detection protects native momentum scroll
+        const handleScroll = () => {
+            isInteractingRef.current = true
+            if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
+            scrollTimeoutRef.current = setTimeout(() => {
+                isInteractingRef.current = false
+            }, 500) // Resume 500ms after scroll STOPS completely
+        }
+
+        container.addEventListener('pointerdown', setInteracting, { passive: true })
+        container.addEventListener('touchstart', setInteracting, { passive: true })
+        container.addEventListener('mouseenter', setInteracting, { passive: true })
+        container.addEventListener('mouseleave', () => {
+            if (!scrollTimeoutRef.current) isInteractingRef.current = false
+        })
+        container.addEventListener('pointerup', () => { handleScroll() }, { passive: true })
+        container.addEventListener('touchend', () => { handleScroll() }, { passive: true })
+        container.addEventListener('scroll', handleScroll, { passive: true })
+
+        return () => {
+            container.removeEventListener('pointerdown', setInteracting)
+            container.removeEventListener('touchstart', setInteracting)
+            container.removeEventListener('mouseenter', setInteracting)
+            container.removeEventListener('pointerup', handleScroll)
+            container.removeEventListener('touchend', handleScroll)
+            container.removeEventListener('scroll', handleScroll)
+            if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
+        }
+    }, [])
 
     return (
         <div
             ref={containerRef}
             className="flex overflow-x-auto gap-5 pb-8 scrollbar-hide py-4 snap-mandatory snap-x md:snap-none"
-            style={{ willChange: 'scroll-position' }}
-            onMouseEnter={() => setIsInteracting(true)}
-            onMouseLeave={() => setIsInteracting(false)}
-            onTouchStart={() => setIsInteracting(true)}
-            onTouchEnd={() => {
-                setTimeout(() => setIsInteracting(false), 1000)
-            }}
-            onScroll={() => setIsInteracting(true)}
-            onScrollEnd={() => setTimeout(() => setIsInteracting(false), 1000)}
+            style={{ willChange: 'scroll-position', overscrollBehaviorX: 'contain' }}
         >
-            {children}
-            {children}
+            <div className="flex shrink-0 gap-5">
+                {children}
+            </div>
+            <div className="flex shrink-0 gap-5">
+                {children}
+            </div>
         </div>
     )
 }
@@ -157,10 +194,6 @@ export default function DailyMissions({ missions, onClaim }: Props) {
 
             {/* Unified Marquee Preview (Desktop & Mobile) */}
             <div className="relative group/mural overflow-hidden py-4 -mx-4 px-4 w-full max-w-[100vw]">
-                {/* Fade edges */}
-                <div className="absolute left-0 top-0 bottom-0 w-8 md:w-24 bg-gradient-to-r from-[#0f0f11] to-transparent z-10 pointer-events-none" />
-                <div className="absolute right-0 top-0 bottom-0 w-8 md:w-24 bg-gradient-to-l from-[#0f0f11] to-transparent z-10 pointer-events-none" />
-
                 <InteractiveMarquee>
                     {previewMissions.map((mission, index) => {
                         const isClaimed = claimedIds.has(mission.instance_id) || mission.claimed
@@ -190,7 +223,7 @@ export default function DailyMissions({ missions, onClaim }: Props) {
                     {hasMore && (
                         <div
                             onClick={() => setIsModalOpen(true)}
-                            className="w-[180px] shrink-0 snap-center flex flex-col items-center justify-center gap-4 rounded-3xl border border-dashed border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 active:scale-95 transition-all cursor-pointer backdrop-blur-sm h-[220px] group/more"
+                            className="w-[180px] shrink-0 snap-center flex flex-col items-center justify-center gap-4 rounded-[2rem] border border-dashed border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 active:scale-95 transition-all cursor-pointer backdrop-blur-sm h-[220px] group/more"
                         >
                             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-white/10 to-transparent flex items-center justify-center group-hover/more:scale-110 transition-transform duration-300 shadow-lg">
                                 <LayoutGrid size={28} className="text-white/40 group-hover/more:text-white transition-colors" />

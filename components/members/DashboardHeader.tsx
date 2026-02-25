@@ -37,6 +37,7 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
     const [inventoryTab, setInventoryTab] = useState<'sorvetes' | 'drops'>('sorvetes')
     const [uploadingAvatar, setUploadingAvatar] = useState(false)
     const [localAvatarUrl, setLocalAvatarUrl] = useState<string | null>(avatarUrl)
+    const [imageError, setImageError] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
 
     // XP progress within current level (server-provided)
@@ -82,24 +83,41 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
         }
 
         setUploadingAvatar(true)
-        const supabase = createSupabaseBrowser()
-        const ext = file.name.split('.').pop() ?? 'png'
-        const path = `${profile.id}/avatar-${Date.now()}.${ext}`
+        try {
+            const supabase = createSupabaseBrowser()
 
-        // Upload to Storage
-        const { error: uploadError } = await supabase.storage
-            .from('avatars')
-            .upload(path, file, { upsert: true, contentType: file.type })
-
-        if (!uploadError) {
-            // Update Profile DB Record
-            await supabase.from('profiles').upsert({ id: profile.id, avatar_path: path })
-
-            // Get new signed URL to update UI immediately
-            const { data: signed } = await supabase.storage.from('avatars').createSignedUrl(path, 3600)
-            if (signed?.signedUrl) {
-                setLocalAvatarUrl(signed.signedUrl)
+            // Get the REAL authenticated user ID from the session (bulletproof)
+            const { data: { user } } = await supabase.auth.getUser()
+            if (!user?.id) {
+                console.error('Avatar upload: user not authenticated')
+                setUploadingAvatar(false)
+                return
             }
+
+            const ext = file.name.split('.').pop() ?? 'png'
+            const path = `${user.id}/avatar-${Date.now()}.${ext}`
+
+            // Upload to Storage
+            const { error: uploadError } = await supabase.storage
+                .from('avatars')
+                .upload(path, file, { upsert: true, contentType: file.type })
+
+            if (uploadError) {
+                console.error('Avatar upload error:', uploadError.message)
+            } else {
+                // Update Profile DB Record
+                await supabase.from('profiles').update({ avatar_path: path }).eq('id', user.id)
+
+                // Get new signed URL to update UI immediately
+                const { data: signed } = await supabase.storage.from('avatars').createSignedUrl(path, 315360000)
+                if (signed?.signedUrl) {
+                    setLocalAvatarUrl(signed.signedUrl)
+                    setImageError(false)
+                    router.refresh()
+                }
+            }
+        } catch (err) {
+            console.error('Avatar upload failed:', err)
         }
 
         setUploadingAvatar(false)
@@ -111,18 +129,18 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
             <div
                 className="md:sticky md:top-4 z-40 mb-6 md:mb-8"
             >
-                <div className="relative rounded-[2.5rem] bg-black/80 md:bg-white/[0.02] md:backdrop-blur-[50px] border border-white/10 text-white p-6 md:p-10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.4)] ring-1 ring-white/20 group transition-all duration-500 hover:bg-white/[0.05]">
+                <div className="relative rounded-[2.5rem] bg-gradient-to-b from-white-[0.08] via-black/40 to-black/80 md:from-white/[0.05] md:via-white/[0.01] md:to-black/80 backdrop-blur-[40px] border border-white/10 text-white p-6 md:p-10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.4)] ring-1 ring-white/20 group transition-all duration-500 hover:border-white/20">
 
                     {/* Background & Effects Wrapper (Contained) */}
                     <div className="absolute inset-0 overflow-hidden rounded-[2.5rem] pointer-events-none">
-                        {/* 0. Gloss Overlay (Top-Down Reflection) */}
-                        <div className="absolute inset-x-0 top-0 h-2/3 bg-gradient-to-b from-white/15 via-white/5 to-transparent pointer-events-none" />
+                        {/* 0. Gloss Overlay (Softened, as gradient handles the base fade) */}
+                        <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/10 to-transparent pointer-events-none mix-blend-overlay" />
 
                         {/* 1. Dynamic 'Vitral' Ambient Background */}
                         <div className="absolute inset-0 hidden md:block">
-                            {/* Prismatic Orbs - desktop only (heavy GPU compositing) */}
-                            <div className="absolute -top-32 -right-32 w-[25rem] h-[25rem] bg-gradient-to-br from-rose-500/20 via-fuchsia-500/20 to-indigo-500/20 rounded-full blur-[60px] mix-blend-screen animate-pulse duration-[4000ms]" />
-                            <div className="absolute top-20 -left-20 w-[20rem] h-[20rem] bg-gradient-to-tr from-cyan-500/20 via-sky-500/20 to-blue-500/20 rounded-full blur-[40px] mix-blend-screen animate-pulse duration-[5000ms]" />
+                            {/* Prismatic Orbs - desktop only (warm brand palette) */}
+                            <div className="absolute -top-32 -right-32 w-[25rem] h-[25rem] bg-gradient-to-br from-illa-pink/20 via-rose-500/20 to-pink-500/20 rounded-full blur-[60px] mix-blend-screen animate-pulse duration-[4000ms]" />
+                            <div className="absolute top-20 -left-20 w-[20rem] h-[20rem] bg-gradient-to-tr from-amber-500/20 via-orange-500/20 to-yellow-500/20 rounded-full blur-[40px] mix-blend-screen animate-pulse duration-[5000ms]" />
                         </div>
                     </div>
 
@@ -159,39 +177,47 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
 
                         {/* Avatar */}
                         <div
-                            className="relative flex-shrink-0 group/avatar cursor-pointer mx-auto md:mx-0"
+                            className="relative flex-shrink-0 group/avatar cursor-pointer mx-auto md:mx-0 transition-transform duration-500 hover:scale-[1.03]"
                             onClick={() => fileInputRef.current?.click()}
                         >
-                            {/* Rotating conic-gradient — desktop only (expensive on mobile GPU) */}
-                            <motion.div
-                                animate={{ rotate: 360 }}
-                                transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                                className="hidden md:block absolute -inset-4 bg-[conic-gradient(from_0deg,transparent_0_340deg,rgba(229,1,125,0.5)_360deg)] rounded-full blur-[6px] opacity-60 group-hover/avatar:opacity-100 transition-opacity"
-                            />
-                            {/* Mobile: static subtle glow instead */}
-                            <div className="md:hidden absolute -inset-3 bg-illa-pink/20 rounded-full blur-[8px]" />
-                            <div className="absolute -inset-1 bg-gradient-to-br from-illa-pink via-purple-500 to-illa-yellow rounded-full opacity-40 blur-xl group-hover/avatar:opacity-80 group-hover/avatar:blur-2xl transition duration-500" />
+                            {/* Sleek Cinematic Spinning Neon Border */}
+                            <div className="absolute -inset-[3px] md:-inset-[4px] rounded-full overflow-hidden bg-black z-0 shadow-[0_0_30px_rgba(229,1,125,0.3)] pointer-events-none">
+                                <motion.div
+                                    animate={{ rotate: 360 }}
+                                    transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                                    className="absolute -inset-[100%] opacity-90"
+                                    style={{
+                                        background: 'conic-gradient(from 0deg, transparent 60%, rgba(229,1,125,0.9) 80%, rgba(245,158,11,1) 100%)'
+                                    }}
+                                />
+                                <div className="absolute inset-[2px] bg-[url('/noise.png')] bg-cover bg-black rounded-full" />
+                            </div>
 
-                            <div className="relative w-36 h-36 md:w-44 md:h-44 rounded-full overflow-hidden border-[3px] border-white/30 bg-black/40 shadow-[0_0_30px_rgba(0,0,0,0.5)] transform transition-transform group-hover/avatar:scale-105 duration-300 backdrop-blur-md">
+                            {/* Subtle Ambient Backlight */}
+                            <div className="absolute -inset-2 bg-gradient-to-br from-illa-pink to-amber-500 rounded-full opacity-20 blur-xl group-hover/avatar:opacity-40 group-hover/avatar:blur-2xl transition duration-700 z-0 pointer-events-none" />
+
+                            <div className="relative z-10 w-36 h-36 md:w-44 md:h-44 rounded-full overflow-hidden border-2 border-black/80 bg-black/40 shadow-[0_0_30px_rgba(0,0,0,0.8)] backdrop-blur-md">
                                 {uploadingAvatar ? (
                                     <div className="w-full h-full bg-black/60 flex items-center justify-center">
                                         <Loader2 size={32} className="text-illa-pink animate-spin" />
                                     </div>
-                                ) : profile.avatar_path && localAvatarUrl ? (
+                                ) : profile.avatar_path && localAvatarUrl && !imageError ? (
                                     <>
                                         <img
+                                            key={localAvatarUrl} // Force React to rebuild the DOM node for fresh cache
                                             src={localAvatarUrl}
                                             alt={profile.full_name || 'User'}
                                             className="w-full h-full object-cover"
+                                            onError={() => setImageError(true)}
                                         />
-                                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
+                                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm pointer-events-none">
                                             <Camera size={28} className="text-white drop-shadow-md" />
                                         </div>
                                     </>
                                 ) : (
                                     <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center text-white/50 relative">
                                         <User size={56} />
-                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
+                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm pointer-events-none">
                                             <Camera size={28} className="text-white drop-shadow-md" />
                                         </div>
                                     </div>
@@ -221,7 +247,7 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                                 </div>
                             </div>
 
-                            <p className="text-white/60 font-medium text-sm md:text-base mb-6 max-w-sm">Explore seu painel gamificado e alcance recompensas exclusivas.</p>
+                            <p className="text-white/60 font-medium text-sm md:text-base mb-6 max-w-sm">Explore seu painel ILLA e ganhe recompensas exclusivas.</p>
 
                             {/* Counters */}
                             <div className="flex w-full items-center justify-center md:justify-start gap-3 md:gap-4">
@@ -281,7 +307,7 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                                         initial={{ width: 0 }}
                                         animate={{ width: `${progressPercent}%` }}
                                         transition={{ duration: 1.5, ease: "easeOut" }}
-                                        className="h-full bg-gradient-to-r from-illa-pink via-purple-500 to-illa-yellow relative"
+                                        className="h-full bg-gradient-to-r from-illa-pink via-rose-500 to-illa-yellow relative"
                                     >
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-white/20" />
                                         <div className="absolute right-0 top-0 bottom-0 w-3 bg-white blur-[4px] shadow-[0_0_20px_white]" />

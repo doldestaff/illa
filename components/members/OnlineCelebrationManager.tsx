@@ -25,12 +25,27 @@ const STAR_BURSTS = [
     { emoji: '🎊', x: 55, y: 65, delay: 0.18, size: 16, rot: -15 },
 ]
 
+function GoldenShimmer() {
+    return (
+        <motion.div
+            className="absolute inset-0 pointer-events-none z-0"
+            animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
+            transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+            style={{
+                background: 'linear-gradient(120deg, transparent 30%, rgba(255,215,0,0.2) 50%, rgba(255,160,0,0.15) 70%, transparent 90%)',
+                backgroundSize: '200% 200%',
+                borderRadius: 'inherit'
+            }}
+        />
+    )
+}
+
 function JoyCloud({ children }: { children: React.ReactNode }) {
     return (
         <div
             className="relative w-[220px] max-w-[92vw] mx-auto"
             style={{
-                filter: 'drop-shadow(0 0 30px rgba(255,215,0,0.6)) drop-shadow(0 0 60px rgba(255,160,0,0.5)) drop-shadow(0 18px 50px rgba(255,215,0,0.4))'
+                filter: 'drop-shadow(0 -10px 40px rgba(255,215,0,0.5)) drop-shadow(0 0 60px rgba(255,160,0,0.5)) drop-shadow(0 18px 50px rgba(255,215,0,0.4))'
             }}
         >
             {/* ── Animated splat emoji halo ── */}
@@ -48,26 +63,17 @@ function JoyCloud({ children }: { children: React.ReactNode }) {
             ))}
 
             {/* ── Cloud top bumps ── */}
-            <div className="absolute -top-6   left-[10%] w-[60px] h-[60px] bg-white rounded-full z-0" />
-            <div className="absolute -top-12  left-1/2 -translate-x-1/2 w-[110px] h-[110px] bg-white rounded-full z-0" />
-            <div className="absolute -top-6   right-[10%] w-[65px] h-[65px] bg-white rounded-full z-0" />
+            <div className="absolute -top-6   left-[10%] w-[60px] h-[60px] bg-[#FFFdf5] rounded-full z-0 overflow-hidden"><GoldenShimmer /></div>
+            <div className="absolute -top-12  left-1/2 -translate-x-1/2 w-[110px] h-[110px] bg-[#FFFdf5] rounded-full z-0 overflow-hidden"><GoldenShimmer /></div>
+            <div className="absolute -top-6   right-[10%] w-[65px] h-[65px] bg-[#FFFdf5] rounded-full z-0 overflow-hidden"><GoldenShimmer /></div>
 
             {/* ── Inner rainbow shimmer on body ── */}
             <div
-                className="relative bg-white rounded-[2.5rem] px-3 pt-3 pb-2 z-10 flex flex-col items-center justify-center min-h-[80px]"
+                className="relative bg-[#FFFdf5] rounded-[2.5rem] px-3 pt-3 pb-2 z-10 flex flex-col items-center justify-center min-h-[80px]"
                 style={{ boxShadow: 'inset 0 -6px 0 rgba(241,245,249,0.9)' }}
             >
                 {/* rainbow shimmer */}
-                <motion.div
-                    className="absolute inset-0 pointer-events-none z-0"
-                    animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
-                    transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
-                    style={{
-                        background: 'linear-gradient(120deg, transparent 30%, rgba(255,215,0,0.1) 50%, rgba(255,160,0,0.1) 70%, transparent 90%)',
-                        backgroundSize: '200% 200%',
-                        borderRadius: 'inherit'
-                    }}
-                />
+                <GoldenShimmer />
                 {children}
             </div>
         </div>
@@ -93,10 +99,10 @@ function GamifiedCloud({ children }: { children: React.ReactNode }) {
             className="relative w-[220px] max-w-[92vw] mx-auto"
             style={{ filter: 'drop-shadow(0 12px 32px rgba(229,0,126,0.25))' }}
         >
-            <div className="absolute -top-6 left-[10%] w-[60px] h-[60px] bg-white rounded-full z-0" />
-            <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-[110px] h-[110px] bg-white rounded-full z-0" />
-            <div className="absolute -top-6 right-[10%] w-[65px] h-[65px] bg-white rounded-full z-0" />
-            <div className="relative bg-white rounded-[2.5rem] px-3 pt-3 pb-2 z-10 flex flex-col items-center justify-center min-h-[80px] shadow-[inset_0_-6px_0_rgba(241,245,249,0.9)]">
+            <div className="absolute -top-6 left-[10%] w-[60px] h-[60px] bg-[#fcfbf9] rounded-full z-0" />
+            <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-[110px] h-[110px] bg-[#fcfbf9] rounded-full z-0" />
+            <div className="absolute -top-6 right-[10%] w-[65px] h-[65px] bg-[#fcfbf9] rounded-full z-0" />
+            <div className="relative bg-[#fcfbf9] rounded-[2.5rem] px-3 pt-3 pb-2 z-10 flex flex-col items-center justify-center min-h-[80px] shadow-[inset_0_-6px_0_rgba(241,245,249,0.9)]">
                 {children}
             </div>
         </div>
