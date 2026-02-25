@@ -38,7 +38,6 @@ export function HeroScrollFrames() {
             {/* SSR skeleton — high priority poster to prevent flash */}
             <img
                 src="/hero/mobile/frames/hero-1-mobile_002.webp"
-                // @ts-expect-error — fetchPriority is a valid HTML attribute
                 fetchPriority="high"
                 loading="eager"
                 decoding="async"
@@ -47,7 +46,6 @@ export function HeroScrollFrames() {
             />
             <img
                 src="/hero/desktop/frames/hero-1-desktop_002.webp"
-                // @ts-expect-error — fetchPriority is a valid HTML attribute
                 fetchPriority="high"
                 loading="eager"
                 decoding="async"
