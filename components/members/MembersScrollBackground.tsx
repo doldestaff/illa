@@ -23,8 +23,11 @@ export default function MembersScrollBackground() {
     const [isMobile, setIsMobile] = useState(false)
     const { scrollY } = useScroll()
 
-    // Fades the overlay opacity from 1 down to 0.4 as the user scrolls from 0 to 500px down
-    const overlayOpacity = useTransform(scrollY, [0, 500], [1, 0.4])
+    // Curva de opacidade em 3 pontos:
+    // 0px (topo)       → 0.85 (overlay escuro para leitura)
+    // 450px (missões)  → 0    (completamente transparente — imagem 100% visível)
+    // 900px (abaixo)   → 0.45 (retorna parcialmente mas não completamente escuro)
+    const overlayOpacity = useTransform(scrollY, [0, 450, 900], [0.85, 0, 0.45])
 
     // Detect mobile once on mount
     useEffect(() => {

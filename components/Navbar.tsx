@@ -232,35 +232,53 @@ function NavbarInner() {
                         </Link>
                     </div>
 
-                    {/* Mobile Menu Toggle */}
-                    <button
-                        onClick={() => setIsOpen(!isOpen)}
-                        className={cn(
-                            "md:hidden relative z-50 w-12 h-12 flex items-center justify-center rounded-full transition-all duration-300 shadow-sm pointer-events-auto",
-                            isOpen
-                                ? "bg-white text-illa-pink rotate-90 shadow-lg ring-2 ring-illa-pink/20"
-                                : "bg-white/90 backdrop-blur-md text-dark hover:shadow-md hover:scale-105 active:scale-95"
-                        )}
-                        aria-label="Toggle Menu"
-                    >
-                        <div className="relative w-6 h-6">
-                            <Menu
-                                className={cn(
-                                    "absolute inset-0 transition-all duration-300",
-                                    isOpen ? "opacity-0 rotate-90 scale-50" : "opacity-100 rotate-0 scale-100"
-                                )}
-                                size={24}
-                            />
-                            <div
-                                className={cn(
-                                    "absolute inset-0 flex items-center justify-center font-bold text-2xl transition-all duration-300",
-                                    isOpen ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-50"
-                                )}
-                            >
-                                ✕
+                    {/* Mobile Controls Row */}
+                    <div className="md:hidden flex items-center gap-2 relative z-50 pointer-events-auto">
+
+                        {/* Login / Account Icon */}
+                        <button
+                            onClick={handleAuthClick}
+                            aria-label={user ? 'Minha Conta' : 'Entrar'}
+                            className={cn(
+                                "w-12 h-12 flex items-center justify-center rounded-full transition-all duration-300 shadow-sm",
+                                user
+                                    ? "bg-illa-pink text-white shadow-lg ring-2 ring-illa-pink/30 hover:bg-pink-600 active:scale-95"
+                                    : "bg-white/90 backdrop-blur-md text-dark hover:shadow-md hover:scale-105 active:scale-95"
+                            )}
+                        >
+                            {user ? <User size={22} strokeWidth={2.5} /> : <LogIn size={22} strokeWidth={2.5} />}
+                        </button>
+
+                        {/* Hamburger Toggle */}
+                        <button
+                            onClick={() => setIsOpen(!isOpen)}
+                            className={cn(
+                                "w-12 h-12 flex items-center justify-center rounded-full transition-all duration-300 shadow-sm",
+                                isOpen
+                                    ? "bg-white text-illa-pink rotate-90 shadow-lg ring-2 ring-illa-pink/20"
+                                    : "bg-white/90 backdrop-blur-md text-dark hover:shadow-md hover:scale-105 active:scale-95"
+                            )}
+                            aria-label="Toggle Menu"
+                        >
+                            <div className="relative w-6 h-6">
+                                <Menu
+                                    className={cn(
+                                        "absolute inset-0 transition-all duration-300",
+                                        isOpen ? "opacity-0 rotate-90 scale-50" : "opacity-100 rotate-0 scale-100"
+                                    )}
+                                    size={24}
+                                />
+                                <div
+                                    className={cn(
+                                        "absolute inset-0 flex items-center justify-center font-bold text-2xl transition-all duration-300",
+                                        isOpen ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-50"
+                                    )}
+                                >
+                                    ✕
+                                </div>
                             </div>
-                        </div>
-                    </button>
+                        </button>
+                    </div>
 
                     {/* Mobile Menu Overlay */}
                     <div
