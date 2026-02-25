@@ -142,6 +142,13 @@ export function PinnedButtonsParallax() {
             let localP = (progress - start) / duration
             localP = Math.max(0, Math.min(1, localP))
 
+            // Fade out the scroll indicator when reaching the end (Goal Gradient Effect)
+            const indicator = containerRef.current?.querySelector('#parallax-scroll-indicator') as HTMLElement | null
+            if (indicator && i === 0) {
+                const indicatorOpacity = progress > 0.85 ? Math.max(0, 1 - ((progress - 0.85) / 0.15)) : 1
+                indicator.style.opacity = indicatorOpacity.toString()
+            }
+
             const dir = i % 2 === 0 ? -1 : 1
 
             // 1. BASE CONTINUOUS FLOW: Cards never stop moving, ensuring fluidity.
@@ -305,6 +312,32 @@ export function PinnedButtonsParallax() {
                         />
                     ))}
                 </div>
+
+                {/* Cinematic Plasmatic Scroll Indicator (UX: Von Restorff & Continuation) */}
+                <div id="parallax-scroll-indicator" className="absolute right-3 md:right-8 top-[60%] -translate-y-1/2 flex flex-col items-center gap-3 pointer-events-none z-40 transition-opacity duration-300">
+                    <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.3em] text-white/50 [writing-mode:vertical-rl] drop-shadow-md">
+                        Explore
+                    </span>
+                    <div className="w-[3px] h-16 md:h-24 rounded-full bg-black/15 backdrop-blur-md relative overflow-hidden border border-white/10 shadow-[inset_0_0_4px_rgba(0,0,0,0.5)]">
+                        <div
+                            className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-transparent via-illa-pink to-white rounded-full"
+                            style={{
+                                animation: 'parallax-scroll-indicator 2s cubic-bezier(0.65, 0, 0.35, 1) infinite',
+                                filter: 'drop-shadow(0 0 6px rgba(229,1,125,0.8))'
+                            }}
+                        />
+                    </div>
+                </div>
+
+                <style dangerouslySetInnerHTML={{
+                    __html: `
+                    @keyframes parallax-scroll-indicator {
+                        0% { transform: translateY(-100%); opacity: 0; }
+                        20% { opacity: 1; }
+                        80% { opacity: 1; }
+                        100% { transform: translateY(200%); opacity: 0; }
+                    }
+                `}} />
             </div>
         </section>
     )
