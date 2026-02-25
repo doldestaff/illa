@@ -111,7 +111,9 @@ export function PinnedButtonsParallax() {
 
         const rect = containerRef.current.getBoundingClientRect()
         const height = rect.height
-        const windowH = window.innerHeight
+        // PERF: Prevent URL bar hide jumpiness by referencing a static svh element instead of dynamic innerHeight
+        const stickyEl = containerRef.current.querySelector('.sticky')
+        const windowH = stickyEl ? stickyEl.getBoundingClientRect().height : window.innerHeight
         const scrollableDist = height - windowH
         const rawProgress = -rect.top / scrollableDist
 
@@ -229,9 +231,9 @@ export function PinnedButtonsParallax() {
     return (
         <section
             ref={containerRef}
-            className="relative w-full h-[400vh] bg-white text-dark"
+            className="relative w-full h-[400svh] bg-white text-dark"
         >
-            <div className="sticky top-0 w-full h-[100dvh] flex items-center justify-center overflow-hidden touch-pan-y">
+            <div className="sticky top-0 w-full h-[100svh] flex items-center justify-center overflow-hidden touch-pan-y">
 
                 <LazyVideo />
 

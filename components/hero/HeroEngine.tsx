@@ -171,8 +171,10 @@ export function HeroEngine({
                 const h = window.visualViewport ? window.visualViewport.height : window.innerHeight
                 const w = window.visualViewport ? window.visualViewport.width : window.innerWidth
 
+                const isMob = w < 768
+                const threshold = isMob ? 150 : 60
                 // Only update if dimensions actually changed significantly (prevent URL bar hide jitter)
-                if (Math.abs(state.current.appHeight - h) < 60 &&
+                if (Math.abs(state.current.appHeight - h) < threshold &&
                     Math.abs(state.current.appWidth - w) < 1) return
 
                 state.current.appHeight = h

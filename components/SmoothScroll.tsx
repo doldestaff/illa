@@ -57,7 +57,7 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
                 duration: 1.2,
                 smoothWheel: true,
                 touchMultiplier: 1.2, // Slightly higher implies more slide per swipe
-                syncTouch: true, // CRITICAL: MUST be true to prevent native scroll from fighting Lenis virtual scroll
+                syncTouch: false, // OFF: Allows native mobile browser WhatsApp-like momentum scrolling
             } : {
                 // Desktop: full cinematic smooth
                 lerp: 0.1,
