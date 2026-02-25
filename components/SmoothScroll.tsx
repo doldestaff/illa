@@ -19,26 +19,9 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
     }, [])
 
     useEffect(() => {
-        // PERF: On mobile, skip the GSAP ticker RAF pump entirely.
-        // Lenis is passive on mobile (no smoothing), so pumping its RAF
-        // every frame wastes CPU and can cause micro-jank.
-        if (isMobile) {
-            // Just bind ScrollTrigger to native scroll
-            let initTimer: ReturnType<typeof setTimeout>
-            const lenis = lenisRef.current?.lenis
-            if (lenis) {
-                initTimer = setTimeout(() => {
-                    ScrollTrigger.refresh()
-                    lenis.on('scroll', ScrollTrigger.update)
-                }, 1000)
-            }
-            return () => {
-                clearTimeout(initTimer!)
-                if (lenis) lenis.off('scroll', ScrollTrigger.update)
-            }
-        }
-
-        // Desktop: Full GSAP + Lenis integration
+        // ALWAYS run GSAP ticker + Lenis RAF pump, even on mobile.
+        // With lerp:1 on mobile, the pump is virtually free (no interpolation math),
+        // but it's REQUIRED for useLenis() callbacks to fire across all components.
         gsap.ticker.remove(gsap.updateRoot)
         gsap.ticker.add((time) => {
             lenisRef.current?.lenis?.raf(time * 1000)
@@ -62,7 +45,7 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
                 lenis.off('scroll', ScrollTrigger.update)
             }
         }
-    }, [isMobile])
+    }, [])
 
     return (
         <ReactLenis
