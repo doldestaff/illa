@@ -19,14 +19,17 @@ export default function Home() {
 
       <HeroScrollFrames />
 
-      {/* Defer parsing of this heavy tree */}
-      <PinnedButtonsParallax />
-      <div id="products">
-        <ProductsShowcase />
+      {/* PERF: Defer parsing of this heavy tree */}
+      {/* content-visibility tells the browser to NOT render (paint/layout) these sections until scrolled near */}
+      <div style={{ contentVisibility: 'auto', containIntrinsicSize: '1000px' }}>
+        <PinnedButtonsParallax />
+        <div id="products">
+          <ProductsShowcase />
+        </div>
+        <SocialProof />
+        <InstagramFeed />
+        <StoreLocations />
       </div>
-      <SocialProof />
-      <InstagramFeed />
-      <StoreLocations />
 
       <Footer />
     </main>

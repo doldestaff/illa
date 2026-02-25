@@ -6,6 +6,8 @@ import { cn } from '@/lib/utils'
 // --- Types ---
 export interface HeroEngineProps {
     manifestUrl?: string // e.g. /hero/manifest.mobile.json
+    // Inline manifest data to skip fetch waterfall (PERF: critical for first-load)
+    inlineManifest?: { frameCount: number; frames: string[] }
     // Alternative to manifest: Manual pattern
     manualFrames?: {
         pathPrefix: string // e.g. "/members-bg/IllaMembers-mobile_"
@@ -77,6 +79,7 @@ class FrameCache {
 
 export function HeroEngine({
     manifestUrl,
+    inlineManifest,
     manualFrames,
     posterUrl,
     className,
@@ -118,12 +121,20 @@ export function HeroEngine({
     // --- 1. Load Manifest or Set Manual ---
     useEffect(() => {
         let active = true
-        // Init — no console.log in production
 
         if (manualFrames) {
             state.current.isManual = true
             state.current.frameCount = manualFrames.frameCount
             setManifest({ frameCount: manualFrames.frameCount, frames: [] })
+            return
+        }
+
+        // PERF: Use inline manifest to skip fetch waterfall on first load
+        if (inlineManifest) {
+            state.current.frameCount = inlineManifest.frameCount
+            state.current.frames = inlineManifest.frames
+            state.current.isManual = false
+            setManifest(inlineManifest)
             return
         }
 
@@ -148,7 +159,7 @@ export function HeroEngine({
         }
 
         return () => { active = false }
-    }, [manifestUrl, manualFrames])
+    }, [manifestUrl, inlineManifest, manualFrames])
 
     // --- 2. Resize Handler (Stable & Debounced) ---
     useEffect(() => {
@@ -312,19 +323,19 @@ export function HeroEngine({
         const init = async () => {
             if (!manifest || state.current.frameCount === 0) return
 
-            // Load a small batch of initial frames to ensure smooth start
-            // PERF FIX: On mobile, only load the very minimum upfront to unblock CPU
+            // PERF: On mobile, only load the ONE visible frame to unblock first paint ASAP
+            // Other frames will be loaded by the background preloader + lookahead
             const isBackgroundMode = scrollMode === 'document'
-            const priorityFrames = state.current.isMobile
-                ? (isBackgroundMode ? [0, 1] : [0, 1, 2])
+            const startFrame = startIndex || 0
+            const initialFrames = state.current.isMobile
+                ? (isBackgroundMode ? [0, 1] : [startFrame])
                 : [0, 1, 2, 3, 4]
 
-            const toLoad = new Set([startIndex || 0, ...priorityFrames])
+            const toLoad = new Set([startFrame, ...initialFrames])
 
             // Wait for at least the starting frame to load before we even attempt to draw
             await Promise.all(Array.from(toLoad).map(i => loadFrame(i, true)))
 
-            // We do NOT set isLoaded here anymore. We wait for the first successful canvas draw.
             scheduleDraw()
         }
         init()
@@ -343,8 +354,9 @@ export function HeroEngine({
         const frame = state.current.cache.get(idx)
 
         // Lookahead Strategy (Bi-directional based on velocity)
-        // Load fewer frames ahead on mobile to reduce network/CPU contention
-        let lookahead = state.current.isMobile ? (scrollMode === 'document' ? 2 : 10) : 10
+        // PERF: Reduced mobile lookahead from 10→4 to avoid saturating the network
+        // during init. Frames beyond 4 are handled by the background preloader.
+        let lookahead = state.current.isMobile ? (scrollMode === 'document' ? 2 : 4) : 10
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if (typeof navigator !== 'undefined' && 'deviceMemory' in navigator && (navigator as any).deviceMemory <= 2) {
             lookahead = 1

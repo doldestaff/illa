@@ -32,6 +32,23 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
+      <head>
+        {/* PERF: Preload hero first frame — starts downloading before JS even parses */}
+        <link
+          rel="preload"
+          href="/hero/mobile/frames/hero-1-mobile_002.webp"
+          as="image"
+          type="image/webp"
+          media="(max-width: 768px)"
+        />
+        <link
+          rel="preload"
+          href="/hero/desktop/frames/hero-1-desktop_002.webp"
+          as="image"
+          type="image/webp"
+          media="(min-width: 769px)"
+        />
+      </head>
       <body
         className={cn(
           openSans.variable,

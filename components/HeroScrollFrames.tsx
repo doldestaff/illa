@@ -1,16 +1,18 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { AlertTriangle } from 'lucide-react'
 import { HeroGhostButtons } from './HeroGhostButtons'
 import { useMotionValue } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { HeroEngine } from './hero/HeroEngine'
 
+// PERF: Inline manifest data — eliminates 1 RTT fetch waterfall on first load
+import mobileManifest from '@/public/hero/manifest.mobile.json'
+import desktopManifest from '@/public/hero/manifest.desktop.json'
+
 export function HeroScrollFrames() {
     // Mount state
     const [isMobile, setIsMobile] = useState<boolean | null>(null)
-    const [error, setError] = useState<string | null>(null)
 
     // Stable Refs
     const buttonProgress = useMotionValue(0)
@@ -27,21 +29,28 @@ export function HeroScrollFrames() {
     }, [])
 
     const handleProgress = (progress: number) => {
-        // Ghost Button progress is now fully handled in the child component using the global 0..1 scroll value
         buttonProgress.set(progress)
     }
 
     // --- Render ---
     if (isMobile === null) return (
         <div className="h-[100dvh] w-full bg-[#111] relative overflow-hidden">
-            {/* SSR skeleton fallback to prevent pink flash */}
+            {/* SSR skeleton — high priority poster to prevent flash */}
             <img
                 src="/hero/mobile/frames/hero-1-mobile_002.webp"
+                // @ts-expect-error — fetchPriority is a valid HTML attribute
+                fetchPriority="high"
+                loading="eager"
+                decoding="async"
                 className="absolute inset-0 w-full h-full object-cover md:hidden"
                 alt="Illa Loading"
             />
             <img
                 src="/hero/desktop/frames/hero-1-desktop_002.webp"
+                // @ts-expect-error — fetchPriority is a valid HTML attribute
+                fetchPriority="high"
+                loading="eager"
+                decoding="async"
                 className="absolute inset-0 w-full h-full object-cover hidden md:block"
                 alt="Illa Loading"
             />
@@ -53,11 +62,7 @@ export function HeroScrollFrames() {
     const DESKTOP_HEIGHT_vh = 500
     const SCROLL_HEIGHT_vh = isMobile ? MOBILE_HEIGHT_vh : DESKTOP_HEIGHT_vh
 
-
-
-
-
-    // ...
+    const manifest = isMobile ? mobileManifest : desktopManifest
 
     return (
         <section
@@ -66,9 +71,9 @@ export function HeroScrollFrames() {
         >
             <div className="sticky top-0 w-full h-[100dvh] overflow-hidden bg-[#111]">
 
-                {/* New Unified Engine */}
+                {/* Unified Engine — inline manifest eliminates fetch waterfall */}
                 <HeroEngine
-                    manifestUrl={`/hero/manifest.${isMobile ? 'mobile' : 'desktop'}.json`}
+                    inlineManifest={manifest}
                     posterUrl={`/hero/${isMobile ? 'mobile' : 'desktop'}/frames/hero-1-${isMobile ? 'mobile' : 'desktop'}_002.webp`}
                     scrollMode="viewport"
                     scrollSectionHeightVh={SCROLL_HEIGHT_vh}
@@ -85,4 +90,3 @@ export function HeroScrollFrames() {
         </section>
     )
 }
-

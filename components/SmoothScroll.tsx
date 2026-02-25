@@ -26,15 +26,21 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
             gsap.updateRoot(time)
         })
 
-        // 2. Bind ScrollTrigger update to Lenis scroll
+        // PERF 2. Bind ScrollTrigger update to Lenis scroll
+        // Defer GSAP heavy init by 1s (or idle) to unblock main thread hydration
+        let initTimer: ReturnType<typeof setTimeout>
         const lenis = lenisRef.current?.lenis
+
         if (lenis) {
-            ScrollTrigger.refresh()
-            lenis.on('scroll', ScrollTrigger.update)
+            initTimer = setTimeout(() => {
+                ScrollTrigger.refresh()
+                lenis.on('scroll', ScrollTrigger.update)
+            }, 1000)
         }
 
         return () => {
             gsap.ticker.remove(gsap.updateRoot)
+            clearTimeout(initTimer)
             if (lenis) {
                 lenis.off('scroll', ScrollTrigger.update)
             }

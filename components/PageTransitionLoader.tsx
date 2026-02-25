@@ -60,7 +60,8 @@ export function PageTransitionLoader() {
                 position: 'fixed',
                 inset: 0,
                 zIndex: 99999,
-                pointerEvents: 'none',
+                // PERF: Never block interactions during the fade out phase
+                pointerEvents: visible && progress < 100 ? 'auto' : 'none',
                 // Fade out when progress reaches 100
                 opacity: progress === 100 ? 0 : 1,
                 transition: 'opacity 350ms ease-out',

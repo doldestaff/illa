@@ -67,7 +67,7 @@ function LazyVideo() {
         if (!el) return
         const observer = new IntersectionObserver(
             ([entry]) => setIsVisible(entry.isIntersecting),
-            { rootMargin: '200px', threshold: 0.1 }
+            { rootMargin: '400px', threshold: 0.01 }
         )
         observer.observe(el)
         return () => observer.disconnect()
@@ -82,18 +82,21 @@ function LazyVideo() {
     }, [isVisible])
 
     return (
-        <div ref={containerRef} className="absolute inset-0 z-0 bg-gray-100">
+        <div ref={containerRef} className="absolute inset-0 z-0 bg-[#F5F5F7]">
             <video
                 ref={videoRef}
                 className={cn(
-                    'w-full h-full object-cover transition-opacity duration-1000',
+                    'lazy-parallax-video w-full h-full object-cover transition-opacity duration-1000',
                     isVisible ? 'opacity-100' : 'opacity-0'
                 )}
-                loop muted playsInline preload="none"
+                loop muted playsInline preload="auto"
                 src="/instagram/reels/mobile/Insta-1.mp4"
+                style={{
+                    transform: `translate3d(0, 0px, 0) scale(1.15)`,
+                    willChange: 'transform'
+                }}
             />
-            {/* Soft white smoke veil over video */}
-            <div className="absolute inset-0 bg-white/25 backdrop-blur-[1px]" />
+            <div className="absolute inset-0 bg-white/35 backdrop-blur-[2px]" />
         </div>
     )
 }
@@ -112,12 +115,18 @@ export function PinnedButtonsParallax() {
         const scrollableDist = height - windowH
         const rawProgress = -rect.top / scrollableDist
 
-        // No delay — cards start appearing immediately as user enters Section 2
         const progress = Math.max(0, Math.min(1, rawProgress));
+
+        // Background Parallax Update (Sync with scroll)
+        const video = containerRef.current.querySelector('.lazy-parallax-video') as HTMLElement
+        if (video) {
+            const videoY = (progress - 0.5) * 60 // Subtle movement
+            video.style.transform = `translate3d(0, ${videoY}px, 0) scale(1.15)`
+        }
 
         const totalCards = cards.length
         const step = 1 / totalCards
-        const overlap = 0.5
+        const overlap = 0.6
 
         cardsRef.current.forEach((card, i) => {
             if (!card) return
@@ -133,87 +142,87 @@ export function PinnedButtonsParallax() {
             let localP = (progress - start) / duration
             localP = Math.max(0, Math.min(1, localP))
 
-            const easeOutQuart = (t: number) => 1 - Math.pow(1 - t, 4)
-            const easeInCubic = (t: number) => t * t * t
+            const easeOutExpo = (t: number) => t === 1 ? 1 : 1 - Math.pow(2, -10 * t)
+            const easeInOutQuint = (t: number) => t < 0.5 ? 16 * t * t * t * t * t : 1 - Math.pow(-2 * t + 2, 5) / 2
 
             let opacity = 0
-            let y = 110
-            let z = -500
-            let rotateX = 60
-            let rotateZ = (i % 2 === 0 ? -1 : 1) * 10
-            let translateX = (i % 2 === 0 ? -1 : 1) * 80
-            let scale = 0.6
+            let y = 140
+            let z = -400
+            let rotateX = 45
+            let rotateZ = (i % 2 === 0 ? -1 : 1) * 8
+            let translateX = (i % 2 === 0 ? -1 : 1) * 60
+            let scale = 0.75
             let pointerEvents: 'auto' | 'none' = 'none'
             let highlightX = -100
-            let iconScale = 0.5
+            let iconScale = 0.7
             let glowIntensity = 0
 
             if (localP < 0.35) {
                 const t = localP / 0.35
-                const e = easeOutQuart(t)
+                const e = easeOutExpo(t)
                 opacity = t
-                y = 110 * (1 - e)
-                z = -500 * (1 - e)
-                translateX = (i % 2 === 0 ? -1 : 1) * 80 * (1 - e)
-                rotateX = 60 * (1 - e)
-                rotateZ = (i % 2 === 0 ? -1 : 1) * 10 * (1 - e)
-                scale = 0.6 + 0.4 * e
-                iconScale = 0.5 + 0.5 * e
-                highlightX = -100 + 200 * e
-                glowIntensity = e
+                y = 140 * (1 - e)
+                z = -400 * (1 - e)
+                translateX = (i % 2 === 0 ? -1 : 1) * 60 * (1 - e)
+                rotateX = 45 * (1 - e)
+                rotateZ = (i % 2 === 0 ? -1 : 1) * 8 * (1 - e)
+                scale = 0.75 + 0.25 * e
+                iconScale = 0.7 + 0.3 * e
+                highlightX = -100 + 150 * e
+                glowIntensity = e * 0.5
             } else if (localP > 0.65) {
                 const t = (localP - 0.65) / 0.35
-                const e = easeInCubic(t)
+                const e = easeInOutQuint(t)
                 opacity = 1 - t
-                y = -120 * e
-                z = 300 * e
-                translateX = 0
-                rotateX = -20 * e
-                rotateZ = 0
-                scale = 1 + 0.15 * e
-                iconScale = 1 + 0.1 * e
-                highlightX = 100 + 200 * e
-                glowIntensity = 1 - e
+                y = -150 * e
+                z = 200 * e
+                translateX = (i % 2 === 0 ? 0.3 : -0.3) * 40 * e
+                rotateX = -15 * e
+                rotateZ = (i % 2 === 0 ? 1 : -1) * 4 * e
+                scale = 1 + 0.1 * e
+                iconScale = 1 + 0.05 * e
+                highlightX = 50 + 150 * e
+                glowIntensity = 0.5 * (1 - t)
             } else {
-                // CENTER FOCUS — fully active
-                opacity = 1; y = 0; z = 0; rotateX = 0; rotateZ = 0
-                translateX = 0; scale = 1; iconScale = 1
+                const mt = (localP - 0.35) / 0.3
+                opacity = 1
+                y = -15 * mt
+                z = 20 * mt
+                translateX = 0
+                rotateX = -5 * mt
+                rotateZ = 0
+                scale = 1 + 0.05 * mt
+                iconScale = 1
                 pointerEvents = 'auto'
-                highlightX = 100
-                glowIntensity = 1
+                highlightX = 50 + 50 * mt
+                glowIntensity = 0.5 + 0.2 * Math.sin(mt * Math.PI)
             }
 
             card.style.opacity = opacity.toString()
             card.style.transform = `translate3d(${translateX}px, ${y}px, ${z}px) rotateX(${rotateX}deg) rotateZ(${rotateZ}deg) scale(${scale})`
-            card.style.zIndex = pointerEvents === 'auto' ? '50' : Math.round(opacity * 10).toString()
+            card.style.zIndex = pointerEvents === 'auto' ? '50' : Math.round(opacity * 20).toString()
             card.style.pointerEvents = pointerEvents
 
-            // Neon Glow FX (Pink & White)
-            card.style.borderColor = `rgba(229,1,125,${0.2 + (glowIntensity * 0.4)})`
-            card.style.boxShadow = `
-                0 8px 48px 0 rgba(255,255,255,0.4), 
-                0 0 ${glowIntensity * 40}px rgba(229,1,125,${glowIntensity * 0.7}), 
-                0 0 ${glowIntensity * 15}px rgba(255,255,255,${glowIntensity})
-            `
+            card.style.borderColor = `rgba(229,1,125,${0.1 + (glowIntensity * 0.3)})`
+            card.style.boxShadow = `0 ${8 + (glowIntensity * 10)}px ${30 + (glowIntensity * 20)}px rgba(229,1,125,${glowIntensity * 0.4})`
 
             if (content) {
-                content.style.opacity = (opacity * Math.min(1, ((localP - 0.1) / 0.8) * 2)).toString()
-                content.style.transform = `translateY(${y * 0.15}px)`
+                content.style.opacity = (opacity * Math.min(1, ((localP - 0.05) / 0.9) * 2)).toString()
+                content.style.transform = `translateY(${y * 0.1}px)`
             }
             if (icon) {
-                icon.style.transform = `scale(${scale * iconScale}) translateY(${y * -0.08}px)`
+                icon.style.transform = `scale(${iconScale})`
             }
             if (highlight) {
-                highlight.style.transform = `translateX(${highlightX}%) skewX(-20deg)`
-                highlight.style.opacity = (opacity * 0.5).toString()
+                highlight.style.transform = `translateX(${highlightX}%) skewX(-15deg)`
+                highlight.style.opacity = (opacity * 0.4).toString()
             }
 
-            // Progress dot
             if (dot) {
                 const isActive = pointerEvents === 'auto'
-                dot.style.background = isActive ? 'rgba(229,1,125,0.8)' : 'rgba(0,0,0,0.2)'
-                dot.style.transform = isActive ? 'scale(1.5)' : 'scale(1)'
-                dot.style.boxShadow = isActive ? '0 0 8px rgba(229,1,125,0.5)' : 'none'
+                dot.style.background = isActive ? '#E5017D' : 'rgba(0,0,0,0.15)'
+                dot.style.transform = isActive ? `scale(${1.2 + (glowIntensity * 0.4)})` : 'scale(1)'
+                dot.style.opacity = (0.3 + (opacity * 0.7)).toString()
             }
         })
     }, [])
@@ -225,13 +234,10 @@ export function PinnedButtonsParallax() {
         >
             <div className="sticky top-0 w-full h-[100dvh] flex items-center justify-center overflow-hidden touch-pan-y">
 
-                {/* Video Background */}
                 <LazyVideo />
 
-                {/* Radial softness — centre of stage */}
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,_rgba(255,255,255,0.5)_0%,_transparent_70%)] pointer-events-none z-0" />
 
-                {/* Card stage */}
                 <div className="relative w-full max-w-md h-[380px] flex items-center justify-center [perspective:1000px]">
                     {cards.map((card, index) => (
                         <a
@@ -261,17 +267,14 @@ export function PinnedButtonsParallax() {
                             )}
                             style={{ opacity: 0, willChange: 'transform, opacity' }}
                         >
-                            {/* Sweeping glass highlight */}
                             <div
                                 className="glass-highlight absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/50 to-transparent pointer-events-none z-20"
-                                style={{ transform: 'translateX(-100%) skewX(-20deg)' }}
+                                style={{ transform: 'translateX(-100%) skewX(-15deg)' }}
                             />
 
-                            {/* Soft inner glow top */}
                             <div className="absolute top-0 left-0 right-0 h-[40%] bg-gradient-to-b from-white/40 to-transparent rounded-t-[3rem] pointer-events-none" />
 
                             <div className="card-content relative z-10 flex flex-col items-center gap-4 md:gap-5">
-                                {/* Icon */}
                                 <div
                                     className={cn(
                                         'card-icon w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center',
@@ -292,7 +295,6 @@ export function PinnedButtonsParallax() {
                                     </p>
                                 </div>
 
-                                {/* CTA */}
                                 <div className="mt-2 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-white bg-illa-pink/85 px-6 py-3 rounded-full shadow-[0_4px_12px_rgba(229,1,125,0.2)] group-hover:bg-illa-pink group-hover:shadow-[0_8px_24px_rgba(229,1,125,0.4)] transition-all duration-300 transform group-hover:-translate-y-0.5">
                                     {card.label} <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
                                 </div>
@@ -301,7 +303,6 @@ export function PinnedButtonsParallax() {
                     ))}
                 </div>
 
-                {/* Progress dots */}
                 <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-3 pointer-events-none z-30">
                     {cards.map((card, i) => (
                         <div
