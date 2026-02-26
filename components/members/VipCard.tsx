@@ -127,14 +127,14 @@ export default function VipCard({ referralCode, referralCount, vipPayload, onLoa
 
                 {/* Background Image Native Shape */}
                 <div className="relative w-full aspect-[4/5] bg-[#0c0514] overflow-hidden">
-                    <img src="/digital-card/digitalcard-illa.webp?v=update6" alt="ILLA Exclusive Digital Card" className="absolute top-0 left-0 w-full h-full object-cover pointer-events-none z-0 scale-[1.02]" />
+                    <img src="/digital-card/digitalcard-illa.webp?v=update7" alt="ILLA Exclusive Digital Card" className="absolute top-0 left-0 w-full h-full object-cover object-top pointer-events-none z-0" />
                 </div>
 
                 {/* Sub-container for interactive/dynamic elements overlaying the image */}
                 <div className="absolute inset-x-0 top-0 bottom-[120px] z-10 flex flex-col">
 
-                    {/* QR Code Container - Absolute positioned over the white square cavity */}
-                    <div className="absolute top-[22%] lg:top-[25%] left-1/2 -translate-x-1/2 w-[38%] aspect-square flex items-center justify-center rounded-[1rem] overflow-hidden group/qr cursor-pointer shadow-xl">
+                    {/* QR Code Container - positioned over the white square on the webp art */}
+                    <div className="absolute top-[15%] left-1/2 -translate-x-1/2 w-[42%] aspect-square flex items-center justify-center rounded-[1rem] overflow-hidden group/qr cursor-pointer shadow-xl">
                         {loading || !vip ? (
                             <div className="w-full h-full flex items-center justify-center bg-white/10 backdrop-blur-sm">
                                 <Loader2 size={24} className="animate-spin text-white/50" />
@@ -152,11 +152,11 @@ export default function VipCard({ referralCode, referralCount, vipPayload, onLoa
                     </div>
                 </div>
 
-                {/* Bottom Area - Code & Expiration positioned securely at the physical bottom of the card */}
-                <div className="relative z-20 px-6 py-6 pb-8 flex flex-col justify-end bg-gradient-to-t from-[#0c0514] via-[#0c0514]/90 to-transparent -mt-20">
+                {/* Bottom Area - Code & Expiration close to the CHAVE DE ACESSO text on webp art */}
+                <div className="relative z-20 px-4 py-2 pb-6 flex flex-col justify-end bg-gradient-to-t from-[#0c0514] via-[#0c0514]/90 to-transparent -mt-10">
                     {/* Access Code Row */}
-                    <div className="flex items-center justify-between mb-4 mt-2 px-2">
-                        <span className="font-mono font-bold text-2xl md:text-3xl tracking-[0.2em] text-white drop-shadow-md z-10">
+                    <div className="flex items-center justify-between mb-3 mt-1 px-2">
+                        <span className="font-mono font-bold text-3xl tracking-[0.15em] text-white drop-shadow-md z-10">
                             {vip?.short_code ?? '••••••••'}
                         </span>
                         {vip && (
