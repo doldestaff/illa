@@ -75,8 +75,8 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
             className={`relative overflow-hidden transition-colors duration-500 group h-full flex flex-col justify-between ${isClaimed
                 ? 'bg-white/[0.04] rounded-[2rem] border border-white/10 opacity-70 grayscale p-5 backdrop-blur-md shadow-inner'
                 : canClaim
-                    ? `bg-white/[0.12] rounded-[2rem] border ${theme.border} ${theme.shadow} ring-1 ${theme.ring} p-5 backdrop-blur-2xl bg-blend-overlay`
-                    : 'bg-white/[0.08] rounded-[2rem] border border-white/15 hover:border-white/25 shadow-[0_8px_32px_rgba(0,0,0,0.25)] p-5 backdrop-blur-2xl bg-blend-overlay'
+                    ? `bg-white/25 rounded-[2rem] border-[1.5px] ${theme.border} ${theme.shadow} ring-1 ${theme.ring} p-5 backdrop-blur-2xl bg-blend-overlay`
+                    : 'bg-[#0f0f11]/40 rounded-[2rem] border border-white/20 hover:border-white/30 hover:bg-[#0f0f11]/50 shadow-[0_8px_32px_rgba(0,0,0,0.4)] p-5 backdrop-blur-2xl bg-blend-overlay'
                 }`}
         >
             {/* Spotlight only on actionable cards */}
@@ -102,12 +102,12 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                             {isCompleted && !isClaimed && (
                                 <span className={`flex h-2 w-2 rounded-full animate-pulse ${theme.pulse}`} />
                             )}
-                            <h3 className={`font-bold text-[15px] leading-tight tracking-tight max-w-full drop-shadow-md line-clamp-2 ${isClaimed ? 'text-white/40' : 'text-white/90'}`}>
+                            <h3 className={`font-bold text-[15px] leading-tight tracking-tight max-w-full drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] line-clamp-2 ${isClaimed ? 'text-white/50' : 'text-white'}`}>
                                 {mission.title}
                             </h3>
                         </div>
                         {!isClaimed && mission.description && (
-                            <p className="text-[11px] text-white/50 font-medium leading-relaxed line-clamp-2 min-h-[2.5em]">
+                            <p className="text-[11px] text-white/80 font-medium leading-relaxed line-clamp-2 min-h-[2.5em] drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
                                 {mission.description}
                             </p>
                         )}
@@ -167,20 +167,20 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
 
                         {/* Minimalist Progress Bar */}
                         <div className="relative">
-                            <div className="flex justify-between text-[9px] font-bold mb-1.5 tracking-widest uppercase">
-                                <span className={`${isCompleted ? theme.text : 'text-white/40'}`}>PROGRESSO</span>
-                                <span className={`${isCompleted ? theme.text : 'text-white/50'}`}>
-                                    {mission.progress} <span className="text-white/20">/</span> {mission.target}
+                            <div className="flex justify-between text-[9px] font-bold mb-1.5 tracking-widest uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                                <span className={`${isCompleted ? theme.text : 'text-white/70'}`}>PROGRESSO</span>
+                                <span className={`${isCompleted ? theme.text : 'text-white/80'}`}>
+                                    {mission.progress} <span className="text-white/40">/</span> {mission.target}
                                 </span>
                             </div>
-                            <div className="h-1.5 bg-white/10 rounded-full overflow-hidden flex items-center shadow-inner">
+                            <div className="h-1.5 bg-black/40 backdrop-blur-md rounded-full overflow-hidden flex items-center shadow-inner border border-white/10">
                                 <motion.div
                                     initial={{ width: 0 }}
                                     animate={{ width: `${percent}%` }}
                                     transition={{ duration: 1.2, ease: "easeOut", type: "spring", bounce: 0.3 }}
                                     className={`h-full rounded-full relative transition-colors duration-1000 ${isCompleted
                                         ? theme.progress
-                                        : 'bg-white/40'
+                                        : 'bg-white/80'
                                         }`}
                                 >
                                     {canClaim && (
