@@ -188,7 +188,7 @@ function NavbarInner() {
                     </Link>
 
                     {/* Desktop Actions */}
-                    <div className="hidden md:flex items-center gap-4">
+                    <div className="hidden md:flex items-center gap-4 pointer-events-auto">
                         <button
                             onClick={handleAuthClick}
                             className={cn(
