@@ -234,7 +234,7 @@ export function InstagramFeed() {
             {/* ── Background video ── */}
             <video
                 ref={videoRef}
-                src="/instagram/reels/mobile/insta-2.mp4"
+                src="/instagram/reels/mobile/insta-3.mp4"
                 loop
                 muted
                 playsInline
