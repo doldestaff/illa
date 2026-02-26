@@ -27,6 +27,9 @@ export default function MembersScrollBackground() {
     // ~480px (missões) → 0 totalmente transparente — background 100% visível
     const overlayOpacity = useTransform(scrollY, [0, 80, 480], [0.9, 0.85, 0])
 
+    // A própria imagem de fundo clareia gradualmente
+    const imageOpacity = useTransform(scrollY, [0, 80, 480], [0.35, 0.45, 1])
+
     // Detect mobile once on mount
     useEffect(() => {
         const check = () => setIsMobile(window.innerWidth < 768)
@@ -39,8 +42,11 @@ export default function MembersScrollBackground() {
 
     return (
         <div className="fixed inset-0 w-full h-[100vh] min-h-[100dvh] pointer-events-none z-[-1] overflow-hidden bg-black">
-            {/* Pure CSS background - handled entirely by compositor thread */}
-            <div className="absolute inset-0 w-full h-full opacity-35 mix-blend-screen overflow-hidden">
+            {/* Animated CSS background - handling opacity smoothly */}
+            <motion.div
+                style={{ opacity: imageOpacity }}
+                className="absolute inset-0 w-full h-full mix-blend-screen overflow-hidden"
+            >
                 <Image
                     src={POSTER_MOBILE}
                     alt="Background"
@@ -50,7 +56,7 @@ export default function MembersScrollBackground() {
                     className="object-cover"
                     quality={90}
                 />
-            </div>
+            </motion.div>
 
             {/* Subtle gradient overlay to ensure text readability (Reduces on scroll to reveal BG) */}
             <motion.div

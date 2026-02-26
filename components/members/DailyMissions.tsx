@@ -150,12 +150,17 @@ export default function DailyMissions({ missions, onClaim }: Props) {
 
     if (missions.length === 0) return null
 
-    // Determine featured missions for the mural
-    const previewMissions = missions.slice(0, 3)
-    const hasMore = missions.length > 3
+    // Determine all missions for the mural - Sort completed and claimed to the end
+    const sortedMissions = [...missions].sort((a, b) => {
+        const aCompleted = a.progress >= a.target || a.claimed || claimedIds.has(a.instance_id)
+        const bCompleted = b.progress >= b.target || b.claimed || claimedIds.has(b.instance_id)
 
-    // Duplicated array for seamless infinite marquee loop (desktop)
-    const marqueeMissions = [...previewMissions, ...previewMissions]
+        if (!aCompleted && bCompleted) return -1
+        if (aCompleted && !bCompleted) return 1
+        return 0
+    })
+
+    const previewMissions = sortedMissions
 
     return (
         <div className="space-y-6 py-6 relative">
