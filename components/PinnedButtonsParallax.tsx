@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, useEffect, useCallback } from 'react'
-import { Info, Store, MapPin, MessageCircle, ShoppingBag, Instagram, ArrowRight, ArrowUp } from 'lucide-react'
+import { Info, Store, MapPin, MessageCircle, ShoppingBag, Instagram, ArrowRight, ArrowUp, ChevronsDown } from 'lucide-react'
 import { useLenis } from 'lenis/react'
 import { cn } from '@/lib/utils'
 
@@ -114,6 +114,7 @@ export function PinnedButtonsParallax() {
         video: HTMLElement | null
         indicator: HTMLElement | null
         upIndicator: HTMLElement | null
+        tutorialChevron: HTMLElement | null
         cards: Array<{
             content: HTMLElement | null
             icon: HTMLElement | null
@@ -147,6 +148,7 @@ export function PinnedButtonsParallax() {
                 video: containerRef.current.querySelector('.lazy-parallax-video') as HTMLElement | null,
                 indicator: containerRef.current.querySelector('#parallax-scroll-indicator') as HTMLElement | null,
                 upIndicator: containerRef.current.querySelector('#scroll-up-indicator') as HTMLElement | null,
+                tutorialChevron: containerRef.current.querySelector('#tutorial-chevron-down') as HTMLElement | null,
                 cards: cardsRef.current.map(card => {
                     if (!card) return { content: null, icon: null, highlight: null }
                     return {
@@ -299,10 +301,22 @@ export function PinnedButtonsParallax() {
             }
         })
 
+        // -- Dynamic UX Interactions --
+
+        // 1. "Deslize de volta" indicator (Pops up at the very end of the scroll)
         if (cache.upIndicator) {
             const showUp = progress > 0.95
             cache.upIndicator.style.opacity = showUp ? '1' : '0'
             cache.upIndicator.style.pointerEvents = showUp ? 'auto' : 'none'
+        }
+
+        // 2. Tutorial Chevron (Visible when inside section, hides when reaching the end OR scrolling actively)
+        // Note: The active scroll hiding is handled in the lenis onScroll callback via CSS variables or direct style
+        // Here we just handle the base visibility based on progress boundaries.
+        if (cache.tutorialChevron) {
+            const isInside = progress > 0.05 && progress < 0.9
+            // Set base opacity, we'll modulate this in the lenis callback based on velocity
+            cache.tutorialChevron.style.opacity = isInside ? '1' : '0'
         }
     }, [isTablet, isMobile])
 
@@ -310,8 +324,18 @@ export function PinnedButtonsParallax() {
         updateParallaxRef.current = updateParallax
     })
 
-    const lenis = useLenis(() => {
+    const lenis = useLenis((e) => {
         updateParallaxRef.current?.()
+        // Pacing & Dynamic Tutorial UX: Hide the tutorial chevron when scrolling actively
+        // Using velocity to fade out the chevron. If |velocity| > subtle threshold, hide it.
+        if (domCacheRef.current?.tutorialChevron) {
+            const cv = domCacheRef.current.tutorialChevron;
+            // Base visibility from the parallax loop takes precedence (if out of bounds, opacity is 0 string)
+            if (cv.style.opacity !== '0') {
+                const isActiveScrolling = Math.abs(e.velocity) > 0.5;
+                cv.style.opacity = isActiveScrolling ? '0.1' : '1';
+            }
+        }
     })
 
     useEffect(() => {
@@ -399,7 +423,7 @@ export function PinnedButtonsParallax() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <h3 className="font-bold text-3xl md:text-4xl font-script bg-clip-text text-transparent bg-gradient-to-br from-white via-white/95 to-white/70 [filter:drop-shadow(0_4px_12px_rgba(0,0,0,0.85))_drop-shadow(0_2px_4px_rgba(0,0,0,0.7))]">
+                                    <h3 className="font-bold text-3xl md:text-4xl font-script bg-clip-text text-transparent bg-gradient-to-br from-white via-white/95 to-white/70 [filter:drop-shadow(0_4px_12px_rgba(180,83,9,0.75))_drop-shadow(0_2px_4px_rgba(80,40,0,0.6))]">
                                         {card.title}
                                     </h3>
                                     <p className="text-[#2D2D30] font-medium leading-relaxed max-w-[270px] mx-auto text-sm tracking-wide opacity-80 transition-opacity group-hover:opacity-100">
@@ -443,7 +467,7 @@ export function PinnedButtonsParallax() {
                 </div>
 
                 {/* Mobile Scroll Up Indicator at the very end of the section */}
-                <div id="scroll-up-indicator" className="absolute bottom-16 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pointer-events-none z-50 transition-opacity duration-300 opacity-0 md:hidden">
+                <div id="scroll-up-indicator" className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 pointer-events-none z-50 transition-opacity duration-300 opacity-0 md:hidden">
                     <button
                         onClick={(e) => {
                             e.preventDefault()
@@ -455,14 +479,19 @@ export function PinnedButtonsParallax() {
                                 window.scrollTo({ top: window.scrollY - window.innerHeight * 0.5, behavior: 'smooth' })
                             }
                         }}
-                        className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-[0_4px_16px_rgba(0,0,0,0.5)] hover:bg-black/60 transition-colors pointer-events-auto"
+                        className="flex flex-col items-center gap-2 group pointer-events-auto filter drop-shadow-[0_4px_12px_rgba(229,1,125,0.4)]"
                         aria-label="Voltar para cima"
                     >
-                        <ArrowUp size={24} className="text-white drop-shadow-md animate-bounce" />
+                        <ArrowUp size={36} className="text-illa-pink animate-bounce transition-transform group-hover:-translate-y-1 drop-shadow-md" strokeWidth={2.5} />
+                        <span className="text-illa-pink text-[12px] font-black uppercase tracking-[0.2em] text-center w-max drop-shadow-sm">
+                            Deslize de volta
+                        </span>
                     </button>
-                    <span className="text-white text-[11px] font-bold uppercase tracking-wider drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] text-center w-max px-3 py-1 bg-black/30 rounded-full backdrop-blur-sm">
-                        Deslize de volta
-                    </span>
+                </div>
+
+                {/* Dynamic Scroll Tutorial Chevron */}
+                <div id="tutorial-chevron-down" className="absolute bottom-20 left-1/2 -translate-x-1/2 flex items-center justify-center pointer-events-none z-50 transition-opacity duration-[400ms] opacity-0">
+                    <ChevronsDown size={56} opacity={0.8} className="text-illa-pink animate-bounce drop-shadow-[0_4px_16px_rgba(229,1,125,0.5)]" strokeWidth={1.5} />
                 </div>
 
                 <style dangerouslySetInnerHTML={{
