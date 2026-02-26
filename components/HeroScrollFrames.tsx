@@ -33,31 +33,31 @@ export function HeroScrollFrames() {
     }
 
     // --- Render ---
-    if (isMobile === null) return (
-        <div className="h-[100vh] min-h-[100dvh] w-full bg-[#111] relative overflow-hidden">
-            {/* SSR skeleton — high priority poster to prevent flash */}
-            <img
-                src="/hero/mobile/frames/hero-1-mobile_002.webp"
-                fetchPriority="high"
-                loading="eager"
-                decoding="async"
-                className="absolute inset-0 w-full h-full object-cover md:hidden"
-                alt="Illa Loading"
-            />
-            <img
-                src="/hero/desktop/frames/hero-1-desktop_002.webp"
-                fetchPriority="high"
-                loading="eager"
-                decoding="async"
-                className="absolute inset-0 w-full h-full object-cover hidden md:block"
-                alt="Illa Loading"
-            />
-        </div>
-    )
-
     // Config
     const MOBILE_HEIGHT_vh = 350
     const DESKTOP_HEIGHT_vh = 500
+
+    if (isMobile === null) return (
+        <section
+            className="relative w-full z-10"
+            style={{ height: '100vh' }}
+        >
+            <div className="sticky top-0 w-full h-[100vh] min-h-[100dvh] overflow-hidden bg-[#111]">
+                {/* SSR skeleton — high priority poster to prevent flash, but SYNCHRONOUS decoding so iOS doesn't panic on hydration switch */}
+                <img
+                    src="/hero/mobile/frames/hero-1-mobile_002.webp"
+                    className="absolute inset-0 w-full h-full object-cover md:hidden"
+                    alt="Illa Loading"
+                />
+                <img
+                    src="/hero/desktop/frames/hero-1-desktop_002.webp"
+                    className="absolute inset-0 w-full h-full object-cover hidden md:block"
+                    alt="Illa Loading"
+                />
+            </div>
+        </section>
+    )
+
     const SCROLL_HEIGHT_vh = isMobile ? MOBILE_HEIGHT_vh : DESKTOP_HEIGHT_vh
 
     const manifest = isMobile ? mobileManifest : desktopManifest

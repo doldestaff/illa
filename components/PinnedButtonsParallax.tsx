@@ -89,14 +89,15 @@ function LazyVideo() {
                     'lazy-parallax-video w-full h-full object-cover transition-opacity duration-1000',
                     isVisible ? 'opacity-100' : 'opacity-0'
                 )}
-                loop muted playsInline preload="auto"
+                loop muted playsInline preload="none"
                 src="/instagram/reels/mobile/Insta-1.mp4"
                 style={{
                     transform: `translate3d(0, 0px, 0) scale(1.15)`,
                     willChange: 'transform'
                 }}
             />
-            <div className="absolute inset-0 bg-white/35 backdrop-blur-[2px]" />
+            {/* iOS Crashing Bug Fix: Do NOT use backdrop-blur over a hardware video tag in a sticky container */}
+            <div className="absolute inset-0 bg-white/40" />
         </div>
     )
 }
