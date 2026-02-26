@@ -164,17 +164,18 @@ export default function DailyMissions({ missions, onClaim }: Props) {
 
     return (
         <div className="space-y-6 py-6 relative">
+            {/* Seamless Section Context gradient - No hard lines, edge-to-edge */}
+            <div className="absolute inset-y-0 w-[100vw] left-1/2 -translate-x-1/2 bg-gradient-to-b from-black/60 via-black/30 to-transparent pointer-events-none -z-10" />
+
             {/* Ambient Background Glows */}
             <div className="absolute -top-10 -left-10 w-64 h-64 bg-illa-pink/10 rounded-full blur-[80px] pointer-events-none" />
             <div className="absolute top-20 right-0 w-64 h-64 bg-illa-yellow/5 rounded-full blur-[80px] pointer-events-none" />
 
-            {/* Header - Interactive & Cinematic com fundo escuro para contraste */}
+            {/* Header - Interactive & Cinematic */}
             <div
                 onClick={() => setIsModalOpen(true)}
                 className="relative z-10 flex items-center justify-between cursor-pointer group select-none px-4 md:px-0"
             >
-                {/* Fundo escuro sólido atrás do título */}
-                <div className="absolute inset-x-0 -inset-y-3 bg-gradient-to-b from-black/70 via-black/60 to-black/20 rounded-3xl backdrop-blur-sm -mx-4 pointer-events-none" />
 
                 <div className="flex items-center gap-4 relative z-10">
                     <div className="relative">
@@ -206,8 +207,6 @@ export default function DailyMissions({ missions, onClaim }: Props) {
 
             {/* Unified Marquee Preview (Desktop & Mobile) */}
             <div className="relative group/mural py-4 -mx-4 px-4 w-full max-w-[100vw] overflow-hidden">
-                {/* Fundo escuro sob o carrossel para separar do background */}
-                <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/20 rounded-3xl -inset-x-0 pointer-events-none" />
 
                 <InteractiveMarquee>
                     {previewMissions.map((mission, index) => {
