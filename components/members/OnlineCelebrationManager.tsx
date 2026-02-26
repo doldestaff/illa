@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import type { CelebrationWindow, CelebrationClaimResult } from '@/lib/gamification-types'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Clock, AlertCircle, ChevronRight, Coins } from 'lucide-react'
+import { Clock, AlertCircle, ChevronRight, Coins, X } from 'lucide-react'
 import GlobalCoin from '@/components/ui/GlobalCoin'
 import Link from 'next/link'
 
@@ -340,33 +340,48 @@ export default function OnlineCelebrationManager({ onClaim, pollIntervalMs = 5 *
                                         </div>
                                     </div>
 
-                                    {/* Claim button */}
-                                    <motion.button
-                                        whileHover={{ scale: 1.03 }}
-                                        whileTap={{ scale: 0.95 }}
-                                        onClick={handleClaim}
-                                        disabled={claiming}
-                                        // Adding a custom hover animation with a sweeping light effect to grab attention
-                                        className="w-full mt-4 relative overflow-hidden bg-gradient-to-r from-illa-pink via-[#FF4A6B] to-orange-500 rounded-2xl px-4 py-3.5 shadow-[0_8px_20px_-5px_rgba(229,0,126,0.35)] transition-all focus:outline-none focus:ring-4 focus:ring-illa-pink/30 group disabled:opacity-50 disabled:cursor-not-allowed border-b-4 border-orange-600/30"
-                                    >
-                                        {/* Sweeping Light Animation Overlay */}
-                                        <motion.div
-                                            animate={{ x: ['-200%', '200%'] }}
-                                            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-                                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent skew-x-12 z-0 pointer-events-none"
-                                            style={{ width: '150%' }}
-                                        />
+                                    {/* Action Buttons */}
+                                    <div className="flex items-center gap-2 w-full mt-4">
+                                        {/* Claim Button */}
+                                        <motion.button
+                                            whileHover={{ scale: 1.03 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            onClick={handleClaim}
+                                            disabled={claiming}
+                                            // Adding a custom hover animation with a sweeping light effect to grab attention
+                                            className="flex-1 relative overflow-hidden bg-gradient-to-r from-illa-pink via-[#FF4A6B] to-orange-500 rounded-2xl px-4 py-3.5 shadow-[0_8px_20px_-5px_rgba(229,0,126,0.35)] transition-all focus:outline-none focus:ring-4 focus:ring-illa-pink/30 group disabled:opacity-50 disabled:cursor-not-allowed border-b-4 border-orange-600/30"
+                                        >
+                                            {/* Sweeping Light Animation Overlay */}
+                                            <motion.div
+                                                animate={{ x: ['-200%', '200%'] }}
+                                                transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+                                                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent skew-x-12 z-0 pointer-events-none"
+                                                style={{ width: '150%' }}
+                                            />
 
-                                        <div className="absolute inset-0 bg-white/20 translate-y-[-100%] group-hover:translate-y-[0%] transition-transform duration-500 z-0 pointer-events-none" />
+                                            <div className="absolute inset-0 bg-white/20 translate-y-[-100%] group-hover:translate-y-[0%] transition-transform duration-500 z-0 pointer-events-none" />
 
-                                        {claiming ? (
-                                            <div className="w-5 h-5 border-2 border-white/50 border-t-white rounded-full animate-spin mx-auto relative z-10 pointer-events-none" />
-                                        ) : (
-                                            <span className="relative z-10 text-white font-black text-[16px] flex items-center justify-center gap-1.5 uppercase tracking-widest drop-shadow-sm pointer-events-none">
-                                                Coletar <ChevronRight size={18} className="group-hover:translate-x-1.5 transition-transform" strokeWidth={3} />
-                                            </span>
-                                        )}
-                                    </motion.button>
+                                            {claiming ? (
+                                                <div className="w-5 h-5 border-2 border-white/50 border-t-white rounded-full animate-spin mx-auto relative z-10 pointer-events-none" />
+                                            ) : (
+                                                <span className="relative z-10 text-white font-black text-[16px] flex items-center justify-center gap-1.5 uppercase tracking-widest drop-shadow-sm pointer-events-none">
+                                                    Coletar <ChevronRight size={18} className="group-hover:translate-x-1.5 transition-transform" strokeWidth={3} />
+                                                </span>
+                                            )}
+                                        </motion.button>
+
+                                        {/* Dismiss/Close Button (Ghost Style) */}
+                                        <motion.button
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            onClick={() => setWindow(null)}
+                                            disabled={claiming}
+                                            className="w-12 h-12 shrink-0 flex items-center justify-center rounded-2xl bg-black/5 text-black/40 hover:bg-black/10 hover:text-black/60 transition-colors border border-black/5 disabled:opacity-50"
+                                            aria-label="Dispensar"
+                                        >
+                                            <X size={18} strokeWidth={3} />
+                                        </motion.button>
+                                    </div>
                                 </GamifiedCloud>
                             </motion.div>
                         )}
