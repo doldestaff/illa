@@ -106,6 +106,18 @@ export function PinnedButtonsParallax() {
     const containerRef = useRef<HTMLDivElement>(null)
     const cardsRef = useRef<(HTMLAnchorElement | null)[]>([])
     const dotsRef = useRef<(HTMLDivElement | null)[]>([])
+    const [isTablet, setIsTablet] = useState(false)
+
+    // Detect tablet viewport (iPad: 768-1024px)
+    useEffect(() => {
+        const check = () => {
+            const w = window.innerWidth
+            setIsTablet(w >= 768 && w < 1024)
+        }
+        check()
+        window.addEventListener('resize', check)
+        return () => window.removeEventListener('resize', check)
+    }, [])
 
     const updateParallaxRef = useRef<(() => void) | undefined>(undefined)
 
@@ -129,7 +141,7 @@ export function PinnedButtonsParallax() {
 
         const totalCards = cards.length
         const step = 1 / totalCards
-        const overlap = 0.6
+        const overlap = isTablet ? 0.35 : 0.6
 
         cardsRef.current.forEach((card, i) => {
             if (!card) return
@@ -253,7 +265,7 @@ export function PinnedButtonsParallax() {
     return (
         <section
             ref={containerRef}
-            className="relative w-full h-[400vh] bg-white text-dark"
+            className={cn('relative w-full bg-white text-dark', isTablet ? 'h-[550vh]' : 'h-[400vh]')}
         >
             <div className="sticky top-0 w-full h-[100vh] min-h-[100dvh] flex items-center justify-center overflow-hidden">
 

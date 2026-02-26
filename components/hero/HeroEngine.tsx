@@ -485,7 +485,15 @@ export function HeroEngine({
                 // Snap to target when close enough
                 smoothedFrame = target
                 draw(target)
-                lerpRafId = null
+                // Trailing watchdog: catch new targets that arrived while converging
+                // This closes the gap between scroll handler ticking and lerp loop lifecycle
+                lerpRafId = requestAnimationFrame(() => {
+                    if (Math.abs(state.current.targetFrameIndex - smoothedFrame) > 0.3) {
+                        lerpRafId = requestAnimationFrame(lerpLoop)
+                    } else {
+                        lerpRafId = null
+                    }
+                })
             }
         }
 

@@ -167,35 +167,17 @@ function PostModal({ post, onClose }: { post: InstaPost; onClose: () => void }) 
                         sizes="560px"
                     />
 
-                    {/* Reel: Big centered play button that opens Instagram */}
-                    {post.type === 'reel' ? (
-                        <a
-                            href={post.postUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={e => e.stopPropagation()}
-                            className="absolute inset-0 flex flex-col items-center justify-center bg-black/30 hover:bg-black/40 transition-colors group"
-                        >
-                            {/* Play circle */}
-                            <div className="w-[72px] h-[72px] rounded-full bg-white/90 group-hover:bg-white group-hover:scale-110 transition-all flex items-center justify-center shadow-2xl backdrop-blur-sm">
-                                <Play size={32} className="text-illa-pink fill-illa-pink ml-1" />
-                            </div>
-                            <span className="mt-3 text-white text-sm font-bold tracking-wide bg-black/40 px-4 py-1.5 rounded-full backdrop-blur-sm">
-                                Assistir no Instagram
-                            </span>
-                        </a>
-                    ) : (
-                        /* Image: small bottom overlay link */
-                        <a
-                            href={post.postUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={e => e.stopPropagation()}
-                            className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-black/50 hover:bg-black/70 text-white text-xs font-bold px-3 py-1.5 rounded-full backdrop-blur-sm transition-colors whitespace-nowrap"
-                        >
-                            <Instagram size={12} /> Ver no Instagram
-                        </a>
-                    )}
+                    {/* Unified subtle bottom link — no overlay blocking thumbnail */}
+                    <a
+                        href={post.postUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={e => e.stopPropagation()}
+                        className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-black/50 hover:bg-black/70 text-white text-xs font-bold px-3 py-1.5 rounded-full backdrop-blur-sm transition-colors whitespace-nowrap"
+                    >
+                        {post.type === 'reel' ? <Play size={12} className="fill-white" /> : <Instagram size={12} />}
+                        Ver no Instagram
+                    </a>
                 </div>
 
                 {/* Content panel */}
