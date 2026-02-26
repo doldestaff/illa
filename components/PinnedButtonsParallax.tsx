@@ -267,14 +267,15 @@ export function PinnedButtonsParallax() {
                 glowIntensity = 0.5 * (1 - e)
             } else {
                 // MOMENTUM CENTER (30% to 70%)
-                // Pointer events only active when clearly readable
-                pointerEvents = 'auto'
                 glowIntensity = 0.5 + 0.3 * Math.sin(((localP - 0.3) / 0.4) * Math.PI) // Peak neon in center
             }
 
+            // Always clickable when reasonably visible, overlapping is handled natively by z-index
+            pointerEvents = (localP > 0.05 && localP < 0.95) ? 'auto' : 'none'
+
             card.style.opacity = opacity.toString()
             card.style.transform = `translate3d(${translateX}px, ${y}px, ${z}px) rotateX(${rotateX}deg) rotateZ(${rotateZ}deg) scale(${scale})`
-            card.style.zIndex = pointerEvents === 'auto' ? '50' : Math.round(opacity * 20).toString()
+            card.style.zIndex = Math.round(opacity * 50).toString()
             card.style.pointerEvents = pointerEvents
 
             // Neon Glow based on continuous intensity

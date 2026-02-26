@@ -124,7 +124,7 @@ export default function VipCard({ referralCode, referralCount, vipPayload, onLoa
 
             {/* Main VIP Card - Image Based Layout */}
             <div className="relative overflow-hidden rounded-[2rem] bg-[#0c0514] text-white shadow-[0_10px_40px_rgba(0,0,0,0.8)] border border-white/10 transition-transform hover:scale-[1.01] duration-500 perspective-1000 group w-full aspect-square max-w-[400px] mx-auto">
-                <img src="/digital-card/digitalcard-illa.png" alt="ILLA Exclusive Digital Card" className="absolute inset-0 w-full h-full object-cover pointer-events-none z-0" />
+                <img src="/digital-card/digitalcard-illa.png?v=update1" alt="ILLA Exclusive Digital Card" className="absolute inset-0 w-full h-full object-cover pointer-events-none z-0" />
 
                 {/* Sub-container for interactive/dynamic elements overlaying the image */}
                 <div className="absolute inset-0 z-10 flex flex-col">
