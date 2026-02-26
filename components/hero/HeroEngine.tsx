@@ -282,11 +282,16 @@ export function HeroEngine({
 
             let frameSource: ImageBitmap | HTMLImageElement
             try {
-                // Try off-main-thread decode
-                frameSource = await createImageBitmap(blob, {
-                    premultiplyAlpha: 'none',
-                    colorSpaceConversion: 'none'
-                })
+                // Try off-main-thread decode, but SKIP on mobile because iOS Safari iOS 15- 
+                // crashes the GPU process immediately when creating too many ImageBitmaps
+                if (!state.current.isMobile) {
+                    frameSource = await createImageBitmap(blob, {
+                        premultiplyAlpha: 'none',
+                        colorSpaceConversion: 'none'
+                    })
+                } else {
+                    throw new Error('Skip Bitmap on Mobile')
+                }
             } catch (bitmapError) {
                 // Fallback to Image element if createImageBitmap fails or is unsupported
                 frameSource = await new Promise<HTMLImageElement>((resolve, reject) => {

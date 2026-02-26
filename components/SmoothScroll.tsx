@@ -61,26 +61,27 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
     }, [])
 
     return (
-        <ReactLenis
-            ref={lenisRef}
-            root
-            options={isMobile ? {
-                // Mobile: cinematic smooth scroll with Lenis controlling everything
-                lerp: 0.1,
-                duration: 1.2,
-                smoothWheel: true,
-                touchMultiplier: 1.2,
-                // syncTouch is omitted here to prevent severe iOS/Android passive touch-action bugs
-            } : {
-                // Desktop: full cinematic smooth
-                lerp: 0.1,
-                duration: 1.5,
-                smoothWheel: true,
-                touchMultiplier: 2,
-                syncTouch: false,
-            }}
-        >
-            {children}
-        </ReactLenis>
+        <>
+            {isMobile ? (
+                <div className="w-full h-full">
+                    {children}
+                </div>
+            ) : (
+                <ReactLenis
+                    ref={lenisRef}
+                    root
+                    options={{
+                        // Desktop: full cinematic smooth
+                        lerp: 0.1,
+                        duration: 1.5,
+                        smoothWheel: true,
+                        touchMultiplier: 2,
+                        syncTouch: false,
+                    }}
+                >
+                    {children}
+                </ReactLenis>
+            )}
+        </>
     )
 }

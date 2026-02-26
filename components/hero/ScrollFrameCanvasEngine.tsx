@@ -130,14 +130,30 @@ export function ScrollFrameCanvasEngine({
         const url = state.current.props.getFrameUrl(index)
 
         try {
-            // High-perf loading
-            // Fetch blob -> createImageBitmap (off-main-thread decode)
-            const resp = await fetch(url)
-            const blob = await resp.blob()
-            const bitmap = await createImageBitmap(blob, {
-                premultiplyAlpha: 'none',
-                colorSpaceConversion: 'none'
-            })
+            let bitmap: ImageBitmap | HTMLImageElement
+            try {
+                // High-perf loading
+                const resp = await fetch(url)
+                const blob = await resp.blob()
+                if (window.innerWidth >= 768) {
+                    bitmap = await createImageBitmap(blob, {
+                        premultiplyAlpha: 'none',
+                        colorSpaceConversion: 'none'
+                    })
+                } else {
+                    throw new Error('Skip Bitmap on Mobile to prevent iOS Safari GPU crash')
+                }
+            } catch (bitmapErr) {
+                bitmap = await new Promise<HTMLImageElement>((resolve, reject) => {
+                    // Re-fetch if blob isn't available from the primary try block
+                    fetch(url).then(r => r.blob()).then(fallbackBlob => {
+                        const img = new Image()
+                        img.onload = () => resolve(img)
+                        img.onerror = reject
+                        img.src = URL.createObjectURL(fallbackBlob)
+                    }).catch(reject)
+                })
+            }
 
             state.current.cache.add(index, bitmap)
 
