@@ -72,11 +72,11 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
             whileHover={canClaim && !claiming ? { scale: 1.02, y: -4 } : { scale: 1.01 }}
             whileTap={canClaim && !claiming ? { scale: 0.98 } : { scale: 0.99 }}
             transition={{ type: "spring", stiffness: 400, damping: 17 }}
-            className={`relative overflow-hidden transition-colors duration-500 group h-full flex flex-col justify-between ${isClaimed
-                ? 'bg-white/[0.04] rounded-[2rem] border border-white/10 opacity-70 grayscale p-5 backdrop-blur-md shadow-inner'
+            className={`relative overflow-hidden transition-colors duration-500 group h-full flex flex-col justify-between p-5 ${isClaimed
+                ? 'opacity-70 grayscale'
                 : canClaim
-                    ? `bg-white/25 rounded-[2rem] border-[1.5px] ${theme.border} ${theme.shadow} ring-1 ${theme.ring} p-5 backdrop-blur-2xl bg-blend-overlay`
-                    : 'bg-[#0f0f11]/40 rounded-[2rem] border border-white/20 hover:border-white/30 hover:bg-[#0f0f11]/50 shadow-[0_8px_32px_rgba(0,0,0,0.4)] p-5 backdrop-blur-2xl bg-blend-overlay'
+                    ? `bg-white/5 rounded-[2rem] border border-white/10 ${theme.shadow} ring-1 ${theme.ring} backdrop-blur-2xl`
+                    : 'bg-white/5 rounded-[2rem] border border-white/5 hover:border-white/10 hover:bg-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.1)] backdrop-blur-2xl'
                 }`}
         >
             {/* Spotlight only on actionable cards */}
