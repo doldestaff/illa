@@ -90,6 +90,19 @@ export default function InventoryModal({ isOpen, onClose, initialTab = 'sorvetes
                     {/* Tabs */}
                     <div className="flex p-2 bg-black/20 gap-2">
                         <button
+                            onClick={() => setActiveTab('drops')}
+                            className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${activeTab === 'drops'
+                                ? 'bg-[#38bdf8] text-white shadow-lg shadow-[#38bdf8]/20'
+                                : 'text-white/40 hover:text-white hover:bg-white/5'
+                                }`}
+                        >
+                            <Zap size={16} />
+                            Histórico de Drops
+                            <span className="bg-black/20 px-1.5 py-0.5 rounded-md text-[10px]">
+                                {data.drops.length}
+                            </span>
+                        </button>
+                        <button
                             onClick={() => setActiveTab('sorvetes')}
                             className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${activeTab === 'sorvetes'
                                 ? 'bg-illa-pink text-white shadow-lg shadow-illa-pink/20'
@@ -100,19 +113,6 @@ export default function InventoryModal({ isOpen, onClose, initialTab = 'sorvetes
                             Meus Sorvetes
                             <span className="bg-black/20 px-1.5 py-0.5 rounded-md text-[10px]">
                                 {data.sorvetes.length}
-                            </span>
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('drops')}
-                            className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${activeTab === 'drops'
-                                ? 'bg-illa-yellow text-white shadow-lg shadow-illa-yellow/20'
-                                : 'text-white/40 hover:text-white hover:bg-white/5'
-                                }`}
-                        >
-                            <Zap size={16} />
-                            Histórico de Drops
-                            <span className="bg-black/20 px-1.5 py-0.5 rounded-md text-[10px]">
-                                {data.drops.length}
                             </span>
                         </button>
                     </div>
