@@ -111,12 +111,7 @@ function PostTile({ post, onClick, index }: { post: InstaPost; onClick: () => vo
                 sizes="(max-width: 768px) 33vw, 25vw"
             />
 
-            {/* Reel badge */}
-            {post.type === 'reel' && (
-                <div className="absolute top-2 right-2 z-10">
-                    <Play size={14} className="text-white drop-shadow-lg fill-white" />
-                </div>
-            )}
+
 
             {/* Hover overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-end pb-3 gap-1">
@@ -178,14 +173,7 @@ function PostModal({ post, onClose }: { post: InstaPost; onClose: () => void }) 
                     {/* Bottom gradient on image */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
 
-                    {/* Play badge on image */}
-                    {post.type === 'reel' && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-xl">
-                                <Play size={28} className="text-white fill-white translate-x-0.5" />
-                            </div>
-                        </div>
-                    )}
+
 
                     {/* Likes on image */}
                     <div className="absolute bottom-3 left-4 flex items-center gap-1.5">

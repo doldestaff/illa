@@ -14,6 +14,7 @@ function InteractiveMarquee({ children }: { children: React.ReactNode }) {
     // Interaction/Scroll state tracked purely in refs to avoid React renders
     const isInteractingRef = useRef(false)
     const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+    const onOpenModalRef = useRef<(() => void) | undefined>(undefined)
 
     useEffect(() => {
         const container = containerRef.current
@@ -101,6 +102,9 @@ function InteractiveMarquee({ children }: { children: React.ReactNode }) {
             className="flex overflow-x-auto gap-5 pb-8 scrollbar-hide py-4 snap-mandatory snap-x md:snap-none"
             style={{ willChange: 'scroll-position', overscrollBehaviorX: 'contain' }}
         >
+            <div className="flex shrink-0 gap-5">
+                {children}
+            </div>
             <div className="flex shrink-0 gap-5">
                 {children}
             </div>
@@ -218,20 +222,25 @@ export default function DailyMissions({ missions, onClaim }: Props) {
                             </div>
                         )
                     })}
-
-                    {/* "See All" Card */}
-                    {hasMore && (
-                        <div
-                            onClick={() => setIsModalOpen(true)}
-                            className="w-[180px] shrink-0 snap-center flex flex-col items-center justify-center gap-4 rounded-[2rem] border border-dashed border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 active:scale-95 transition-all cursor-pointer backdrop-blur-sm h-[220px] group/more"
-                        >
-                            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-white/10 to-transparent flex items-center justify-center group-hover/more:scale-110 transition-transform duration-300 shadow-lg">
-                                <LayoutGrid size={28} className="text-white/40 group-hover/more:text-white transition-colors" />
-                            </div>
-                            <span className="text-sm font-bold text-white/50 group-hover/more:text-white transition-colors uppercase tracking-wider">Ver +{missions.length - 3}</span>
-                        </div>
-                    )}
                 </InteractiveMarquee>
+
+                {/* Fade edges overlays */}
+                <div className="absolute left-0 top-0 bottom-0 w-8 md:w-16 bg-gradient-to-r from-[#0f0f11] to-transparent pointer-events-none z-10" />
+                <div className="absolute right-0 top-0 bottom-0 w-8 md:w-16 bg-gradient-to-l from-[#0f0f11] to-transparent pointer-events-none z-10" />
+            </div>
+
+            {/* Clear Call to Action for Missions Panel */}
+            <div className="px-4 mt-2">
+                <button
+                    onClick={() => setIsModalOpen(true)}
+                    className="group flex w-full md:w-auto md:mx-auto items-center justify-center gap-2 py-3 px-8 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300 relative overflow-hidden backdrop-blur-md"
+                >
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent w-full translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out" />
+                    <span className="text-xs font-semibold uppercase tracking-widest text-white/70 group-hover:text-white transition-colors">
+                        Abrir Mural de Missões
+                    </span>
+                    <ArrowRight size={14} className="text-white/40 group-hover:text-white group-hover:translate-x-1 transition-all" />
+                </button>
             </div>
 
             {/* All Completed Bonus State */}
