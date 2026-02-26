@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, useEffect, useCallback } from 'react'
-import { Info, Store, MapPin, MessageCircle, ShoppingBag, Instagram, ArrowRight } from 'lucide-react'
+import { Info, Store, MapPin, MessageCircle, ShoppingBag, Instagram, ArrowRight, ArrowUp } from 'lucide-react'
 import { useLenis } from 'lenis/react'
 import { cn } from '@/lib/utils'
 
@@ -109,6 +109,19 @@ export function PinnedButtonsParallax() {
     const containerRef = useRef<HTMLDivElement>(null)
     const cardsRef = useRef<(HTMLAnchorElement | null)[]>([])
     const dotsRef = useRef<(HTMLDivElement | null)[]>([])
+
+    type DOMCache = {
+        video: HTMLElement | null
+        indicator: HTMLElement | null
+        upIndicator: HTMLElement | null
+        cards: Array<{
+            content: HTMLElement | null
+            icon: HTMLElement | null
+            highlight: HTMLElement | null
+        }>
+    }
+    const domCacheRef = useRef<DOMCache | null>(null)
+
     const [isTablet, setIsTablet] = useState(false)
     const [isMobile, setIsMobile] = useState(false)
 
@@ -129,6 +142,24 @@ export function PinnedButtonsParallax() {
     const updateParallax = useCallback(() => {
         if (!containerRef.current) return
 
+        if (!domCacheRef.current) {
+            domCacheRef.current = {
+                video: containerRef.current.querySelector('.lazy-parallax-video') as HTMLElement | null,
+                indicator: containerRef.current.querySelector('#parallax-scroll-indicator') as HTMLElement | null,
+                upIndicator: containerRef.current.querySelector('#scroll-up-indicator') as HTMLElement | null,
+                cards: cardsRef.current.map(card => {
+                    if (!card) return { content: null, icon: null, highlight: null }
+                    return {
+                        content: card.querySelector('.card-content') as HTMLElement | null,
+                        icon: card.querySelector('.card-icon') as HTMLElement | null,
+                        highlight: card.querySelector('.glass-highlight') as HTMLElement | null,
+                    }
+                })
+            }
+        }
+
+        const cache = domCacheRef.current
+
         const rect = containerRef.current.getBoundingClientRect()
         const height = rect.height
         const windowH = window.innerHeight
@@ -138,46 +169,46 @@ export function PinnedButtonsParallax() {
         const progress = Math.max(0, Math.min(1, rawProgress));
 
         // Background Parallax Update (Sync with scroll)
-        const video = containerRef.current.querySelector('.lazy-parallax-video') as HTMLElement
-        if (video) {
+        if (cache.video) {
             const videoY = (progress - 0.5) * 60 // Subtle movement
-            video.style.transform = `translate3d(0, ${videoY}px, 0) scale(1.15)`
+            cache.video.style.transform = `translate3d(0, ${videoY}px, 0) scale(1.15)`
         }
 
         const totalCards = cards.length
         const step = 1 / totalCards
         // Mobile: less overlap = clear card separation; tablet/desktop: more cinematic overlap
-        const overlap = isTablet ? 0.35 : isMobile ? 0.25 : 0.6
+        const overlap = isTablet ? 0.35 : isMobile ? 0.15 : 0.6
 
         // ── Hold-curve for mobile ────────────────────────────────────────────────
-        // Remaps localP so the center window (0.3–0.7) is compressed to a slow crawl,
-        // creating a natural ~1s visual pause before the next card enters.
+        // Remaps localP so the center window is compressed to a slow crawl,
+        // creating a natural visual pause before the next card enters.
         const applyHoldCurve = (p: number): number => {
             if (!isMobile) return p
-            const ENTRY_END = 0.30  // 0..0.30 → fast entry
-            const CENTER_START = 0.30
-            const CENTER_END = 0.70  // 0.30..0.70 → slow hold
-            const EXIT_START = 0.70  // 0.70..1 → fast exit
+            const ENTRY_END = 0.20  // 0..0.20 → fast entry
+            const CENTER_START = 0.20
+            const CENTER_END = 0.80  // 0.20..0.80 → extremely slow hold (long duration)
+            const EXIT_START = 0.80  // 0.80..1 → fast exit
             if (p <= ENTRY_END) {
-                // Map 0..0.30 → 0..0.38 (slightly compressed entry)
-                return (p / ENTRY_END) * 0.38
+                // Map 0..0.20 → 0..0.35 (slightly compressed entry)
+                return (p / ENTRY_END) * 0.35
             } else if (p <= CENTER_END) {
-                // Map 0.30..0.70 → 0.38..0.62 (VERY slow — hold zone)
+                // Map 0.20..0.80 → 0.35..0.65 (VERY slow — large plateau / hold zone)
                 const t = (p - CENTER_START) / (CENTER_END - CENTER_START)
-                return 0.38 + t * 0.24
+                return 0.35 + t * 0.30
             } else {
-                // Map 0.70..1 → 0.62..1 (slightly compressed exit)
+                // Map 0.80..1 → 0.65..1 (slightly compressed exit)
                 const t = (p - EXIT_START) / (1 - EXIT_START)
-                return 0.62 + t * 0.38
+                return 0.65 + t * 0.35
             }
         }
 
         cardsRef.current.forEach((card, i) => {
             if (!card) return
 
-            const content = card.querySelector('.card-content') as HTMLElement | null
-            const icon = card.querySelector('.card-icon') as HTMLElement | null
-            const highlight = card.querySelector('.glass-highlight') as HTMLElement | null
+            const cardCache = cache.cards[i]
+            const content = cardCache?.content
+            const icon = cardCache?.icon
+            const highlight = cardCache?.highlight
             const dot = dotsRef.current[i]
 
             const start = (i * step) - (i > 0 ? step * overlap : 0)
@@ -187,10 +218,9 @@ export function PinnedButtonsParallax() {
             const localP = applyHoldCurve(rawLocalP)
 
             // Fade out the scroll indicator when reaching the end (Goal Gradient Effect)
-            const indicator = containerRef.current?.querySelector('#parallax-scroll-indicator') as HTMLElement | null
-            if (indicator && i === 0) {
+            if (cache.indicator && i === 0) {
                 const indicatorOpacity = progress > 0.85 ? Math.max(0, 1 - ((progress - 0.85) / 0.15)) : 1
-                indicator.style.opacity = indicatorOpacity.toString()
+                cache.indicator.style.opacity = indicatorOpacity.toString()
             }
 
             const dir = i % 2 === 0 ? -1 : 1
@@ -268,6 +298,12 @@ export function PinnedButtonsParallax() {
                 dot.style.opacity = (0.3 + (opacity * 0.7)).toString()
             }
         })
+
+        if (cache.upIndicator) {
+            const showUp = progress > 0.95
+            cache.upIndicator.style.opacity = showUp ? '1' : '0'
+            cache.upIndicator.style.pointerEvents = showUp ? 'auto' : 'none'
+        }
     }, [isTablet, isMobile])
 
     useEffect(() => {
@@ -298,7 +334,7 @@ export function PinnedButtonsParallax() {
     return (
         <section
             ref={containerRef}
-            className={cn('relative w-full bg-white text-dark', isTablet ? 'h-[550vh]' : isMobile ? 'h-[500vh]' : 'h-[400vh]')}
+            className={cn('relative w-full bg-white text-dark', isTablet ? 'h-[550vh]' : isMobile ? 'h-[700vh]' : 'h-[400vh]')}
         >
             <div className="sticky top-0 w-full h-[100vh] min-h-[100dvh] flex items-center justify-center overflow-hidden">
 
@@ -363,7 +399,7 @@ export function PinnedButtonsParallax() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <h3 className="font-bold text-3xl md:text-4xl font-script bg-clip-text text-transparent bg-gradient-to-br from-white via-white/95 to-white/70 [filter:drop-shadow(0_2px_8px_rgba(0,0,0,0.55))_drop-shadow(0_1px_3px_rgba(0,0,0,0.4))]">
+                                    <h3 className="font-bold text-3xl md:text-4xl font-script bg-clip-text text-transparent bg-gradient-to-br from-white via-white/95 to-white/70 [filter:drop-shadow(0_4px_12px_rgba(0,0,0,0.85))_drop-shadow(0_2px_4px_rgba(0,0,0,0.7))]">
                                         {card.title}
                                     </h3>
                                     <p className="text-[#2D2D30] font-medium leading-relaxed max-w-[270px] mx-auto text-sm tracking-wide opacity-80 transition-opacity group-hover:opacity-100">
@@ -404,6 +440,29 @@ export function PinnedButtonsParallax() {
                             }}
                         />
                     </div>
+                </div>
+
+                {/* Mobile Scroll Up Indicator at the very end of the section */}
+                <div id="scroll-up-indicator" className="absolute bottom-16 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pointer-events-none z-50 transition-opacity duration-300 opacity-0 md:hidden">
+                    <button
+                        onClick={(e) => {
+                            e.preventDefault()
+                            const section = containerRef.current
+                            if (section && lenis) {
+                                // Scroll just enough up to activate scrolling reverse flow easily
+                                lenis.scrollTo(section.getBoundingClientRect().top + window.scrollY - 100)
+                            } else {
+                                window.scrollTo({ top: window.scrollY - window.innerHeight * 0.5, behavior: 'smooth' })
+                            }
+                        }}
+                        className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-[0_4px_16px_rgba(0,0,0,0.5)] hover:bg-black/60 transition-colors pointer-events-auto"
+                        aria-label="Voltar para cima"
+                    >
+                        <ArrowUp size={24} className="text-white drop-shadow-md animate-bounce" />
+                    </button>
+                    <span className="text-white text-[11px] font-bold uppercase tracking-wider drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] text-center w-max px-3 py-1 bg-black/30 rounded-full backdrop-blur-sm">
+                        Deslize de volta
+                    </span>
                 </div>
 
                 <style dangerouslySetInnerHTML={{
