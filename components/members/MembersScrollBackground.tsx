@@ -25,11 +25,11 @@ export default function MembersScrollBackground() {
 
     // 0px (topo) → 0.9 escuro para legibilidade do header e avatar
     // ~480px (missões) → 0 totalmente transparente — background 100% visível
-    // ~900px (loja de descontos) → 0.45 (vitral escurece 50% do inicial)
-    const overlayOpacity = useTransform(scrollY, [0, 80, 480, 600, 900], [0.9, 0.85, 0, 0, 0.45])
+    // ~900px (loja de descontos em diante) → vitral volta a escurecer (0.85) como no topo
+    const overlayOpacity = useTransform(scrollY, [0, 80, 480, 600, 900], [0.9, 0.85, 0, 0, 0.85])
 
-    // A própria imagem de fundo clareia gradualmente nas missões e permanece acesa
-    const imageOpacity = useTransform(scrollY, [0, 80, 480], [0.35, 0.45, 1])
+    // A imagem também diminui o brilho para destacar os cards da Área VIP
+    const imageOpacity = useTransform(scrollY, [0, 80, 480, 600, 900], [0.35, 0.45, 1, 1, 0.45])
 
     // Detect mobile once on mount
     useEffect(() => {
