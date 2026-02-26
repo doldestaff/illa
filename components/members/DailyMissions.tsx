@@ -257,13 +257,12 @@ export default function DailyMissions({ missions, onClaim }: Props) {
             <div className="px-4 mt-2">
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="group flex w-full md:w-auto md:mx-auto items-center justify-center gap-2 py-3 px-8 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300 relative overflow-hidden backdrop-blur-md"
+                    className="group flex w-full md:w-auto md:mx-auto items-center justify-center gap-2 py-4 px-6 transition-all duration-300 relative overflow-hidden"
                 >
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent w-full translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out" />
-                    <span className="text-xs font-semibold uppercase tracking-widest text-white/70 group-hover:text-white transition-colors">
+                    <span className="text-sm font-semibold uppercase tracking-[0.2em] text-white/60 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-white/60 transition-all duration-300 drop-shadow-md">
                         Abrir Mural de Missões
                     </span>
-                    <ArrowRight size={14} className="text-white/40 group-hover:text-white group-hover:translate-x-1 transition-all" />
+                    <ArrowRight size={16} className="text-white/40 group-hover:text-white group-hover:translate-x-2 transition-transform duration-500 ease-out" strokeWidth={2.5} />
                 </button>
             </div>
 
