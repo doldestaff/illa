@@ -168,12 +168,15 @@ export default function DailyMissions({ missions, onClaim }: Props) {
             <div className="absolute -top-10 -left-10 w-64 h-64 bg-illa-pink/10 rounded-full blur-[80px] pointer-events-none" />
             <div className="absolute top-20 right-0 w-64 h-64 bg-illa-yellow/5 rounded-full blur-[80px] pointer-events-none" />
 
-            {/* Header - Interactive & Cinematic */}
+            {/* Header - Interactive & Cinematic com fundo escuro para contraste */}
             <div
                 onClick={() => setIsModalOpen(true)}
                 className="relative z-10 flex items-center justify-between cursor-pointer group select-none px-4 md:px-0"
             >
-                <div className="flex items-center gap-4">
+                {/* Fundo escuro sólido atrás do título */}
+                <div className="absolute inset-x-0 -inset-y-3 bg-gradient-to-b from-black/70 via-black/60 to-black/20 rounded-3xl backdrop-blur-sm -mx-4 pointer-events-none" />
+
+                <div className="flex items-center gap-4 relative z-10">
                     <div className="relative">
                         <div className="absolute inset-0 bg-illa-pink/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                         <div className="bg-gradient-to-br from-white/10 to-white/5 p-3 rounded-2xl border border-white/10 group-hover:border-illa-pink/30 group-hover:bg-white/10 transition-all duration-300 relative z-10 backdrop-blur-sm">
@@ -181,17 +184,17 @@ export default function DailyMissions({ missions, onClaim }: Props) {
                         </div>
                     </div>
                     <div>
-                        <h2 className="text-xl md:text-2xl font-black text-white flex items-center gap-2 drop-shadow-lg tracking-tight">
+                        <h2 className="text-xl md:text-2xl font-black text-white flex items-center gap-2 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] tracking-tight">
                             Missões do Dia
                             <ArrowRight size={20} className="text-illa-pink opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
                         </h2>
-                        <p className="text-xs font-medium text-white/40 group-hover:text-white/60 transition-colors uppercase tracking-widest mt-1">
+                        <p className="text-xs font-medium text-white/60 group-hover:text-white/80 transition-colors uppercase tracking-widest mt-1 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
                             Ver todas as missões
                         </p>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 relative z-10">
                     <div className={`px-4 py-2 rounded-full border backdrop-blur-md transition-all duration-300 ${allCompleted
                         ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]'
                         : 'bg-white/5 border-white/10 text-white/50 group-hover:border-white/20 group-hover:bg-white/10'
@@ -203,17 +206,37 @@ export default function DailyMissions({ missions, onClaim }: Props) {
 
             {/* Unified Marquee Preview (Desktop & Mobile) */}
             <div className="relative group/mural py-4 -mx-4 px-4 w-full max-w-[100vw] overflow-hidden">
+                {/* Fundo escuro sob o carrossel para separar do background */}
+                <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/20 rounded-3xl -inset-x-0 pointer-events-none" />
+
                 <InteractiveMarquee>
                     {previewMissions.map((mission, index) => {
                         const isClaimed = claimedIds.has(mission.instance_id) || mission.claimed
                         const isCompleted = mission.progress >= mission.target
                         const canClaim = isCompleted && !isClaimed
+                        // Card 2 (index === 1) → Glow pulsante de destaque
+                        const isSpotlightCard = index === 1
 
                         return (
                             <div
                                 key={`mission-${mission.instance_id}`}
-                                className="w-[300px] sm:w-[340px] md:w-[360px] h-[220px] shrink-0 snap-center first:pl-2 md:first:pl-0"
+                                className="w-[300px] sm:w-[340px] md:w-[360px] h-[220px] shrink-0 snap-center first:pl-2 md:first:pl-0 relative"
                             >
+                                {/* Spotlight: pulsing glow ring only on card 2 */}
+                                {isSpotlightCard && (
+                                    <motion.div
+                                        animate={{
+                                            boxShadow: [
+                                                '0 0 0px 0px rgba(229,1,125,0)',
+                                                '0 0 24px 8px rgba(229,1,125,0.45)',
+                                                '0 0 0px 0px rgba(229,1,125,0)',
+                                            ],
+                                            scale: [1, 1.01, 1],
+                                        }}
+                                        transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+                                        className="absolute inset-0 rounded-[2rem] pointer-events-none z-20"
+                                    />
+                                )}
                                 <div className="h-full transform transition-all duration-300 md:hover:scale-[1.03] md:hover:-translate-y-2 hover:shadow-2xl hover:shadow-illa-pink/20 cursor-pointer">
                                     <MissionCard
                                         mission={mission}
