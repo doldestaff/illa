@@ -126,15 +126,15 @@ export default function VipCard({ referralCode, referralCount, vipPayload, onLoa
             <div className="relative w-[calc(100%+1.5rem)] -ml-3 sm:w-full sm:mx-auto sm:max-w-[400px] filter drop-shadow-[0_10px_40px_rgba(0,0,0,0.8)] transition-transform hover:scale-[1.01] duration-500 perspective-1000 group rounded-[2rem] bg-[#0c0514] overflow-hidden border border-white/10">
 
                 {/* Background Image Native Shape - Shorter height to crop empty bottom space */}
-                <div className="relative w-full pt-[112%] bg-[#0c0514] overflow-hidden">
-                    <img src="/digital-card/digitalcard-illa.webp?v=update8" alt="ILLA Exclusive Digital Card" className="absolute top-0 left-0 w-full h-full object-cover object-top pointer-events-none z-0" />
+                <div className="relative w-full pt-[95%] sm:pt-[100%] bg-[#0c0514] overflow-hidden">
+                    <img src="/digital-card/digitalcard-illa.webp?v=update9" alt="ILLA Exclusive Digital Card" className="absolute inset-0 w-full h-[120%] object-cover object-top pointer-events-none z-0 scale-[1.02] -translate-y-[8%]" />
                 </div>
 
                 {/* Sub-container for interactive/dynamic elements overlaying the image */}
                 <div className="absolute inset-x-0 top-0 bottom-[120px] z-10 flex flex-col">
 
                     {/* QR Code Container - positioned over the white square on the webp art */}
-                    <div className="absolute top-[16.5%] left-1/2 -translate-x-1/2 w-[35%] aspect-square flex items-center justify-center group/qr cursor-pointer">
+                    <div className="absolute top-[8%] left-1/2 -translate-x-1/2 w-[35%] aspect-square flex items-center justify-center group/qr cursor-pointer">
                         {loading || !vip ? (
                             <div className="w-full h-full flex items-center justify-center bg-white/10 backdrop-blur-sm rounded-2xl">
                                 <Loader2 size={24} className="animate-spin text-white/50" />
@@ -153,7 +153,7 @@ export default function VipCard({ referralCode, referralCount, vipPayload, onLoa
                 </div>
 
                 {/* Bottom Area - Code & Expiration close to the CHAVE DE ACESSO text on webp art */}
-                <div className="relative z-20 px-4 py-2 pb-6 flex flex-col justify-end bg-gradient-to-t from-[#0c0514] via-[#0c0514]/90 to-transparent -mt-[4.5rem]">
+                <div className="relative z-20 px-4 py-2 pb-6 flex flex-col justify-end bg-gradient-to-t from-[#0c0514] via-[#0c0514]/90 to-transparent -mt-[8rem]">
                     {/* Access Code Row */}
                     <div className="flex items-center justify-between mb-3 mt-1 px-4">
                         <span className="font-mono font-bold text-3xl tracking-[0.15em] text-white drop-shadow-md z-10">
