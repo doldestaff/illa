@@ -123,7 +123,7 @@ export default function VipCard({ referralCode, referralCount, vipPayload, onLoa
             </div>
 
             {/* Main VIP Card Container */}
-            <div className="relative w-full max-w-[400px] mx-auto filter drop-shadow-[0_10px_40px_rgba(0,0,0,0.8)] transition-transform hover:scale-[1.01] duration-500 perspective-1000 group rounded-[2rem] bg-[#0c0514] overflow-hidden border border-white/10">
+            <div className="relative w-[calc(100%+1.5rem)] -ml-3 sm:w-full sm:mx-auto sm:max-w-[400px] filter drop-shadow-[0_10px_40px_rgba(0,0,0,0.8)] transition-transform hover:scale-[1.01] duration-500 perspective-1000 group rounded-[2rem] bg-[#0c0514] overflow-hidden border border-white/10">
 
                 {/* Background Image Native Shape */}
                 <div className="relative w-full pt-[115%]"> {/* Forces a slight rectangular aspect ratio if image fails, acts as anchor */}
@@ -174,7 +174,7 @@ export default function VipCard({ referralCode, referralCount, vipPayload, onLoa
                     <div className="flex items-center justify-between text-[11px] md:text-xs text-white/50 px-2 relative z-10">
                         <div className="flex items-center gap-1.5 font-medium">
                             <Clock size={12} className="opacity-70" />
-                            <span>Expira em: <span className="text-white/80">{vip ? new Date(vip.expires_at).toLocaleDateString('pt-BR') : '--/--'}</span></span>
+                            <span className="text-white/80 tracking-wide">{vip ? new Date(vip.expires_at).toLocaleDateString('pt-BR') : '--/--'}</span>
                         </div>
                         <div className="flex items-center gap-1.5 font-medium">
                             <QrCode size={12} className="opacity-70" />
