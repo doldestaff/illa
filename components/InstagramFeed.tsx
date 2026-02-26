@@ -92,6 +92,41 @@ const posts: InstaPost[] = [
 // ─── PostTile ────────────────────────────────────────────────────────────────
 
 function PostTile({ post, onClick }: { post: InstaPost; onClick: () => void }) {
+    // Reels link directly to Instagram; images open the local modal preview
+    if (post.type === 'reel') {
+        return (
+            <motion.a
+                href={post.postUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
+                className="relative aspect-square overflow-hidden rounded-2xl group cursor-pointer focus:outline-none focus:ring-4 focus:ring-illa-pink/50 bg-gray-100 block"
+            >
+                <Image
+                    src={post.imageUrl}
+                    alt={post.caption.slice(0, 60)}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    sizes="(max-width: 768px) 33vw, 25vw"
+                />
+
+                {/* Reel badge */}
+                <div className="absolute top-2.5 right-2.5 z-10">
+                    <Play size={16} className="text-white drop-shadow-lg fill-white" />
+                </div>
+
+                {/* Hover overlay — play CTA */}
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-2">
+                    <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/40">
+                        <Play size={22} className="text-white fill-white translate-x-0.5" />
+                    </div>
+                    <span className="text-white font-bold text-xs">Ver no Instagram</span>
+                </div>
+            </motion.a>
+        )
+    }
+
     return (
         <motion.button
             whileHover={{ scale: 1.04 }}
@@ -106,13 +141,6 @@ function PostTile({ post, onClick }: { post: InstaPost; onClick: () => void }) {
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
                 sizes="(max-width: 768px) 33vw, 25vw"
             />
-
-            {/* Reel badge */}
-            {post.type === 'reel' && (
-                <div className="absolute top-2.5 right-2.5 z-10">
-                    <Play size={16} className="text-white drop-shadow-lg fill-white" />
-                </div>
-            )}
 
             {/* Hover overlay */}
             <div className="absolute inset-0 bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-1.5">
