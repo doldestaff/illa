@@ -25,9 +25,10 @@ export default function MembersScrollBackground() {
 
     // 0px (topo) → 0.9 escuro para legibilidade do header e avatar
     // ~480px (missões) → 0 totalmente transparente — background 100% visível
-    const overlayOpacity = useTransform(scrollY, [0, 80, 480], [0.9, 0.85, 0])
+    // ~900px (loja de descontos) → 0.45 (vitral escurece 50% do inicial)
+    const overlayOpacity = useTransform(scrollY, [0, 80, 480, 600, 900], [0.9, 0.85, 0, 0, 0.45])
 
-    // A própria imagem de fundo clareia gradualmente
+    // A própria imagem de fundo clareia gradualmente nas missões e permanece acesa
     const imageOpacity = useTransform(scrollY, [0, 80, 480], [0.35, 0.45, 1])
 
     // Detect mobile once on mount
