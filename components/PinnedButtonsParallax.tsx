@@ -60,36 +60,39 @@ const cards = [
 function LazyVideo() {
     const videoRef = useRef<HTMLVideoElement>(null)
     const containerRef = useRef<HTMLDivElement>(null)
-    const [isVisible, setIsVisible] = useState(false)
 
     useEffect(() => {
+        const video = videoRef.current
         const el = containerRef.current
-        if (!el) return
+        if (!video || !el) return
+
+        // Ensure play starts even if autoPlay was deferred by browser
+        video.play().catch(() => { })
+
         const observer = new IntersectionObserver(
-            ([entry]) => setIsVisible(entry.isIntersecting),
-            { rootMargin: '400px', threshold: 0.01 }
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    video.play().catch(() => { })
+                } else {
+                    video.pause()
+                }
+            },
+            { rootMargin: '100px', threshold: 0 }
         )
         observer.observe(el)
         return () => observer.disconnect()
     }, [])
 
-    useEffect(() => {
-        if (isVisible) {
-            videoRef.current?.play().catch(() => { })
-        } else {
-            videoRef.current?.pause()
-        }
-    }, [isVisible])
-
     return (
         <div ref={containerRef} className="absolute inset-0 z-0 bg-[#F5F5F7]">
             <video
                 ref={videoRef}
-                className={cn(
-                    'lazy-parallax-video w-full h-full object-cover transition-opacity duration-1000',
-                    isVisible ? 'opacity-100' : 'opacity-0'
-                )}
-                loop muted playsInline preload="none"
+                className="lazy-parallax-video w-full h-full object-cover"
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload="auto"
                 src="/instagram/reels/mobile/Insta-1.mp4"
                 style={{
                     transform: `translate3d(0, 0px, 0) scale(1.15)`,
@@ -265,7 +268,6 @@ export function PinnedButtonsParallax() {
                 dot.style.opacity = (0.3 + (opacity * 0.7)).toString()
             }
         })
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isTablet, isMobile])
 
     useEffect(() => {
