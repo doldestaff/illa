@@ -107,7 +107,9 @@ export function PinnedButtonsParallax() {
     const cardsRef = useRef<(HTMLAnchorElement | null)[]>([])
     const dotsRef = useRef<(HTMLDivElement | null)[]>([])
 
-    const lenis = useLenis(() => {
+    const updateParallaxRef = useRef<() => void>()
+
+    updateParallaxRef.current = () => {
         if (!containerRef.current) return
 
         const rect = containerRef.current.getBoundingClientRect()
@@ -225,6 +227,27 @@ export function PinnedButtonsParallax() {
                 dot.style.opacity = (0.3 + (opacity * 0.7)).toString()
             }
         })
+    }
+
+    const lenis = useLenis(() => {
+        updateParallaxRef.current?.()
+    })
+
+    useEffect(() => {
+        let rafId: number
+        const onScroll = () => {
+            cancelAnimationFrame(rafId)
+            rafId = requestAnimationFrame(() => updateParallaxRef.current?.())
+        }
+
+        window.addEventListener('scroll', onScroll, { passive: true })
+        // Initial setup to paint first frame
+        updateParallaxRef.current?.()
+
+        return () => {
+            window.removeEventListener('scroll', onScroll)
+            cancelAnimationFrame(rafId)
+        }
     }, [])
 
     return (
@@ -252,7 +275,15 @@ export function PinnedButtonsParallax() {
                                     window.dispatchEvent(new CustomEvent(card.action))
                                 } else if (card.href.startsWith('#')) {
                                     e.preventDefault()
-                                    lenis?.scrollTo(card.href, { offset: -50 })
+                                    if (lenis) {
+                                        lenis.scrollTo(card.href, { offset: -50 })
+                                    } else {
+                                        const target = document.querySelector(card.href)
+                                        if (target) {
+                                            const y = target.getBoundingClientRect().top + window.scrollY - 50
+                                            window.scrollTo({ top: y, behavior: 'smooth' })
+                                        }
+                                    }
                                 }
                             }}
                             className={cn(
