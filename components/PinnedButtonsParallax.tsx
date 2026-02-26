@@ -181,7 +181,7 @@ export function PinnedButtonsParallax() {
             const duration = step + step * overlap
 
             const rawLocalP = Math.max(0, Math.min(1, (progress - start) / duration))
-            let localP = applyHoldCurve(rawLocalP)
+            const localP = applyHoldCurve(rawLocalP)
 
             // Fade out the scroll indicator when reaching the end (Goal Gradient Effect)
             const indicator = containerRef.current?.querySelector('#parallax-scroll-indicator') as HTMLElement | null
@@ -361,7 +361,7 @@ export function PinnedButtonsParallax() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <h3 className="font-bold text-3xl md:text-4xl font-script bg-clip-text text-transparent bg-gradient-to-br from-white via-white/95 to-white/70 drop-shadow-sm">
+                                    <h3 className="font-bold text-3xl md:text-4xl font-script bg-clip-text text-transparent bg-gradient-to-br from-white via-white/95 to-white/70 [filter:drop-shadow(0_2px_8px_rgba(0,0,0,0.55))_drop-shadow(0_1px_3px_rgba(0,0,0,0.4))]">
                                         {card.title}
                                     </h3>
                                     <p className="text-[#2D2D30] font-medium leading-relaxed max-w-[270px] mx-auto text-sm tracking-wide opacity-80 transition-opacity group-hover:opacity-100">
