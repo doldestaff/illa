@@ -134,7 +134,7 @@ export default function VipCard({ referralCode, referralCount, vipPayload, onLoa
                 <div className="absolute inset-x-0 top-0 bottom-[120px] z-10 flex flex-col">
 
                     {/* QR Code Container - positioned over the white square on the webp art */}
-                    <div className="absolute top-[25%] left-1/2 -translate-x-1/2 w-[35%] aspect-square flex items-center justify-center group/qr cursor-pointer">
+                    <div className="absolute top-[29%] left-1/2 -translate-x-1/2 w-[35%] aspect-square flex items-center justify-center group/qr cursor-pointer">
                         {loading || !vip ? (
                             <div className="w-full h-full flex items-center justify-center bg-white/10 backdrop-blur-sm rounded-2xl">
                                 <Loader2 size={24} className="animate-spin text-white/50" />
