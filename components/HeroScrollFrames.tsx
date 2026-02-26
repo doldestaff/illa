@@ -45,7 +45,7 @@ export function HeroScrollFrames() {
             <div className="sticky top-0 w-full h-[100vh] min-h-[100dvh] overflow-hidden bg-[#111]">
                 {/* SSR skeleton — high priority poster to prevent flash, but SYNCHRONOUS decoding so iOS doesn't panic on hydration switch */}
                 <img
-                    src="/hero/mobile/frames/hero-1-mobile_002.webp"
+                    src="/hero/mobile/frames/hero-1-mobile_004.webp"
                     className="absolute inset-0 w-full h-full object-cover md:hidden"
                     alt="Illa Loading"
                 />
@@ -72,11 +72,11 @@ export function HeroScrollFrames() {
                 {/* Unified Engine — inline manifest eliminates fetch waterfall */}
                 <HeroEngine
                     inlineManifest={manifest}
-                    posterUrl={`/hero/${isMobile ? 'mobile' : 'desktop'}/frames/hero-1-${isMobile ? 'mobile' : 'desktop'}_002.webp`}
+                    posterUrl={`/hero/${isMobile ? 'mobile' : 'desktop'}/frames/hero-1-${isMobile ? 'mobile' : 'desktop'}_${isMobile ? '004' : '002'}.webp`}
                     scrollMode="viewport"
                     scrollSectionHeightVh={SCROLL_HEIGHT_vh}
                     onProgress={handleProgress}
-                    startIndex={2}
+                    startIndex={0}
                     debug={typeof window !== 'undefined' && window.location.search.includes('debugHero')}
                     className="z-10"
                 />
