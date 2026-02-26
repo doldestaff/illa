@@ -64,11 +64,7 @@ export default function MissionsModal({ isOpen, onClose, missions, claimingId, c
                             animate={{ scale: 1, opacity: 1, y: 0 }}
                             exit={{ scale: 0.97, opacity: 0, y: 20 }}
                             transition={{ type: 'spring', damping: 28, stiffness: 320 }}
-                            className="w-full max-w-lg sm:max-h-[88vh] h-[92dvh] sm:h-auto rounded-t-[2.5rem] sm:rounded-[2.5rem] overflow-hidden pointer-events-auto flex flex-col relative"
-                            style={{
-                                background: 'linear-gradient(145deg, rgba(18,14,28,0.98) 0%, rgba(10,6,22,0.99) 100%)',
-                                boxShadow: '0 -8px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.06), inset 0 1px 0 rgba(255,255,255,0.08)',
-                            }}
+                            className="w-full max-w-lg sm:max-h-[88vh] h-[92dvh] sm:h-auto rounded-t-[2.5rem] sm:rounded-[2.5rem] overflow-hidden pointer-events-auto flex flex-col relative bg-[#0a0616]/60 backdrop-blur-3xl border border-white/10 shadow-[0_-8px_60px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.08)]"
                         >
                             {/* Ambient glows */}
                             <div className="absolute -top-24 -left-24 w-64 h-64 bg-illa-pink/15 rounded-full blur-[80px] pointer-events-none" />
@@ -161,8 +157,8 @@ export default function MissionsModal({ isOpen, onClose, missions, claimingId, c
                                     })}
                             </div>
 
-                            {/* Footer gradient fade */}
-                            <div className="h-10 bg-gradient-to-t from-[rgba(10,6,22,0.99)] to-transparent pointer-events-none -mt-10 relative z-20 flex-shrink-0" />
+                            {/* Footer gradient fade using transparency */}
+                            <div className="h-12 bg-gradient-to-t from-black/80 to-transparent pointer-events-none -mt-12 relative z-20 flex-shrink-0" />
                         </motion.div>
                     </div>
                 </>
