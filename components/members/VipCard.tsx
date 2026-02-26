@@ -122,15 +122,19 @@ export default function VipCard({ referralCode, referralCount, vipPayload, onLoa
                 <h2 className="text-lg font-bold text-white">Área VIP</h2>
             </div>
 
-            {/* Main VIP Card - Image Based Layout */}
-            <div className="relative w-full max-w-[400px] mx-auto filter drop-shadow-[0_10px_40px_rgba(0,0,0,0.8)] transition-transform hover:scale-[1.01] duration-500 perspective-1000 group">
-                <img src="/digital-card/digitalcard-illa.webp?v=update3" alt="ILLA Exclusive Digital Card" className="w-full h-auto object-contain pointer-events-none z-0" />
+            {/* Main VIP Card Container */}
+            <div className="relative w-full max-w-[400px] mx-auto filter drop-shadow-[0_10px_40px_rgba(0,0,0,0.8)] transition-transform hover:scale-[1.01] duration-500 perspective-1000 group rounded-[2rem] bg-[#0c0514] overflow-hidden border border-white/10">
+
+                {/* Background Image Native Shape */}
+                <div className="relative w-full pt-[115%]"> {/* Forces a slight rectangular aspect ratio if image fails, acts as anchor */}
+                    <img src="/digital-card/digitalcard-illa.webp?v=update4" alt="ILLA Exclusive Digital Card" className="absolute top-0 left-0 w-full h-auto object-contain pointer-events-none z-0" />
+                </div>
 
                 {/* Sub-container for interactive/dynamic elements overlaying the image */}
-                <div className="absolute inset-0 z-10 flex flex-col">
+                <div className="absolute inset-x-0 top-0 bottom-[120px] z-10 flex flex-col">
 
                     {/* QR Code Container - Absolute positioned over the white square cavity */}
-                    <div className="absolute top-[26%] lg:top-[28%] left-1/2 -translate-x-1/2 w-[38%] aspect-square flex items-center justify-center rounded-[1rem] overflow-hidden group/qr cursor-pointer">
+                    <div className="absolute top-[22%] lg:top-[25%] left-1/2 -translate-x-1/2 w-[38%] aspect-square flex items-center justify-center rounded-[1rem] overflow-hidden group/qr cursor-pointer shadow-xl">
                         {loading || !vip ? (
                             <div className="w-full h-full flex items-center justify-center bg-white/10 backdrop-blur-sm">
                                 <Loader2 size={24} className="animate-spin text-white/50" />
@@ -146,35 +150,35 @@ export default function VipCard({ referralCode, referralCount, vipPayload, onLoa
                             </div>
                         )}
                     </div>
+                </div>
 
-                    {/* Bottom Area - Code & Expiration positioned over the glass oval */}
-                    <div className="absolute bottom-[2%] left-0 right-0 px-6 py-4 flex flex-col justify-end h-[35%]">
-                        {/* Access Code Row */}
-                        <div className="flex items-center justify-between mb-4 mt-8 px-2">
-                            <span className="font-mono font-bold text-2xl md:text-3xl tracking-[0.2em] text-white drop-shadow-md">
-                                {vip?.short_code ?? '••••••••'}
-                            </span>
-                            {vip && (
-                                <button
-                                    onClick={() => copyToClipboard(vip.short_code, 'code')}
-                                    className="p-2 md:p-3 rounded-xl bg-white/5 hover:bg-white/15 border border-white/5 transition-all focus:scale-95 text-white/60 hover:text-white"
-                                    title="Copiar código"
-                                >
-                                    {codeCopied ? <Check size={18} className="text-emerald-400" /> : <Copy size={18} />}
-                                </button>
-                            )}
+                {/* Bottom Area - Code & Expiration positioned securely at the physical bottom of the card */}
+                <div className="relative z-20 px-6 py-6 pb-8 flex flex-col justify-end bg-gradient-to-t from-[#0c0514] via-[#0c0514]/90 to-transparent -mt-20">
+                    {/* Access Code Row */}
+                    <div className="flex items-center justify-between mb-4 mt-2 px-2">
+                        <span className="font-mono font-bold text-2xl md:text-3xl tracking-[0.2em] text-white drop-shadow-md z-10">
+                            {vip?.short_code ?? '••••••••'}
+                        </span>
+                        {vip && (
+                            <button
+                                onClick={() => copyToClipboard(vip.short_code, 'code')}
+                                className="p-2 md:p-3 rounded-xl bg-white/5 hover:bg-white/15 border border-white/5 transition-all focus:scale-95 text-white/60 hover:text-white z-10 relative"
+                                title="Copiar código"
+                            >
+                                {codeCopied ? <Check size={18} className="text-emerald-400" /> : <Copy size={18} />}
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Footer Info Row */}
+                    <div className="flex items-center justify-between text-[11px] md:text-xs text-white/50 px-2 relative z-10">
+                        <div className="flex items-center gap-1.5 font-medium">
+                            <Clock size={12} className="opacity-70" />
+                            <span>Expira em: <span className="text-white/80">{vip ? new Date(vip.expires_at).toLocaleDateString('pt-BR') : '--/--'}</span></span>
                         </div>
-
-                        {/* Footer Info Row */}
-                        <div className="flex items-center justify-between text-[11px] md:text-xs text-white/50 px-2">
-                            <div className="flex items-center gap-1.5 font-medium">
-                                <Clock size={12} className="opacity-70" />
-                                <span>Expira em: <span className="text-white/80">{vip ? new Date(vip.expires_at).toLocaleDateString('pt-BR') : '--/--'}</span></span>
-                            </div>
-                            <div className="flex items-center gap-1.5 font-medium">
-                                <QrCode size={12} className="opacity-70" />
-                                <span>Uso presencial</span>
-                            </div>
+                        <div className="flex items-center gap-1.5 font-medium">
+                            <QrCode size={12} className="opacity-70" />
+                            <span>Uso presencial</span>
                         </div>
                     </div>
                 </div>
