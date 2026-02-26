@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, useCallback } from 'react'
 import { Info, Store, MapPin, MessageCircle, ShoppingBag, Instagram, ArrowRight } from 'lucide-react'
 import { useLenis } from 'lenis/react'
 import { cn } from '@/lib/utils'
@@ -121,7 +121,7 @@ export function PinnedButtonsParallax() {
 
     const updateParallaxRef = useRef<(() => void) | undefined>(undefined)
 
-    updateParallaxRef.current = () => {
+    const updateParallax = useCallback(() => {
         if (!containerRef.current) return
 
         const rect = containerRef.current.getBoundingClientRect()
@@ -171,13 +171,13 @@ export function PinnedButtonsParallax() {
             let y = 150 - (300 * localP)
             let z = -100 + (200 * localP)
             let rotateX = 15 - (30 * localP)
-            let rotateZ = dir * 4 - (dir * 8 * localP)
+            const rotateZ = dir * 4 - (dir * 8 * localP)
             let translateX = dir * 20 - (dir * 40 * localP)
             let scale = 0.85 + (0.25 * localP)
 
             let opacity = 1
-            let highlightX = -100 + (300 * localP)
-            let iconScale = 0.9 + (0.2 * localP)
+            const highlightX = -100 + (300 * localP)
+            const iconScale = 0.9 + (0.2 * localP)
             let glowIntensity = 0.5
             let pointerEvents: 'auto' | 'none' = 'none'
 
@@ -239,7 +239,12 @@ export function PinnedButtonsParallax() {
                 dot.style.opacity = (0.3 + (opacity * 0.7)).toString()
             }
         })
-    }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isTablet])
+
+    useEffect(() => {
+        updateParallaxRef.current = updateParallax
+    })
 
     const lenis = useLenis(() => {
         updateParallaxRef.current?.()

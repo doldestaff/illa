@@ -1,11 +1,18 @@
 'use client'
 
+import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Target } from 'lucide-react'
 import type { MissionInstance } from '@/lib/gamification-types'
 import MissionCard from './MissionCard'
-import { useEffect, useState } from 'react'
+import { useSyncExternalStore } from 'react'
 import { createPortal } from 'react-dom'
+
+// Idiomatic React 18 client-mount detection (avoids setState-in-effect lint)
+function subscribe() { return () => { } }
+function useIsClientMounted() {
+    return useSyncExternalStore(subscribe, () => true, () => false)
+}
 
 interface Props {
     isOpen: boolean
@@ -17,11 +24,7 @@ interface Props {
 }
 
 export default function MissionsModal({ isOpen, onClose, missions, claimingId, claimedIds, onClaim }: Props) {
-    const [mounted, setMounted] = useState(false)
-
-    useEffect(() => {
-        setMounted(true)
-    }, [])
+    const mounted = useIsClientMounted()
 
     // Lock body scroll when open
     useEffect(() => {
