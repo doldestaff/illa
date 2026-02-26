@@ -48,14 +48,22 @@ export default function AmbientFloatProducts() {
             }
         }
 
-        mq.addEventListener('change', onChange)
+        if (mq.addEventListener) {
+            mq.addEventListener('change', onChange)
+        } else {
+            mq.addListener(onChange)
+        }
 
         if (!reducedMotion.current) {
             rafRef.current = requestAnimationFrame(tick)
         }
 
         return () => {
-            mq.removeEventListener('change', onChange)
+            if (mq.removeEventListener) {
+                mq.removeEventListener('change', onChange)
+            } else {
+                mq.removeListener(onChange)
+            }
             cancelAnimationFrame(rafRef.current)
         }
     }, [tick])

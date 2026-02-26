@@ -141,14 +141,6 @@ body {
   /* Explicit touch-action is removed as it severely conflicts with mobile Safari rendering limits on 100vh sticky nodes */
 }
 
-@layer utilities {
-  .h-screen-safe {
-    height: 100vh;
-    height: 100dvh;
-  }
-}
-
-
 body {
   background: var(--background);
   color: var(--foreground);

@@ -14,8 +14,21 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
         const mq = window.matchMedia('(max-width: 768px)')
         setTimeout(() => setIsMobile(mq.matches), 0)
         const onChange = (e: MediaQueryListEvent) => setIsMobile(e.matches)
-        mq.addEventListener('change', onChange)
-        return () => mq.removeEventListener('change', onChange)
+
+        if (mq.addEventListener) {
+            mq.addEventListener('change', onChange)
+        } else {
+            // Support for older iOS Safari (before version 14)
+            mq.addListener(onChange)
+        }
+
+        return () => {
+            if (mq.removeEventListener) {
+                mq.removeEventListener('change', onChange)
+            } else {
+                mq.removeListener(onChange)
+            }
+        }
     }, [])
 
     useEffect(() => {
