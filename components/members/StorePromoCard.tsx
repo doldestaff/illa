@@ -13,7 +13,7 @@ export default function StorePromoCard() {
                 whileHover={{ scale: 1.02, rotate: 0.5 }}
                 whileTap={{ scale: 0.98 }}
                 transition={{ duration: 0.4 }}
-                className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-900/40 via-fuchsia-900/20 to-black/40 border border-white/10 shadow-2xl group-hover:shadow-purple-500/20 transition-all duration-500"
+                className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-900/40 via-fuchsia-900/20 to-black/40 border border-white/10 shadow-2xl group-hover:shadow-purple-500/20 transition-all duration-500 backdrop-blur-xl"
             >
                 {/* Background Effects */}
                 <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none" />
@@ -21,14 +21,16 @@ export default function StorePromoCard() {
                 <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-pink-500/30 rounded-full blur-[80px] group-hover:bg-pink-500/40 transition-colors duration-500" />
 
                 {/* Content Container */}
-                <div className="relative z-10 p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+                <div className="relative z-10 p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 overflow-hidden">
 
-                    {/* Left: Text Content */}
-                    <div className="flex-1 text-center sm:text-left space-y-2">
+                    {/* Content Top to Bottom Alignment */}
+                    <div className="flex flex-col items-center sm:items-start text-center sm:text-left space-y-3 w-full">
+
+                        {/* Novidade Badge centered above Title */}
                         <motion.div
                             animate={{ scale: [1, 1.05, 1] }}
                             transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-                            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/30 backdrop-blur-md mb-2 shadow-[0_0_10px_rgba(245,158,11,0.2)]"
+                            className="inline-flex items-center justify-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/30 backdrop-blur-md shadow-[0_0_10px_rgba(245,158,11,0.2)]"
                         >
                             <Sparkles size={12} className="text-amber-400" />
                             <span className="text-[10px] font-bold uppercase tracking-widest text-amber-200">Novidade</span>
@@ -38,9 +40,23 @@ export default function StorePromoCard() {
                             Loja de <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Descontos</span>
                         </h3>
 
-                        <p className="text-sm sm:text-base text-white/60 max-w-md mx-auto sm:mx-0 font-medium leading-relaxed group-hover:text-white/80 transition-colors">
+                        <p className="text-sm sm:text-base text-white/60 max-w-sm font-medium leading-relaxed group-hover:text-white/80 transition-colors px-2 sm:px-0">
                             Troque suas moedas por vouchers exclusivos e economize na sua próxima compra.
                         </p>
+
+                        {/* Right: Visual & CTA (Centrado abaixo do texto no mobile, lateral no desktop) */}
+                        <div className="flex items-center justify-center sm:hidden mt-2 pt-2 gap-4 shrink-0">
+                            <div className="relative w-16 h-16 flex items-center justify-center">
+                                <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl rotate-3 opacity-20 blur-lg group-hover:rotate-12 transition-transform duration-500" />
+                                <div className="relative w-full h-full bg-gradient-to-br from-white/10 to-white/5 border border-white/20 rounded-2xl flex items-center justify-center backdrop-blur-xl shadow-inner group-hover:-translate-y-2 transition-transform duration-500 group-hover:border-purple-500/50">
+                                    <Tag size={32} className="text-white drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)] group-hover:scale-110 transition-transform" />
+                                    <div className="absolute -top-2 -right-2 bg-amber-400 text-black text-[10px] font-black px-1.5 py-0.5 rounded-md shadow-lg rotate-12 animate-bounce">
+                                        %
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
 
                     {/* Right: Visual & CTA */}
