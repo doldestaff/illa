@@ -107,7 +107,7 @@ export function PinnedButtonsParallax() {
     const cardsRef = useRef<(HTMLAnchorElement | null)[]>([])
     const dotsRef = useRef<(HTMLDivElement | null)[]>([])
 
-    const updateParallaxRef = useRef<() => void>()
+    const updateParallaxRef = useRef<(() => void) | undefined>(undefined)
 
     updateParallaxRef.current = () => {
         if (!containerRef.current) return
