@@ -197,7 +197,7 @@ export default function DailyMissions({ missions, onClaim }: Props) {
             </div>
 
             {/* Unified Marquee Preview (Desktop & Mobile) */}
-            <div className="relative group/mural overflow-hidden py-4 -mx-4 px-4 w-full max-w-[100vw]">
+            <div className="relative group/mural py-4 -mx-4 px-4 w-full max-w-[100vw] overflow-hidden">
                 <InteractiveMarquee>
                     {previewMissions.map((mission, index) => {
                         const isClaimed = claimedIds.has(mission.instance_id) || mission.claimed
@@ -223,10 +223,6 @@ export default function DailyMissions({ missions, onClaim }: Props) {
                         )
                     })}
                 </InteractiveMarquee>
-
-                {/* Fade edges overlays */}
-                <div className="absolute left-0 top-0 bottom-0 w-8 md:w-16 bg-gradient-to-r from-[#0f0f11] to-transparent pointer-events-none z-10" />
-                <div className="absolute right-0 top-0 bottom-0 w-8 md:w-16 bg-gradient-to-l from-[#0f0f11] to-transparent pointer-events-none z-10" />
             </div>
 
             {/* Clear Call to Action for Missions Panel */}

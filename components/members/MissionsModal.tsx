@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Target } from 'lucide-react'
+import { X, Target, Sparkles } from 'lucide-react'
 import type { MissionInstance } from '@/lib/gamification-types'
 import MissionCard from './MissionCard'
 import { useSyncExternalStore } from 'react'
@@ -39,6 +39,11 @@ export default function MissionsModal({ isOpen, onClose, missions, claimingId, c
 
     if (!mounted) return null
 
+    const claimableCount = missions.filter(m => {
+        const isClaimed = claimedIds.has(m.instance_id) || m.claimed
+        return m.progress >= m.target && !isClaimed
+    }).length
+
     return createPortal(
         <AnimatePresence>
             {isOpen && (
@@ -49,91 +54,115 @@ export default function MissionsModal({ isOpen, onClose, missions, claimingId, c
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+                        className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md"
                     />
 
                     {/* Modal Container */}
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+                    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 pointer-events-none">
                         <motion.div
-                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                            initial={{ scale: 0.95, opacity: 0, y: 40 }}
                             animate={{ scale: 1, opacity: 1, y: 0 }}
-                            exit={{ scale: 0.95, opacity: 0, y: 10 }}
-                            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                            className="bg-white/95 backdrop-blur-2xl border-2 border-white/60 w-full max-w-lg max-h-[85vh] rounded-[2rem] shadow-[0_15px_40px_-5px_rgba(0,0,0,0.2)] overflow-hidden pointer-events-auto flex flex-col relative"
+                            exit={{ scale: 0.97, opacity: 0, y: 20 }}
+                            transition={{ type: 'spring', damping: 28, stiffness: 320 }}
+                            className="w-full max-w-lg sm:max-h-[88vh] h-[92dvh] sm:h-auto rounded-t-[2.5rem] sm:rounded-[2.5rem] overflow-hidden pointer-events-auto flex flex-col relative"
+                            style={{
+                                background: 'linear-gradient(145deg, rgba(18,14,28,0.98) 0%, rgba(10,6,22,0.99) 100%)',
+                                boxShadow: '0 -8px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.06), inset 0 1px 0 rgba(255,255,255,0.08)',
+                            }}
                         >
-                            {/* Ambient background subtle glow */}
-                            <div className="absolute inset-x-0 -top-10 h-32 bg-gradient-to-br from-illa-pink/20 to-transparent blur-2xl pointer-events-none" />
+                            {/* Ambient glows */}
+                            <div className="absolute -top-24 -left-24 w-64 h-64 bg-illa-pink/15 rounded-full blur-[80px] pointer-events-none" />
+                            <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-purple-600/10 rounded-full blur-[80px] pointer-events-none" />
+                            <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] pointer-events-none mix-blend-overlay" />
 
                             {/* Header */}
-                            <div className="relative p-6 pt-8 pb-4 border-b border-black/5 bg-gradient-to-b from-white/40 to-transparent z-10">
+                            <div className="relative px-6 pt-7 pb-5 border-b border-white/[0.07] flex-shrink-0">
+                                {/* Pill handle (mobile) */}
+                                <div className="absolute top-3 left-1/2 -translate-x-1/2 w-10 h-1 rounded-full bg-white/20 sm:hidden" />
+
                                 <button
                                     onClick={onClose}
-                                    className="absolute top-5 right-5 p-2 rounded-full bg-black/5 hover:bg-black/10 text-black/40 hover:text-black/70 transition-colors"
+                                    className="absolute top-6 right-5 p-2 rounded-full bg-white/8 hover:bg-white/15 text-white/40 hover:text-white/80 transition-all border border-white/10"
                                 >
-                                    <X size={20} />
+                                    <X size={18} />
                                 </button>
 
-                                <div className="flex items-center gap-3">
-                                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-illa-pink to-pink-500 shadow-lg shadow-pink-500/30 flex items-center justify-center border border-pink-400">
-                                        <Target size={24} className="text-white drop-shadow-sm" />
+                                <div className="flex items-center gap-4">
+                                    <div className="relative">
+                                        <div className="absolute inset-0 bg-illa-pink/40 blur-xl rounded-full" />
+                                        <div className="relative w-13 h-13 w-[52px] h-[52px] rounded-2xl bg-gradient-to-br from-illa-pink via-pink-500 to-rose-600 shadow-lg shadow-pink-600/40 flex items-center justify-center border border-pink-400/30">
+                                            <Target size={26} className="text-white drop-shadow-md" />
+                                        </div>
                                     </div>
-                                    <div>
-                                        <h2 className="text-2xl font-black text-gray-900 tracking-tight">Mural de Missões</h2>
-                                        <p className="text-sm font-medium text-gray-500">Complete desafios para ganhar recompensas</p>
+                                    <div className="flex-1">
+                                        <h2 className="text-[22px] font-black text-white tracking-tight leading-none">
+                                            Mural de Missões
+                                        </h2>
+                                        <p className="text-[13px] font-medium text-white/40 mt-1">
+                                            Complete desafios para ganhar recompensas
+                                        </p>
                                     </div>
                                 </div>
+
+                                {/* Stats bar */}
+                                {claimableCount > 0 && (
+                                    <div className="mt-4 flex items-center gap-2 bg-illa-pink/10 border border-illa-pink/20 rounded-full px-4 py-2 w-fit">
+                                        <Sparkles size={13} className="text-illa-pink animate-pulse" />
+                                        <span className="text-[12px] font-bold text-illa-pink tracking-wide">
+                                            {claimableCount} {claimableCount === 1 ? 'missão disponível' : 'missões disponíveis'} para coletar
+                                        </span>
+                                    </div>
+                                )}
                             </div>
 
                             {/* Scrollable Content */}
-                            <div data-lenis-prevent className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-black/10 scrollbar-track-transparent relative z-10">
-                                <div className="space-y-4">
-                                    {[...missions]
-                                        .sort((a, b) => {
-                                            const aClaimed = claimedIds.has(a.instance_id) || a.claimed;
-                                            const bClaimed = claimedIds.has(b.instance_id) || b.claimed;
-                                            const aCompleted = a.progress >= a.target;
-                                            const bCompleted = b.progress >= b.target;
-                                            const aCanClaim = aCompleted && !aClaimed;
-                                            const bCanClaim = bCompleted && !bClaimed;
+                            <div
+                                data-lenis-prevent
+                                className="flex-1 overflow-y-auto p-5 pb-8 space-y-3 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent"
+                            >
+                                {[...missions]
+                                    .sort((a, b) => {
+                                        const aClaimed = claimedIds.has(a.instance_id) || a.claimed;
+                                        const bClaimed = claimedIds.has(b.instance_id) || b.claimed;
+                                        const aCompleted = a.progress >= a.target;
+                                        const bCompleted = b.progress >= b.target;
+                                        const aCanClaim = aCompleted && !aClaimed;
+                                        const bCanClaim = bCompleted && !bClaimed;
 
-                                            // 1. Claimables first
-                                            if (aCanClaim && !bCanClaim) return -1;
-                                            if (!aCanClaim && bCanClaim) return 1;
+                                        if (aCanClaim && !bCanClaim) return -1;
+                                        if (!aCanClaim && bCanClaim) return 1;
+                                        if (!aClaimed && bClaimed) return -1;
+                                        if (aClaimed && !bClaimed) return 1;
+                                        return 0;
+                                    })
+                                    .map((mission, index) => {
+                                        const isClaimed = claimedIds.has(mission.instance_id) || mission.claimed
+                                        const isCompleted = mission.progress >= mission.target
+                                        const canClaim = isCompleted && !isClaimed
 
-                                            // 2. In progress middle
-                                            if (!aClaimed && bClaimed) return -1;
-                                            if (aClaimed && !bClaimed) return 1;
-
-                                            // 3. Keep original order within the same group
-                                            return 0;
-                                        })
-                                        .map((mission, index) => {
-                                            const isClaimed = claimedIds.has(mission.instance_id) || mission.claimed
-                                            const isCompleted = mission.progress >= mission.target
-                                            const canClaim = isCompleted && !isClaimed
-
-                                            return (
-                                                <motion.div
-                                                    key={mission.instance_id}
-                                                    initial={{ opacity: 0, x: -20 }}
-                                                    animate={{ opacity: 1, x: 0 }}
-                                                    transition={{ delay: index * 0.05 }}
-                                                >
-                                                    <MissionCard
-                                                        mission={mission}
-                                                        isClaimed={isClaimed}
-                                                        canClaim={canClaim}
-                                                        claiming={claimingId === mission.instance_id}
-                                                        onClaim={onClaim}
-                                                    />
-                                                </motion.div>
-                                            )
-                                        })}
-                                </div>
+                                        return (
+                                            <motion.div
+                                                key={mission.instance_id}
+                                                initial={{ opacity: 0, y: 12 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ delay: index * 0.04, type: 'spring', stiffness: 300, damping: 25 }}
+                                                className="h-[200px]"
+                                            >
+                                                <MissionCard
+                                                    mission={mission}
+                                                    isClaimed={isClaimed}
+                                                    canClaim={canClaim}
+                                                    claiming={claimingId === mission.instance_id}
+                                                    onClaim={onClaim}
+                                                    colorTheme={['pink', 'yellow', 'white'][index % 3] as 'pink' | 'yellow' | 'white'}
+                                                />
+                                            </motion.div>
+                                        )
+                                    })}
                             </div>
 
-                            {/* Footer Gradient Fade */}
-                            <div className="h-8 bg-gradient-to-t from-[#f8f9fa] to-transparent pointer-events-none -mt-8 relative z-20" />
+                            {/* Footer gradient fade */}
+                            <div className="h-10 bg-gradient-to-t from-[rgba(10,6,22,0.99)] to-transparent pointer-events-none -mt-10 relative z-20 flex-shrink-0" />
                         </motion.div>
                     </div>
                 </>

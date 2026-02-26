@@ -73,10 +73,10 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
             whileTap={canClaim && !claiming ? { scale: 0.98 } : { scale: 0.99 }}
             transition={{ type: "spring", stiffness: 400, damping: 17 }}
             className={`relative overflow-hidden transition-colors duration-500 group h-full flex flex-col justify-between ${isClaimed
-                ? 'opacity-50 grayscale border-b border-white/5 last:border-0 py-3 px-2'
+                ? 'opacity-60 grayscale border-b border-white/5 last:border-0 py-3 px-2'
                 : canClaim
-                    ? `bg-white/5 rounded-[2rem] border ${theme.border} ${theme.shadow} ring-1 ${theme.ring} p-5 backdrop-blur-2xl bg-blend-overlay`
-                    : 'bg-white/[0.03] rounded-[2rem] border border-white/10 hover:border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.15)] p-5 backdrop-blur-2xl bg-blend-overlay'
+                    ? `bg-white/[0.12] rounded-[2rem] border ${theme.border} ${theme.shadow} ring-1 ${theme.ring} p-5 backdrop-blur-2xl bg-blend-overlay`
+                    : 'bg-white/[0.08] rounded-[2rem] border border-white/15 hover:border-white/25 shadow-[0_8px_32px_rgba(0,0,0,0.25)] p-5 backdrop-blur-2xl bg-blend-overlay'
                 }`}
         >
             {/* Spotlight only on actionable cards */}

@@ -23,11 +23,9 @@ export default function MembersScrollBackground() {
     const [isMobile, setIsMobile] = useState(false)
     const { scrollY } = useScroll()
 
-    // Curva de opacidade em 3 pontos:
-    // 0px (topo)       → 0.85 (overlay escuro para leitura)
-    // 450px (missões)  → 0    (completamente transparente — imagem 100% visível)
-    // 900px (abaixo)   → 0.45 (retorna parcialmente mas não completamente escuro)
-    const overlayOpacity = useTransform(scrollY, [0, 450, 900], [0.85, 0, 0.45])
+    // 0px (topo) → 0.9 escuro para legibilidade do header e avatar
+    // ~480px (missões) → 0 totalmente transparente — background 100% visível
+    const overlayOpacity = useTransform(scrollY, [0, 80, 480], [0.9, 0.85, 0])
 
     // Detect mobile once on mount
     useEffect(() => {
