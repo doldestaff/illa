@@ -267,7 +267,7 @@ export function InstagramFeed() {
                     </div>
 
                     <h2 className="font-script text-4xl md:text-5xl text-white leading-tight mb-2 drop-shadow-xl">
-                        Siga a gente! 🍦
+                        Siga a gente! <img src="/icons/logo-circle.png" alt="Illa" width={32} height={32} className="inline-block align-middle -mt-1" />
                     </h2>
                     <p className="text-white/60 text-sm mb-5">
                         Os momentos mais gostosos estão lá:{' '}
