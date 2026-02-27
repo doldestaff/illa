@@ -127,98 +127,14 @@ function PostTile({ post, onClick, index }: { post: InstaPost; onClick: () => vo
     )
 }
 
-// ─── PostModal ───────────────────────────────────────────────────────────────
-
-function PostModal({ post, onClose }: { post: InstaPost; onClose: () => void }) {
-    useEffect(() => {
-        const handler = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
-        window.addEventListener('keydown', handler)
-        return () => window.removeEventListener('keydown', handler)
-    }, [onClose])
-
-    return (
-        <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] bg-black/75 backdrop-blur-md flex items-center justify-center p-4"
-            onClick={onClose}
-        >
-            <motion.div
-                initial={{ scale: 0.88, opacity: 0, y: 24 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.88, opacity: 0, y: 24 }}
-                transition={{ type: 'spring', bounce: 0.35, duration: 0.45 }}
-                onClick={e => e.stopPropagation()}
-                className="relative bg-white rounded-[2.2rem] overflow-hidden shadow-[0_32px_80px_rgba(0,0,0,0.5)] w-full max-w-sm max-h-[88vh] flex flex-col"
-            >
-                {/* Close button */}
-                <button
-                    onClick={onClose}
-                    className="absolute top-3.5 right-3.5 z-30 bg-black/40 hover:bg-black/70 text-white rounded-full p-2 transition-colors backdrop-blur-sm border border-white/20"
-                    aria-label="Fechar"
-                >
-                    <X size={15} />
-                </button>
-
-                {/* Thumbnail */}
-                <div className="relative aspect-[4/4.5] shrink-0">
-                    <Image
-                        src={post.imageUrl}
-                        alt={post.caption.slice(0, 60)}
-                        fill
-                        className="object-cover"
-                        sizes="440px"
-                    />
-                    {/* Bottom gradient on image */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-
-
-
-                    {/* Likes on image */}
-                    <div className="absolute bottom-3 left-4 flex items-center gap-1.5">
-                        <Heart size={14} className="text-white fill-white drop-shadow" />
-                        <span className="text-white font-bold text-sm drop-shadow">{post.likes.toLocaleString('pt-BR')}</span>
-                    </div>
-                </div>
-
-                {/* Content */}
-                <div className="flex flex-col p-5 overflow-y-auto flex-1 min-h-0">
-                    {/* Profile row */}
-                    <div className="flex items-center gap-2.5 mb-3">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#E1306C] via-[#C13584] to-[#F77737] flex items-center justify-center shrink-0 shadow">
-                            <Instagram size={15} className="text-white" />
-                        </div>
-                        <div>
-                            <p className="font-bold text-sm text-gray-900 leading-none">illasorvetesoficial</p>
-                            <p className="text-xs text-gray-400 mt-0.5">Maceió, AL</p>
-                        </div>
-                    </div>
-
-                    <p className="text-sm text-gray-600 leading-relaxed mb-5 flex-1">{post.caption}</p>
-
-                    <a
-                        href={post.postUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#E1306C] via-[#C13584] to-[#F77737] text-white font-bold py-3.5 rounded-2xl hover:shadow-lg hover:shadow-pink-300/40 hover:scale-[1.02] active:scale-[0.98] transition-all text-sm"
-                    >
-                        {post.type === 'reel' ? <Play size={15} className="fill-white" /> : <ExternalLink size={15} />}
-                        {post.type === 'reel' ? 'Assistir o Reel' : 'Ver no Instagram'}
-                    </a>
-                </div>
-            </motion.div>
-        </motion.div>
-    )
-}
-
 // ─── Main ────────────────────────────────────────────────────────────────────
 
 export function InstagramFeed() {
-    const [selectedPost, setSelectedPost] = useState<InstaPost | null>(null)
-    const openPost = useCallback((post: InstaPost) => setSelectedPost(post), [])
-    const closePost = useCallback(() => setSelectedPost(null), [])
     const videoRef = useRef<HTMLVideoElement>(null)
+
+    const openInInstagram = useCallback((url: string) => {
+        window.open(url, '_blank', 'noopener,noreferrer')
+    }, [])
 
     useEffect(() => {
         const v = videoRef.current
@@ -267,7 +183,7 @@ export function InstagramFeed() {
                     </div>
 
                     <h2 className="font-script text-4xl md:text-5xl text-white leading-tight mb-2 drop-shadow-xl">
-                        Siga a gente! <img src="/icons/logo-circle.png" alt="Illa" width={32} height={32} className="inline-block align-middle -mt-1" />
+                        Siga a gente!
                     </h2>
                     <p className="text-white/60 text-sm mb-5">
                         Os momentos mais gostosos estão lá:{' '}
@@ -288,7 +204,7 @@ export function InstagramFeed() {
                 {/* Grid 3×3 */}
                 <div className="grid grid-cols-3 gap-1.5 md:gap-2">
                     {posts.map((post, i) => (
-                        <PostTile key={post.id} post={post} onClick={() => openPost(post)} index={i} />
+                        <PostTile key={post.id} post={post} onClick={() => openInInstagram(post.postUrl)} index={i} />
                     ))}
                 </div>
 
@@ -310,11 +226,6 @@ export function InstagramFeed() {
                     </a>
                 </motion.div>
             </div>
-
-            {/* Modal */}
-            <AnimatePresence>
-                {selectedPost && <PostModal post={selectedPost} onClose={closePost} />}
-            </AnimatePresence>
         </section>
     )
 }
