@@ -116,9 +116,15 @@ export default function ProfileEditor({ user }: ProfileEditorProps) {
 
         if (updateError) {
             setError('Erro ao salvar. Tente novamente.')
+            setSaving(false)
         } else {
             setSaved(true)
-            setTimeout(() => setSaved(false), 3000)
+            // Invalidate Next.js server cache so the dashboard re-reads
+            // the updated profile on first navigation back (fixes the double-save bug)
+            router.refresh()
+            setTimeout(() => {
+                router.push('/members')
+            }, 800)
         }
         setSaving(false)
     }

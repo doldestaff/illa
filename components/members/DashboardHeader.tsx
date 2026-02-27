@@ -307,11 +307,15 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                                         initial={{ width: 0 }}
                                         animate={{ width: `${progressPercent}%` }}
                                         transition={{ duration: 1.5, ease: "easeOut" }}
-                                        className="h-full bg-gradient-to-r from-illa-pink via-rose-500 to-illa-yellow relative"
+                                        className="h-full bg-[length:200%_100%] animate-[shimmer_3s_linear_infinite] relative rounded-full shadow-[0_0_15px_rgba(229,1,125,0.5)]"
+                                        style={{ backgroundImage: 'linear-gradient(90deg, #E5017D, #F59E0B, #E5017D)' }}
                                     >
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-white/20" />
-                                        <div className="absolute right-0 top-0 bottom-0 w-3 bg-white blur-[4px] shadow-[0_0_20px_white]" />
-                                        <div className="hidden md:block absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay" />
+                                        <div className="absolute inset-0 bg-gradient-to-b from-white/30 to-transparent mix-blend-overlay rounded-full" />
+                                        {/* Dynamic Glow Pointer - Only visible if there's progress */}
+                                        {progressPercent > 2 && (
+                                            <div className="absolute right-0 top-0 bottom-0 w-2 bg-white blur-[2px] rounded-full opacity-80" />
+                                        )}
+                                        <div className="hidden md:block absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay rounded-full" />
                                     </motion.div>
                                 </div>
                             </div>
