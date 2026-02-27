@@ -302,20 +302,33 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                                         {isMaxLevel ? 'N\u00edvel m\u00e1ximo!' : `Faltam ${xpToNext} XP`}
                                     </span>
                                 </div>
-                                <div className="h-5 md:h-6 bg-black/20 rounded-full overflow-hidden border border-white/10 relative backdrop-blur-md">
+                                <div className="h-6 md:h-[1.75rem] w-full bg-black/40 rounded-full overflow-hidden border border-white/5 relative backdrop-blur-xl shadow-[inset_0_3px_6px_rgba(0,0,0,0.6),0_2px_15px_rgba(229,1,125,0.15)] p-[2px]">
                                     <motion.div
                                         initial={{ width: 0 }}
                                         animate={{ width: `${progressPercent}%` }}
-                                        transition={{ duration: 1.5, ease: "easeOut" }}
-                                        className="h-full bg-[length:200%_100%] animate-[shimmer_3s_linear_infinite] relative rounded-full shadow-[0_0_15px_rgba(229,1,125,0.5)]"
-                                        style={{ backgroundImage: 'linear-gradient(90deg, #E5017D, #F59E0B, #E5017D)' }}
+                                        transition={{ duration: 1.5, ease: "easeOut", type: "spring", bounce: 0.15 }}
+                                        className="h-full relative rounded-full flex items-center shadow-[0_0_20px_rgba(229,1,125,0.4)]"
                                     >
-                                        <div className="absolute inset-0 bg-gradient-to-b from-white/30 to-transparent mix-blend-overlay rounded-full" />
-                                        {/* Dynamic Glow Pointer - Only visible if there's progress */}
+                                        {/* 1. Animação de Fundo (Cor Base) */}
+                                        <div
+                                            className="absolute inset-0 bg-[length:200%_100%] animate-[shimmer_3s_linear_infinite] rounded-full"
+                                            style={{ backgroundImage: 'linear-gradient(90deg, #E5017D, #F59E0B, #E5017D)' }}
+                                        />
+
+                                        {/* 2. Textura Glass & Volume */}
+                                        <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/5 to-black/30 mix-blend-overlay rounded-full" />
+                                        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay rounded-full pointer-events-none" />
+
+                                        {/* 3. Ponta Branca com Divisões Gradientes (Cuda do Cometa) */}
                                         {progressPercent > 2 && (
-                                            <div className="absolute right-0 top-0 bottom-0 w-2 bg-white blur-[2px] rounded-full opacity-80" />
+                                            <div className="absolute inset-y-0 right-0 w-16 flex justify-end items-center pointer-events-none">
+                                                {/* Gradiente de Fusão (Apenas luz quente para trás, sem estourar o fundo branco) */}
+                                                <div className="absolute inset-y-0 right-0 w-full bg-gradient-to-r from-transparent via-amber-500/20 to-amber-200/60 rounded-r-full" />
+
+                                                {/* Ponta Branca Sólida Esculpida (Curta, Intensa) */}
+                                                <div className="relative h-[calc(100%-2px)] w-2 bg-white rounded-full shadow-[0_0_12px_rgba(255,255,255,1),-3px_0_15px_rgba(245,158,11,1)] mr-[1px] blur-[0.3px]" />
+                                            </div>
                                         )}
-                                        <div className="hidden md:block absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay rounded-full" />
                                     </motion.div>
                                 </div>
                             </div>
