@@ -2,12 +2,12 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react'
 import type { MissionInstance } from '@/lib/gamification-types'
-import { Target, Sparkles, ArrowRight, LayoutGrid, CheckCircle2 } from 'lucide-react'
+import { Compass, Sparkles, ArrowRight, LayoutGrid, CheckCircle2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import MissionCard from './MissionCard'
 import MissionsModal from './MissionsModal'
 
-function InteractiveMarquee({ children }: { children: React.ReactNode }) {
+function InteractiveMarquee({ children, onIndexChange }: { children: React.ReactNode, onIndexChange?: (index: number) => void }) {
     const containerRef = useRef<HTMLDivElement>(null)
     const [isVisible, setIsVisible] = useState(false)
 
@@ -96,6 +96,32 @@ function InteractiveMarquee({ children }: { children: React.ReactNode }) {
         }
     }, [])
 
+    // New Observer to detect which card is centered for the slide counter
+    useEffect(() => {
+        if (!onIndexChange) return
+        const container = containerRef.current
+        if (!container) return
+
+        const observer = new IntersectionObserver((entries) => {
+            let maxRatio = 0
+            let targetIndex = -1
+            entries.forEach(entry => {
+                if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
+                    maxRatio = entry.intersectionRatio
+                    targetIndex = Number((entry.target as HTMLElement).dataset.index)
+                }
+            })
+            if (targetIndex >= 0) {
+                onIndexChange(targetIndex)
+            }
+        }, { root: container, threshold: [0.4, 0.6, 0.8, 1.0] })
+
+        const items = container.querySelectorAll('.marquee-item')
+        items.forEach(item => observer.observe(item))
+
+        return () => observer.disconnect()
+    }, [onIndexChange, children])
+
     return (
         <div
             ref={containerRef}
@@ -132,6 +158,8 @@ export default function DailyMissions({ missions, onClaim }: Props) {
     const totalCount = missions.length
     const allCompleted = totalCount > 0 && completedCount === totalCount
 
+    const [activeIndex, setActiveIndex] = useState(0)
+
     const handleClaim = useCallback(async (instanceId: string) => {
         setClaimingId(instanceId)
         try {
@@ -163,25 +191,20 @@ export default function DailyMissions({ missions, onClaim }: Props) {
     const previewMissions = sortedMissions
 
     return (
-        <div className="space-y-6 py-6 relative">
-            {/* Seamless Section Context gradient - No hard lines, edge-to-edge */}
-            <div className="absolute inset-y-0 w-[100vw] left-1/2 -translate-x-1/2 bg-gradient-to-b from-black/60 via-black/30 to-transparent pointer-events-none -z-10" />
-
-            {/* Ambient Background Glows */}
-            <div className="absolute -top-10 -left-10 w-64 h-64 bg-illa-pink/10 rounded-full blur-[80px] pointer-events-none" />
-            <div className="absolute top-20 right-0 w-64 h-64 bg-illa-yellow/5 rounded-full blur-[80px] pointer-events-none" />
+        <div className="flex flex-col pt-4 pb-2 relative">
 
             {/* Header - Interactive & Cinematic */}
             <div
                 onClick={() => setIsModalOpen(true)}
-                className="relative z-10 flex items-center justify-between cursor-pointer group select-none px-4 md:px-0"
+                className="relative z-10 flex items-center justify-between cursor-pointer group select-none px-4 md:px-0 mb-3"
             >
 
-                <div className="flex items-center gap-4 relative z-10">
+                <div className="flex items-center gap-3 relative z-10">
                     <div className="relative">
-                        <div className="absolute inset-0 bg-illa-pink/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                        <div className="bg-gradient-to-br from-white/10 to-white/5 p-3 rounded-2xl border border-white/10 group-hover:border-illa-pink/30 group-hover:bg-white/10 transition-all duration-300 relative z-10 backdrop-blur-sm">
-                            <Target size={24} className="text-illa-pink group-hover:scale-110 group-hover:rotate-12 transition-transform duration-500 ease-out" />
+                        <div className="absolute inset-0 bg-amber-500/10 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        <div className="w-12 h-12 bg-[#201d1a] border border-amber-900/40 shadow-[inset_0_2px_8px_rgba(0,0,0,0.4),0_2px_10px_rgba(0,0,0,0.3)] rounded-full flex items-center justify-center relative z-10 group-hover:scale-105 transition-transform duration-300">
+                            <div className="absolute inset-[2px] rounded-full border border-amber-500/10 bg-gradient-to-tr from-amber-700/10 to-amber-400/5" />
+                            <Compass size={22} className="text-amber-200 drop-shadow-[0_0_8px_rgba(251,191,36,0.3)] group-hover:rotate-12 transition-transform duration-500 relative z-10" />
                         </div>
                     </div>
                     <div>
@@ -196,56 +219,35 @@ export default function DailyMissions({ missions, onClaim }: Props) {
                 </div>
 
                 <div className="flex items-center gap-3 relative z-10">
-                    <div className={`px-4 py-2 rounded-full border backdrop-blur-md transition-all duration-300 ${allCompleted
-                        ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]'
-                        : 'bg-white/5 border-white/10 text-white/50 group-hover:border-white/20 group-hover:bg-white/10'
-                        }`}>
-                        <span className="text-sm font-bold tracking-wider">{completedCount} <span className="opacity-50">/</span> {totalCount}</span>
+                    <div className="px-4 py-2 rounded-full border backdrop-blur-md bg-[#25252a]/60 border-white/10 text-white/70 shadow-inner group-hover:border-white/20 transition-all duration-300">
+                        <span className="text-sm font-bold tracking-wider">{activeIndex + 1} <span className="opacity-50">/</span> {previewMissions.length}</span>
                     </div>
                 </div>
             </div>
 
-            {/* Unified Marquee Preview (Desktop & Mobile) */}
-            <div className="relative group/mural py-4 -mx-4 px-4 w-full max-w-[100vw] overflow-hidden">
-
-                <InteractiveMarquee>
+            {/* Unified Marquee Preview (Desktop & Mobile) - Disney Experience */}
+            <div className="relative group/mural py-8 -mx-4 px-4 w-full max-w-[100vw] overflow-hidden">
+                <InteractiveMarquee onIndexChange={setActiveIndex}>
                     {previewMissions.map((mission, index) => {
                         const isClaimed = claimedIds.has(mission.instance_id) || mission.claimed
                         const isCompleted = mission.progress >= mission.target
                         const canClaim = isCompleted && !isClaimed
-                        // Card 2 (index === 1) → Glow pulsante de destaque
-                        const isSpotlightCard = index === 1
 
                         return (
                             <div
                                 key={`mission-${mission.instance_id}`}
-                                className="w-[300px] sm:w-[340px] md:w-[360px] h-[220px] shrink-0 snap-center first:pl-2 md:first:pl-0 relative"
+                                data-index={index}
+                                // Format: Wide horizontal card for the WebP content.
+                                // Increased margin/padding so the magical glow from MissionCard can escape freely.
+                                className="marquee-item w-[310px] sm:w-[340px] md:w-[380px] h-[180px] md:h-[220px] shrink-0 snap-center first:pl-2 md:first:pl-0 relative cursor-pointer"
                             >
-                                {/* Spotlight: pulsing glow ring only on card 2 */}
-                                {isSpotlightCard && (
-                                    <motion.div
-                                        animate={{
-                                            boxShadow: [
-                                                '0 0 0px 0px rgba(229,1,125,0)',
-                                                '0 0 24px 8px rgba(229,1,125,0.45)',
-                                                '0 0 0px 0px rgba(229,1,125,0)',
-                                            ],
-                                            scale: [1, 1.01, 1],
-                                        }}
-                                        transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
-                                        className="absolute inset-0 rounded-[2rem] pointer-events-none z-20"
-                                    />
-                                )}
-                                <div className="h-full transform transition-all duration-300 md:hover:scale-[1.03] md:hover:-translate-y-2 hover:shadow-2xl hover:shadow-illa-pink/20 cursor-pointer">
-                                    <MissionCard
-                                        mission={mission}
-                                        isClaimed={isClaimed}
-                                        canClaim={canClaim}
-                                        claiming={claimingId === mission.instance_id}
-                                        onClaim={handleClaim}
-                                        colorTheme={['pink', 'yellow', 'white'][index % 3] as 'pink' | 'yellow' | 'white'}
-                                    />
-                                </div>
+                                <MissionCard
+                                    mission={mission}
+                                    isClaimed={isClaimed}
+                                    canClaim={canClaim}
+                                    claiming={claimingId === mission.instance_id}
+                                    onClaim={handleClaim}
+                                />
                             </div>
                         )
                     })}
@@ -253,15 +255,15 @@ export default function DailyMissions({ missions, onClaim }: Props) {
             </div>
 
             {/* Clear Call to Action for Missions Panel */}
-            <div className="px-4 mt-2">
+            <div className="px-4 -mt-5 relative z-20 pointer-events-none">
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="group flex w-full md:w-auto md:mx-auto items-center justify-center gap-2 py-4 px-6 transition-all duration-300 relative overflow-hidden"
+                    className="group flex w-full md:w-auto md:mx-auto items-center justify-center gap-2 py-2 px-6 transition-all duration-300 relative pointer-events-auto"
                 >
-                    <span className="text-sm font-semibold uppercase tracking-[0.2em] text-white/60 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-white/60 transition-all duration-300 drop-shadow-md">
+                    <span className="text-xs sm:text-sm font-bold uppercase tracking-[0.15em] text-white/50 group-hover:text-white transition-all duration-300 drop-shadow-md">
                         Abrir Mural de Missões
                     </span>
-                    <ArrowRight size={16} className="text-white/40 group-hover:text-white group-hover:translate-x-2 transition-transform duration-500 ease-out" strokeWidth={2.5} />
+                    <ArrowRight size={16} className="text-white/40 group-hover:text-white group-hover:translate-x-1 transition-transform duration-300 ease-out" strokeWidth={2.5} />
                 </button>
             </div>
 

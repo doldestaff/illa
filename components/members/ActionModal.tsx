@@ -74,13 +74,29 @@ export default function ActionModal({ isOpen, onClose, title, themeGradient = "f
                     {/* Container - Bottom aligned on mobile, Center on desktop */}
                     <div className="fixed inset-0 z-[9999] flex flex-col justify-end md:justify-center items-center pointer-events-none">
 
-                        {/* Premium Entrance Glow (Behind Modal) */}
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.5 }}
-                            animate={{ opacity: [0, 0.5, 0], scale: [0.8, 1.3, 1.5] }}
-                            transition={{ duration: 1.5, ease: "easeOut" }}
-                            className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150vw] h-[150vw] md:w-[60vw] md:h-[60vw] bg-gradient-to-r ${themeGradient} rounded-full blur-[100px] pointer-events-none mix-blend-screen opacity-50`}
-                        />
+                        {/* Cinematic Neon Glow (Aurora Effect Behind Modal) */}
+                        <div className="absolute inset-0 z-[-1] overflow-hidden pointer-events-none flex justify-center items-center">
+                            {/* Top Beam */}
+                            <motion.div
+                                initial={{ opacity: 0, y: -50, scale: 0.8 }}
+                                animate={{ opacity: [0, 0.4, 0.4], y: [-50, 0, -20], scale: [0.8, 1.2, 1] }}
+                                transition={{ duration: 3, ease: "easeOut" }}
+                                className={`absolute top-[-10%] md:top-[-20%] w-[150vw] md:w-[80vw] h-[50vh] bg-gradient-to-b ${themeGradient} blur-[120px] opacity-40 mix-blend-screen will-change-transform transform-gpu`}
+                            />
+                            {/* Side Ambient Lights */}
+                            <motion.div
+                                initial={{ opacity: 0, x: -100 }}
+                                animate={{ opacity: [0, 0.25, 0.15], x: [-100, 0, -50] }}
+                                transition={{ duration: 4, ease: "easeInOut", delay: 0.2 }}
+                                className={`absolute left-[-20%] top-[30%] w-[80vw] h-[60vh] bg-gradient-to-tr ${themeGradient} blur-[140px] opacity-20 mix-blend-screen will-change-transform transform-gpu`}
+                            />
+                            <motion.div
+                                initial={{ opacity: 0, x: 100 }}
+                                animate={{ opacity: [0, 0.25, 0.15], x: [100, 0, 50] }}
+                                transition={{ duration: 4, ease: "easeInOut", delay: 0.4 }}
+                                className={`absolute right-[-20%] top-[20%] w-[80vw] h-[70vh] bg-gradient-to-tl ${themeGradient} blur-[150px] opacity-20 mix-blend-screen will-change-[transform,opacity] transform-gpu`}
+                            />
+                        </div>
 
                         <motion.div
                             variants={isMobile ? mobileVariants : desktopVariants}

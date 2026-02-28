@@ -252,7 +252,7 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                             {/* Counters */}
                             <div className="flex w-full items-center justify-center md:justify-start gap-3 md:gap-4">
 
-                                {/* Drops */}
+                                {/* Drops -> Baú Gamer */}
                                 <motion.button
                                     onClick={() => openInventory('drops')}
                                     whileHover={{ scale: 1.05 }}
@@ -260,7 +260,16 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                                     className="relative flex items-center justify-center gap-2.5 px-4 py-2 rounded-[1rem] bg-white/[0.08] backdrop-blur-md border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.2)] min-w-[90px] group/drops"
                                 >
                                     <div className="relative z-10 flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-br from-[#38bdf8] to-[#0284c7] shadow-[0_2px_4px_rgba(56,189,248,0.5)] border border-white/20 group-hover/drops:scale-110 transition-transform duration-300">
-                                        <Droplet size={14} fill="currentColor" className="text-white drop-shadow-md" strokeWidth={2} />
+                                        {/* Soft inner white neon */}
+                                        <div className="absolute inset-0 m-auto w-3 h-3 bg-white rounded-full blur-[4px] animate-[pulse_2s_ease-in-out_infinite]" />
+
+                                        {/* Gamer Chest Icon - pure white */}
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-[14px] h-[14px] text-white relative z-10 drop-shadow-[0_0_2px_rgba(255,255,255,0.8)]">
+                                            {/* Chest Lid */}
+                                            <path d="M4 4h16a2 2 0 0 1 2 2v3H2V6a2 2 0 0 1 2-2z" />
+                                            {/* Chest Base */}
+                                            <path d="M2 11v8a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-8h-9v1a1 1 0 0 1-2 0v-1H2z" />
+                                        </svg>
                                     </div>
                                     <span className="text-2xl font-black text-white relative z-10 drop-shadow-sm tabular-nums tracking-tight">{profile.drops || 0}</span>
                                 </motion.button>

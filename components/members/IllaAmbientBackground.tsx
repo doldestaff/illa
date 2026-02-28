@@ -9,6 +9,7 @@ export default function IllaAmbientBackground() {
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-900/5 to-black/80" />
 
             {/* Moving Orbs */}
+            {/* CRITICAL PERF: Removed mix-blend-screen and added transform-gpu to offload the heavy blur animation strictly to GPU compositing, fixing scroll stutter on mobile. */}
             <motion.div
                 animate={{
                     x: [0, 100, 0],
@@ -20,7 +21,7 @@ export default function IllaAmbientBackground() {
                     repeat: Infinity,
                     ease: "easeInOut"
                 }}
-                className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-illa-pink/20 rounded-full blur-[120px] mix-blend-screen"
+                className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-illa-pink/20 rounded-full blur-[120px] will-change-transform transform-gpu"
             />
 
             <motion.div
@@ -35,7 +36,7 @@ export default function IllaAmbientBackground() {
                     ease: "easeInOut",
                     delay: 2
                 }}
-                className="absolute bottom-[-10%] right-[-10%] w-[60vw] h-[60vw] bg-illa-yellow/15 rounded-full blur-[140px] mix-blend-screen"
+                className="absolute bottom-[-10%] right-[-10%] w-[60vw] h-[60vw] bg-illa-yellow/15 rounded-full blur-[140px] will-change-transform transform-gpu"
             />
 
             <motion.div
@@ -50,7 +51,7 @@ export default function IllaAmbientBackground() {
                     ease: "easeInOut",
                     delay: 5
                 }}
-                className="absolute top-[40%] left-[30%] w-[30vw] h-[30vw] bg-purple-500/10 rounded-full blur-[100px] mix-blend-overlay"
+                className="absolute top-[40%] left-[30%] w-[30vw] h-[30vw] bg-purple-500/10 rounded-full blur-[100px] will-change-[transform,opacity] transform-gpu"
             />
 
             {/* Mesh Grid Overlay (Subtle Tech Feel) */}
