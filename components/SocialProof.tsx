@@ -301,91 +301,103 @@ export function SocialProof() {
                                     <StarRating rating={rating} interactive onChange={setRating} />
                                 </div>
 
-                                {/* Comment */}
-                                <div>
-                                    <textarea
-                                        value={text}
-                                        onChange={e => setText(e.target.value)}
-                                        placeholder="O que achou da Illa? Conte sua experiência..."
-                                        rows={3}
-                                        maxLength={300}
-                                        className="w-full bg-white/5 border border-white/15 rounded-2xl px-5 py-4 text-white placeholder:text-white/30 focus:outline-none focus:border-white/40 focus:bg-white/10 transition-all resize-none text-sm"
-                                    />
-                                    <p className="text-right text-[10px] text-white/30 mt-1">{text.length}/300</p>
-                                </div>
+                                {/* Comment & User Details (Progressive Disclosure) */}
+                                <AnimatePresence>
+                                    {rating > 0 && (
+                                        <motion.div
+                                            initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                                            animate={{ opacity: 1, height: 'auto', marginTop: 24 }}
+                                            exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                                            className="space-y-6 overflow-hidden"
+                                        >
+                                            {/* Comment */}
+                                            <div>
+                                                <textarea
+                                                    value={text}
+                                                    onChange={e => setText(e.target.value)}
+                                                    placeholder="O que achou da Illa? Conte sua experiência..."
+                                                    rows={3}
+                                                    maxLength={300}
+                                                    className="w-full bg-white/5 border border-white/15 rounded-2xl px-5 py-4 text-white placeholder:text-white/30 focus:outline-none focus:border-white/40 focus:bg-white/10 transition-all resize-none text-sm"
+                                                />
+                                                <p className="text-right text-[10px] text-white/30 mt-1">{text.length}/300</p>
+                                            </div>
 
-                                {/* Name + Profession Row */}
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div className="relative">
-                                        <User size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
-                                        <input
-                                            type="text"
-                                            value={name}
-                                            onChange={e => setName(e.target.value)}
-                                            placeholder="Seu nome"
-                                            maxLength={50}
-                                            className="w-full bg-white/5 border border-white/15 rounded-xl pl-11 pr-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-white/40 focus:bg-white/10 transition-all text-sm"
-                                        />
-                                    </div>
-                                    <div className="relative">
-                                        <Briefcase size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
-                                        <input
-                                            type="text"
-                                            value={role}
-                                            onChange={e => setRole(e.target.value)}
-                                            placeholder="Profissão (opcional)"
-                                            maxLength={40}
-                                            className="w-full bg-white/5 border border-white/15 rounded-xl pl-11 pr-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-white/40 focus:bg-white/10 transition-all text-sm"
-                                        />
-                                    </div>
-                                </div>
+                                            {/* Name + Profession Row */}
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                <div className="relative">
+                                                    <User size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
+                                                    <input
+                                                        type="text"
+                                                        value={name}
+                                                        onChange={e => setName(e.target.value)}
+                                                        placeholder="Seu nome"
+                                                        maxLength={50}
+                                                        className="w-full bg-white/5 border border-white/15 rounded-xl pl-11 pr-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-white/40 focus:bg-white/10 transition-all text-sm"
+                                                    />
+                                                </div>
+                                                <div className="relative">
+                                                    <Briefcase size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
+                                                    <input
+                                                        type="text"
+                                                        value={role}
+                                                        onChange={e => setRole(e.target.value)}
+                                                        placeholder="Profissão (opcional)"
+                                                        maxLength={40}
+                                                        className="w-full bg-white/5 border border-white/15 rounded-xl pl-11 pr-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-white/40 focus:bg-white/10 transition-all text-sm"
+                                                    />
+                                                </div>
+                                            </div>
 
-                                {/* Instagram */}
-                                {!userId && (
-                                    <div className="relative">
-                                        <AtSign size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
-                                        <input
-                                            type="text"
-                                            value={instagram}
-                                            onChange={e => setInstagram(e.target.value)}
-                                            placeholder="@seuinstagram (opcional)"
-                                            maxLength={40}
-                                            className="w-full bg-white/5 border border-white/15 rounded-xl pl-11 pr-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-white/40 focus:bg-white/10 transition-all text-sm"
-                                        />
-                                    </div>
-                                )}
+                                            {/* Instagram */}
+                                            {!userId && (
+                                                <div className="relative">
+                                                    <AtSign size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
+                                                    <input
+                                                        type="text"
+                                                        value={instagram}
+                                                        onChange={e => setInstagram(e.target.value)}
+                                                        placeholder="@seuinstagram (opcional)"
+                                                        maxLength={40}
+                                                        className="w-full bg-white/5 border border-white/15 rounded-xl pl-11 pr-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-white/40 focus:bg-white/10 transition-all text-sm"
+                                                    />
+                                                </div>
+                                            )}
 
-                                {/* Logged-in indicator */}
-                                {userId && (
-                                    <div className="flex items-center gap-2 text-xs text-white/40">
-                                        <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                                        Logado como {userEmail || 'membro'} — Instagram será preenchido automaticamente.
-                                    </div>
-                                )}
+                                            {/* Logged-in indicator */}
+                                            {userId && (
+                                                <div className="flex items-center gap-2 text-xs text-white/40">
+                                                    <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                                                    Logado como {userEmail || 'membro'} — Instagram será preenchido automaticamente.
+                                                </div>
+                                            )}
 
-                                {/* Error */}
-                                {formError && (
-                                    <p className="text-red-300 text-sm text-center font-medium bg-red-500/10 rounded-xl py-2 px-4">{formError}</p>
-                                )}
+                                            {/* Error */}
+                                            {formError && (
+                                                <p className="text-red-300 text-sm text-center font-medium bg-red-500/10 rounded-xl py-2 px-4">{formError}</p>
+                                            )}
 
-                                {/* Submit */}
-                                <button
-                                    type="submit"
-                                    disabled={submitting}
-                                    className="w-full bg-white text-illa-pink font-bold py-4 rounded-2xl hover:bg-illa-yellow hover:text-dark transition-all shadow-lg hover:shadow-xl active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
-                                >
-                                    {submitting ? (
-                                        <>
-                                            <Loader2 size={18} className="animate-spin" />
-                                            Enviando...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Send size={16} />
-                                            Publicar avaliação
-                                        </>
+                                            {/* Submit */}
+                                            <button
+                                                type="submit"
+                                                disabled={submitting}
+                                                className="w-full bg-white text-illa-pink font-bold py-4 rounded-2xl hover:bg-illa-yellow hover:text-dark transition-all shadow-lg hover:shadow-xl active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
+                                            >
+                                                {submitting ? (
+                                                    <>
+                                                        <Loader2 size={18} className="animate-spin" />
+                                                        Enviando...
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Send size={16} />
+                                                        Publicar avaliação
+                                                    </>
+                                                )}
+                                            </button>
+                                        </motion.div>
                                     )}
-                                </button>
+                                </AnimatePresence>
                             </motion.form>
                         )}
                     </AnimatePresence>

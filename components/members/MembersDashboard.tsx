@@ -45,6 +45,9 @@ const RecipesLibrary = dynamic(() => import('./RecipesLibrary'), {
 const WeeklyLeaderboard = dynamic(() => import('./WeeklyLeaderboard'), {
     loading: () => <SectionSkeleton />,
 })
+const ReceitasCinematicButton = dynamic(() => import('./ReceitasCinematicButton'), {
+    loading: () => <SectionSkeleton />,
+})
 const BirthdayModule = dynamic(() => import('./BirthdayModule'), {
     loading: () => <SectionSkeleton />,
 })
@@ -522,6 +525,10 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                                     userLevel={snapshot.profile.level}
                                     onToggle={handleRecipeToggle}
                                 />
+                            </motion.div>
+
+                            <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
+                                <ReceitasCinematicButton />
                             </motion.div>
 
                             <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>

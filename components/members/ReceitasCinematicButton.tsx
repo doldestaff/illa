@@ -1,0 +1,72 @@
+'use client'
+
+import { motion } from 'framer-motion'
+import Link from 'next/link'
+import { Sparkles, ArrowRight, Play, Film } from 'lucide-react'
+
+export default function ReceitasCinematicButton() {
+    return (
+        <Link href="/receitas" className="block w-full group outline-none">
+            <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="relative overflow-hidden rounded-3xl p-[2px] w-full"
+            >
+                {/* Animated Neon Border */}
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-400 via-orange-500 to-pink-500 rounded-3xl opacity-70 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-amber-400 via-orange-500 to-pink-500 blur-xl opacity-40 group-hover:opacity-80 transition-opacity duration-700 animate-pulse" />
+
+                {/* Inner Content */}
+                <div className="relative h-full w-full bg-[#0B0B0D] rounded-[22px] overflow-hidden flex flex-col md:flex-row items-center border border-white/10 z-10">
+
+                    {/* Background Glow */}
+                    <div className="absolute top-0 left-1/4 w-full h-full bg-orange-500/20 blur-[80px] rounded-full pointer-events-none group-hover:bg-amber-500/30 transition-colors duration-700" />
+
+                    {/* Image Area - WebP Placeholder */}
+                    <div className="w-full md:w-2/5 h-48 md:h-full relative overflow-hidden bg-black/50">
+                        {/* Placeholder for WebP Image */}
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <Film className="w-16 h-16 text-white/10" />
+                            <span className="absolute bottom-4 right-4 text-[10px] uppercase font-bold tracking-widest text-white/30">
+                                INSIRA SUA WEBP AQUI
+                            </span>
+                        </div>
+                        {/* Overlay Gradient for seamless blend */}
+                        <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#0B0B0D] via-transparent to-transparent opacity-90" />
+                    </div>
+
+                    {/* Text Area */}
+                    <div className="w-full md:w-3/5 p-8 flex flex-col justify-center relative z-20">
+                        <div className="flex items-center gap-2 mb-3">
+                            <span className="px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-400 text-xs font-black tracking-widest uppercase flex items-center gap-1.5 shadow-[0_0_15px_rgba(245,158,11,0.2)]">
+                                <Sparkles className="w-3 h-3" />
+                                Cinema de Gelato
+                            </span>
+                            <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/60 text-xs font-bold tracking-widest uppercase">
+                                Grátis
+                            </span>
+                        </div>
+
+                        <h3 className="text-2xl md:text-3xl font-black text-white mb-2 leading-tight">
+                            Receitas Ocultas <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500 drop-shadow-[0_0_10px_rgba(251,191,36,0.3)]">ILLA</span>
+                        </h3>
+
+                        <p className="text-sm md:text-base text-white/60 mb-6 max-w-md font-medium leading-relaxed">
+                            Desbloqueie sobremesas cinematográficas, ganhe moedas a cada missão concluída e surpreenda-se.
+                        </p>
+
+                        <div className="flex items-center gap-4">
+                            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-orange-600 text-white shadow-[0_0_20px_rgba(245,158,11,0.4)] group-hover:shadow-[0_0_30px_rgba(245,158,11,0.6)] transition-all duration-300 group-hover:scale-110">
+                                <Play className="w-5 h-5 ml-1 fill-current" />
+                            </div>
+                            <span className="text-sm font-bold text-white uppercase tracking-wider group-hover:text-amber-400 transition-colors flex items-center gap-2">
+                                Iniciar Sessão <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+            </motion.div>
+        </Link>
+    )
+}
