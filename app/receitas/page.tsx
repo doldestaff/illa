@@ -358,13 +358,51 @@ export default function ReceitasCinematicPage() {
     return (
         <div ref={containerRef} className="min-h-screen bg-[#050505] text-white selection:bg-amber-500/30 font-sans pb-32">
 
-            {/* Cinematic Background Elements with ScrollFX */}
-            <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-                <motion.div style={{ y: bgY1, scale: bgScale }} className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-pink-600/10 blur-[120px] rounded-full" />
-                <motion.div style={{ y: bgY2, scale: bgScale }} className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-amber-600/10 blur-[150px] rounded-full" />
-                <motion.div style={{ y: bgY1, scale: bgScale }} className="absolute top-[40%] left-[60%] w-[30%] h-[30%] bg-orange-600/10 blur-[100px] rounded-full" />
-                {/* Noise texture overlay */}
-                <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }} />
+            {/* Ultra-Cinematic Animated Luminous Background */}
+            <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-[#030303]">
+                {/* Deep Ambient Space */}
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(30,15,5,0.4)_0%,rgba(3,3,3,1)_100%)]" />
+
+                {/* Floating Nebula / Aurora Orbs */}
+                <motion.div
+                    animate={{
+                        transform: ['translate(0%, 0%) rotate(0deg) scale(1)', 'translate(5%, 10%) rotate(90deg) scale(1.15)', 'translate(-5%, 5%) rotate(180deg) scale(0.9)', 'translate(0%, 0%) rotate(360deg) scale(1)'],
+                    }}
+                    transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                    className="absolute top-[-30%] left-[-20%] w-[80vw] h-[80vw] md:w-[60vw] md:h-[60vw] rounded-full bg-gradient-to-br from-pink-600/15 to-rose-900/10 blur-[100px] md:blur-[140px] mix-blend-screen"
+                />
+
+                <motion.div
+                    animate={{
+                        transform: ['translate(0%, 0%) rotate(0deg) scale(1)', 'translate(-10%, -10%) rotate(-90deg) scale(1.2)', 'translate(10%, -15%) rotate(-180deg) scale(1.05)', 'translate(0%, 0%) rotate(-360deg) scale(1)'],
+                    }}
+                    transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+                    className="absolute bottom-[-20%] right-[-20%] w-[90vw] h-[90vw] md:w-[70vw] md:h-[70vw] rounded-full bg-gradient-to-tl from-amber-600/15 via-orange-500/10 to-transparent blur-[120px] md:blur-[160px] mix-blend-screen"
+                />
+
+                <motion.div
+                    animate={{
+                        transform: ['translate(0%, 0%) scale(1)', 'translate(15%, 15%) scale(1.3)', 'translate(-10%, 10%) scale(1.1)', 'translate(0%, 0%) scale(1)'],
+                    }}
+                    transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+                    className="absolute top-[30%] left-[30%] w-[50vw] h-[50vw] md:w-[40vw] md:h-[40vw] rounded-full bg-amber-400/5 blur-[80px] md:blur-[120px] mix-blend-screen"
+                />
+
+                {/* Scroll-Responsive Depth Glow */}
+                <motion.div
+                    style={{ y: bgY1, opacity: scrollYProgress }}
+                    className="absolute top-[10%] inset-x-0 mx-auto w-[80vw] h-[40vw] bg-pink-500/5 blur-[120px] rounded-full mix-blend-screen"
+                />
+
+                {/* Slow Cinematic Light Sweep (Scanline) */}
+                <motion.div
+                    animate={{ y: ['-10vh', '110vh'] }}
+                    transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+                    className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-amber-400/10 to-transparent w-full blur-[2px]"
+                />
+
+                {/* Refined Noise Texture for Premium Grain */}
+                <div className="absolute inset-0 opacity-[0.04] mix-blend-screen pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.8%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }} />
             </div>
 
             {/* Top Navigation */}
@@ -526,7 +564,7 @@ export default function ReceitasCinematicPage() {
                                                     {/* Animated border glow on hover */}
                                                     <div className="absolute inset-0 bg-gradient-to-r from-amber-500/0 via-amber-500/50 to-pink-500/0 opacity-0 group-hover/upload:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
-                                                    <div className="relative h-48 md:h-56 bg-white/5 hover:bg-white/[0.07] border border-dashed border-white/20 hover:border-amber-500/50 rounded-xl transition-all duration-300 flex flex-col items-center justify-center overflow-hidden">
+                                                    <div className="relative min-h-[224px] h-auto py-8 bg-white/5 hover:bg-white/[0.07] border border-dashed border-white/20 hover:border-amber-500/50 rounded-xl transition-all duration-300 flex flex-col items-center justify-center overflow-hidden">
 
                                                         {/* Subtle background glow */}
                                                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-amber-500/10 blur-[40px] rounded-full group-hover/upload:bg-amber-500/20 transition-colors duration-500" />
