@@ -437,16 +437,17 @@ export default function ReceitasCinematicPage() {
                         className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white/80 text-sm font-medium mb-6 uppercase tracking-widest backdrop-blur-md"
                     >
                         <ChefHat className="w-4 h-4 text-amber-400" />
-                        Cardápio Secreto ILLA
+                        Cardápio Secreto.
                     </motion.div>
 
                     <motion.h1
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
-                        className="text-5xl md:text-7xl font-black mb-6 leading-[1.1] tracking-tight"
+                        className="text-[2.75rem] leading-[1.1] sm:text-6xl lg:text-7xl font-black mb-6 tracking-tight flex flex-col md:block"
                     >
-                        Cinema de <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-orange-500 drop-shadow-[0_0_30px_rgba(251,191,36,0.2)]">Receitas</span>
+                        <span>Receitas Secretas </span>
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-orange-500 drop-shadow-[0_0_30px_rgba(251,191,36,0.2)]">da Illa</span>
                     </motion.h1>
 
                     <motion.p
@@ -547,77 +548,89 @@ export default function ReceitasCinematicPage() {
                                                     </div>
                                                 </div>
 
-                                                {/* Image Upload Space (Cinematic Placeholder) */}
-                                                <input
-                                                    type="file"
-                                                    accept="image/*,video/mp4,video/quicktime"
-                                                    className="hidden"
-                                                    ref={fileInputRef}
-                                                    onChange={(e) => handleFileChange(e, mission)}
-                                                />
-                                                <motion.div
-                                                    onClick={() => !uploading && fileInputRef.current?.click()}
-                                                    whileHover={{ scale: uploading ? 1 : 1.01 }}
-                                                    whileTap={{ scale: uploading ? 1 : 0.99 }}
-                                                    className={`w-full relative group/upload rounded-2xl p-1 overflow-hidden mt-8 ${uploading ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}`}
-                                                >
-                                                    {/* Animated border glow on hover */}
-                                                    <div className="absolute inset-0 bg-gradient-to-r from-amber-500/0 via-amber-500/50 to-pink-500/0 opacity-0 group-hover/upload:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                                                {/* Check-in Section (Only if NOT completed) */}
+                                                {!isCompleted && (
+                                                    <>
+                                                        {/* Image Upload Space (Cinematic Placeholder) */}
+                                                        <input
+                                                            type="file"
+                                                            accept="image/*,video/mp4,video/quicktime"
+                                                            className="hidden"
+                                                            ref={fileInputRef}
+                                                            onChange={(e) => handleFileChange(e, mission)}
+                                                        />
+                                                        <motion.div
+                                                            onClick={() => !uploading && fileInputRef.current?.click()}
+                                                            whileHover={{ scale: uploading ? 1 : 1.01 }}
+                                                            whileTap={{ scale: uploading ? 1 : 0.99 }}
+                                                            className={`w-full relative group/upload rounded-2xl p-1 overflow-hidden mt-8 ${uploading ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}`}
+                                                        >
+                                                            {/* Animated border glow on hover */}
+                                                            <div className="absolute inset-0 bg-gradient-to-r from-amber-500/0 via-amber-500/50 to-pink-500/0 opacity-0 group-hover/upload:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
-                                                    <div className="relative min-h-[224px] h-auto py-8 bg-white/5 hover:bg-white/[0.07] border border-dashed border-white/20 hover:border-amber-500/50 rounded-xl transition-all duration-300 flex flex-col items-center justify-center overflow-hidden">
+                                                            <div className="relative min-h-[224px] h-auto py-8 bg-white/5 hover:bg-white/[0.07] border border-dashed border-white/20 hover:border-amber-500/50 rounded-xl transition-all duration-300 flex flex-col items-center justify-center overflow-hidden">
 
-                                                        {/* Subtle background glow */}
-                                                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-amber-500/10 blur-[40px] rounded-full group-hover/upload:bg-amber-500/20 transition-colors duration-500" />
+                                                                {/* Subtle background glow */}
+                                                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-amber-500/10 blur-[40px] rounded-full group-hover/upload:bg-amber-500/20 transition-colors duration-500" />
 
-                                                        <div className="relative z-10 flex flex-col items-center text-center px-4">
-                                                            <div className="w-14 h-14 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-4 group-hover/upload:scale-110 group-hover/upload:bg-amber-500/20 transition-all duration-300 shadow-[0_0_15px_rgba(0,0,0,0.5)]">
-                                                                {uploading ? (
-                                                                    <Loader2 className="w-6 h-6 text-amber-400 animate-spin" />
-                                                                ) : (
-                                                                    <Camera className="w-6 h-6 text-white/60 group-hover/upload:text-amber-400 transition-colors" />
-                                                                )}
+                                                                <div className="relative z-10 flex flex-col items-center text-center px-4">
+                                                                    <div className="w-14 h-14 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-4 group-hover/upload:scale-110 group-hover/upload:bg-amber-500/20 transition-all duration-300 shadow-[0_0_15px_rgba(0,0,0,0.5)]">
+                                                                        {uploading ? (
+                                                                            <Loader2 className="w-6 h-6 text-amber-400 animate-spin" />
+                                                                        ) : (
+                                                                            <Camera className="w-6 h-6 text-white/60 group-hover/upload:text-amber-400 transition-colors" />
+                                                                        )}
+                                                                    </div>
+                                                                    <h5 className="text-lg font-bold text-white mb-2 group-hover/upload:text-amber-200 transition-colors">
+                                                                        {uploading ? 'Enviando...' : 'Registre a Experiência'}
+                                                                    </h5>
+                                                                    {!uploading && (
+                                                                        <>
+                                                                            <p className="text-sm text-white/50 max-w-sm mb-4">
+                                                                                Faça o upload de uma foto ou vídeo curto (até 30s) mostrando o resultado da sua receita para o Check-in
+                                                                            </p>
+                                                                            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-xs font-bold text-white uppercase tracking-widest group-hover/upload:bg-amber-500 group-hover/upload:text-[#050505] transition-all duration-300">
+                                                                                <Upload className="w-3 h-3" /> Fazer Upload
+                                                                            </span>
+                                                                        </>
+                                                                    )}
+                                                                </div>
+
+                                                                <ImageIcon className="absolute -bottom-10 -right-10 w-40 h-40 text-white/[0.02] group-hover/upload:text-amber-500/[0.05] transition-colors duration-500 rotate-12" />
+                                                                <Video className="absolute -top-10 -left-10 w-40 h-40 text-white/[0.02] group-hover/upload:text-pink-500/[0.05] transition-colors duration-500 -rotate-12" />
                                                             </div>
-                                                            <h5 className="text-lg font-bold text-white mb-2 group-hover/upload:text-amber-200 transition-colors">
-                                                                {uploading ? 'Enviando...' : 'Registre a Experiência'}
-                                                            </h5>
-                                                            {!uploading && (
-                                                                <>
-                                                                    <p className="text-sm text-white/50 max-w-sm mb-4">
-                                                                        Faça o upload de uma foto ou vídeo curto (até 30s) mostrando o resultado da sua receita para o Check-in
-                                                                    </p>
-                                                                    <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-xs font-bold text-white uppercase tracking-widest group-hover/upload:bg-amber-500 group-hover/upload:text-[#050505] transition-all duration-300">
-                                                                        <Upload className="w-3 h-3" /> Fazer Upload
-                                                                    </span>
-                                                                </>
-                                                            )}
+                                                        </motion.div>
+
+                                                        <div className="mt-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                                                            <div className="text-xs font-bold text-amber-500 uppercase tracking-widest mb-1 flex items-center gap-2">
+                                                                <Sparkles className="w-3 h-3" /> Check-in da Missão
+                                                            </div>
+                                                            <div className="text-white/80 text-sm font-medium">{mission.checkin}</div>
                                                         </div>
-
-                                                        <ImageIcon className="absolute -bottom-10 -right-10 w-40 h-40 text-white/[0.02] group-hover/upload:text-amber-500/[0.05] transition-colors duration-500 rotate-12" />
-                                                        <Video className="absolute -top-10 -left-10 w-40 h-40 text-white/[0.02] group-hover/upload:text-pink-500/[0.05] transition-colors duration-500 -rotate-12" />
-                                                    </div>
-                                                </motion.div>
-
-                                                <div className="mt-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
-                                                    <div className="text-xs font-bold text-amber-500 uppercase tracking-widest mb-1 flex items-center gap-2">
-                                                        <Sparkles className="w-3 h-3" /> Check-in da Missão
-                                                    </div>
-                                                    <div className="text-white/80 text-sm font-medium">{mission.checkin}</div>
-                                                </div>
+                                                    </>
+                                                )}
                                             </motion.div>
                                         )}
                                     </AnimatePresence>
 
                                     {/* Footer Actions */}
                                     <div className="mt-auto pt-6 flex gap-3">
-                                        {!isActive && !isCompleted && (
+                                        {/* State 1: Collapsed (Can be either incomplete or complete) */}
+                                        {!isActive && (
                                             <button
                                                 onClick={() => setActiveMission(mission.id)}
-                                                className="w-full py-3 rounded-full bg-white/10 hover:bg-white/15 text-white text-sm font-bold tracking-widest uppercase transition-colors"
+                                                className={`w-full py-3 rounded-full text-sm font-bold tracking-widest uppercase transition-colors flex items-center justify-center gap-2 ${isCompleted ? 'bg-green-500/10 hover:bg-green-500/20 text-green-400 border border-green-500/20' : 'bg-white/10 hover:bg-white/15 text-white'}`}
                                             >
-                                                Ver Receita
+                                                {isCompleted ? (
+                                                    <><CheckCircle2 className="w-4 h-4" /> Ver Receita Completa</>
+                                                ) : (
+                                                    'Ver Receita'
+                                                )}
                                             </button>
                                         )}
-                                        {isActive && !isCompleted && (
+
+                                        {/* State 2: Active / Opened */}
+                                        {isActive && (
                                             <>
                                                 <button
                                                     onClick={() => setActiveMission(null)}
@@ -625,18 +638,15 @@ export default function ReceitasCinematicPage() {
                                                 >
                                                     Fechar
                                                 </button>
-                                                <button
-                                                    onClick={() => handleComplete(mission)}
-                                                    className="flex-[2] py-3 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white text-sm font-bold tracking-widest uppercase shadow-[0_0_20px_rgba(245,158,11,0.3)] transition-all"
-                                                >
-                                                    Concluir & Ganhar Moedas
-                                                </button>
+                                                {!isCompleted && (
+                                                    <button
+                                                        onClick={() => handleComplete(mission)}
+                                                        className="flex-[2] py-3 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white text-sm font-bold tracking-widest uppercase shadow-[0_0_20px_rgba(245,158,11,0.3)] transition-all"
+                                                    >
+                                                        Concluir & Ganhar
+                                                    </button>
+                                                )}
                                             </>
-                                        )}
-                                        {isCompleted && (
-                                            <div className="w-full py-3 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-sm font-bold tracking-widest uppercase text-center flex items-center justify-center gap-2">
-                                                <CheckCircle2 className="w-4 h-4" /> Missão Cumprida
-                                            </div>
                                         )}
                                     </div>
                                 </div>
