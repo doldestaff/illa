@@ -252,9 +252,9 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                                 <h1 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-white/70 tracking-tight drop-shadow-[0_2px_15px_rgba(255,255,255,0.2)]">
                                     {profile.full_name || 'Membro ILLA'}
                                 </h1>
-                                <div className="inline-flex items-center justify-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-illa-yellow to-amber-500 shadow-[0_4px_16px_rgba(245,158,11,0.4)] border border-white/50 transform hover:scale-105 transition-transform cursor-default mt-1 md:mt-0">
-                                    <Star size={14} fill="black" className="text-black" />
-                                    <span className="text-black text-sm font-black tracking-wider drop-shadow-sm">LVL {profile.level}</span>
+                                <div className="inline-flex shrink-0 w-fit items-center justify-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-illa-yellow to-amber-500 shadow-[0_4px_16px_rgba(245,158,11,0.4)] border border-white/50 transform hover:scale-105 transition-transform cursor-default mt-1 md:mt-0 whitespace-nowrap">
+                                    <Star size={14} fill="black" className="text-black shrink-0" />
+                                    <span className="text-black text-sm font-black tracking-wider drop-shadow-sm whitespace-nowrap">LVL {profile.level}</span>
                                 </div>
                             </div>
 
