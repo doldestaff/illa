@@ -139,13 +139,13 @@ function MobileButtons({ progress }: { progress: MotionValue<number> }) {
 
             <motion.div style={{ y: yFloat }} className="relative w-full max-w-[360px] h-[300px] flex justify-center items-center">
 
-                {/* Massive glowing aura - Soft Volumetric Effect */}
+                {/* Massive glowing aura - Solid fast rendering */}
                 <motion.div
                     style={{ scale: auraScale, opacity: auraOpacity }}
-                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[240px] h-[240px] pointer-events-none z-0 flex items-center justify-center"
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] pointer-events-none z-0 flex items-center justify-center"
                 >
-                    <div className="absolute inset-0 bg-gradient-radial from-[#FF6B6B]/40 via-[#FFCA28]/20 to-transparent blur-[60px] rounded-full mix-blend-screen" />
-                    <div className="absolute w-[60%] h-[60%] bg-[#FFD54F]/50 blur-[50px] rounded-full mix-blend-overlay" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(255,107,107,0.7)_0%,rgba(255,202,40,0.5)_40%,transparent_75%)] rounded-full" />
+                    <div className="absolute w-[50%] h-[50%] bg-[radial-gradient(circle,rgba(255,213,79,0.9)_0%,transparent_70%)] rounded-full" />
                 </motion.div>
 
                 {buttons.map((btn, i) => {
@@ -194,15 +194,16 @@ function MobileButtons({ progress }: { progress: MotionValue<number> }) {
                             className={`
                                 group absolute flex flex-col items-center justify-center gap-2 
                                 w-[156px] h-[130px] p-4 
-                                bg-illa-pink/85 backdrop-blur-3xl 
-                                border-[2px] border-white/70 rounded-[1.5rem] 
-                                shadow-[0_12px_24px_-6px_rgba(229,1,125,0.6),inset_0_2px_8px_rgba(255,255,255,0.4)]
+                                bg-illa-pink/95 
+                                border-[2px] border-white/50 rounded-[1.5rem] 
+                                shadow-[0_8px_16px_rgba(229,1,125,0.6),inset_0_1px_4px_rgba(255,255,255,0.3)]
                                 text-white font-black tracking-wider text-center
                                 pointer-events-auto cursor-pointer
                                 hover:bg-illa-yellow hover:text-dark hover:border-transparent 
                                 active:scale-95 active:bg-illa-yellow/90
                                 transition-all duration-300 ease-out
                                 ${isLeft ? 'origin-right' : 'origin-left'}
+                                will-change-transform [transform:translateZ(0)]
                             `}
                         >
                             <btn.icon size={32} className="text-current drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)] transition-transform group-active:scale-90 duration-200" strokeWidth={2.5} />
@@ -255,15 +256,15 @@ function TabletButtons({ progress }: { progress: MotionValue<number> }) {
 
             <motion.div style={{ y: yFloat }} className="relative w-full max-w-[640px] h-[350px] flex justify-center items-center">
 
-                {/* Massive glowing aura behind buttons - Now soft, volumetric and smoky */}
+                {/* Massive glowing aura behind buttons - Fast CSS Radial Gradients */}
                 <motion.div
                     style={{ scale: auraScale, opacity: auraOpacity }}
-                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] md:w-[600px] md:h-[600px] pointer-events-none z-0 flex items-center justify-center"
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] md:w-[700px] md:h-[700px] pointer-events-none z-0 flex items-center justify-center"
                 >
                     {/* Layer 1: Wide soft pink/orange spread */}
-                    <div className="absolute inset-0 bg-gradient-radial from-[#FF6B6B]/40 via-[#FFCA28]/20 to-transparent blur-[80px] md:blur-[140px] rounded-full mix-blend-screen" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(255,107,107,0.7)_0%,rgba(255,202,40,0.5)_40%,transparent_75%)] rounded-full" />
                     {/* Layer 2: Inner hot yellow core for depth */}
-                    <div className="absolute w-[50%] h-[50%] bg-[#FFD54F]/50 blur-[60px] md:blur-[100px] rounded-full mix-blend-overlay" />
+                    <div className="absolute w-[50%] h-[50%] bg-[radial-gradient(circle,rgba(255,213,79,0.9)_0%,transparent_70%)] rounded-full" />
                 </motion.div>
 
                 {buttons.map((btn, i) => {
@@ -314,17 +315,18 @@ function TabletButtons({ progress }: { progress: MotionValue<number> }) {
                             style={{ x, y, scale, rotateX, rotateY, opacity }}
                             className="
                                 group absolute flex flex-col items-center justify-center gap-4 
-                                w-[260px] h-[160px] p-6 z-10
-                                bg-illa-pink/85 backdrop-blur-3xl 
-                                border-[3px] border-white/70 rounded-[2.5rem] 
+                                w-[240px] h-[140px] p-6 z-10
+                                bg-illa-pink/95 
+                                border-[3px] border-white/60 rounded-[2.5rem] 
                                 text-white font-black tracking-widest text-center
                                 pointer-events-auto cursor-pointer
                                 hover:bg-illa-yellow hover:text-dark hover:border-transparent 
-                                hover:scale-110 hover:z-50
+                                hover:scale-105 hover:z-50
                                 active:scale-95 active:bg-illa-yellow/90
-                                transition-all duration-400 ease-out
-                                shadow-[0_24px_50px_-12px_rgba(229,1,125,0.6),inset_0_4px_16px_rgba(255,255,255,0.4)]
+                                transition-all duration-300 ease-out
+                                shadow-[0_12px_30px_-6px_rgba(229,1,125,0.7),inset_0_2px_8px_rgba(255,255,255,0.3)]
                                 hover:shadow-[0_0_80px_rgba(255,223,0,0.8),inset_0_4px_16px_rgba(255,255,255,0.8)]
+                                will-change-transform [transform:translateZ(0)]
                             "
                         >
                             <btn.icon size={48} className="text-current drop-shadow-md transition-transform group-hover:scale-110 duration-300" strokeWidth={2.5} />

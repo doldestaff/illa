@@ -202,7 +202,9 @@ export function ScrollFrameCanvasEngine({
         if (!ctx) return
 
         // Layout: Cover
-        const dpr = Math.min(window.devicePixelRatio || 1, 1.5) // Cap at 1.5 for performance
+        // Capping DPR at 1.0 on mobile to drastically reduce GPU fill rate during scroll.
+        // Cap at 1.5 on desktop/tablet to prevent 4K/retina displays from choking.
+        const dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1.0 : 1.5)
         const w = state.current.appWidth
         const h = state.current.appHeight
 
@@ -321,6 +323,7 @@ export function ScrollFrameCanvasEngine({
             )}
 
             {/* Poster using standard img for fastest LCP */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
                 src={posterUrl}
                 alt="background"

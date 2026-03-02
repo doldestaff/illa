@@ -247,9 +247,9 @@ export function HeroEngine({
         if (state.current.inflight.has(index)) return // Already loading
 
         // Concurrency Limiter (prevent browser choke)
-        // Aggressive on mobile background mode
+        // Aggressive on mobile to save GPU/Network parsing
         const isBackgroundMode = scrollMode === 'document'
-        const maxInflight = state.current.isMobile ? (isBackgroundMode ? 3 : 8) : 8
+        const maxInflight = state.current.isMobile ? (isBackgroundMode ? 2 : 3) : 6
 
         if (!priority && state.current.inflight.size >= maxInflight) {
             // Priority Check: Abort furthest frame to make room for nearest frame
@@ -362,9 +362,9 @@ export function HeroEngine({
         const frame = state.current.cache.get(idx)
 
         // Lookahead Strategy (Bi-directional based on velocity)
-        // PERF: Reduced mobile/tablet lookahead from 10→4 to avoid saturating the network
-        // during init. Frames beyond 4 are handled by the background preloader.
-        let lookahead = (state.current.isMobile || state.current.isTablet) ? (scrollMode === 'document' ? 2 : 4) : 10
+        // PERF: Reduced mobile/tablet lookahead from 4→2 to avoid saturating the network
+        // during init. Frames beyond 2 are handled by the background preloader.
+        let lookahead = (state.current.isMobile || state.current.isTablet) ? 2 : 8
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if (typeof navigator !== 'undefined' && 'deviceMemory' in navigator && (navigator as any).deviceMemory <= 2) {
             lookahead = 1
@@ -629,7 +629,7 @@ export function HeroEngine({
                     } else {
                         clearTimeout(idleCallbackId)
                     }
-                } catch (e) {
+                } catch {
                     clearTimeout(idleCallbackId)
                 }
             }
@@ -652,6 +652,7 @@ export function HeroEngine({
             {/* Poster: graceful fallback to prevent initial black screen — transition removed on mobile to prevent cross-fade bridge */}
             {
                 posterUrl && (
+                    /* eslint-disable-next-line @next/next/no-img-element */
                     <img
                         src={posterUrl}
                         className={cn(
