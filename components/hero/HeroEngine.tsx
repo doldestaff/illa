@@ -109,6 +109,7 @@ export function HeroEngine({
         appHeight: 0,
         appWidth: 0,
         isMobile: false,
+        isTablet: false,
         pendingDraw: false,
         // Props for loop
         frameCount: 0,
@@ -178,13 +179,14 @@ export function HeroEngine({
                 state.current.appHeight = h
                 state.current.appWidth = w
 
-                // Mobile detection for perf
+                // Mobile & Tablet detection for perf & math
                 state.current.isMobile = w < 768
+                state.current.isTablet = w >= 768 && w < 1024
 
                 // PERFORMANCE: Background areas like members dash have 82 frames.
                 // We MUST set the cache equal or slightly larger to prevent reload-thrashing looping.
                 const isBackgroundMode = scrollMode === 'document'
-                state.current.cache.setLimit(state.current.isMobile ? (isBackgroundMode ? 90 : 100) : 100)
+                state.current.cache.setLimit((state.current.isMobile || state.current.isTablet) ? (isBackgroundMode ? 90 : 100) : 100)
 
                 if (containerRef.current) {
                     containerRef.current.style.setProperty('--app-h', `${h}px`)
@@ -204,10 +206,11 @@ export function HeroEngine({
         state.current.appHeight = h
         state.current.appWidth = w
         state.current.isMobile = w < 768
-        setIsMobileHero(w < 768)
+        state.current.isTablet = w >= 768 && w < 1024
+        setIsMobileHero(w < 768 || (w >= 768 && w < 1024)) // Let tablet also skip the poster fade sequence
 
         const isBackgroundMode = scrollMode === 'document'
-        state.current.cache.setLimit(state.current.isMobile ? (isBackgroundMode ? 90 : 100) : 100)
+        state.current.cache.setLimit((state.current.isMobile || state.current.isTablet) ? (isBackgroundMode ? 90 : 100) : 100)
 
         if (containerRef.current) containerRef.current.style.setProperty('--app-h', `${h}px`)
 
@@ -359,9 +362,9 @@ export function HeroEngine({
         const frame = state.current.cache.get(idx)
 
         // Lookahead Strategy (Bi-directional based on velocity)
-        // PERF: Reduced mobile lookahead from 10→4 to avoid saturating the network
+        // PERF: Reduced mobile/tablet lookahead from 10→4 to avoid saturating the network
         // during init. Frames beyond 4 are handled by the background preloader.
-        let lookahead = state.current.isMobile ? (scrollMode === 'document' ? 2 : 4) : 10
+        let lookahead = (state.current.isMobile || state.current.isTablet) ? (scrollMode === 'document' ? 2 : 4) : 10
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if (typeof navigator !== 'undefined' && 'deviceMemory' in navigator && (navigator as any).deviceMemory <= 2) {
             lookahead = 1
@@ -421,8 +424,8 @@ export function HeroEngine({
         const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true })
         if (!ctx) return
 
-        // Cap DPR at 1.0 on ANY mobile to reduce canvas size and GPU fill-rate
-        const dpr = Math.min(window.devicePixelRatio || 1, state.current.isMobile ? 1.0 : 1.5)
+        // Cap DPR at 1.0 on ANY mobile/tablet to reduce canvas size and GPU fill-rate
+        const dpr = Math.min(window.devicePixelRatio || 1, (state.current.isMobile || state.current.isTablet) ? 1.0 : 1.5)
         const w = state.current.appWidth
         const h = state.current.appHeight
         const targetW = Math.floor(w * dpr)
@@ -447,8 +450,18 @@ export function HeroEngine({
         const scale = objectFit === 'contain' ? Math.min(w / iW, h / iH) : Math.max(w / iW, h / iH)
         const finalW = iW * scale
         const finalH = iH * scale
+
+        // Horizontal center
         const x = (w - finalW) / 2
-        const y = objectFit === 'contain' ? 0 : (h - finalH) / 2 // Align to top for contain, center for cover
+
+        // Vertical center with tablet offset
+        // On iPad/Tablet (portrait tall aspect), the mobile frames are heavily cropped at top/bottom.
+        // For tablets in portrait mode, the image was too high. Let's pull it down slightly (+2%) or center it.
+        let yOffset = 0
+        if (state.current.isTablet && h > w) {
+            yOffset = Number.isFinite(h) ? h * 0.02 : 0 // Shift down by 2% of screen height
+        }
+        const y = objectFit === 'contain' ? 0 : ((h - finalH) / 2) + yOffset
 
         ctx.drawImage(frame, x, y, finalW, finalH)
 

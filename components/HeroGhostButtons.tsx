@@ -7,10 +7,11 @@ import { useLenis } from 'lenis/react'
 interface HeroGhostButtonsProps {
     progress: MotionValue<number>
     isMobile: boolean
+    isTablet?: boolean | null
 }
 
 const buttons = [
-    { label: 'PEDIR NO WHATSAPP', icon: MessageCircle, link: 'https://api.whatsapp.com/send/?phone=558287286990&text=Oi%C3%AA%21+Vim+do+site+da+Illa%21' },
+    { label: 'PEDIR NO WHATSAPP', icon: MessageCircle, link: 'https://api.whatsapp.com/send/?phone=558287286990&text=Oi%C3%A2%21+Vim+do+site+da+Illa%21' },
     { label: 'IFOOD', icon: ShoppingBag, link: 'https://www.ifood.com.br/delivery/maceio-al/illa-sorvetes---sorveteria-serraria-serraria/403679e8-d45f-4f93-8fc9-c5e0e6f2dd04' },
     { label: 'LOCALIZAÇÃO', icon: MapPin, link: '#locations' },
     { label: 'FRANQUIAS', icon: Store, link: '#' },
@@ -55,10 +56,10 @@ function DesktopGhostButton({ btn, i, total, progress }: { btn: (typeof buttons)
             style={{ opacity, x, scale, display }}
             className="
                 flex items-center gap-3 
-                px-6 py-2.5 
+                px-5 md:px-6 py-2.5 md:py-3.5 
                 bg-illa-pink/90 backdrop-blur-xl 
                 border border-white/50 rounded-full 
-                text-white text-sm font-bold tracking-wide whitespace-nowrap
+                text-white text-xs md:text-sm font-bold tracking-wide whitespace-nowrap
                 hover:bg-illa-yellow hover:text-dark hover:scale-105 hover:border-transparent 
                 active:scale-95
                 transition-colors
@@ -93,99 +94,253 @@ function DesktopButtons({ progress }: { progress: MotionValue<number> }) {
 }
 
 function MobileButtons({ progress }: { progress: MotionValue<number> }) {
-    // The buttons scroll physically upwards between 15% and 80% of the overall view progress
-    const scrollY = useTransform(progress, [0.15, 0.80], [0, -220])
-
-    // Arrow fades early once user slightly scrolls away from top
-    const arrowOpacity = useTransform(progress, [0, 0.05], [1, 0])
-
-    // Fade out the entire module perfectly cleanly at the end of the scroll (e.g. 0.98 -> 1)
-    const fadeOpacity = useTransform(progress, [0.98, 1], [1, 0])
-
     const lenis = useLenis()
 
+    // Grid Positions for Mobile (relative to center)
+    // Tighter spacing to fit 390px screens. Width=156px per button.
+    const gapX = 82
+    const gapY = 70
+    const positions = [
+        { x: -gapX, y: -gapY }, // Top Left
+        { x: gapX, y: -gapY },  // Top Right
+        { x: -gapX, y: gapY },  // Bottom Left
+        { x: gapX, y: gapY }    // Bottom Right
+    ]
+
+    const fadeOpacity = useTransform(progress, [0.95, 1], [1, 0])
+    const yFloat = useTransform(progress, [0.15, 0.8], [0, -60])
+
+    const auraScale = useTransform(progress, [0.15, 0.4], [0.5, 1.2])
+    const auraOpacity = useTransform(progress, [0.15, 0.4, 0.8, 1], [0, 0.6, 0.6, 0])
+
+    // Scroll hint disappears instantly when user starts scrolling
+    const scrollHintOpacity = useTransform(progress, [0, 0.05], [1, 0])
+    const scrollHintY = useTransform(progress, [0, 0.05], [0, 10])
+
     return (
-        <motion.div style={{ opacity: fadeOpacity }}>
+        <motion.div style={{ opacity: fadeOpacity }} className="absolute bottom-[2vh] left-0 right-0 z-20 flex justify-center items-center pointer-events-none [perspective:1000px]">
+
+            {/* Cinematic Scroll Hint (Mobile) */}
             <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: "easeOut", delay: 0.5 }}
-                className="absolute bottom-[20vh] left-0 right-0 z-20 flex justify-center h-[120px] items-center overflow-visible"
+                style={{ opacity: scrollHintOpacity, y: scrollHintY }}
+                className="absolute top-[40px] flex flex-col items-center gap-3 z-30"
             >
-                {/* The mask container limits visibility so it feels like they are sliding in and out */}
-                <div className="relative w-full h-[250px] flex justify-center items-center pointer-events-none [mask-image:linear-gradient(to_bottom,transparent,black_20%,black_80%,transparent)]">
+                <motion.div
+                    animate={{ y: [0, 8, 0], opacity: [0.3, 1, 0.3] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    className="w-[1px] h-8 bg-gradient-to-b from-transparent via-white to-transparent shadow-[0_0_8px_rgba(255,255,255,0.8)]"
+                />
 
-                    {/* The inner track that actually moves based on scroll progress */}
-                    <motion.div
-                        style={{ y: scrollY }}
-                        className="absolute top-[180px] flex flex-col gap-6 items-center pointer-events-auto w-full"
-                    >
-                        {buttons.map((btn, i) => {
-                            // These labels are treated as internal actions (scroll or modal)
-                            const isAction = btn.label === 'QUEM SOMOS' || btn.label === 'CONTATO' || btn.label === 'FRANQUIAS' || btn.label === 'LOCALIZAÇÃO'
-
-                            return (
-                                <a
-                                    key={btn.label}
-                                    href={btn.link}
-                                    target={isAction ? undefined : "_blank"}
-                                    rel={isAction ? undefined : "noreferrer"}
-                                    onClick={(e) => {
-                                        if (btn.label === 'QUEM SOMOS') {
-                                            e.preventDefault()
-                                            window.dispatchEvent(new CustomEvent('open-about-modal'))
-                                        } else if (btn.label === 'FRANQUIAS') {
-                                            e.preventDefault()
-                                            window.dispatchEvent(new CustomEvent('open-dev-modal'))
-                                        } else if (btn.label === 'LOCALIZAÇÃO') {
-                                            e.preventDefault()
-                                            if (lenis) {
-                                                lenis.scrollTo('#locations', { offset: -50 })
-                                            } else {
-                                                const el = document.getElementById('locations')
-                                                el?.scrollIntoView({ behavior: 'smooth' })
-                                            }
-                                        }
-                                    }}
-                                    className="
-                                        flex items-center justify-center gap-3 
-                                        w-[65vw] max-w-[260px] py-4
-                                        bg-illa-pink/90 backdrop-blur-xl hover:bg-illa-yellow hover:text-dark hover:border-transparent
-                                        border border-white/50 rounded-2xl 
-                                        text-white text-sm font-bold tracking-widest
-                                        cursor-pointer
-                                        active:scale-95 transition-all duration-300
-                                        group shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]
-                                    "
-                                >
-                                    <btn.icon size={18} className="text-current" />
-                                    <span className="drop-shadow-md group-hover:drop-shadow-none">{btn.label}</span>
-                                </a>
-                            )
-                        })}
-                    </motion.div>
-
-                </div>
+                <p className="text-white/80 uppercase font-bold tracking-[0.3em] text-[9px] text-center font-body flex flex-col items-center gap-0.5 drop-shadow-md">
+                    <span className="opacity-70 text-[8px]">Descubra a Illa</span>
+                    <span className="text-white">Deslize</span>
+                </p>
             </motion.div>
 
-            {/* Scroll Hint Arrow Fixed Near Bottom */}
-            <motion.div
-                style={{ opacity: arrowOpacity }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 1, delay: 1 }}
-                className="absolute bottom-16 left-0 right-0 flex justify-center pointer-events-none z-30"
-            >
-                <div className="flex flex-col items-center gap-2 text-white/80 drop-shadow-lg">
-                    <ChevronDown size={32} strokeWidth={2} className="animate-bounce" />
-                    <span className="text-[10px] uppercase font-bold tracking-[0.2em] opacity-90">Scroll</span>
-                </div>
+            <motion.div style={{ y: yFloat }} className="relative w-full max-w-[360px] h-[300px] flex justify-center items-center">
+
+                {/* Massive glowing aura - Soft Volumetric Effect */}
+                <motion.div
+                    style={{ scale: auraScale, opacity: auraOpacity }}
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[240px] h-[240px] pointer-events-none z-0 flex items-center justify-center"
+                >
+                    <div className="absolute inset-0 bg-gradient-radial from-[#FF6B6B]/40 via-[#FFCA28]/20 to-transparent blur-[60px] rounded-full mix-blend-screen" />
+                    <div className="absolute w-[60%] h-[60%] bg-[#FFD54F]/50 blur-[50px] rounded-full mix-blend-overlay" />
+                </motion.div>
+
+                {buttons.map((btn, i) => {
+                    const isLeft = i % 2 === 0
+                    const targetX = positions[i].x
+                    const targetY = positions[i].y
+
+                    // Staggered animation start for each button
+                    const delayStart = 0.15 + (i * 0.04)
+                    const expandEnd = Math.min(0.8, delayStart + 0.25)
+
+                    // Explosive 3D fanning fly-out
+                    const x = useTransform(progress, [0.15, expandEnd], [0, targetX])
+                    const y = useTransform(progress, [0.15, expandEnd], [100, targetY])
+                    const rotateX = useTransform(progress, [0, 0.5], [60, 0])
+                    const rotateY = useTransform(progress, [0, 0.5], [isLeft ? -30 : 30, 0])
+                    const scale = useTransform(progress, [0, 0.4], [0.5, 1])
+                    const opacity = useTransform(progress, [0, 0.2, 0.8, 1], [0, 1, 1, 0])
+
+                    const isAction = btn.label === 'QUEM SOMOS' || btn.label === 'CONTATO' || btn.label === 'FRANQUIAS' || btn.label === 'LOCALIZAÇÃO'
+
+                    return (
+                        <motion.a
+                            key={btn.label}
+                            href={btn.link}
+                            target={isAction ? undefined : "_blank"}
+                            rel={isAction ? undefined : "noreferrer"}
+                            onClick={(e) => {
+                                if (btn.label === 'QUEM SOMOS') {
+                                    e.preventDefault()
+                                    window.dispatchEvent(new CustomEvent('open-about-modal'))
+                                } else if (btn.label === 'FRANQUIAS') {
+                                    e.preventDefault()
+                                    window.dispatchEvent(new CustomEvent('open-dev-modal'))
+                                } else if (btn.label === 'LOCALIZAÇÃO') {
+                                    e.preventDefault()
+                                    if (lenis) {
+                                        lenis.scrollTo('#locations', { offset: -50 })
+                                    } else {
+                                        const el = document.getElementById('locations')
+                                        el?.scrollIntoView({ behavior: 'smooth' })
+                                    }
+                                }
+                            }}
+                            style={{ x, y, scale, rotateX, rotateY, opacity, zIndex: 20 - i }}
+                            className={`
+                                group absolute flex flex-col items-center justify-center gap-2 
+                                w-[156px] h-[130px] p-4 
+                                bg-illa-pink/85 backdrop-blur-3xl 
+                                border-[2px] border-white/70 rounded-[1.5rem] 
+                                shadow-[0_12px_24px_-6px_rgba(229,1,125,0.6),inset_0_2px_8px_rgba(255,255,255,0.4)]
+                                text-white font-black tracking-wider text-center
+                                pointer-events-auto cursor-pointer
+                                hover:bg-illa-yellow hover:text-dark hover:border-transparent 
+                                active:scale-95 active:bg-illa-yellow/90
+                                transition-all duration-300 ease-out
+                                ${isLeft ? 'origin-right' : 'origin-left'}
+                            `}
+                        >
+                            <btn.icon size={32} className="text-current drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)] transition-transform group-active:scale-90 duration-200" strokeWidth={2.5} />
+                            <span className="text-[10px] drop-shadow-md leading-tight uppercase font-script transition-colors duration-300">{btn.label}</span>
+                        </motion.a>
+                    )
+                })}
             </motion.div>
         </motion.div>
     )
 }
 
-export function HeroGhostButtons({ progress, isMobile }: HeroGhostButtonsProps) {
+function TabletButtons({ progress }: { progress: MotionValue<number> }) {
+    const lenis = useLenis()
+
+    // Fade out entirely at the very end of the scroll
+    const fadeOpacity = useTransform(progress, [0.95, 1], [1, 0])
+
+    // Overall container floats up slowly
+    const yFloat = useTransform(progress, [0.15, 0.8], [0, -120])
+
+    const auraScale = useTransform(progress, [0.15, 0.4], [0.5, 1.2])
+    const auraOpacity = useTransform(progress, [0.15, 0.4, 0.8, 1], [0, 0.6, 0.6, 0])
+
+    // Scroll hint disappears instantly when user starts scrolling
+    const scrollHintOpacity = useTransform(progress, [0, 0.05], [1, 0])
+    // Pushes down slightly as it fades out
+    const scrollHintY = useTransform(progress, [0, 0.05], [0, 20])
+
+    return (
+        <motion.div style={{ opacity: fadeOpacity }} className="absolute bottom-[5vh] md:bottom-[15vh] left-0 right-0 z-20 flex justify-center items-center pointer-events-none [perspective:1200px]">
+
+            {/* Massive Cinematic Scroll Hint (Visible only initially) */}
+            <motion.div
+                style={{ opacity: scrollHintOpacity, y: scrollHintY }}
+                className="absolute top-[80px] flex flex-col items-center gap-4 z-30"
+            >
+                {/* Breathing dot/line animation */}
+                <motion.div
+                    animate={{ y: [0, 10, 0], opacity: [0.3, 1, 0.3] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    className="w-[1px] h-12 bg-gradient-to-b from-transparent via-white to-transparent shadow-[0_0_10px_rgba(255,255,255,0.8)]"
+                />
+
+                <p className="text-white/80 uppercase font-bold tracking-[0.4em] text-[10px] md:text-sm text-center font-body flex flex-col items-center gap-1 drop-shadow-xl">
+                    <span className="opacity-70 text-[10px]">Descubra o Universo Illa</span>
+                    <span className="text-white">Deslize para baixo</span>
+                </p>
+            </motion.div>
+
+            <motion.div style={{ y: yFloat }} className="relative w-full max-w-[640px] h-[350px] flex justify-center items-center">
+
+                {/* Massive glowing aura behind buttons - Now soft, volumetric and smoky */}
+                <motion.div
+                    style={{ scale: auraScale, opacity: auraOpacity }}
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] md:w-[600px] md:h-[600px] pointer-events-none z-0 flex items-center justify-center"
+                >
+                    {/* Layer 1: Wide soft pink/orange spread */}
+                    <div className="absolute inset-0 bg-gradient-radial from-[#FF6B6B]/40 via-[#FFCA28]/20 to-transparent blur-[80px] md:blur-[140px] rounded-full mix-blend-screen" />
+                    {/* Layer 2: Inner hot yellow core for depth */}
+                    <div className="absolute w-[50%] h-[50%] bg-[#FFD54F]/50 blur-[60px] md:blur-[100px] rounded-full mix-blend-overlay" />
+                </motion.div>
+
+                {buttons.map((btn, i) => {
+                    const isLeft = i % 2 === 0
+                    const isTop = i < 2
+
+                    // Massive spacing for 2x2 grid (Tablet)
+                    const targetX = isLeft ? -150 : 150
+                    const targetY = isTop ? -90 : 90
+
+                    // Staggered animation start for each button
+                    const delayStart = 0.15 + (i * 0.04)
+                    const expandEnd = Math.min(0.8, delayStart + 0.25)
+
+                    // Explosive 3D fanning fly-out
+                    const x = useTransform(progress, [0.15, expandEnd], [0, targetX])
+                    const y = useTransform(progress, [0.15, expandEnd], [100, targetY])
+                    const rotateX = useTransform(progress, [0.15, expandEnd], [60, 0])
+                    const rotateY = useTransform(progress, [0.15, expandEnd], [isLeft ? 45 : -45, 0])
+                    const scale = useTransform(progress, [0.15, expandEnd - 0.05, expandEnd], [0.2, 1.1, 1])
+                    const opacity = useTransform(progress, [delayStart, delayStart + 0.1], [0, 1])
+
+                    const isAction = btn.label === 'QUEM SOMOS' || btn.label === 'CONTATO' || btn.label === 'FRANQUIAS' || btn.label === 'LOCALIZAÇÃO'
+
+                    return (
+                        <motion.a
+                            key={btn.label}
+                            href={btn.link}
+                            target={isAction ? undefined : "_blank"}
+                            rel={isAction ? undefined : "noreferrer"}
+                            onClick={(e) => {
+                                if (btn.label === 'QUEM SOMOS') {
+                                    e.preventDefault()
+                                    window.dispatchEvent(new CustomEvent('open-about-modal'))
+                                } else if (btn.label === 'FRANQUIAS') {
+                                    e.preventDefault()
+                                    window.dispatchEvent(new CustomEvent('open-dev-modal'))
+                                } else if (btn.label === 'LOCALIZAÇÃO') {
+                                    e.preventDefault()
+                                    if (lenis) {
+                                        lenis.scrollTo('#locations', { offset: -50 })
+                                    } else {
+                                        const el = document.getElementById('locations')
+                                        el?.scrollIntoView({ behavior: 'smooth' })
+                                    }
+                                }
+                            }}
+                            style={{ x, y, scale, rotateX, rotateY, opacity }}
+                            className="
+                                group absolute flex flex-col items-center justify-center gap-4 
+                                w-[260px] h-[160px] p-6 z-10
+                                bg-illa-pink/85 backdrop-blur-3xl 
+                                border-[3px] border-white/70 rounded-[2.5rem] 
+                                text-white font-black tracking-widest text-center
+                                pointer-events-auto cursor-pointer
+                                hover:bg-illa-yellow hover:text-dark hover:border-transparent 
+                                hover:scale-110 hover:z-50
+                                active:scale-95 active:bg-illa-yellow/90
+                                transition-all duration-400 ease-out
+                                shadow-[0_24px_50px_-12px_rgba(229,1,125,0.6),inset_0_4px_16px_rgba(255,255,255,0.4)]
+                                hover:shadow-[0_0_80px_rgba(255,223,0,0.8),inset_0_4px_16px_rgba(255,255,255,0.8)]
+                            "
+                        >
+                            <btn.icon size={48} className="text-current drop-shadow-md transition-transform group-hover:scale-110 duration-300" strokeWidth={2.5} />
+                            <span className="text-sm drop-shadow-lg leading-tight uppercase font-script text-[1.1rem] transition-colors duration-300">{btn.label}</span>
+                        </motion.a>
+                    )
+                })}
+            </motion.div>
+        </motion.div>
+    )
+}
+
+export function HeroGhostButtons({ progress, isMobile, isTablet }: HeroGhostButtonsProps) {
+    if (isTablet) {
+        return <TabletButtons progress={progress} />
+    }
     if (isMobile) {
         return <MobileButtons progress={progress} />
     }
