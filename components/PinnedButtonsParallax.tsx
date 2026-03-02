@@ -92,7 +92,7 @@ function LazyVideo() {
                 loop
                 muted
                 playsInline
-                preload="auto"
+                preload="metadata"
                 src="/instagram/reels/mobile/Insta-1.mp4"
                 style={{
                     transform: `translate3d(0, 0px, 0) scale(1.15)`,
@@ -162,11 +162,14 @@ export function PinnedButtonsParallax() {
 
         const cache = domCacheRef.current
 
-        const rect = containerRef.current.getBoundingClientRect()
-        const height = rect.height
+        // PERF: Use scrollY + cached offsets instead of getBoundingClientRect()
+        // getBoundingClientRect forces a synchronous layout/reflow on every call
+        const scrollY = window.scrollY || window.pageYOffset
+        const containerTop = containerRef.current.offsetTop
+        const height = containerRef.current.offsetHeight
         const windowH = window.innerHeight
         const scrollableDist = height - windowH
-        const rawProgress = -rect.top / scrollableDist
+        const rawProgress = (scrollY - containerTop) / scrollableDist
 
         const progress = Math.max(0, Math.min(1, rawProgress));
 
@@ -340,6 +343,14 @@ export function PinnedButtonsParallax() {
     })
 
     useEffect(() => {
+        // PERF: Only use native scroll listener on mobile where Lenis is disabled.
+        // On desktop/tablet Lenis already calls updateParallax via useLenis hook.
+        if (!isMobile) {
+            // Still need initial paint
+            updateParallaxRef.current?.()
+            return
+        }
+
         let rafId: number
         const onScroll = () => {
             cancelAnimationFrame(rafId)
@@ -354,7 +365,7 @@ export function PinnedButtonsParallax() {
             window.removeEventListener('scroll', onScroll)
             cancelAnimationFrame(rafId)
         }
-    }, [])
+    }, [isMobile])
 
     return (
         <section
@@ -395,14 +406,14 @@ export function PinnedButtonsParallax() {
                             className={cn(
                                 'absolute inset-0 m-auto overflow-hidden',
                                 'w-[85vw] max-w-[360px] md:max-w-[520px] h-[360px] md:h-[480px]',
-                                'bg-white/30 backdrop-blur-2xl border border-white/60',
+                                'bg-white/80 border border-white/60',
                                 'rounded-[3rem] shadow-[0_8px_48px_0_rgba(255,255,255,0.4),0_2px_8px_0_rgba(0,0,0,0.08)]',
                                 'flex flex-col items-center justify-center text-center p-6 md:p-10',
                                 'cursor-pointer group',
                                 'hover:bg-white/45 hover:border-white/80 hover:shadow-[0_12px_60px_0_rgba(255,255,255,0.6)]',
                                 'transition-shadow duration-500',
                             )}
-                            style={{ opacity: 0, willChange: 'transform, opacity' }}
+                            style={{ opacity: 0, willChange: 'transform, opacity', transform: 'translateZ(0)' }}
                         >
                             <div
                                 className="glass-highlight absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/50 to-transparent pointer-events-none z-20"
@@ -415,7 +426,7 @@ export function PinnedButtonsParallax() {
                                 <div
                                     className={cn(
                                         'card-icon w-20 h-20 md:w-28 md:h-28 rounded-full flex items-center justify-center',
-                                        'bg-white/70 backdrop-blur-sm shadow-lg ring-2 ring-white/50',
+                                        'bg-white/90 shadow-lg ring-2 ring-white/50',
                                         'text-illa-pink',
                                         'group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 ease-out',
                                     )}
@@ -456,7 +467,7 @@ export function PinnedButtonsParallax() {
                     <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.3em] text-white/50 [writing-mode:vertical-rl] drop-shadow-md">
                         Explore
                     </span>
-                    <div className="w-[3px] h-16 md:h-24 rounded-full bg-black/15 backdrop-blur-md relative overflow-hidden border border-white/10 shadow-[inset_0_0_4px_rgba(0,0,0,0.5)]">
+                    <div className="w-[3px] h-16 md:h-24 rounded-full bg-black/20 relative overflow-hidden border border-white/10 shadow-[inset_0_0_4px_rgba(0,0,0,0.5)]">
                         <div
                             className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-transparent via-illa-pink to-white rounded-full"
                             style={{
