@@ -136,11 +136,22 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                         {/* 0. Gloss Overlay (Softened, as gradient handles the base fade) */}
                         <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/10 to-transparent pointer-events-none mix-blend-overlay" />
 
-                        {/* 1. Dynamic 'Vitral' Ambient Background */}
-                        <div className="absolute inset-0 hidden md:block">
-                            {/* Prismatic Orbs - desktop only (warm brand palette) */}
-                            <div className="absolute -top-32 -right-32 w-[25rem] h-[25rem] bg-gradient-to-br from-illa-pink/20 via-rose-500/20 to-pink-500/20 rounded-full blur-[60px] mix-blend-screen animate-pulse duration-[4000ms]" />
-                            <div className="absolute top-20 -left-20 w-[20rem] h-[20rem] bg-gradient-to-tr from-amber-500/20 via-orange-500/20 to-yellow-500/20 rounded-full blur-[40px] mix-blend-screen animate-pulse duration-[5000ms]" />
+                        {/* 1. Dynamic 'Vitral' Ambient Background (Smoky Neon Orbs) */}
+                        <div className="absolute inset-0 block">
+                            {/* Prismatic Orbs - Active on ALL devices (warm brand palette) */}
+                            <div
+                                className="absolute -top-[10%] -right-[10%] w-[120vw] md:w-[25rem] h-[50vh] md:h-[25rem] transform-gpu will-change-transform rounded-[100%] opacity-40 mix-blend-screen animate-pulse duration-[4000ms] z-0 blur-2xl"
+                                style={{ backgroundImage: 'radial-gradient(ellipse at center, rgba(229,1,125,0.4) 0%, rgba(244,63,94,0.3) 40%, transparent 70%)' }}
+                            />
+                            <div
+                                className="absolute top-[20%] -left-[10%] w-[100vw] md:w-[20rem] h-[40vh] md:h-[20rem] transform-gpu will-change-transform rounded-[100%] opacity-40 mix-blend-screen animate-pulse duration-[5000ms] z-0 blur-2xl"
+                                style={{ backgroundImage: 'radial-gradient(ellipse at center, rgba(245,158,11,0.4) 0%, rgba(234,88,12,0.3) 40%, transparent 70%)' }}
+                            />
+                            {/* Central Body Illuminator */}
+                            <div
+                                className="absolute top-[30%] left-[20%] w-[80vw] h-[60vh] transform-gpu will-change-transform rounded-[100%] opacity-20 mix-blend-screen animate-[pulse_6s_ease-in-out_infinite] z-0 blur-2xl"
+                                style={{ backgroundImage: 'radial-gradient(ellipse at center, rgba(255,255,255,0.15) 0%, transparent 70%)' }}
+                            />
                         </div>
                     </div>
 

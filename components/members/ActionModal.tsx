@@ -74,27 +74,41 @@ export default function ActionModal({ isOpen, onClose, title, themeGradient = "f
                     {/* Container - Bottom aligned on mobile, Center on desktop */}
                     <div className="fixed inset-0 z-[9999] flex flex-col justify-end md:justify-center items-center pointer-events-none">
 
-                        {/* Cinematic Neon Glow (Aurora Effect Behind Modal) */}
+                        {/* Surprising Smoky Neon Glow (Behind Modal) */}
                         <div className="absolute inset-0 z-[-1] overflow-hidden pointer-events-none flex justify-center items-center">
-                            {/* Top Beam */}
+
+                            {/* Core Intense Neon Ember */}
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.5 }}
+                                animate={{ opacity: [0, 0.9, 0.7], scale: [0.5, 1.3, 1] }}
+                                transition={{ duration: 2, ease: "easeOut" }}
+                                className={`absolute top-[5%] md:top-[10%] w-[120vw] md:w-[60vw] h-[40vh] ${themeGradient} rounded-[100%] blur-3xl opacity-70 mix-blend-screen will-change-transform transform-gpu saturate-200`}
+                                style={{ backgroundImage: 'radial-gradient(ellipse at center, var(--tw-gradient-stops), transparent 70%)' }}
+                            />
+
+                            {/* Wide Smoky Aura (Breathing effect) */}
                             <motion.div
                                 initial={{ opacity: 0, y: -50, scale: 0.8 }}
-                                animate={{ opacity: [0, 0.4, 0.4], y: [-50, 0, -20], scale: [0.8, 1.2, 1] }}
-                                transition={{ duration: 3, ease: "easeOut" }}
-                                className={`absolute top-[-10%] md:top-[-20%] w-[150vw] md:w-[80vw] h-[50vh] bg-gradient-to-b ${themeGradient} blur-[120px] opacity-40 mix-blend-screen will-change-transform transform-gpu`}
+                                animate={{ opacity: [0, 0.6, 0.5], y: [-50, 0, -20], scale: [0.8, 1.5, 1.2] }}
+                                transition={{ duration: 5, ease: "easeInOut", repeat: Infinity, repeatType: "mirror" }}
+                                className={`absolute top-[-20%] w-[150vw] md:w-[120vw] h-[70vh] ${themeGradient} rounded-[100%] blur-[80px] opacity-50 mix-blend-screen will-change-transform transform-gpu saturate-150`}
+                                style={{ backgroundImage: 'radial-gradient(ellipse at center, var(--tw-gradient-stops), transparent 70%)' }}
                             />
-                            {/* Side Ambient Lights */}
+
+                            {/* Side Ambient Lights for Envelopment */}
                             <motion.div
                                 initial={{ opacity: 0, x: -100 }}
-                                animate={{ opacity: [0, 0.25, 0.15], x: [-100, 0, -50] }}
+                                animate={{ opacity: [0, 0.4, 0.2], x: [-100, 0, -50] }}
                                 transition={{ duration: 4, ease: "easeInOut", delay: 0.2 }}
-                                className={`absolute left-[-20%] top-[30%] w-[80vw] h-[60vh] bg-gradient-to-tr ${themeGradient} blur-[140px] opacity-20 mix-blend-screen will-change-transform transform-gpu`}
+                                className={`absolute left-[-30%] top-[20%] w-[100vw] h-[60vh] ${themeGradient} rounded-[100%] blur-[60px] opacity-30 mix-blend-screen will-change-transform transform-gpu`}
+                                style={{ backgroundImage: 'radial-gradient(ellipse at center, var(--tw-gradient-stops), transparent 70%)' }}
                             />
                             <motion.div
                                 initial={{ opacity: 0, x: 100 }}
-                                animate={{ opacity: [0, 0.25, 0.15], x: [100, 0, 50] }}
+                                animate={{ opacity: [0, 0.4, 0.2], x: [100, 0, 50] }}
                                 transition={{ duration: 4, ease: "easeInOut", delay: 0.4 }}
-                                className={`absolute right-[-20%] top-[20%] w-[80vw] h-[70vh] bg-gradient-to-tl ${themeGradient} blur-[150px] opacity-20 mix-blend-screen will-change-[transform,opacity] transform-gpu`}
+                                className={`absolute right-[-30%] top-[10%] w-[100vw] h-[70vh] ${themeGradient} rounded-[100%] blur-[60px] opacity-30 mix-blend-screen will-change-transform transform-gpu`}
+                                style={{ backgroundImage: 'radial-gradient(ellipse at center, var(--tw-gradient-stops), transparent 70%)' }}
                             />
                         </div>
 
