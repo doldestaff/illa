@@ -64,13 +64,13 @@ function PremiumGoldenCloud({ children, isClaimed = false }: { children: React.R
             ))}
 
             {/* Premium Golden Bumps */}
-            <div className="absolute -top-6 left-[8%] w-[60px] h-[60px] rounded-full z-0 bg-gradient-to-br from-[#FFFDF0] to-[#FFD54F] shadow-[inset_2px_2px_6px_rgba(255,255,255,0.9)] overflow-hidden">
+            <div className="absolute -top-6 left-[8%] w-[60px] h-[60px] rounded-full z-0 bg-gradient-to-br from-[#FFCF24] to-[#DF7A00] shadow-[inset_2px_2px_6px_rgba(255,235,120,0.6)] overflow-hidden">
                 <GoldenShimmer />
             </div>
-            <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-[110px] h-[110px] rounded-full z-0 bg-gradient-to-b from-[#FFFFFF] via-[#FFE885] to-[#FFBF00] shadow-[inset_0_5px_15px_rgba(255,255,255,1)] overflow-hidden">
+            <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-[110px] h-[110px] rounded-full z-0 bg-gradient-to-b from-[#FFCF24] via-[#FFAD00] to-[#DF7A00] shadow-[inset_0_4px_12px_rgba(255,235,120,0.8)] overflow-hidden">
                 <GoldenShimmer />
             </div>
-            <div className="absolute -top-6 right-[8%] w-[65px] h-[65px] rounded-full z-0 bg-gradient-to-bl from-[#FFFDF0] to-[#FFD54F] shadow-[inset_-2px_2px_6px_rgba(255,255,255,0.9)] overflow-hidden">
+            <div className="absolute -top-6 right-[8%] w-[65px] h-[65px] rounded-full z-0 bg-gradient-to-bl from-[#FFCF24] to-[#DF7A00] shadow-[inset_-2px_2px_6px_rgba(255,235,120,0.6)] overflow-hidden">
                 <GoldenShimmer />
             </div>
 
