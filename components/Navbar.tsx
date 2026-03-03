@@ -6,12 +6,15 @@ import { cn } from '@/lib/utils'
 import { useState, useEffect, Suspense } from 'react'
 import Image from 'next/image'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
-import { AuthModal } from './AuthModal'
-import { AboutModal } from './AboutModal'
-import { DevelopmentModal } from './DevelopmentModal'
+import dynamic from 'next/dynamic'
 import { createSupabaseBrowser } from '@/lib/supabaseClient'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import { useLenis } from 'lenis/react'
+
+// PERF: Lazy-load modals — they are never visible on initial load
+const AuthModal = dynamic(() => import('./AuthModal').then(m => m.AuthModal), { ssr: false })
+const AboutModal = dynamic(() => import('./AboutModal').then(m => m.AboutModal), { ssr: false })
+const DevelopmentModal = dynamic(() => import('./DevelopmentModal').then(m => m.DevelopmentModal), { ssr: false })
 
 function LoginParamListener({ onLoginParam }: { onLoginParam: () => void }) {
     const searchParams = useSearchParams()
@@ -243,7 +246,7 @@ function NavbarInner() {
                                 "w-12 h-12 flex items-center justify-center rounded-full transition-all duration-300 shadow-sm",
                                 user
                                     ? "bg-illa-pink text-white shadow-lg ring-2 ring-illa-pink/30 hover:bg-pink-600 active:scale-95"
-                                    : "bg-white/90 backdrop-blur-md text-dark hover:shadow-md hover:scale-105 active:scale-95"
+                                    : "bg-white text-dark hover:shadow-md hover:scale-105 active:scale-95"
                             )}
                         >
                             {user ? <User size={22} strokeWidth={2.5} /> : <LogIn size={22} strokeWidth={2.5} />}
@@ -256,7 +259,7 @@ function NavbarInner() {
                                 "w-12 h-12 flex items-center justify-center rounded-full transition-all duration-300 shadow-sm",
                                 isOpen
                                     ? "bg-white text-illa-pink rotate-90 shadow-lg ring-2 ring-illa-pink/20"
-                                    : "bg-white/90 backdrop-blur-md text-dark hover:shadow-md hover:scale-105 active:scale-95"
+                                    : "bg-white text-dark hover:shadow-md hover:scale-105 active:scale-95"
                             )}
                             aria-label="Toggle Menu"
                         >
@@ -283,7 +286,7 @@ function NavbarInner() {
                     {/* Mobile Menu Overlay */}
                     <div
                         className={cn(
-                            "fixed inset-0 bg-white/95 backdrop-blur-xl z-40 flex flex-col transition-all duration-500 md:hidden pointer-events-auto",
+                            "fixed inset-0 bg-white z-40 flex flex-col transition-all duration-500 md:hidden pointer-events-auto",
                             isOpen ? "opacity-100 visible translate-y-0" : "opacity-0 invisible pointer-events-none -translate-y-4"
                         )}
                         style={{

@@ -49,7 +49,7 @@ function ReviewCard({ review, index }: { review: Review; index: number }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: index * 0.1 }}
-            className="bg-white/10 backdrop-blur-sm p-8 rounded-2xl border border-white/10 hover:bg-white/15 transition-colors"
+            className="bg-white/10 p-8 rounded-2xl border border-white/10 hover:bg-white/15 transition-colors"
         >
             <div className="flex gap-1 text-illa-yellow mb-4">
                 <StarRating rating={review.rating} />
@@ -208,7 +208,7 @@ export function SocialProof() {
             {/* Background Elements */}
             <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
                 <div className="absolute top-10 left-10 w-20 h-20 rounded-full border-4 border-white transform rotate-12" />
-                <div className="absolute bottom-20 right-20 w-32 h-32 bg-white rounded-full mix-blend-overlay blur-2xl" />
+                <div className="absolute bottom-20 right-20 w-32 h-32 bg-white rounded-full opacity-30 blur-2xl" />
             </div>
 
             <div className="container mx-auto px-4 relative z-10">
@@ -269,7 +269,7 @@ export function SocialProof() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.5 }}
-                    className="mt-16 bg-white/10 backdrop-blur-md border border-white/15 rounded-3xl p-8 md:p-10 max-w-2xl mx-auto"
+                    className="mt-16 bg-white/15 border border-white/15 rounded-3xl p-8 md:p-10 max-w-2xl mx-auto"
                 >
                     <h3 className="text-2xl font-bold text-center mb-2">Deixe sua avaliação</h3>
                     <p className="text-white/60 text-sm text-center mb-8">Sua opinião faz diferença para nós! ❤️</p>
