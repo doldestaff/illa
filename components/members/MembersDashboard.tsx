@@ -80,7 +80,6 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
     const [vipPayload, setVipPayload] = useState<VipPayload | null>(null)
     const [sorvetesCount, setSorvetesCount] = useState(initial.sorvetes_free_count ?? 0)
     const [activeModal, setActiveModal] = useState<'history' | 'scanner' | 'sorvetes' | 'invite' | null>(null)
-    const activeModal = useRef<'history' | 'scanner' | 'sorvetes' | 'invite' | null>(null)
     const progressTracked = useRef(false)
     const { isSupported, isSubscribed, subscribe } = usePushNotifications()
     const { play } = useGlobalAudio()
