@@ -72,8 +72,6 @@ function JoyCloud({ children }: { children: React.ReactNode }) {
                 className="relative bg-[#FFFdf5] rounded-[2.5rem] px-3 pt-3 pb-2 z-10 flex flex-col items-center justify-center min-h-[80px]"
                 style={{ boxShadow: 'inset 0 -6px 0 rgba(241,245,249,0.9)' }}
             >
-                {/* rainbow shimmer */}
-                <GoldenShimmer />
                 {children}
             </div>
         </div>
@@ -249,7 +247,7 @@ export default function OnlineCelebrationManager({ onClaim, pollIntervalMs = 5 *
                                         initial={{ y: 20, opacity: 0 }}
                                         animate={{ y: 0, opacity: 1 }}
                                         transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 20 }}
-                                        className="text-center z-10 -mt-1"
+                                        className="text-center z-10 mt-2"
                                     >
                                         <span className="block text-[48px] font-black text-transparent bg-clip-text bg-gradient-to-br from-illa-pink via-[#FF4A6B] to-orange-500 leading-none tracking-tight">
                                             +{window.reward_points}
