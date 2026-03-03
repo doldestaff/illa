@@ -74,19 +74,20 @@ function PremiumGoldenCloud({ children, isClaimed = false }: { children: React.R
                 <GoldenShimmer />
             </div>
 
-            {/* Main Body */}
+            {/* Main Body Background (has overflow-hidden for texture, merges seamlessly via top shadow removal) */}
             <div
-                className="relative rounded-[2.5rem] px-3 pt-3 pb-2 z-10 flex flex-col items-center justify-center min-h-[80px] bg-gradient-to-b from-[#FFCF24] via-[#FFAD00] to-[#DF7A00] overflow-hidden"
+                className="absolute inset-x-0 bottom-0 top-0 rounded-[2.5rem] bg-gradient-to-b from-[#FFCF24] via-[#FFAD00] to-[#DF7A00] overflow-hidden z-10"
                 style={{
-                    boxShadow: 'inset 0 8px 6px -4px rgba(255,235,120,0.9), inset 0 -12px 24px rgba(150,40,0,0.5), 0 0 0 1px rgba(255,245,200,0.6)'
+                    boxShadow: 'inset 0 -12px 24px rgba(150,40,0,0.5), 0 0 0 1px rgba(255,245,200,0.6)'
                 }}
             >
                 <GoldenShimmer />
                 <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.08] mix-blend-overlay pointer-events-none z-0" />
+            </div>
 
-                <div className="relative z-10 w-full flex flex-col items-center">
-                    {children}
-                </div>
+            {/* Content Container (no overflow-hidden, allows coin to escape bounds) */}
+            <div className="relative z-20 px-3 pt-3 pb-4 w-full flex flex-col items-center justify-center min-h-[80px]">
+                {children}
             </div>
         </div>
     )
@@ -231,10 +232,10 @@ export default function OnlineCelebrationManager({ onClaim, pollIntervalMs = 5 *
 
                                     <motion.div
                                         animate={{ scale: [1, 1.15, 1], rotate: [0, -8, 8, -4, 4, 0] }}
-                                        transition={{ duration: 0.9, ease: 'easeOut' }}
-                                        className="relative flex items-center justify-center z-20 mt-1 drop-shadow-[0_0_25px_rgba(255,160,0,0.4)]"
+                                        transition={{ duration: 0.9, ease: 'easeOut', delay: 0.1 }}
+                                        className="relative flex items-center justify-center z-20 mt-1 drop-shadow-[0_0_25px_rgba(255,160,0,0.5)]"
                                     >
-                                        <div className="relative z-10 w-[86px] h-[86px] flex items-center justify-center drop-shadow-2xl -mt-16 mb-2">
+                                        <div className="relative z-10 w-[96px] h-[96px] flex items-center justify-center drop-shadow-2xl -mt-20 mb-1">
                                             <GlobalCoin size="lg" animate />
                                         </div>
                                     </motion.div>
@@ -243,15 +244,15 @@ export default function OnlineCelebrationManager({ onClaim, pollIntervalMs = 5 *
                                         initial={{ y: 20, opacity: 0 }}
                                         animate={{ y: 0, opacity: 1 }}
                                         transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 20 }}
-                                        className="text-center z-10 mt-2"
+                                        className="text-center z-10 -mt-2"
                                     >
-                                        <span className="block text-[56px] font-black text-white drop-shadow-[0_4px_8px_rgba(220,38,38,0.6)] leading-none tracking-tight">
+                                        <span className="block text-[52px] font-black text-white drop-shadow-[0_4px_8px_rgba(220,38,38,0.6)] leading-none tracking-tight">
                                             +{window.reward_points}
                                         </span>
-                                        <span className="text-[18px] font-black text-white drop-shadow-[0_2px_4px_rgba(220,38,38,0.6)] uppercase tracking-[0.15em] mt-1 block">
+                                        <span className="text-[18px] font-black text-white drop-shadow-[0_2px_4px_rgba(220,38,38,0.6)] uppercase tracking-[0.15em] mt-0.5 block">
                                             {window.reward_points === 1 ? 'MOEDA!' : 'MOEDAS!'}
                                         </span>
-                                        <span className="text-[10px] font-bold text-amber-950/60 uppercase tracking-[0.4em] mt-2 block">
+                                        <span className="text-[9px] font-bold text-amber-950/60 uppercase tracking-[0.4em] mt-1.5 block">
                                             {window.reward_points === 1 ? 'Coletada' : 'Coletadas'}
                                         </span>
                                     </motion.div>
@@ -261,7 +262,7 @@ export default function OnlineCelebrationManager({ onClaim, pollIntervalMs = 5 *
                                         initial={{ y: 5, opacity: 0 }}
                                         animate={{ y: 0, opacity: 1 }}
                                         transition={{ delay: 0.8, duration: 0.5 }}
-                                        className="z-10 mt-3 flex justify-center w-full"
+                                        className="z-10 mt-2 flex justify-center w-full"
                                     >
                                         <Link
                                             href="/members"
