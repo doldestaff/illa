@@ -6,6 +6,8 @@ import { cn } from '@/lib/utils'
 import { CinematicToastProvider } from '@/components/notifications/CinematicToastProvider'
 import { PageTransitionLoader } from '@/components/PageTransitionLoader'
 import { GlobalCelebrationProvider } from '@/components/GlobalCelebrationProvider'
+import { GlobalAudioProvider } from '@/components/GlobalAudioProvider'
+import FloatingAudioToggle from '@/components/FloatingAudioToggle'
 
 const openSans = Open_Sans({
   subsets: ['latin'],
@@ -64,11 +66,14 @@ export default function RootLayout({
       >
         <PageTransitionLoader />
         <SmoothScroll>
-          <CinematicToastProvider>
-            <GlobalCelebrationProvider>
-              {children}
-            </GlobalCelebrationProvider>
-          </CinematicToastProvider>
+          <GlobalAudioProvider>
+            <CinematicToastProvider>
+              <GlobalCelebrationProvider>
+                {children}
+                <FloatingAudioToggle />
+              </GlobalCelebrationProvider>
+            </CinematicToastProvider>
+          </GlobalAudioProvider>
         </SmoothScroll>
       </body>
     </html>
