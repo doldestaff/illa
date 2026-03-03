@@ -64,37 +64,37 @@ export default function MissionsModal({ isOpen, onClose, missions, claimingId, c
                             animate={{ scale: 1, opacity: 1, y: 0 }}
                             exit={{ scale: 0.97, opacity: 0, y: 20 }}
                             transition={{ type: 'spring', damping: 28, stiffness: 320 }}
-                            className="w-full max-w-lg sm:max-h-[88vh] h-[92dvh] sm:h-auto rounded-t-[2.5rem] sm:rounded-[2.5rem] overflow-hidden pointer-events-auto flex flex-col relative bg-[#0a0616]/60 backdrop-blur-3xl border border-white/10 shadow-[0_-8px_60px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.08)]"
+                            className="w-full max-w-lg sm:max-h-[88vh] h-[92dvh] sm:h-auto rounded-t-[2.5rem] sm:rounded-[2.5rem] overflow-hidden pointer-events-auto flex flex-col relative bg-[#1a0f0b]/80 backdrop-blur-3xl border border-white/10 shadow-[0_-8px_60px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.08)]"
                         >
-                            {/* Ambient glows */}
-                            <div className="absolute -top-24 -left-24 w-64 h-64 bg-illa-pink/15 rounded-full blur-[80px] pointer-events-none" />
-                            <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-purple-600/10 rounded-full blur-[80px] pointer-events-none" />
-                            <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] pointer-events-none mix-blend-overlay" />
+                            {/* Ambient glows - Changed to warm adventure tones */}
+                            <div className="absolute -top-24 -left-24 w-64 h-64 bg-amber-500/20 rounded-full blur-[80px] pointer-events-none mix-blend-screen" />
+                            <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-orange-600/10 rounded-full blur-[80px] pointer-events-none mix-blend-screen" />
+                            <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.05] pointer-events-none mix-blend-overlay" />
 
                             {/* Header */}
-                            <div className="relative px-6 pt-7 pb-5 border-b border-white/[0.07] flex-shrink-0">
+                            <div className="relative px-6 pt-7 pb-5 border-b border-amber-900/30 flex-shrink-0">
                                 {/* Pill handle (mobile) */}
                                 <div className="absolute top-3 left-1/2 -translate-x-1/2 w-10 h-1 rounded-full bg-white/20 sm:hidden" />
 
                                 <button
                                     onClick={onClose}
-                                    className="absolute top-6 right-5 p-2 rounded-full bg-white/8 hover:bg-white/15 text-white/40 hover:text-white/80 transition-all border border-white/10"
+                                    className="absolute top-6 right-5 p-2 rounded-full bg-white/5 hover:bg-amber-500/15 text-white/40 hover:text-amber-100 transition-all border border-white/5 hover:border-amber-500/30"
                                 >
                                     <X size={18} />
                                 </button>
 
                                 <div className="flex items-center gap-4">
                                     <div className="relative">
-                                        <div className="absolute inset-0 bg-illa-pink/40 blur-xl rounded-full" />
-                                        <div className="relative w-13 h-13 w-[52px] h-[52px] rounded-2xl bg-gradient-to-br from-illa-pink via-pink-500 to-rose-600 shadow-lg shadow-pink-600/40 flex items-center justify-center border border-pink-400/30">
-                                            <Target size={26} className="text-white drop-shadow-md" />
+                                        <div className="absolute inset-0 bg-amber-500/40 blur-xl rounded-full animate-pulse" />
+                                        <div className="relative w-[52px] h-[52px] rounded-2xl bg-gradient-to-br from-amber-400 via-orange-500 to-rose-600 shadow-lg shadow-amber-600/30 flex items-center justify-center border border-amber-300/40">
+                                            <Target size={26} className="text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]" />
                                         </div>
                                     </div>
                                     <div className="flex-1">
-                                        <h2 className="text-[22px] font-black text-white tracking-tight leading-none">
+                                        <h2 className="text-[22px] font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-50 via-white to-amber-200 tracking-tight leading-none drop-shadow-sm">
                                             Mural de Missões
                                         </h2>
-                                        <p className="text-[13px] font-medium text-white/40 mt-1">
+                                        <p className="text-[13px] font-medium text-amber-100/50 mt-1">
                                             Complete desafios para ganhar recompensas
                                         </p>
                                     </div>
@@ -102,9 +102,9 @@ export default function MissionsModal({ isOpen, onClose, missions, claimingId, c
 
                                 {/* Stats bar */}
                                 {claimableCount > 0 && (
-                                    <div className="mt-4 flex items-center gap-2 bg-illa-pink/10 border border-illa-pink/20 rounded-full px-4 py-2 w-fit">
-                                        <Sparkles size={13} className="text-illa-pink animate-pulse" />
-                                        <span className="text-[12px] font-bold text-illa-pink tracking-wide">
+                                    <div className="mt-4 flex items-center gap-2 bg-gradient-to-r from-amber-500/20 to-orange-500/10 border border-amber-500/30 rounded-full px-4 py-2 w-fit shadow-[0_0_15px_rgba(245,158,11,0.15)]">
+                                        <Sparkles size={13} className="text-amber-400 animate-pulse" />
+                                        <span className="text-[12px] font-bold text-amber-300 tracking-wide drop-shadow-sm">
                                             {claimableCount} {claimableCount === 1 ? 'missão disponível' : 'missões disponíveis'} para coletar
                                         </span>
                                     </div>

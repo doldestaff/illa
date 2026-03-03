@@ -235,9 +235,8 @@ export default function OnlineCelebrationManager({ onClaim, pollIntervalMs = 5 *
                                     <motion.div
                                         animate={{ scale: [1, 1.15, 1], rotate: [0, -8, 8, -4, 4, 0] }}
                                         transition={{ duration: 0.9, ease: 'easeOut' }}
-                                        className="relative flex items-center justify-center z-20 mt-1"
+                                        className="relative flex items-center justify-center z-20 mt-1 drop-shadow-[0_0_25px_rgba(255,160,0,0.4)]"
                                     >
-                                        <div className="absolute inset-0 bg-gradient-to-tr from-illa-pink to-amber-400 blur-2xl opacity-40 animate-pulse rounded-full" />
                                         <div className="relative z-10 w-[86px] h-[86px] flex items-center justify-center drop-shadow-2xl -mt-16 mb-2">
                                             <GlobalCoin size="lg" animate />
                                         </div>
