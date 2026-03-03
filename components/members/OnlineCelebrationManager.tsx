@@ -64,21 +64,21 @@ function PremiumGoldenCloud({ children, isClaimed = false }: { children: React.R
             ))}
 
             {/* Premium Golden Bumps */}
-            <div className="absolute -top-6 left-[8%] w-[60px] h-[60px] rounded-full z-0 bg-gradient-to-br from-[#FFCF24] to-[#DF7A00] shadow-[inset_2px_2px_6px_rgba(255,235,120,0.6)] overflow-hidden">
+            <div className="absolute -top-6 left-[8%] w-[60px] h-[60px] rounded-full z-0 bg-gradient-to-br from-[#FFCF24] to-[#FFAD00] overflow-hidden">
                 <GoldenShimmer />
             </div>
-            <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-[110px] h-[110px] rounded-full z-0 bg-gradient-to-b from-[#FFCF24] via-[#FFAD00] to-[#DF7A00] shadow-[inset_0_4px_12px_rgba(255,235,120,0.8)] overflow-hidden">
+            <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-[110px] h-[110px] rounded-full z-0 bg-gradient-to-b from-[#FFCF24] via-[#FFAD00] to-[#DF7A00] overflow-hidden">
                 <GoldenShimmer />
             </div>
-            <div className="absolute -top-6 right-[8%] w-[65px] h-[65px] rounded-full z-0 bg-gradient-to-bl from-[#FFCF24] to-[#DF7A00] shadow-[inset_-2px_2px_6px_rgba(255,235,120,0.6)] overflow-hidden">
+            <div className="absolute -top-6 right-[8%] w-[65px] h-[65px] rounded-full z-0 bg-gradient-to-bl from-[#FFCF24] to-[#FFAD00] overflow-hidden">
                 <GoldenShimmer />
             </div>
 
             {/* Main Body Background (has overflow-hidden for texture, merges seamlessly via top shadow removal) */}
             <div
-                className="absolute inset-x-0 bottom-0 top-0 rounded-[2.5rem] bg-gradient-to-b from-[#FFCF24] via-[#FFAD00] to-[#DF7A00] overflow-hidden z-10"
+                className="absolute inset-x-0 bottom-0 top-0 rounded-[2.5rem] bg-[#FFCF24] bg-gradient-to-b from-transparent via-[#FFAD00] to-[#DF7A00] overflow-hidden z-10"
                 style={{
-                    boxShadow: 'inset 0 -12px 24px rgba(150,40,0,0.5), 0 0 0 1px rgba(255,245,200,0.6)'
+                    boxShadow: 'inset 0 -12px 24px rgba(150,40,0,0.5)'
                 }}
             >
                 <GoldenShimmer />
