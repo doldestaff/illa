@@ -123,7 +123,12 @@ export function StoreLocations() {
                         {stores.map((store) => (
                             <button
                                 key={store.id}
-                                onClick={() => setActiveStore(store)}
+                                type="button"
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    e.stopPropagation()
+                                    setActiveStore(store)
+                                }}
                                 className={cn(
                                     "flex-1 py-2.5 px-3 rounded-full text-sm font-bold transition-all duration-250 border",
                                     activeStore.id === store.id
@@ -176,24 +181,28 @@ export function StoreLocations() {
 
                             {/* CTAs */}
                             <div className="flex gap-3 pl-[52px]">
-                                <a
-                                    href={activeStore.mapUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
+                                <button
+                                    type="button"
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        window.open(activeStore.mapUrl, '_blank', 'noopener,noreferrer')
+                                    }}
                                     className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full bg-illa-pink text-white text-sm font-bold shadow-sm hover:shadow-md transition-all"
                                 >
                                     <Navigation size={14} />
                                     Ver no Mapa
-                                </a>
-                                <a
-                                    href={activeStore.mapUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        window.open(activeStore.mapUrl, '_blank', 'noopener,noreferrer')
+                                    }}
                                     className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-full border border-gray-200 text-dark/60 text-sm font-bold hover:border-illa-pink/30 hover:text-illa-pink transition-all"
                                 >
                                     <ExternalLink size={14} />
                                     Maps
-                                </a>
+                                </button>
                             </div>
                         </motion.div>
                     </AnimatePresence>
