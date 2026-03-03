@@ -39,6 +39,18 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
     const [localAvatarUrl, setLocalAvatarUrl] = useState<string | null>(avatarUrl)
     const [imageError, setImageError] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
+    const [levelUpTrigger, setLevelUpTrigger] = useState(false)
+    const prevLevelRef = useRef(profile.level)
+
+    // Detect Level Up
+    useEffect(() => {
+        if (profile.level > prevLevelRef.current) {
+            setLevelUpTrigger(true)
+            prevLevelRef.current = profile.level
+            // Auto reset animation trigger
+            setTimeout(() => setLevelUpTrigger(false), 3000)
+        }
+    }, [profile.level])
 
     // XP progress within current level (server-provided)
     const xpInto = profile.xp_into_level
@@ -252,10 +264,31 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                                 <h1 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-white/70 tracking-tight drop-shadow-[0_2px_15px_rgba(255,255,255,0.2)]">
                                     {profile.full_name || 'Membro ILLA'}
                                 </h1>
-                                <div className="inline-flex shrink-0 w-fit items-center justify-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-illa-yellow to-amber-500 shadow-[0_4px_16px_rgba(245,158,11,0.4)] border border-white/50 transform hover:scale-105 transition-transform cursor-default mt-1 md:mt-0 whitespace-nowrap">
-                                    <Star size={14} fill="black" className="text-black shrink-0" />
-                                    <span className="text-black text-sm font-black tracking-wider drop-shadow-sm whitespace-nowrap">LVL {profile.level}</span>
-                                </div>
+                                <motion.div
+                                    animate={levelUpTrigger ? {
+                                        scale: [1, 1.3, 1],
+                                        boxShadow: [
+                                            "0 4px 16px rgba(245,158,11,0.4)",
+                                            "0 0 60px rgba(251,191,36,1)",
+                                            "0 4px 16px rgba(245,158,11,0.4)"
+                                        ],
+                                        rotate: [0, -5, 5, 0]
+                                    } : {}}
+                                    transition={{ duration: 1.2, type: "spring", bounce: 0.5 }}
+                                    className="relative inline-flex shrink-0 w-fit items-center justify-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-illa-yellow to-amber-500 shadow-[0_4px_16px_rgba(245,158,11,0.4)] border border-white/50 transform hover:scale-105 transition-transform cursor-default mt-1 md:mt-0 whitespace-nowrap mx-auto md:mx-0"
+                                >
+                                    {/* Level Up Aura */}
+                                    {levelUpTrigger && (
+                                        <motion.div
+                                            initial={{ opacity: 0, scale: 0.5 }}
+                                            animate={{ opacity: [0, 1, 0], scale: [1, 2.5] }}
+                                            transition={{ duration: 1 }}
+                                            className="absolute inset-0 bg-amber-400 rounded-full blur-xl pointer-events-none"
+                                        />
+                                    )}
+                                    <Star size={14} fill="black" className="text-black shrink-0 relative z-10" />
+                                    <span className="text-black text-sm font-black tracking-wider drop-shadow-sm whitespace-nowrap relative z-10">LVL {profile.level}</span>
+                                </motion.div>
                             </div>
 
                             <p className="text-white/60 font-medium text-sm md:text-base mb-6 max-w-sm">Explore seu painel ILLA e ganhe recompensas exclusivas.</p>
