@@ -40,16 +40,17 @@ function GoldenShimmer() {
     )
 }
 
-function JoyCloud({ children }: { children: React.ReactNode }) {
+function PremiumGoldenCloud({ children, isClaimed = false }: { children: React.ReactNode, isClaimed?: boolean }) {
     return (
         <div
-            className="relative w-[220px] max-w-[92vw] mx-auto"
+            className="relative w-[220px] max-w-[92vw] mx-auto group"
             style={{
-                filter: 'drop-shadow(0 -10px 40px rgba(255,215,0,0.5)) drop-shadow(0 0 60px rgba(255,160,0,0.5)) drop-shadow(0 18px 50px rgba(255,215,0,0.4))'
+                filter: isClaimed
+                    ? 'drop-shadow(0 -10px 40px rgba(255,215,0,0.5)) drop-shadow(0 0 60px rgba(255,160,0,0.5)) drop-shadow(0 18px 50px rgba(255,215,0,0.4))'
+                    : 'drop-shadow(0 12px 32px rgba(255,160,0,0.3)) drop-shadow(0 0 15px rgba(255,215,0,0.2))'
             }}
         >
-            {/* ── Animated splat emoji halo ── */}
-            {STAR_BURSTS.map((s, i) => (
+            {isClaimed && STAR_BURSTS.map((s, i) => (
                 <motion.span
                     key={i}
                     initial={{ opacity: 0, scale: 0, x: 0, y: 0, rotate: 0 }}
@@ -62,17 +63,30 @@ function JoyCloud({ children }: { children: React.ReactNode }) {
                 </motion.span>
             ))}
 
-            {/* ── Cloud top bumps ── */}
-            <div className="absolute -top-6   left-[10%] w-[60px] h-[60px] bg-[#FFFdf5] rounded-full z-0 overflow-hidden"><GoldenShimmer /></div>
-            <div className="absolute -top-12  left-1/2 -translate-x-1/2 w-[110px] h-[110px] bg-[#FFFdf5] rounded-full z-0 overflow-hidden"><GoldenShimmer /></div>
-            <div className="absolute -top-6   right-[10%] w-[65px] h-[65px] bg-[#FFFdf5] rounded-full z-0 overflow-hidden"><GoldenShimmer /></div>
+            {/* Premium Golden Bumps */}
+            <div className="absolute -top-6 left-[8%] w-[60px] h-[60px] rounded-full z-0 bg-gradient-to-br from-[#FFFDF0] to-[#FFD54F] shadow-[inset_2px_2px_6px_rgba(255,255,255,0.9)] overflow-hidden">
+                <GoldenShimmer />
+            </div>
+            <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-[110px] h-[110px] rounded-full z-0 bg-gradient-to-b from-[#FFFFFF] via-[#FFE885] to-[#FFBF00] shadow-[inset_0_5px_15px_rgba(255,255,255,1)] overflow-hidden">
+                <GoldenShimmer />
+            </div>
+            <div className="absolute -top-6 right-[8%] w-[65px] h-[65px] rounded-full z-0 bg-gradient-to-bl from-[#FFFDF0] to-[#FFD54F] shadow-[inset_-2px_2px_6px_rgba(255,255,255,0.9)] overflow-hidden">
+                <GoldenShimmer />
+            </div>
 
-            {/* ── Inner rainbow shimmer on body ── */}
+            {/* Main Body */}
             <div
-                className="relative bg-[#FFFdf5] rounded-[2.5rem] px-3 pt-3 pb-2 z-10 flex flex-col items-center justify-center min-h-[80px]"
-                style={{ boxShadow: 'inset 0 -6px 0 rgba(241,245,249,0.9)' }}
+                className="relative rounded-[2.5rem] px-3 pt-3 pb-2 z-10 flex flex-col items-center justify-center min-h-[80px] bg-gradient-to-b from-[#FFCF24] via-[#FFAD00] to-[#DF7A00] overflow-hidden"
+                style={{
+                    boxShadow: 'inset 0 8px 6px -4px rgba(255,235,120,0.9), inset 0 -12px 24px rgba(150,40,0,0.5), 0 0 0 1px rgba(255,245,200,0.6)'
+                }}
             >
-                {children}
+                <GoldenShimmer />
+                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.08] mix-blend-overlay pointer-events-none z-0" />
+
+                <div className="relative z-10 w-full flex flex-col items-center">
+                    {children}
+                </div>
             </div>
         </div>
     )
@@ -85,25 +99,8 @@ function PostClaimContainer({ children }: { children: React.ReactNode }) {
             transition={{ y: { duration: 3.5, repeat: Infinity, ease: 'easeInOut' } }}
             className="w-full"
         >
-            <JoyCloud>{children}</JoyCloud>
+            <PremiumGoldenCloud isClaimed>{children}</PremiumGoldenCloud>
         </motion.div>
-    )
-}
-
-// ─── Plain Cloud for pre-claim / error states ─────────────────────────────────
-function GamifiedCloud({ children }: { children: React.ReactNode }) {
-    return (
-        <div
-            className="relative w-[220px] max-w-[92vw] mx-auto"
-            style={{ filter: 'drop-shadow(0 12px 32px rgba(229,0,126,0.25))' }}
-        >
-            <div className="absolute -top-6 left-[10%] w-[60px] h-[60px] bg-[#fcfbf9] rounded-full z-0" />
-            <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-[110px] h-[110px] bg-[#fcfbf9] rounded-full z-0" />
-            <div className="absolute -top-6 right-[10%] w-[65px] h-[65px] bg-[#fcfbf9] rounded-full z-0" />
-            <div className="relative bg-[#fcfbf9] rounded-[2.5rem] px-3 pt-3 pb-2 z-10 flex flex-col items-center justify-center min-h-[80px] shadow-[inset_0_-6px_0_rgba(241,245,249,0.9)]">
-                {children}
-            </div>
-        </div>
     )
 }
 
@@ -248,13 +245,13 @@ export default function OnlineCelebrationManager({ onClaim, pollIntervalMs = 5 *
                                         transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 20 }}
                                         className="text-center z-10 mt-2"
                                     >
-                                        <span className="block text-[48px] font-black text-transparent bg-clip-text bg-gradient-to-br from-illa-pink via-[#FF4A6B] to-orange-500 leading-none tracking-tight">
+                                        <span className="block text-[56px] font-black text-white drop-shadow-[0_4px_8px_rgba(220,38,38,0.6)] leading-none tracking-tight">
                                             +{window.reward_points}
                                         </span>
-                                        <span className="text-[16px] font-black text-transparent bg-clip-text bg-gradient-to-br from-illa-pink to-orange-500 uppercase tracking-[0.15em] mt-1 block">
-                                            {window.reward_points === 1 ? 'Moeda!' : 'Moedas!'}
+                                        <span className="text-[18px] font-black text-white drop-shadow-[0_2px_4px_rgba(220,38,38,0.6)] uppercase tracking-[0.15em] mt-1 block">
+                                            {window.reward_points === 1 ? 'MOEDA!' : 'MOEDAS!'}
                                         </span>
-                                        <span className="text-[10px] font-bold text-black/30 uppercase tracking-[0.4em] mt-2 block">
+                                        <span className="text-[10px] font-bold text-amber-950/60 uppercase tracking-[0.4em] mt-2 block">
                                             {window.reward_points === 1 ? 'Coletada' : 'Coletadas'}
                                         </span>
                                     </motion.div>
@@ -270,11 +267,11 @@ export default function OnlineCelebrationManager({ onClaim, pollIntervalMs = 5 *
                                             href="/members"
                                             className="flex items-center justify-center gap-1.5 px-3 py-1 group animate-pulse hover:animate-none"
                                         >
-                                            <Coins size={14} className="text-illa-pink/80 group-hover:text-illa-pink transition-colors" />
-                                            <span className="text-[12px] font-black text-illa-pink/80 group-hover:text-illa-pink uppercase tracking-widest transition-colors drop-shadow-[0_0_8px_rgba(229,0,126,0.3)]">
+                                            <Coins size={14} className="text-white/90 group-hover:text-white transition-colors drop-shadow-md" />
+                                            <span className="text-[12px] font-black text-white group-hover:text-amber-100 uppercase tracking-widest transition-colors drop-shadow-md">
                                                 Minhas Moedas
                                             </span>
-                                            <ChevronRight size={14} className="text-illa-pink/80 group-hover:translate-x-1 group-hover:text-illa-pink transition-all" />
+                                            <ChevronRight size={14} className="text-white/90 group-hover:translate-x-1 group-hover:text-white transition-all drop-shadow-md" />
                                         </Link>
                                     </motion.div>
                                 </PostClaimContainer>
@@ -290,12 +287,12 @@ export default function OnlineCelebrationManager({ onClaim, pollIntervalMs = 5 *
                                 exit={{ scale: 0.9, opacity: 0 }}
                                 className="my-10"
                             >
-                                <GamifiedCloud>
+                                <PremiumGoldenCloud>
                                     <div className="flex flex-col items-center gap-2 py-4 text-center">
-                                        <AlertCircle size={36} className="text-red-500" />
-                                        <span className="text-sm font-black text-red-600 tracking-wide uppercase">{error}</span>
+                                        <AlertCircle size={36} className="text-red-700" />
+                                        <span className="text-sm font-black text-red-800 tracking-wide uppercase">{error}</span>
                                     </div>
-                                </GamifiedCloud>
+                                </PremiumGoldenCloud>
                             </motion.div>
 
                         ) : (
@@ -309,7 +306,7 @@ export default function OnlineCelebrationManager({ onClaim, pollIntervalMs = 5 *
                                 transition={{ type: 'spring', bounce: 0.35, duration: 0.5 }}
                                 className="my-10"
                             >
-                                <GamifiedCloud>
+                                <PremiumGoldenCloud>
                                     {/* Coin + text */}
                                     <div className="flex items-center justify-center gap-3 w-full -mt-2">
                                         <motion.div
@@ -320,20 +317,19 @@ export default function OnlineCelebrationManager({ onClaim, pollIntervalMs = 5 *
                                             <GlobalCoin size="lg" />
                                         </motion.div>
                                         <div className="flex flex-col gap-0 text-left">
-                                            <span className="text-[14px] font-bold text-black/60 leading-tight uppercase tracking-wide">
+                                            <span className="text-[14px] font-bold text-amber-950/70 leading-tight uppercase tracking-wide">
                                                 Você ganhou
                                             </span>
-                                            <span className="text-transparent bg-clip-text bg-gradient-to-br from-illa-pink to-orange-500 text-[26px] font-black tracking-tight leading-none">
+                                            <span className="text-white drop-shadow-[0_2px_4px_rgba(220,38,38,0.7)] text-[28px] font-black tracking-tight leading-none">
                                                 {window.reward_points} Moeda{window.reward_points > 1 ? 's' : ''}
                                             </span>
                                         </div>
                                     </div>
 
-                                    {/* Timer */}
                                     <div className="flex justify-center mt-3">
-                                        <div className="flex items-center gap-1.5 text-[11px] font-bold text-black/50 bg-[#F8FAFC] px-3 py-1.5 rounded-full border border-slate-100/50">
-                                            <Clock size={12} className="text-illa-pink" strokeWidth={3} />
-                                            Expira em <span className="text-black/80 font-black">{timeLeft}</span>
+                                        <div className="flex items-center gap-1.5 text-[11px] font-bold text-amber-900 bg-white/50 backdrop-blur-sm shadow-sm border border-white/40 px-3 py-1.5 rounded-full">
+                                            <Clock size={12} className="text-orange-600" strokeWidth={3} />
+                                            Expira em <span className="text-amber-950 font-black">{timeLeft}</span>
                                         </div>
                                     </div>
 
@@ -367,19 +363,19 @@ export default function OnlineCelebrationManager({ onClaim, pollIntervalMs = 5 *
                                             )}
                                         </motion.button>
 
-                                        {/* Dismiss/Close Button (Ghost Style) */}
+                                        {/* Dismiss/Close Button (Premium Ghost Style) */}
                                         <motion.button
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
                                             onClick={() => setWindow(null)}
                                             disabled={claiming}
-                                            className="w-12 h-12 shrink-0 flex items-center justify-center rounded-2xl bg-black/5 text-black/40 hover:bg-black/10 hover:text-black/60 transition-colors border border-black/5 disabled:opacity-50"
+                                            className="w-12 h-12 shrink-0 flex items-center justify-center rounded-2xl bg-white/20 text-white hover:bg-white/30 transition-colors border border-white/30 disabled:opacity-50 shadow-sm"
                                             aria-label="Dispensar"
                                         >
                                             <X size={18} strokeWidth={3} />
                                         </motion.button>
                                     </div>
-                                </GamifiedCloud>
+                                </PremiumGoldenCloud>
                             </motion.div>
                         )}
                     </AnimatePresence>
