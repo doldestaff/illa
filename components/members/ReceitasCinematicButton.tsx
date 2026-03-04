@@ -39,12 +39,12 @@ export default function ReceitasCinematicButton() {
 
                     {/* Text Area */}
                     <div className="w-full md:w-3/5 p-8 flex flex-col justify-center relative z-20">
-                        <div className="flex items-center gap-2 mb-3">
-                            <span className="px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-400 text-xs font-black tracking-widest uppercase flex items-center gap-1.5 shadow-[0_0_15px_rgba(245,158,11,0.2)]">
-                                <Sparkles className="w-3 h-3" />
+                        <div className="flex flex-wrap md:flex-nowrap items-center gap-1.5 md:gap-2 mb-3">
+                            <span className="px-2 md:px-3 py-0.5 md:py-1 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-400 text-[9px] md:text-xs font-black tracking-widest uppercase flex items-center gap-1 md:gap-1.5 shadow-[0_0_15px_rgba(245,158,11,0.2)] whitespace-nowrap shrink-0">
+                                <Sparkles className="w-2.5 h-2.5 md:w-3 md:h-3" />
                                 APENAS PARA MEMBROS
                             </span>
-                            <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/60 text-xs font-bold tracking-widest uppercase">
+                            <span className="px-2 md:px-3 py-0.5 md:py-1 rounded-full bg-white/5 border border-white/10 text-white/60 text-[9px] md:text-xs font-bold tracking-widest uppercase whitespace-nowrap">
                                 Grátis
                             </span>
                         </div>
