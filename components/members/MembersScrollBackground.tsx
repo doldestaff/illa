@@ -23,13 +23,12 @@ export default function MembersScrollBackground() {
     const [isMobile, setIsMobile] = useState(false)
     const { scrollY } = useScroll()
 
-    // 0px (topo) → 0.9 escuro para legibilidade do header e avatar
-    // ~480px (missões) → 0 totalmente transparente — background 100% visível
-    // ~900px (loja de descontos em diante) → vitral volta a escurecer (0.85) como no topo
-    const overlayOpacity = useTransform(scrollY, [0, 80, 480, 600, 900], [0.9, 0.85, 0, 0, 0.85])
+    // 0px (topo) → Escuro para legibilidade
+    // FIM da página → 0.2 (20% opacidade)
+    const overlayOpacity = useTransform(scrollY, [0, 800], [0.95, 0.2])
 
-    // A imagem também diminui o brilho para destacar os cards da Área VIP
-    const imageOpacity = useTransform(scrollY, [0, 80, 480, 600, 900], [0.35, 0.45, 1, 1, 0.45])
+    // A imagem também respira junto
+    const imageOpacity = useTransform(scrollY, [0, 800], [0.4, 0.8])
 
     // Detect mobile once on mount
     useEffect(() => {
@@ -43,11 +42,9 @@ export default function MembersScrollBackground() {
 
     return (
         <div className="fixed inset-0 w-full h-[100vh] min-h-[100dvh] pointer-events-none z-[-1] overflow-hidden bg-black">
-            {/* Animated CSS background - handling opacity smoothly */}
-            {/* CRITICAL PERF: Removed mix-blend-screen. Using translateZ(0) to force GPU composite layer. */}
-            <motion.div
-                style={{ opacity: imageOpacity, transform: 'translateZ(0)' }}
-                className="absolute inset-0 w-full h-full overflow-hidden will-change-[opacity]"
+            {/* Background Image - Now static for consistent premium depth */}
+            <div
+                className="absolute inset-0 w-full h-full overflow-hidden opacity-40"
             >
                 <Image
                     src={POSTER_MOBILE}
@@ -58,13 +55,11 @@ export default function MembersScrollBackground() {
                     className="object-cover"
                     quality={90}
                 />
-            </motion.div>
+            </div>
 
-            {/* Subtle gradient overlay to ensure text readability (Reduces on scroll to reveal BG) */}
-            {/* CRITICAL PERF: Removed mix-blend-multiply. Standard alpha blending is 100x faster on mobile GPUs. */}
-            <motion.div
-                style={{ opacity: overlayOpacity, transform: 'translateZ(0)' }}
-                className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-black/90 pointer-events-none will-change-[opacity]"
+            {/* Vitral Estático: Gradiente tri-fásico (66% -> 50% -> 66%) */}
+            <div
+                className="absolute inset-0 pointer-events-none bg-gradient-to-b from-black/66 via-black/50 to-black/66"
             />
         </div>
     )

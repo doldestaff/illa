@@ -34,33 +34,34 @@ function InteractiveMarquee({ children, onIndexChange }: { children: React.React
 
         let animationId: number
         let lastTime = performance.now()
-        const speed = 0.5 // pixels per frame roughly
+        const targetSpeed = 1.2 // Increased for a more dynamic/energetic feel
+        let currentSpeed = targetSpeed
 
-        // Calculate a safe scroll maximum before wrapping.
-        // We know we rendered 3 identical sets of children.
-        // We want to seamlessly wrap when it reaches exactly 1 set's scroll distance.
         const scroll = (currentTime: number) => {
-            if (document.hidden || isInteractingRef.current) {
-                lastTime = currentTime
+            const deltaTime = Math.min(currentTime - lastTime, 64) // Cap delta to avoid jumps
+            lastTime = currentTime
+
+            // Rapid lerp for immediate response but smooth feel
+            const isHovered = isInteractingRef.current
+            const target = isHovered ? 0 : targetSpeed
+            currentSpeed += (target - currentSpeed) * 0.15
+
+            if (document.hidden) {
                 animationId = requestAnimationFrame(scroll)
                 return
             }
 
-            const deltaTime = currentTime - lastTime
-            lastTime = currentTime
+            // Execute scroll even at very low speeds to prevent "stuck" state
+            if (currentSpeed > 0.001) {
+                const thirdWidth = container.scrollWidth / 3
+                if (container.scrollLeft >= thirdWidth) {
+                    container.scrollLeft -= thirdWidth
+                }
+                container.scrollLeft += currentSpeed * (deltaTime / 16)
 
-            // A third of the scroll width represents one full set of cards.
-            // When we cross that distance, we reset back to 0 seamlessly.
-            const thirdWidth = container.scrollWidth / 3
-            if (container.scrollLeft >= thirdWidth) {
-                // To keep it perfectly seamless, we only subtract exactly the width of one set
-                container.scrollLeft -= thirdWidth
-            }
-            container.scrollLeft += speed * (deltaTime / 16)
-
-            // Catch accidental backwards scroll (e.g., user swiping left fast)
-            if (container.scrollLeft <= 0) {
-                container.scrollLeft += thirdWidth
+                if (container.scrollLeft <= 0) {
+                    container.scrollLeft += thirdWidth
+                }
             }
 
             animationId = requestAnimationFrame(scroll)
@@ -76,33 +77,39 @@ function InteractiveMarquee({ children, onIndexChange }: { children: React.React
         if (!container) return
 
         const setInteracting = () => { isInteractingRef.current = true }
+        const clearInteracting = () => {
+            // Only clear if not actually hovering (on desktop)
+            const isHovering = container.matches(':hover')
+            if (!isHovering) isInteractingRef.current = false
+        }
 
-        // Debounced scroll end detection protects native momentum scroll
-        const handleScroll = () => {
-            isInteractingRef.current = true
+        // Debounced interaction end
+        const endInteraction = () => {
             if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
             scrollTimeoutRef.current = setTimeout(() => {
-                isInteractingRef.current = false
-            }, 500) // Resume 500ms after scroll STOPS completely
+                const isHovering = container.matches(':hover')
+                if (!isHovering) isInteractingRef.current = false
+                scrollTimeoutRef.current = null
+            }, 200)
         }
 
         container.addEventListener('pointerdown', setInteracting, { passive: true })
         container.addEventListener('touchstart', setInteracting, { passive: true })
         container.addEventListener('mouseenter', setInteracting, { passive: true })
-        container.addEventListener('mouseleave', () => {
-            if (!scrollTimeoutRef.current) isInteractingRef.current = false
-        })
-        container.addEventListener('pointerup', () => { handleScroll() }, { passive: true })
-        container.addEventListener('touchend', () => { handleScroll() }, { passive: true })
-        container.addEventListener('scroll', handleScroll, { passive: true })
+        container.addEventListener('mouseleave', clearInteracting, { passive: true })
+        container.addEventListener('pointerup', endInteraction, { passive: true })
+        container.addEventListener('touchend', endInteraction, { passive: true })
+
+        // CRITICAL: We DO NOT listen for 'scroll' here because container.scrollLeft += speed 
+        // triggers a 'scroll' event, creating an infinite pause loop.
 
         return () => {
             container.removeEventListener('pointerdown', setInteracting)
             container.removeEventListener('touchstart', setInteracting)
             container.removeEventListener('mouseenter', setInteracting)
-            container.removeEventListener('pointerup', handleScroll)
-            container.removeEventListener('touchend', handleScroll)
-            container.removeEventListener('scroll', handleScroll)
+            container.removeEventListener('mouseleave', clearInteracting)
+            container.removeEventListener('pointerup', endInteraction)
+            container.removeEventListener('touchend', endInteraction)
             if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
         }
     }, [])
@@ -136,12 +143,11 @@ function InteractiveMarquee({ children, onIndexChange }: { children: React.React
     return (
         <div
             ref={containerRef}
-            className="flex overflow-x-auto gap-5 pb-8 py-4 snap-mandatory snap-x md:snap-none"
+            className="flex overflow-x-auto gap-5 pb-8 py-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             style={{
                 willChange: 'scroll-position',
-                overscrollBehaviorX: 'contain',
-                scrollbarWidth: 'none',   /* Firefox */
-                msOverflowStyle: 'none'  /* IE and Edge */
+                WebkitOverflowScrolling: 'touch',
+                transform: 'translateZ(0)', // Force compositor layer
             }}
         >
             {/* Inline style for webkit scrollbar hide fallback */}

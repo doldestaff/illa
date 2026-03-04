@@ -19,13 +19,12 @@ interface MissionCardProps {
  */
 const CARD_IMAGE_MAP: Record<string, string> = {
     // By mission kind slug
-    'share_link': '/mission-cards/compartilhar-link-m-card.webp',
-    'view_exclusive': '/mission-cards/exclusive-fan-m-card.webp',
-    'view_recipes': '/mission-cards/explorarreceitas-m-card.webp',
-    // Additional slug aliases (for flexibility)
-    'compartilhar_link': '/mission-cards/compartilhar-link-m-card.webp',
-    'exclusive_fan': '/mission-cards/exclusive-fan-m-card.webp',
-    'explorar_receitas': '/mission-cards/explorarreceitas-m-card.webp',
+    'share_link': '/mission-cards/compartilhar-link.webp',
+    'view_exclusive': '/mission-cards/fan-exclusive.webp',
+    'view_recipes': '/mission-cards/alquimia-de-sabor.webp',
+    'visit': '/mission-cards/cacador-de-reliquias.webp',
+    'survey': '/mission-cards/critico-gastromico.webp',
+    'profile': '/mission-cards/critico-gastromico.webp', // Fallback for profile
 }
 
 /** Fallback title-based matching for missions without slugified `kind` */
@@ -40,11 +39,15 @@ function resolveCardImage(mission: MissionInstance): string {
         return CARD_IMAGE_MAP['share_link']
     if (titleLower.includes('exclusiv') || titleLower.includes('cartão') || titleLower.includes('benefíc'))
         return CARD_IMAGE_MAP['view_exclusive']
-    if (titleLower.includes('receita') || titleLower.includes('explorar'))
+    if (titleLower.includes('receita') || titleLower.includes('explorar') || titleLower.includes('alquimia'))
         return CARD_IMAGE_MAP['view_recipes']
+    if (titleLower.includes('visita') || titleLower.includes('entrar') || titleLower.includes('caçador'))
+        return CARD_IMAGE_MAP['visit']
+    if (titleLower.includes('avalia') || titleLower.includes('crítico') || titleLower.includes('feedback'))
+        return CARD_IMAGE_MAP['survey']
 
-    // 3. Default fallback (first available card)
-    return '/mission-cards/explorarreceitas-m-card.webp'
+    // 3. Default fallback (sequence-based or first available)
+    return CARD_IMAGE_MAP['view_recipes']
 }
 
 export default function MissionCard({ mission, isClaimed, canClaim, claiming, onClaim }: MissionCardProps) {
@@ -60,25 +63,35 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
             className={`relative h-full w-full group ${isClaimed ? 'opacity-50 grayscale saturate-50' : ''}`}
         >
-            {/* Magical Luminous Soft Glow (escapes the card bounds!) */}
+            {/* 1. Atmospheric Volumetric Light (Optimized for Mobile) */}
             <motion.div
-                variants={{
-                    idle: { opacity: 0, scale: 1, filter: 'blur(10px)' },
-                    hover: { opacity: 1, scale: 1.15, filter: 'blur(25px)' }
+                animate={{
+                    opacity: [0.3, 0.5, 0.3],
                 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-                className="absolute inset-0 bg-gradient-to-tr from-illa-pink/60 via-amber-400/40 to-indigo-500/50 rounded-[2rem] pointer-events-none -z-10"
+                transition={{
+                    duration: 5,
+                    repeat: Infinity,
+                    ease: "linear" // Linear is cheaper for GPU
+                }}
+                className="absolute inset-[-5%] bg-gradient-to-tr from-illa-pink/20 via-orange-500/10 to-rose-600/20 rounded-[3rem] pointer-events-none -z-20 blur-[30px] will-change-transform"
+                style={{ transform: 'translateZ(0)' }} // Force GPU layer
             />
 
-            {/* Inner Content Boundary */}
+            {/* 2. Smoky Neon Effect (Simplified for performance) */}
+            <div className="absolute inset-0 bg-gradient-to-br from-rose-500/20 via-transparent to-illa-pink/20 rounded-[2rem] pointer-events-none -z-10 blur-[15px]" />
+
+            {/* 3. The "Matter" - Optimized Glassmorphism */}
             <motion.div
                 variants={{
-                    idle: { scale: 1, y: 0, boxShadow: '0px 10px 30px rgba(0,0,0,0.1)' },
-                    hover: { scale: 1.08, y: -8, boxShadow: '0px 25px 50px rgba(0,0,0,0.4)' }
+                    idle: { scale: 1, y: 0 },
+                    hover: { scale: 1.05, y: -5 }
                 }}
-                transition={{ type: "spring", stiffness: 400, damping: 15 }}
-                className="relative w-full h-full rounded-[1.5rem] overflow-hidden shadow-xl"
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                className="relative w-full h-full rounded-[1.8rem] overflow-hidden bg-black/40 shadow-[0_12px_30px_rgba(0,0,0,0.5)] will-change-transform"
+                style={{ transform: 'translateZ(0)' }}
             >
+                {/* Subtle Edge Glow instead of heavy border */}
+                <div className="absolute inset-0 rounded-[1.8rem] border border-white/5 pointer-events-none z-20" />
                 {/* 1. Card WebP Image Layer */}
                 <img
                     src={cardImage}
