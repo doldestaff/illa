@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
-import { ArrowLeft, CheckCircle2, Coins, Play, Star, Sparkles, ChefHat, Camera, Upload, ImageIcon, User, Loader2, Video } from 'lucide-react'
+import { ArrowLeft, CheckCircle2, Coins, Play, Sparkles, ChefHat, Camera, Upload, ImageIcon, User, Loader2, Video } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import confetti from 'canvas-confetti'
+import { createSupabaseBrowser } from '@/lib/supabaseClient'
 
 interface RecipeMission {
     id: string
@@ -273,18 +274,51 @@ export default function ReceitasCinematicPage() {
     const bgY2 = useTransform(scrollYProgress, [0, 1], ['0%', '-50%'])
     const bgScale = useTransform(scrollYProgress, [0, 1], [1, 1.2])
 
-    // Efeito para carregar progresso inicial mockado ou local storage
+    // Load completed missions from Supabase on mount
     useEffect(() => {
-        const saved = localStorage.getItem('@Illa:RecipesCompleted')
-        if (saved) {
-            const parsed = JSON.parse(saved)
-            setCompletedMissions(parsed)
-            const coins = parsed.reduce((acc: number, id: string) => {
-                const mission = MISSIONS.find(m => m.id === id)
-                return acc + (mission?.reward || 0)
-            }, 0)
-            setTotalCoins(coins)
+        const supabase = createSupabaseBrowser()
+        let cancelled = false
+
+        async function loadProgress() {
+            const { data: { user } } = await supabase.auth.getUser()
+            if (!user) {
+                // Fallback to localStorage for non-authenticated visitors
+                const saved = localStorage.getItem('@Illa:RecipesCompleted')
+                if (saved && !cancelled) {
+                    const parsed: string[] = JSON.parse(saved)
+                    setCompletedMissions(parsed)
+                    const coins = parsed.reduce((acc, id) => {
+                        const m = MISSIONS.find(m => m.id === id)
+                        return acc + (m?.reward || 0)
+                    }, 0)
+                    setTotalCoins(coins)
+                }
+                return
+            }
+
+            // Load done recipes from the DB
+            const { data: doneRows } = await supabase
+                .from('user_recipes')
+                .select('recipe_id')
+                .eq('user_id', user.id)
+                .eq('done', true)
+
+            // Load current coins from profile
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('points')
+                .eq('id', user.id)
+                .single()
+
+            if (!cancelled) {
+                const ids = (doneRows ?? []).map(r => r.recipe_id)
+                setCompletedMissions(ids)
+                setTotalCoins(profile?.points ?? 0)
+            }
         }
+
+        loadProgress()
+        return () => { cancelled = true }
     }, [])
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, mission: RecipeMission) => {
@@ -315,26 +349,76 @@ export default function ReceitasCinematicPage() {
 
     const processUpload = async (file: File, mission: RecipeMission) => {
         setUploading(true)
+        const supabase = createSupabaseBrowser()
 
-        // Simulating upload to Supabase Storage
-        setTimeout(() => {
+        try {
+            const { data: { user } } = await supabase.auth.getUser()
+
+            let proofUrl: string | null = null
+
+            if (user) {
+                // Upload to Supabase Storage
+                const ext = file.name.split('.').pop() ?? 'jpg'
+                const fileName = `${user.id}/${Date.now()}.${ext}`
+
+                const { error: uploadError } = await supabase.storage
+                    .from('recipe-proofs')
+                    .upload(fileName, file, { upsert: false })
+
+                if (uploadError) {
+                    // Non-fatal: proceed with check-in even if storage fails
+                    console.warn('[recipe-proofs] upload failed:', uploadError.message)
+                } else {
+                    proofUrl = supabase.storage
+                        .from('recipe-proofs')
+                        .getPublicUrl(fileName).data.publicUrl
+                }
+
+                // Call the server-side checkin endpoint
+                const res = await fetch('/api/recipes/checkin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        recipe_id: mission.id,
+                        proof_url: proofUrl,
+                        reward: mission.reward,
+                    }),
+                })
+
+                const json = await res.json()
+
+                if (!res.ok) {
+                    if (res.status === 409) {
+                        toast.error('Essa receita já foi concluída!')
+                        setUploading(false)
+                        return
+                    }
+                    throw new Error(json.error ?? 'Erro ao registrar check-in')
+                }
+
+                // Sync new coin total from server response if available
+                if (typeof json.new_points_total === 'number') {
+                    setTotalCoins(json.new_points_total)
+                }
+            }
+
+            handleComplete(mission, user != null)
+        } catch (err) {
+            const message = err instanceof Error ? err.message : 'Erro inesperado'
+            toast.error(message)
+        } finally {
             setUploading(false)
-            toast.success('Check-in registrado com sucesso!')
-            handleComplete(mission)
-        }, 2000)
+        }
     }
 
-    const handleComplete = (mission: RecipeMission) => {
+    const handleComplete = (mission: RecipeMission, fromServer = false) => {
         if (completedMissions.includes(mission.id)) return
 
         // Confetti effect
         const duration = 3 * 1000
-        // eslint-disable-next-line react-hooks/purity
         const animationEnd = Date.now() + duration
         const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 }
-
         const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min
-
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const interval: any = setInterval(function () {
             const timeLeft = animationEnd - Date.now()
@@ -346,12 +430,17 @@ export default function ReceitasCinematicPage() {
 
         const newCompleted = [...completedMissions, mission.id]
         setCompletedMissions(newCompleted)
-        setTotalCoins(prev => prev + mission.reward)
-        localStorage.setItem('@Illa:RecipesCompleted', JSON.stringify(newCompleted))
+
+        // Only update local coin total if the server didn't already return the new total
+        if (!fromServer) {
+            setTotalCoins(prev => prev + mission.reward)
+            // Keep localStorage as fallback cache for non-authenticated users
+            localStorage.setItem('@Illa:RecipesCompleted', JSON.stringify(newCompleted))
+        }
 
         toast.success(`+${mission.reward} Moedas ILLA!`, {
             description: `Missão "${mission.title}" concluída com sucesso!`,
-            icon: <Coins className="text-amber-400" />
+            icon: <Coins className="text-amber-400" />,
         })
 
         setActiveMission(null)
@@ -642,10 +731,14 @@ export default function ReceitasCinematicPage() {
                                                 </button>
                                                 {!isCompleted && (
                                                     <button
-                                                        onClick={() => handleComplete(mission)}
-                                                        className="flex-[2] py-3 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white text-sm font-bold tracking-widest uppercase shadow-[0_0_20px_rgba(245,158,11,0.3)] transition-all"
+                                                        onClick={() => {
+                                                            // Trigger file upload (Registre a Experiência) as the primary action
+                                                            fileInputRef.current?.click()
+                                                        }}
+                                                        disabled={uploading}
+                                                        className="flex-[2] py-3 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white text-sm font-bold tracking-widest uppercase shadow-[0_0_20px_rgba(245,158,11,0.3)] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                                                     >
-                                                        Concluir & Ganhar
+                                                        {uploading ? 'Enviando...' : 'Concluir & Ganhar'}
                                                     </button>
                                                 )}
                                             </>
