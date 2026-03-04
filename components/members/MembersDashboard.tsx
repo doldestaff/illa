@@ -171,6 +171,55 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
         }
     }, [initial.profile.missing_fields])
 
+    // ── Reactively hide "Complete seu perfil" CTA after user saves profile ──
+    // When the user navigates to /members/profile, saves, and comes back,
+    // the page doesn't re-run the Server Component automatically.
+    // This listener polls the lightweight /api/profile/status endpoint on focus
+    // and updates missing_fields in the snapshot so the CTA disappears without
+    // requiring a full page reload.
+    useEffect(() => {
+        const checkProfileCompletion = async () => {
+            try {
+                const res = await fetch('/api/profile/status')
+                if (!res.ok) return
+                const { missing_fields } = await res.json()
+                setSnapshot(prev => {
+                    const current = prev.profile.missing_fields ?? []
+                    if (JSON.stringify(current) === JSON.stringify(missing_fields)) return prev
+                    return {
+                        ...prev,
+                        profile: { ...prev.profile, missing_fields },
+                    }
+                })
+            } catch {
+                // Non-critical, fail silently
+            }
+        }
+
+        // Re-check when user switches back from another browser tab
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                setTimeout(checkProfileCompletion, 300)
+            }
+        }
+
+        // Re-check on in-app SPA back navigation (router.back())
+        const handlePopState = () => {
+            setTimeout(checkProfileCompletion, 400)
+        }
+
+        document.addEventListener('visibilitychange', handleVisibilityChange)
+        window.addEventListener('popstate', handlePopState)
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange)
+            window.removeEventListener('popstate', handlePopState)
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
+
+
     // ── Update profile from any claim result (server is single source of truth) ──
     const updateProfileFromClaim = useCallback(
         (result: {
