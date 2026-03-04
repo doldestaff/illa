@@ -506,9 +506,9 @@ export default function ReceitasCinematicPage() {
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white/80 text-sm font-medium mb-6 uppercase tracking-widest backdrop-blur-md"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/80 text-[10px] md:text-xs font-bold mb-6 uppercase tracking-widest backdrop-blur-md"
                     >
-                        <ChefHat className="w-4 h-4 text-amber-400" />
+                        <ChefHat className="w-3.5 h-3.5 text-amber-400" />
                         Só para membros
                     </motion.div>
 
