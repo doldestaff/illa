@@ -1,10 +1,10 @@
 'use client'
 
 import type { MemberProfile } from '@/lib/gamification-types'
-import { User, Star, Flame, ChevronRight, Volume2, VolumeX } from 'lucide-react'
+import { User, Star, Flame, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import GlobalCoin from '@/components/ui/GlobalCoin'
-import { useGlobalAudio } from '@/components/GlobalAudioProvider'
+
 
 interface Props {
     profile: MemberProfile
@@ -24,7 +24,7 @@ export default function HudHeader({ profile, avatarUrl }: Props) {
     const missingFields = profile.missing_fields || []
     const shouldCompleteProfile = missingFields.length > 0
 
-    const { isMuted, toggleMute } = useGlobalAudio()
+
 
     return (
         <div className="relative overflow-hidden rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 text-white p-6 shadow-[0_8px_32px_0_rgba(0,0,0,0.36)] group hover:border-white/20 transition-all duration-500">
@@ -59,14 +59,7 @@ export default function HudHeader({ profile, avatarUrl }: Props) {
                         <span>LVL {profile.level}</span>
                     </div>
 
-                    {/* Audio Control */}
-                    <button
-                        onClick={toggleMute}
-                        className="absolute -top-1 -left-1 bg-white/10 backdrop-blur-md rounded-full p-1.5 border border-white/20 hover:bg-white/20 transition-all z-20 text-white"
-                        aria-label={isMuted ? "Unmute" : "Mute"}
-                    >
-                        {isMuted ? <VolumeX size={14} className="opacity-70" /> : <Volume2 size={14} />}
-                    </button>
+
                 </div>
 
                 {/* Info */}

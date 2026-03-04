@@ -24,7 +24,7 @@ import { createSupabaseBrowser } from '@/lib/supabaseClient'
 import { usePushNotifications } from '@/hooks/usePushNotifications'
 import { Bell } from 'lucide-react'
 import { toast } from 'sonner'
-import { useGlobalAudio } from '@/components/GlobalAudioProvider'
+
 
 // ── Lazy-loaded below-fold components (perf: only ship JS when needed) ──
 const SectionSkeleton = () => (
@@ -82,12 +82,9 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
     const [activeModal, setActiveModal] = useState<'history' | 'scanner' | 'sorvetes' | 'invite' | null>(null)
     const progressTracked = useRef(false)
     const { isSupported, isSubscribed, subscribe } = usePushNotifications()
-    const { play } = useGlobalAudio()
 
-    // ── Start Global Audio ──
-    useEffect(() => {
-        play()
-    }, [play])
+
+
 
     // ── Fetch real sorvetes count ──
     // Removed duplicate fetch on mount, relying on Snapshot unless stale?

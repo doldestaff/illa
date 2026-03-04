@@ -1,0 +1,11 @@
+﻿
+C:\DEV\ILLA\illa\components\members\HudHeader.tsx
+   4:43  warning  'Volume2' is defined but never used                                                                                                                                                                                                                                                      @typescript-eslint/no-unused-vars
+   4:52  warning  'VolumeX' is defined but never used                                                                                                                                                                                                                                                      @typescript-eslint/no-unused-vars
+  44:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\DEV\ILLA\illa\components\members\MembersDashboard.tsx
+  81:27  warning  'setSorvetesCount' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+Ô£û 4 problems (0 errors, 4 warnings)
+
