@@ -196,197 +196,191 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                     </div>
 
                     {/* Main Content */}
-                    <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6 mt-8">
+                    <div className="relative z-10 mt-8">
+                        {/* ─── mobile + desktop shared grid ─── */}
+                        <div className="flex flex-col md:grid md:grid-cols-[auto_1fr] md:gap-8 md:items-start">
 
-                        {/* Avatar */}
-                        <div
-                            className="relative flex-shrink-0 group/avatar cursor-pointer mx-auto md:mx-0 transition-transform duration-500 hover:scale-[1.03]"
-                            onClick={() => fileInputRef.current?.click()}
-                        >
-                            {/* Sleek Cinematic Spinning Neon Border */}
-                            <div className="absolute -inset-[3px] md:-inset-[4px] rounded-full overflow-hidden bg-black z-0 shadow-[0_0_30px_rgba(229,1,125,0.3)] pointer-events-none">
-                                <motion.div
-                                    animate={{ rotate: 360 }}
-                                    transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                                    className="absolute -inset-[100%] opacity-90"
-                                    style={{
-                                        background: 'conic-gradient(from 0deg, transparent 60%, rgba(229,1,125,0.9) 80%, rgba(245,158,11,1) 100%)'
-                                    }}
-                                />
-                                <div className="absolute inset-[2px] bg-[url('/noise.png')] bg-cover bg-black rounded-full" />
-                            </div>
-
-                            {/* Subtle Ambient Backlight */}
-                            <div className="absolute -inset-2 bg-gradient-to-br from-illa-pink to-amber-500 rounded-full opacity-20 blur-xl group-hover/avatar:opacity-40 group-hover/avatar:blur-2xl transition duration-700 z-0 pointer-events-none" />
-
-                            <div className="relative z-10 w-36 h-36 md:w-44 md:h-44 rounded-full overflow-hidden border-2 border-black/80 bg-black/40 shadow-[0_0_30px_rgba(0,0,0,0.8)] backdrop-blur-md">
-                                {uploadingAvatar ? (
-                                    <div className="w-full h-full bg-black/60 flex items-center justify-center">
-                                        <Loader2 size={32} className="text-illa-pink animate-spin" />
-                                    </div>
-                                ) : profile.avatar_path && localAvatarUrl && !imageError ? (
-                                    <>
-                                        <img
-                                            key={localAvatarUrl} // Force React to rebuild the DOM node for fresh cache
-                                            src={localAvatarUrl}
-                                            alt={profile.full_name || 'User'}
-                                            className="w-full h-full object-cover"
-                                            onError={() => setImageError(true)}
-                                        />
-                                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm pointer-events-none">
-                                            <Camera size={28} className="text-white drop-shadow-md" />
-                                        </div>
-                                    </>
-                                ) : (
-                                    <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center text-white/50 relative">
-                                        <User size={56} />
-                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm pointer-events-none">
-                                            <Camera size={28} className="text-white drop-shadow-md" />
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
-                            <input
-                                ref={fileInputRef}
-                                type="file"
-                                accept="image/jpeg,image/png,image/webp"
-                                className="hidden"
-                                onChange={handleAvatarUpload}
-                            />
-                        </div>
-
-                        {/* Info Section */}
-                        <div className="flex-1 min-w-0 w-full flex flex-col items-center md:items-start text-center md:text-left mt-2 md:mt-0">
-
-                            {/* Name & Level Badge */}
-                            <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4 mb-2">
-                                <h1 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-white/70 tracking-tight drop-shadow-[0_2px_15px_rgba(255,255,255,0.2)]">
-                                    {profile.full_name || 'Membro ILLA'}
-                                </h1>
-                                <motion.div
-                                    animate={levelUpTrigger ? {
-                                        scale: [1, 1.3, 1],
-                                        boxShadow: [
-                                            "0 4px 16px rgba(245,158,11,0.4)",
-                                            "0 0 60px rgba(251,191,36,1)",
-                                            "0 4px 16px rgba(245,158,11,0.4)"
-                                        ],
-                                        rotate: [0, -5, 5, 0]
-                                    } : {}}
-                                    transition={{ duration: 1.2, type: "spring", bounce: 0.5 }}
-                                    className="relative inline-flex shrink-0 w-fit items-center justify-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-illa-yellow to-amber-500 shadow-[0_4px_16px_rgba(245,158,11,0.4)] border border-white/50 transform hover:scale-105 transition-transform cursor-default mt-1 md:mt-0 whitespace-nowrap mx-auto md:mx-0"
-                                >
-                                    {/* Level Up Aura */}
-                                    {levelUpTrigger && (
-                                        <motion.div
-                                            initial={{ opacity: 0, scale: 0.5 }}
-                                            animate={{ opacity: [0, 1, 0], scale: [1, 2.5] }}
-                                            transition={{ duration: 1 }}
-                                            className="absolute inset-0 bg-amber-400 rounded-full blur-xl pointer-events-none"
-                                        />
-                                    )}
-                                    <Star size={14} fill="black" className="text-black shrink-0 relative z-10" />
-                                    <span className="text-black text-sm font-black tracking-wider drop-shadow-sm whitespace-nowrap relative z-10">LVL {profile.level}</span>
-                                </motion.div>
-                            </div>
-
-                            <p className="text-white/60 font-medium text-sm md:text-base mb-6 max-w-sm">Explore seu painel ILLA e ganhe recompensas exclusivas.</p>
-
-                            {/* Counters */}
-                            <div className="flex w-full items-center justify-center md:justify-start gap-3 md:gap-4">
-
-                                {/* Drops -> Baú Gamer */}
-                                <motion.button
-                                    onClick={() => openInventory('drops')}
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    className="relative flex items-center justify-center gap-2.5 px-4 py-2 rounded-[1rem] bg-white/[0.08] backdrop-blur-md border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.2)] min-w-[90px] group/drops"
-                                >
-                                    <div className="relative z-10 flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-br from-[#38bdf8] to-[#0284c7] shadow-[0_2px_4px_rgba(56,189,248,0.5)] border border-white/20 group-hover/drops:scale-110 transition-transform duration-300">
-                                        {/* Soft inner white neon */}
-                                        <div className="absolute inset-0 m-auto w-3 h-3 bg-white rounded-full blur-[4px] animate-[pulse_2s_ease-in-out_infinite]" />
-
-                                        {/* Gamer Chest Icon - pure white */}
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-[14px] h-[14px] text-white relative z-10 drop-shadow-[0_0_2px_rgba(255,255,255,0.8)]">
-                                            {/* Chest Lid */}
-                                            <path d="M4 4h16a2 2 0 0 1 2 2v3H2V6a2 2 0 0 1 2-2z" />
-                                            {/* Chest Base */}
-                                            <path d="M2 11v8a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-8h-9v1a1 1 0 0 1-2 0v-1H2z" />
-                                        </svg>
-                                    </div>
-                                    <span className="text-2xl font-black text-white relative z-10 drop-shadow-sm tabular-nums tracking-tight">{profile.drops || 0}</span>
-                                </motion.button>
-
-                                {/* Moedas */}
-                                <div className="relative flex items-center gap-2.5 px-5 py-2.5 rounded-[1.2rem] bg-white/[0.08] backdrop-blur-md border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.2)] min-w-[140px] cursor-default group/coins">
-                                    <div className="relative z-10 group-hover/coins:scale-110 transition-transform duration-300 -ml-1">
-                                        <GlobalCoin size="md" />
-                                    </div>
-                                    <div className="relative z-10 flex flex-col items-start -space-y-1">
-                                        <span className="text-2xl font-black text-white tracking-tight drop-shadow-sm tabular-nums">{profile.points.toLocaleString()}</span>
-                                        <span className="text-[9px] font-black uppercase tracking-[0.15em] text-[#FCD34D] drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] opacity-90">Moedas</span>
-                                    </div>
-                                </div>
-
-                                {/* Sorvetes */}
-                                <motion.button
-                                    key={`sorvete-${sorvetesCount}`}
-                                    onClick={() => openInventory('sorvetes')}
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    className="relative flex items-center justify-center gap-2.5 px-4 py-2 rounded-[1rem] bg-white/[0.08] backdrop-blur-md border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.2)] min-w-[90px] group/sorvete"
-                                >
-                                    <div className="relative z-10 flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-br from-illa-pink to-[#c40068] shadow-[0_2px_4px_rgba(229,1,125,0.5)] border border-white/20 group-hover/sorvete:scale-110 transition-transform duration-300">
-                                        <IceCream size={14} className="text-white drop-shadow-md" strokeWidth={2.5} />
-                                    </div>
-                                    <span className="text-2xl font-black text-white relative z-10 drop-shadow-sm tabular-nums tracking-tight">{sorvetesCount}</span>
-                                </motion.button>
-                            </div>
-
-                            {/* XP Progress Bar */}
-                            <div className="mt-8 relative group/xp w-full max-w-md">
-                                <div className="flex justify-between items-baseline text-[10px] font-bold uppercase tracking-wider text-white/50 mb-1.5 px-1">
-                                    <span className="flex items-baseline gap-1">
-                                        <span className="text-sm font-black text-white tabular-nums drop-shadow-sm">{xpInto}</span>
-                                        <span>/ {isMaxLevel ? '\u221e' : xpForNext} XP</span>
-                                    </span>
-                                    <span className="text-white/60 font-medium tracking-normal capitalize">
-                                        {isMaxLevel ? 'N\u00edvel m\u00e1ximo!' : `Faltam ${xpToNext} XP`}
-                                    </span>
-                                </div>
-                                <div className="h-6 md:h-[1.75rem] w-full bg-black/40 rounded-full overflow-hidden border border-white/5 relative backdrop-blur-xl shadow-[inset_0_3px_6px_rgba(0,0,0,0.6),0_2px_15px_rgba(229,1,125,0.15)] p-[2px]">
+                            {/* Avatar */}
+                            <div
+                                className="relative flex-shrink-0 group/avatar cursor-pointer mx-auto md:mx-0 transition-transform duration-500 hover:scale-[1.03]"
+                                onClick={() => fileInputRef.current?.click()}
+                            >
+                                {/* Sleek Cinematic Spinning Neon Border */}
+                                <div className="absolute -inset-[3px] md:-inset-[4px] rounded-full overflow-hidden bg-black z-0 shadow-[0_0_30px_rgba(229,1,125,0.3)] pointer-events-none">
                                     <motion.div
-                                        initial={{ width: 0 }}
-                                        animate={{ width: `${progressPercent}%` }}
-                                        transition={{ duration: 1.5, ease: "easeOut", type: "spring", bounce: 0.15 }}
-                                        className="h-full relative rounded-full flex items-center shadow-[0_0_20px_rgba(229,1,125,0.4)]"
-                                    >
-                                        {/* 1. Animação de Fundo (Cor Base) */}
-                                        <div
-                                            className="absolute inset-0 bg-[length:200%_100%] animate-[shimmer_3s_linear_infinite] rounded-full"
-                                            style={{ backgroundImage: 'linear-gradient(90deg, #E5017D, #F59E0B, #E5017D)' }}
-                                        />
+                                        animate={{ rotate: 360 }}
+                                        transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                                        className="absolute -inset-[100%] opacity-90"
+                                        style={{
+                                            background: 'conic-gradient(from 0deg, transparent 60%, rgba(229,1,125,0.9) 80%, rgba(245,158,11,1) 100%)'
+                                        }}
+                                    />
+                                    <div className="absolute inset-[2px] bg-[url('/noise.png')] bg-cover bg-black rounded-full" />
+                                </div>
 
-                                        {/* 2. Textura Glass & Volume */}
-                                        <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/5 to-black/30 mix-blend-overlay rounded-full" />
-                                        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay rounded-full pointer-events-none" />
+                                {/* Subtle Ambient Backlight */}
+                                <div className="absolute -inset-2 bg-gradient-to-br from-illa-pink to-amber-500 rounded-full opacity-20 blur-xl group-hover/avatar:opacity-40 group-hover/avatar:blur-2xl transition duration-700 z-0 pointer-events-none" />
 
-                                        {/* 3. Ponta Branca com Divisões Gradientes (Cuda do Cometa) */}
-                                        {progressPercent > 2 && (
-                                            <div className="absolute inset-y-0 right-0 w-16 flex justify-end items-center pointer-events-none">
-                                                {/* Gradiente de Fusão (Apenas luz quente para trás, sem estourar o fundo branco) */}
-                                                <div className="absolute inset-y-0 right-0 w-full bg-gradient-to-r from-transparent via-amber-500/20 to-amber-200/60 rounded-r-full" />
-
-                                                {/* Ponta Branca Sólida Esculpida (Curta, Intensa) */}
-                                                <div className="relative h-[calc(100%-2px)] w-2 bg-white rounded-full shadow-[0_0_12px_rgba(255,255,255,1),-3px_0_15px_rgba(245,158,11,1)] mr-[1px] blur-[0.3px]" />
+                                <div className="relative z-10 w-36 h-36 md:w-44 md:h-44 rounded-full overflow-hidden border-2 border-black/80 bg-black/40 shadow-[0_0_30px_rgba(0,0,0,0.8)] backdrop-blur-md">
+                                    {uploadingAvatar ? (
+                                        <div className="w-full h-full bg-black/60 flex items-center justify-center">
+                                            <Loader2 size={32} className="text-illa-pink animate-spin" />
+                                        </div>
+                                    ) : profile.avatar_path && localAvatarUrl && !imageError ? (
+                                        <>
+                                            <img
+                                                key={localAvatarUrl}
+                                                src={localAvatarUrl}
+                                                alt={profile.full_name || 'User'}
+                                                className="w-full h-full object-cover"
+                                                onError={() => setImageError(true)}
+                                            />
+                                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm pointer-events-none">
+                                                <Camera size={28} className="text-white drop-shadow-md" />
                                             </div>
+                                        </>
+                                    ) : (
+                                        <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center text-white/50 relative">
+                                            <User size={56} />
+                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm pointer-events-none">
+                                                <Camera size={28} className="text-white drop-shadow-md" />
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept="image/jpeg,image/png,image/webp"
+                                    className="hidden"
+                                    onChange={handleAvatarUpload}
+                                />
+                            </div>
+
+                            {/* Info Section */}
+                            <div className="flex flex-col items-center md:items-start text-center md:text-left mt-4 md:mt-0 min-w-0">
+
+                                {/* ── Row 1: Name + LVL badge ── */}
+                                <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-1">
+                                    <h1 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-white/70 tracking-tight drop-shadow-[0_2px_15px_rgba(255,255,255,0.2)]">
+                                        {profile.full_name || 'Membro ILLA'}
+                                    </h1>
+                                    <motion.div
+                                        animate={levelUpTrigger ? {
+                                            scale: [1, 1.3, 1],
+                                            boxShadow: [
+                                                "0 4px 16px rgba(245,158,11,0.4)",
+                                                "0 0 60px rgba(251,191,36,1)",
+                                                "0 4px 16px rgba(245,158,11,0.4)"
+                                            ],
+                                            rotate: [0, -5, 5, 0]
+                                        } : {}}
+                                        transition={{ duration: 1.2, type: "spring", bounce: 0.5 }}
+                                        className="relative inline-flex shrink-0 w-fit items-center justify-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-illa-yellow to-amber-500 shadow-[0_4px_16px_rgba(245,158,11,0.4)] border border-white/50 transform hover:scale-105 transition-transform cursor-default mx-auto md:mx-0 whitespace-nowrap"
+                                    >
+                                        {levelUpTrigger && (
+                                            <motion.div
+                                                initial={{ opacity: 0, scale: 0.5 }}
+                                                animate={{ opacity: [0, 1, 0], scale: [1, 2.5] }}
+                                                transition={{ duration: 1 }}
+                                                className="absolute inset-0 bg-amber-400 rounded-full blur-xl pointer-events-none"
+                                            />
                                         )}
+                                        <Star size={14} fill="black" className="text-black shrink-0 relative z-10" />
+                                        <span className="text-black text-sm font-black tracking-wider drop-shadow-sm whitespace-nowrap relative z-10">LVL {profile.level}</span>
                                     </motion.div>
                                 </div>
+
+                                {/* ── Row 2: Description ── */}
+                                <p className="text-white/55 font-medium text-sm md:text-sm mb-5 max-w-xs md:max-w-sm">
+                                    Explore seu painel ILLA e ganhe recompensas exclusivas.
+                                </p>
+
+                                {/* ── Row 3: Counters ── */}
+                                <div className="flex items-center justify-center md:justify-start gap-3 mb-6">
+
+                                    {/* Drops → Baú Gamer */}
+                                    <motion.button
+                                        onClick={() => openInventory('drops')}
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        className="relative flex items-center justify-center gap-2.5 px-4 py-2 rounded-[1rem] bg-white/[0.08] backdrop-blur-md border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.2)] min-w-[90px] group/drops"
+                                    >
+                                        <div className="relative z-10 flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-br from-[#38bdf8] to-[#0284c7] shadow-[0_2px_4px_rgba(56,189,248,0.5)] border border-white/20 group-hover/drops:scale-110 transition-transform duration-300">
+                                            <div className="absolute inset-0 m-auto w-3 h-3 bg-white rounded-full blur-[4px] animate-[pulse_2s_ease-in-out_infinite]" />
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-[14px] h-[14px] text-white relative z-10 drop-shadow-[0_0_2px_rgba(255,255,255,0.8)]">
+                                                <path d="M4 4h16a2 2 0 0 1 2 2v3H2V6a2 2 0 0 1 2-2z" />
+                                                <path d="M2 11v8a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-8h-9v1a1 1 0 0 1-2 0v-1H2z" />
+                                            </svg>
+                                        </div>
+                                        <span className="text-2xl font-black text-white relative z-10 drop-shadow-sm tabular-nums tracking-tight">{profile.drops || 0}</span>
+                                    </motion.button>
+
+                                    {/* Moedas */}
+                                    <div className="relative flex items-center gap-2.5 px-5 py-2.5 rounded-[1.2rem] bg-white/[0.08] backdrop-blur-md border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.2)] min-w-[140px] cursor-default group/coins">
+                                        <div className="relative z-10 group-hover/coins:scale-110 transition-transform duration-300 -ml-1">
+                                            <GlobalCoin size="md" />
+                                        </div>
+                                        <div className="relative z-10 flex flex-col items-start -space-y-1">
+                                            <span className="text-2xl font-black text-white tracking-tight drop-shadow-sm tabular-nums">{profile.points.toLocaleString()}</span>
+                                            <span className="text-[9px] font-black uppercase tracking-[0.15em] text-[#FCD34D] drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] opacity-90">Moedas</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Sorvetes */}
+                                    <motion.button
+                                        key={`sorvete-${sorvetesCount}`}
+                                        onClick={() => openInventory('sorvetes')}
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        className="relative flex items-center justify-center gap-2.5 px-4 py-2 rounded-[1rem] bg-white/[0.08] backdrop-blur-md border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.2)] min-w-[90px] group/sorvete"
+                                    >
+                                        <div className="relative z-10 flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-br from-illa-pink to-[#c40068] shadow-[0_2px_4px_rgba(229,1,125,0.5)] border border-white/20 group-hover/sorvete:scale-110 transition-transform duration-300">
+                                            <IceCream size={14} className="text-white drop-shadow-md" strokeWidth={2.5} />
+                                        </div>
+                                        <span className="text-2xl font-black text-white relative z-10 drop-shadow-sm tabular-nums tracking-tight">{sorvetesCount}</span>
+                                    </motion.button>
+                                </div>
+
+                                {/* ── Row 4: XP Bar (full width inside info col) ── */}
+                                <div className="w-full max-w-md md:max-w-full relative group/xp">
+                                    <div className="flex justify-between items-baseline text-[10px] font-bold uppercase tracking-wider text-white/50 mb-1.5 px-1">
+                                        <span className="flex items-baseline gap-1">
+                                            <span className="text-sm font-black text-white tabular-nums drop-shadow-sm">{xpInto}</span>
+                                            <span>/ {isMaxLevel ? '∞' : xpForNext} XP</span>
+                                        </span>
+                                        <span className="text-white/60 font-medium tracking-normal capitalize">
+                                            {isMaxLevel ? 'Nível máximo!' : `Faltam ${xpToNext} XP`}
+                                        </span>
+                                    </div>
+                                    <div className="h-6 md:h-[1.75rem] w-full bg-black/40 rounded-full overflow-hidden border border-white/5 relative backdrop-blur-xl shadow-[inset_0_3px_6px_rgba(0,0,0,0.6),0_2px_15px_rgba(229,1,125,0.15)] p-[2px]">
+                                        <motion.div
+                                            initial={{ width: 0 }}
+                                            animate={{ width: `${progressPercent}%` }}
+                                            transition={{ duration: 1.5, ease: "easeOut", type: "spring", bounce: 0.15 }}
+                                            className="h-full relative rounded-full flex items-center shadow-[0_0_20px_rgba(229,1,125,0.4)]"
+                                        >
+                                            <div
+                                                className="absolute inset-0 bg-[length:200%_100%] animate-[shimmer_3s_linear_infinite] rounded-full"
+                                                style={{ backgroundImage: 'linear-gradient(90deg, #E5017D, #F59E0B, #E5017D)' }}
+                                            />
+                                            <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/5 to-black/30 mix-blend-overlay rounded-full" />
+                                            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay rounded-full pointer-events-none" />
+                                            {progressPercent > 2 && (
+                                                <div className="absolute inset-y-0 right-0 w-16 flex justify-end items-center pointer-events-none">
+                                                    <div className="absolute inset-y-0 right-0 w-full bg-gradient-to-r from-transparent via-amber-500/20 to-amber-200/60 rounded-r-full" />
+                                                    <div className="relative h-[calc(100%-2px)] w-2 bg-white rounded-full shadow-[0_0_12px_rgba(255,255,255,1),-3px_0_15px_rgba(245,158,11,1)] mr-[1px] blur-[0.3px]" />
+                                                </div>
+                                            )}
+                                        </motion.div>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                     </div>
+
 
                     {/* Profile Completion CTA (Only if incomplete) */}
                     {shouldCompleteProfile && (
