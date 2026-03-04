@@ -40,7 +40,7 @@ export default function ReceitasCinematicButton() {
                         <div className="flex items-center gap-2 mb-3">
                             <span className="px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-400 text-xs font-black tracking-widest uppercase flex items-center gap-1.5 shadow-[0_0_15px_rgba(245,158,11,0.2)]">
                                 <Sparkles className="w-3 h-3" />
-                                Cinema de Gelato
+                                APENAS PARA MEMBROS
                             </span>
                             <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/60 text-xs font-bold tracking-widest uppercase">
                                 Grátis

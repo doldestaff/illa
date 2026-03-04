@@ -439,7 +439,7 @@ export default function ReceitasCinematicPage() {
                         className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white/80 text-sm font-medium mb-6 uppercase tracking-widest backdrop-blur-md"
                     >
                         <ChefHat className="w-4 h-4 text-amber-400" />
-                        Cardápio Secreto.
+                        Cardápio Oculto.
                     </motion.div>
 
                     <motion.h1
@@ -448,7 +448,7 @@ export default function ReceitasCinematicPage() {
                         transition={{ delay: 0.1 }}
                         className="text-[2.75rem] leading-[1.1] sm:text-6xl lg:text-7xl font-black mb-6 tracking-tight flex flex-col md:block"
                     >
-                        <span>Receitas Secretas </span>
+                        <span>Receitas Ocultas </span>
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-orange-500 drop-shadow-[0_0_30px_rgba(251,191,36,0.2)]">da Illa</span>
                     </motion.h1>
 

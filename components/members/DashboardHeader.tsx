@@ -300,51 +300,49 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                                 </p>
 
                                 {/* ÔöÇÔöÇ MOBILE-ONLY: Counters + XP Bar ÔöÇÔöÇ */}
-                                <div className="md:hidden w-full flex flex-col items-center">
-                                    <div className="flex w-full items-center justify-center gap-3 mb-6">
+                                <div className="md:hidden w-full flex flex-col items-center mt-5">
+                                    <div className="flex w-full overflow-hidden items-center justify-center gap-1.5 sm:gap-2 mb-6 px-1">
 
                                         {/* Drops ÔåÆ Ba├║ Gamer */}
                                         <motion.button
                                             onClick={() => openInventory('drops')}
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
-                                            className="relative flex items-center justify-center gap-2.5 px-4 py-2 rounded-[1rem] bg-white/[0.08] backdrop-blur-md border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.2)] min-w-[90px] group/drops"
+                                            className="relative flex items-center justify-center gap-1.5 px-3 py-2 rounded-[1rem] bg-white/[0.08] backdrop-blur-md border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.2)] flex-1 min-w-0 group/drops"
                                         >
-                                            <div className="relative z-10 flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-br from-[#38bdf8] to-[#0284c7] shadow-[0_2px_4px_rgba(56,189,248,0.5)] border border-white/20 group-hover/drops:scale-110 transition-transform duration-300">
-                                                <div className="absolute inset-0 m-auto w-3 h-3 bg-white rounded-full blur-[4px] animate-[pulse_2s_ease-in-out_infinite]" />
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-[14px] h-[14px] text-white relative z-10 drop-shadow-[0_0_2px_rgba(255,255,255,0.8)]">
+                                            <div className="relative z-10 flex items-center justify-center w-6 h-6 shrink-0 rounded-full bg-gradient-to-br from-[#38bdf8] to-[#0284c7] shadow-[0_2px_4px_rgba(56,189,248,0.5)] border border-white/20 group-hover/drops:scale-110 transition-transform duration-300">
+                                                <div className="absolute inset-0 m-auto w-2 h-2 bg-white rounded-full blur-[3px] animate-[pulse_2s_ease-in-out_infinite]" />
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3 text-white relative z-10 drop-shadow-[0_0_2px_rgba(255,255,255,0.8)]">
                                                     <path d="M4 4h16a2 2 0 0 1 2 2v3H2V6a2 2 0 0 1 2-2z" />
                                                     <path d="M2 11v8a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-8h-9v1a1 1 0 0 1-2 0v-1H2z" />
                                                 </svg>
                                             </div>
-                                            <span className="text-2xl font-black text-white relative z-10 drop-shadow-sm tabular-nums tracking-tight">{profile.drops || 0}</span>
+                                            <span className="text-xl font-black text-white relative z-10 drop-shadow-sm tabular-nums tracking-tight truncate">{profile.drops || 0}</span>
                                         </motion.button>
 
-                                        {/* Moedas */}
-                                        <div className="relative flex items-center gap-2.5 px-5 py-2.5 rounded-[1.2rem] bg-white/[0.08] backdrop-blur-md border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.2)] min-w-[140px] cursor-default group/coins">
-                                            <div className="relative z-10 group-hover/coins:scale-110 transition-transform duration-300 -ml-1">
-                                                <GlobalCoin size="md" />
+                                        {/* Moedas (Larger in the middle) */}
+                                        <div className="relative flex items-center justify-center gap-2 px-4 py-2.5 rounded-[1.2rem] bg-white/[0.08] backdrop-blur-md border border-white/10 shadow-[inner_0_1px_1px_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.2)] flex-[1.2] min-w-0 cursor-default group/coins">
+                                            <div className="relative z-10 group-hover/coins:scale-110 transition-transform duration-300 shrink-0 -ml-1">
+                                                <GlobalCoin size="sm" />
                                             </div>
-                                            <div className="relative z-10 flex flex-col items-start -space-y-1">
-                                                <span className="text-2xl font-black text-white tracking-tight drop-shadow-sm tabular-nums">{profile.points.toLocaleString()}</span>
-                                                <span className="text-[9px] font-black uppercase tracking-[0.15em] text-[#FCD34D] drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] opacity-90">Moedas</span>
+                                            <div className="relative z-10 flex flex-col items-start -space-y-1 overflow-hidden">
+                                                <span className="text-2xl font-black text-white tracking-tight drop-shadow-sm tabular-nums truncate">{profile.points.toLocaleString()}</span>
+                                                <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.15em] text-[#FCD34D] drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] opacity-90 truncate">Moedas</span>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <div className="flex w-full justify-center mb-6">
                                         {/* Sorvetes */}
                                         <motion.button
                                             key={`sorvete-mobile-${sorvetesCount}`}
                                             onClick={() => openInventory('sorvetes')}
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
-                                            className="relative flex items-center justify-center gap-2.5 px-4 py-2 rounded-[1rem] bg-white/[0.08] backdrop-blur-md border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.2)] min-w-[160px] group/sorvete"
+                                            className="relative flex items-center justify-center gap-1.5 px-3 py-2 rounded-[1rem] bg-white/[0.08] backdrop-blur-md border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.2)] flex-1 min-w-0 group/sorvete"
                                         >
-                                            <div className="relative z-10 flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-br from-illa-pink to-[#c40068] shadow-[0_2px_4px_rgba(229,1,125,0.5)] border border-white/20 group-hover/sorvete:scale-110 transition-transform duration-300">
-                                                <IceCream size={14} className="text-white drop-shadow-md" strokeWidth={2.5} />
+                                            <div className="relative z-10 flex items-center justify-center w-6 h-6 shrink-0 rounded-full bg-gradient-to-br from-illa-pink to-[#c40068] shadow-[0_2px_4px_rgba(229,1,125,0.5)] border border-white/20 group-hover/sorvete:scale-110 transition-transform duration-300">
+                                                <IceCream size={12} className="text-white drop-shadow-md" strokeWidth={2.5} />
                                             </div>
-                                            <span className="text-2xl font-black text-white relative z-10 drop-shadow-sm tabular-nums tracking-tight">{sorvetesCount}</span>
+                                            <span className="text-xl font-black text-white relative z-10 drop-shadow-sm tabular-nums tracking-tight truncate">{sorvetesCount}</span>
                                         </motion.button>
                                     </div>
 
