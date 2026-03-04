@@ -3,18 +3,19 @@
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { Sparkles, ArrowRight, Play, Film } from 'lucide-react'
+import Image from 'next/image'
 
 export default function ReceitasCinematicButton() {
     return (
         <Link href="/receitas" className="block w-full group outline-none">
             <motion.div
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={{ scale: 1.015 }}
+                whileTap={{ scale: 0.985 }}
                 className="relative overflow-hidden rounded-3xl p-[2px] w-full"
             >
-                {/* Animated Neon Border */}
-                <div className="absolute inset-0 bg-gradient-to-r from-amber-400 via-orange-500 to-pink-500 rounded-3xl opacity-70 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-amber-400 via-orange-500 to-pink-500 blur-xl opacity-40 group-hover:opacity-80 transition-opacity duration-700 animate-pulse" />
+                {/* Animated Neon Border - Balanced Opacity */}
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-400 via-orange-500 to-pink-500 rounded-3xl opacity-40 group-hover:opacity-100 transition-opacity duration-700" />
+                <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-amber-400 via-orange-500 to-pink-500 blur-xl opacity-20 group-hover:opacity-60 transition-opacity duration-1000 animate-pulse" />
 
                 {/* Inner Content */}
                 <div className="relative h-full w-full bg-[#0B0B0D] rounded-[22px] overflow-hidden flex flex-col md:flex-row items-center border border-white/10 z-10">
@@ -22,15 +23,16 @@ export default function ReceitasCinematicButton() {
                     {/* Background Glow */}
                     <div className="absolute top-0 left-1/4 w-full h-full bg-orange-500/20 blur-[80px] rounded-full pointer-events-none group-hover:bg-amber-500/30 transition-colors duration-700" />
 
-                    {/* Image Area - WebP Placeholder */}
+                    {/* Image Area - Cinematic Banner */}
                     <div className="w-full md:w-2/5 h-48 md:h-full relative overflow-hidden bg-black/50">
-                        {/* Placeholder for WebP Image */}
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <Film className="w-16 h-16 text-white/10" />
-                            <span className="absolute bottom-4 right-4 text-[10px] uppercase font-bold tracking-widest text-white/30">
-                                INSIRA SUA WEBP AQUI
-                            </span>
-                        </div>
+                        <Image
+                            src="/receitas-ocultas/receitas-banner.webp"
+                            alt="Receitas Ocultas ILLA"
+                            fill
+                            priority
+                            className="object-cover transition-transform duration-[3s] group-hover:scale-110"
+                            quality={90}
+                        />
                         {/* Overlay Gradient for seamless blend */}
                         <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#0B0B0D] via-transparent to-transparent opacity-90" />
                     </div>
