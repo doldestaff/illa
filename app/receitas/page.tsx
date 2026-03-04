@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { ArrowLeft, CheckCircle2, Coins, Play, Sparkles, ChefHat, Camera, Upload, ImageIcon, User, Loader2, Video } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { toast } from 'sonner'
 import confetti from 'canvas-confetti'
 import { createSupabaseBrowser } from '@/lib/supabaseClient'
@@ -449,51 +450,31 @@ export default function ReceitasCinematicPage() {
     return (
         <div ref={containerRef} className="min-h-screen bg-[#050505] text-white selection:bg-amber-500/30 font-sans pb-32">
 
-            {/* Ultra-Cinematic Animated Luminous Background */}
-            <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-[#030303]">
-                {/* Deep Ambient Space */}
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(30,15,5,0.4)_0%,rgba(3,3,3,1)_100%)]" />
+            {/* Cinematic Background with Dynamic Vitral */}
+            <div className="fixed inset-0 z-0 overflow-hidden bg-black">
+                <Image
+                    src="/receitas-ocultas/receitas-bg-mobile.webp"
+                    alt="Receitas Ocultas Background"
+                    fill
+                    priority
+                    className="object-cover opacity-60"
+                    quality={100}
+                />
 
-                {/* Floating Nebula / Aurora Orbs */}
+                {/* Dynamic Vitral Overlay (Darkens when a mission is active) */}
                 <motion.div
+                    initial={false}
                     animate={{
-                        transform: ['translate(0%, 0%) rotate(0deg) scale(1)', 'translate(5%, 10%) rotate(90deg) scale(1.15)', 'translate(-5%, 5%) rotate(180deg) scale(0.9)', 'translate(0%, 0%) rotate(360deg) scale(1)'],
+                        backgroundColor: activeMission ? 'rgba(0, 0, 0, 0.92)' : 'rgba(5, 5, 5, 0.75)',
+                        backdropFilter: activeMission ? 'blur(8px)' : 'blur(4px)'
                     }}
-                    transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-                    className="absolute top-[-30%] left-[-20%] w-[80vw] h-[80vw] md:w-[60vw] md:h-[60vw] rounded-full bg-gradient-to-br from-pink-600/15 to-rose-900/10 blur-[100px] md:blur-[140px] mix-blend-screen"
+                    transition={{ duration: 0.6, ease: "easeInOut" }}
+                    className="absolute inset-0 z-10"
                 />
 
-                <motion.div
-                    animate={{
-                        transform: ['translate(0%, 0%) rotate(0deg) scale(1)', 'translate(-10%, -10%) rotate(-90deg) scale(1.2)', 'translate(10%, -15%) rotate(-180deg) scale(1.05)', 'translate(0%, 0%) rotate(-360deg) scale(1)'],
-                    }}
-                    transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-                    className="absolute bottom-[-20%] right-[-20%] w-[90vw] h-[90vw] md:w-[70vw] md:h-[70vw] rounded-full bg-gradient-to-tl from-amber-600/15 via-orange-500/10 to-transparent blur-[120px] md:blur-[160px] mix-blend-screen"
-                />
-
-                <motion.div
-                    animate={{
-                        transform: ['translate(0%, 0%) scale(1)', 'translate(15%, 15%) scale(1.3)', 'translate(-10%, 10%) scale(1.1)', 'translate(0%, 0%) scale(1)'],
-                    }}
-                    transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute top-[30%] left-[30%] w-[50vw] h-[50vw] md:w-[40vw] md:h-[40vw] rounded-full bg-amber-400/5 blur-[80px] md:blur-[120px] mix-blend-screen"
-                />
-
-                {/* Scroll-Responsive Depth Glow */}
-                <motion.div
-                    style={{ y: bgY1, opacity: scrollYProgress }}
-                    className="absolute top-[10%] inset-x-0 mx-auto w-[80vw] h-[40vw] bg-pink-500/5 blur-[120px] rounded-full mix-blend-screen"
-                />
-
-                {/* Slow Cinematic Light Sweep (Scanline) */}
-                <motion.div
-                    animate={{ y: ['-10vh', '110vh'] }}
-                    transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-                    className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-amber-400/10 to-transparent w-full blur-[2px]"
-                />
-
-                {/* Refined Noise Texture for Premium Grain */}
-                <div className="absolute inset-0 opacity-[0.04] mix-blend-screen pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.8%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }} />
+                {/* Ambient Glows for Depth */}
+                <div className="absolute inset-x-0 top-0 h-[40vh] bg-gradient-to-b from-amber-500/10 to-transparent pointer-events-none z-20" />
+                <div className="absolute inset-x-0 bottom-0 h-[40vh] bg-gradient-to-t from-black via-black/40 to-transparent pointer-events-none z-20" />
             </div>
 
             {/* Top Navigation */}
@@ -528,7 +509,7 @@ export default function ReceitasCinematicPage() {
                         className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white/80 text-sm font-medium mb-6 uppercase tracking-widest backdrop-blur-md"
                     >
                         <ChefHat className="w-4 h-4 text-amber-400" />
-                        Cardápio Oculto.
+                        Só para membros
                     </motion.div>
 
                     <motion.h1
