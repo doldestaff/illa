@@ -200,12 +200,11 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                     {/* Main Content */}
                     <div className="relative z-10 mt-8">
 
-                        {/* ─── Top: Avatar + Identity (shared mobile/desktop) ─── */}
-                        <div className="flex flex-col md:flex-row lg:flex-col xl:flex-row items-center md:items-start lg:items-center xl:items-start gap-6 md:gap-8 lg:gap-6 xl:gap-8">
+                        <div className="flex flex-col md:grid md:grid-cols-[auto_1fr] md:gap-8 md:items-start">
 
                             {/* Avatar */}
                             <div
-                                className="relative shrink-0 group/avatar cursor-pointer transition-transform duration-500 hover:scale-[1.03]"
+                                className="relative flex-shrink-0 group/avatar cursor-pointer mx-auto md:mx-0 transition-transform duration-500 hover:scale-[1.03]"
                                 onClick={() => fileInputRef.current?.click()}
                             >
                                 {/* Sleek Cinematic Spinning Neon Border */}
@@ -224,7 +223,7 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                                 {/* Subtle Ambient Backlight */}
                                 <div className="absolute -inset-2 bg-gradient-to-br from-illa-pink to-amber-500 rounded-full opacity-20 blur-xl group-hover/avatar:opacity-40 group-hover/avatar:blur-2xl transition duration-700 z-0 pointer-events-none" />
 
-                                <div className="relative z-10 w-32 h-32 md:w-36 md:h-36 lg:w-32 lg:h-32 xl:w-36 xl:h-36 rounded-full overflow-hidden border-2 border-black/80 bg-black/40 shadow-[0_0_30px_rgba(0,0,0,0.8)] backdrop-blur-md">
+                                <div className="relative z-10 w-36 h-36 md:w-36 md:h-36 lg:w-32 lg:h-32 xl:w-36 xl:h-36 rounded-full overflow-hidden border-2 border-black/80 bg-black/40 shadow-[0_0_30px_rgba(0,0,0,0.8)] backdrop-blur-md">
                                     {uploadingAvatar ? (
                                         <div className="w-full h-full bg-black/60 flex items-center justify-center">
                                             <Loader2 size={32} className="text-illa-pink animate-spin" />
@@ -261,12 +260,12 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                                 />
                             </div>
 
-                            {/* Info Section — Name + LVL + Description only */}
-                            <div className="flex flex-col items-center md:items-start lg:items-center xl:items-start text-center md:text-left lg:text-center xl:text-left min-w-0 w-full">
+                            {/* Info Section */}
+                            <div className="flex-1 min-w-0 w-full flex flex-col items-center md:items-start text-center md:text-left mt-2 md:mt-0">
 
-                                {/* ── Name + LVL badge ── */}
-                                <div className="flex flex-wrap items-center justify-center md:justify-start lg:justify-center xl:justify-start gap-2 md:gap-3 mb-1 w-full">
-                                    <h1 className="text-3xl md:text-4xl lg:text-3xl xl:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-white/70 tracking-tight drop-shadow-[0_2px_15px_rgba(255,255,255,0.2)] truncate max-w-full">
+                                {/* ÔöÇÔöÇ Row 1: Name + LVL badge ÔöÇÔöÇ */}
+                                <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4 mb-2">
+                                    <h1 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-white/70 tracking-tight drop-shadow-[0_2px_15px_rgba(255,255,255,0.2)]">
                                         {profile.full_name || 'Membro ILLA'}
                                     </h1>
                                     <motion.div
@@ -280,7 +279,7 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                                             rotate: [0, -5, 5, 0]
                                         } : {}}
                                         transition={{ duration: 1.2, type: "spring", bounce: 0.5 }}
-                                        className="relative inline-flex shrink-0 w-fit items-center justify-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-illa-yellow to-amber-500 shadow-[0_4px_16px_rgba(245,158,11,0.4)] border border-white/50 transform hover:scale-105 transition-transform cursor-default whitespace-nowrap"
+                                        className="relative inline-flex shrink-0 w-fit items-center justify-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-illa-yellow to-amber-500 shadow-[0_4px_16px_rgba(245,158,11,0.4)] border border-white/50 transform hover:scale-105 transition-transform cursor-default mt-1 md:mt-0 whitespace-nowrap mx-auto md:mx-0"
                                     >
                                         {levelUpTrigger && (
                                             <motion.div
@@ -295,62 +294,68 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                                     </motion.div>
                                 </div>
 
-                                {/* ── Description ── */}
-                                <p className="text-white/55 font-medium text-sm max-w-xs md:max-w-sm lg:max-w-xs xl:max-w-sm">
+                                {/* ÔöÇÔöÇ Row 2: Description ÔöÇÔöÇ */}
+                                <p className="text-white/60 font-medium text-sm md:text-base mb-6 max-w-sm">
                                     Explore seu painel ILLA e ganhe recompensas exclusivas.
                                 </p>
 
-                                {/* ── MOBILE-ONLY: Counters + XP Bar ── */}
-                                <div className="md:hidden w-full mt-5">
-                                    <div className="flex flex-wrap items-center justify-center gap-2 mb-6 w-full">
+                                {/* ÔöÇÔöÇ MOBILE-ONLY: Counters + XP Bar ÔöÇÔöÇ */}
+                                <div className="md:hidden w-full flex flex-col items-center">
+                                    <div className="flex w-full items-center justify-center gap-3 mb-6">
+
+                                        {/* Drops ÔåÆ Ba├║ Gamer */}
                                         <motion.button
                                             onClick={() => openInventory('drops')}
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
-                                            className="relative flex flex-1 justify-center items-center gap-2.5 px-3 py-2 rounded-[1rem] bg-white/[0.08] backdrop-blur-md border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.2)] min-w-[80px] group/drops"
+                                            className="relative flex items-center justify-center gap-2.5 px-4 py-2 rounded-[1rem] bg-white/[0.08] backdrop-blur-md border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.2)] min-w-[90px] group/drops"
                                         >
-                                            <div className="relative z-10 flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-br from-[#38bdf8] to-[#0284c7] shadow-[0_2px_4px_rgba(56,189,248,0.5)] border border-white/20 group-hover/drops:scale-110 transition-transform duration-300 shrink-0">
+                                            <div className="relative z-10 flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-br from-[#38bdf8] to-[#0284c7] shadow-[0_2px_4px_rgba(56,189,248,0.5)] border border-white/20 group-hover/drops:scale-110 transition-transform duration-300">
                                                 <div className="absolute inset-0 m-auto w-3 h-3 bg-white rounded-full blur-[4px] animate-[pulse_2s_ease-in-out_infinite]" />
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-[14px] h-[14px] text-white relative z-10">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-[14px] h-[14px] text-white relative z-10 drop-shadow-[0_0_2px_rgba(255,255,255,0.8)]">
                                                     <path d="M4 4h16a2 2 0 0 1 2 2v3H2V6a2 2 0 0 1 2-2z" />
                                                     <path d="M2 11v8a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-8h-9v1a1 1 0 0 1-2 0v-1H2z" />
                                                 </svg>
                                             </div>
-                                            <span className="text-xl font-black text-white relative z-10 tabular-nums tracking-tight">{profile.drops || 0}</span>
+                                            <span className="text-2xl font-black text-white relative z-10 drop-shadow-sm tabular-nums tracking-tight">{profile.drops || 0}</span>
                                         </motion.button>
 
-                                        <div className="relative flex flex-1 justify-center items-center gap-2.5 px-4 py-2 rounded-[1.2rem] bg-white/[0.08] backdrop-blur-md border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.2)] min-w-[120px] cursor-default group/coins">
-                                            <div className="relative z-10 group-hover/coins:scale-110 transition-transform duration-300 -ml-1 shrink-0">
+                                        {/* Moedas */}
+                                        <div className="relative flex items-center gap-2.5 px-5 py-2.5 rounded-[1.2rem] bg-white/[0.08] backdrop-blur-md border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.2)] min-w-[140px] cursor-default group/coins">
+                                            <div className="relative z-10 group-hover/coins:scale-110 transition-transform duration-300 -ml-1">
                                                 <GlobalCoin size="md" />
                                             </div>
                                             <div className="relative z-10 flex flex-col items-start -space-y-1">
-                                                <span className="text-xl font-black text-white tracking-tight tabular-nums">{profile.points.toLocaleString()}</span>
-                                                <span className="text-[9px] font-black uppercase tracking-[0.15em] text-[#FCD34D] opacity-90">Moedas</span>
+                                                <span className="text-2xl font-black text-white tracking-tight drop-shadow-sm tabular-nums">{profile.points.toLocaleString()}</span>
+                                                <span className="text-[9px] font-black uppercase tracking-[0.15em] text-[#FCD34D] drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] opacity-90">Moedas</span>
                                             </div>
                                         </div>
+                                    </div>
 
+                                    <div className="flex w-full justify-center mb-6">
+                                        {/* Sorvetes */}
                                         <motion.button
                                             key={`sorvete-mobile-${sorvetesCount}`}
                                             onClick={() => openInventory('sorvetes')}
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
-                                            className="relative flex flex-1 justify-center items-center gap-2.5 px-3 py-2 rounded-[1rem] bg-white/[0.08] backdrop-blur-md border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.2)] min-w-[80px] group/sorvete"
+                                            className="relative flex items-center justify-center gap-2.5 px-4 py-2 rounded-[1rem] bg-white/[0.08] backdrop-blur-md border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.2)] min-w-[160px] group/sorvete"
                                         >
-                                            <div className="relative z-10 flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-br from-illa-pink to-[#c40068] shadow-[0_2px_4px_rgba(229,1,125,0.5)] border border-white/20 group-hover/sorvete:scale-110 transition-transform duration-300 shrink-0">
+                                            <div className="relative z-10 flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-br from-illa-pink to-[#c40068] shadow-[0_2px_4px_rgba(229,1,125,0.5)] border border-white/20 group-hover/sorvete:scale-110 transition-transform duration-300">
                                                 <IceCream size={14} className="text-white drop-shadow-md" strokeWidth={2.5} />
                                             </div>
-                                            <span className="text-xl font-black text-white relative z-10 tabular-nums tracking-tight">{sorvetesCount}</span>
+                                            <span className="text-2xl font-black text-white relative z-10 drop-shadow-sm tabular-nums tracking-tight">{sorvetesCount}</span>
                                         </motion.button>
                                     </div>
 
                                     {/* Mobile XP Bar */}
-                                    <div className="w-full relative">
+                                    <div className="w-full relative group/xp max-w-md mt-2">
                                         <div className="flex justify-between items-baseline text-[10px] font-bold uppercase tracking-wider text-white/50 mb-1.5 px-1">
                                             <span className="flex items-baseline gap-1">
-                                                <span className="text-sm font-black text-white tabular-nums">{xpInto}</span>
+                                                <span className="text-sm font-black text-white drop-shadow-sm tabular-nums">{xpInto}</span>
                                                 <span>/ {isMaxLevel ? '∞' : xpForNext} XP</span>
                                             </span>
-                                            <span className="text-white/60 font-medium tracking-normal capitalize ml-2">
+                                            <span className="text-white/60 font-medium tracking-normal capitalize">
                                                 {isMaxLevel ? 'Nível máximo!' : `Faltam ${xpToNext} XP`}
                                             </span>
                                         </div>
@@ -359,10 +364,11 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                                                 initial={{ width: 0 }}
                                                 animate={{ width: `${progressPercent}%` }}
                                                 transition={{ duration: 1.5, ease: "easeOut", type: "spring", bounce: 0.15 }}
-                                                className="h-full relative rounded-full shadow-[0_0_20px_rgba(229,1,125,0.4)] min-w-[2%]"
+                                                className="h-full relative rounded-full shadow-[0_0_20px_rgba(229,1,125,0.4)] flex items-center min-w-[2%]"
                                             >
                                                 <div className="absolute inset-0 bg-[length:200%_100%] animate-[shimmer_3s_linear_infinite] rounded-full" style={{ backgroundImage: 'linear-gradient(90deg, #E5017D, #F59E0B, #E5017D)' }} />
                                                 <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/5 to-black/30 mix-blend-overlay rounded-full" />
+                                                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay rounded-full pointer-events-none" />
                                                 {progressPercent > 2 && (
                                                     <div className="absolute inset-y-0 right-0 w-16 flex justify-end items-center pointer-events-none">
                                                         <div className="absolute inset-y-0 right-0 w-full bg-gradient-to-r from-transparent via-amber-500/20 to-amber-200/60 rounded-r-full" />
@@ -373,6 +379,7 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                                         </div>
                                     </div>
                                 </div>
+
 
                             </div>
                         </div>

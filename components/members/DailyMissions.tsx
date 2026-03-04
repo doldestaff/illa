@@ -36,10 +36,12 @@ function InteractiveMarquee({ children, onIndexChange }: { children: React.React
         let lastTime = performance.now()
         const speed = 0.5 // pixels per frame roughly
 
+        // Calculate a safe scroll maximum before wrapping.
+        // We know we rendered 3 identical sets of children.
+        // We want to seamlessly wrap when it reaches exactly 1 set's scroll distance.
         const scroll = (currentTime: number) => {
-            // Pause if tab is hidden (battery) or if user is touching/scrolling
             if (document.hidden || isInteractingRef.current) {
-                lastTime = currentTime // prevent massive jump when resuming
+                lastTime = currentTime
                 animationId = requestAnimationFrame(scroll)
                 return
             }
@@ -47,17 +49,26 @@ function InteractiveMarquee({ children, onIndexChange }: { children: React.React
             const deltaTime = currentTime - lastTime
             lastTime = currentTime
 
-            // Seamless wrap: If scroll passes the halfway point (first duplicated set)
-            if (container.scrollLeft >= container.scrollWidth / 2) {
-                container.scrollLeft = 0
+            // A third of the scroll width represents one full set of cards.
+            // When we cross that distance, we reset back to 0 seamlessly.
+            const thirdWidth = container.scrollWidth / 3
+            if (container.scrollLeft >= thirdWidth) {
+                // To keep it perfectly seamless, we only subtract exactly the width of one set
+                container.scrollLeft -= thirdWidth
             }
             container.scrollLeft += speed * (deltaTime / 16)
+
+            // Catch accidental backwards scroll (e.g., user swiping left fast)
+            if (container.scrollLeft <= 0) {
+                container.scrollLeft += thirdWidth
+            }
+
             animationId = requestAnimationFrame(scroll)
         }
 
         animationId = requestAnimationFrame(scroll)
         return () => cancelAnimationFrame(animationId)
-    }, [isVisible])
+    }, [isVisible, children])
 
     // Handle high-frequency events directly on the DOM node for max performance
     useEffect(() => {
@@ -125,9 +136,19 @@ function InteractiveMarquee({ children, onIndexChange }: { children: React.React
     return (
         <div
             ref={containerRef}
-            className="flex overflow-x-auto gap-5 pb-8 scrollbar-hide py-4 snap-mandatory snap-x md:snap-none"
-            style={{ willChange: 'scroll-position', overscrollBehaviorX: 'contain' }}
+            className="flex overflow-x-auto gap-5 pb-8 py-4 snap-mandatory snap-x md:snap-none"
+            style={{
+                willChange: 'scroll-position',
+                overscrollBehaviorX: 'contain',
+                scrollbarWidth: 'none',   /* Firefox */
+                msOverflowStyle: 'none'  /* IE and Edge */
+            }}
         >
+            {/* Inline style for webkit scrollbar hide fallback */}
+            <style dangerouslySetInnerHTML={{
+                __html: `
+                div::-webkit-scrollbar { display: none; }
+            `}} />
             <div className="flex shrink-0 gap-5">
                 {children}
             </div>
