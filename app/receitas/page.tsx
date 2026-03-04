@@ -329,11 +329,13 @@ export default function ReceitasCinematicPage() {
 
         // Confetti effect
         const duration = 3 * 1000
+        // eslint-disable-next-line react-hooks/purity
         const animationEnd = Date.now() + duration
         const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 }
 
         const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const interval: any = setInterval(function () {
             const timeLeft = animationEnd - Date.now()
             if (timeLeft <= 0) return clearInterval(interval)

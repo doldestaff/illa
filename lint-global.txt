@@ -1,0 +1,168 @@
+﻿
+> temp_app@0.1.0 lint
+> eslint
+
+
+C:\DEV\ILLA\illa\app\admin\page.tsx
+  3:31  warning  'useCallback' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\DEV\ILLA\illa\app\api\notifications\route.ts
+  33:27  warning  'countError' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\DEV\ILLA\illa\app\layout.tsx
+  40:9  warning  `rel="preconnect"` is missing from Google Font. See: https://nextjs.org/docs/messages/google-font-preconnect  @next/next/google-font-preconnect
+
+C:\DEV\ILLA\illa\app\members\loading.tsx
+  8:17  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\DEV\ILLA\illa\app\members\notifications\page.tsx
+   3:8   warning  'Link' is defined but never used                  @typescript-eslint/no-unused-vars
+   4:8   warning  'Image' is defined but never used                 @typescript-eslint/no-unused-vars
+   5:10  warning  'ArrowLeft' is defined but never used             @typescript-eslint/no-unused-vars
+   5:21  warning  'Bell' is defined but never used                  @typescript-eslint/no-unused-vars
+   5:27  warning  'Check' is defined but never used                 @typescript-eslint/no-unused-vars
+   5:34  warning  'Loader2' is defined but never used               @typescript-eslint/no-unused-vars
+   5:43  warning  'Trash2' is defined but never used                @typescript-eslint/no-unused-vars
+   8:18  warning  'AnimatePresence' is defined but never used       @typescript-eslint/no-unused-vars
+  26:49  warning  'pushLoading' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  27:13  warning  'showToast' is assigned a value but never used    @typescript-eslint/no-unused-vars
+  29:11  warning  'supabase' is assigned a value but never used     @typescript-eslint/no-unused-vars
+
+C:\DEV\ILLA\illa\app\receitas\page.tsx
+    5:48  warning  'Star' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+  273:11  warning  'bgY2' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 @typescript-eslint/no-unused-vars
+  274:11  warning  'bgScale' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-unused-vars
+  332:30  error    Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\DEV\ILLA\illa\app\receitas\page.tsx:332:30
+  330 |         // Confetti effect
+  331 |         const duration = 3 * 1000
+> 332 |         const animationEnd = Date.now() + duration
+      |                              ^^^^^^^^^^ Cannot call impure function
+  333 |         const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 }
+  334 |
+  335 |         const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min  react-hooks/purity
+  337:25  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  @typescript-eslint/no-explicit-any
+
+C:\DEV\ILLA\illa\components\AboutModal.tsx
+  6:8  warning  'Image' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\DEV\ILLA\illa\components\DevelopmentModal.tsx
+  4:10  warning  'X' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\DEV\ILLA\illa\components\HeroGhostButtons.tsx
+    3:18  warning  'AnimatePresence' is defined but never used                                                                                                             @typescript-eslint/no-unused-vars
+    4:33  warning  'Info' is defined but never used                                                                                                                        @typescript-eslint/no-unused-vars
+    4:39  warning  'Phone' is defined but never used                                                                                                                       @typescript-eslint/no-unused-vars
+    4:66  warning  'ChevronDown' is defined but never used                                                                                                                 @typescript-eslint/no-unused-vars
+  161:31  error    React Hook "useTransform" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function  react-hooks/rules-of-hooks
+  162:31  error    React Hook "useTransform" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function  react-hooks/rules-of-hooks
+  163:37  error    React Hook "useTransform" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function  react-hooks/rules-of-hooks
+  164:37  error    React Hook "useTransform" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function  react-hooks/rules-of-hooks
+  165:35  error    React Hook "useTransform" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function  react-hooks/rules-of-hooks
+  166:37  error    React Hook "useTransform" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function  react-hooks/rules-of-hooks
+  283:31  error    React Hook "useTransform" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function  react-hooks/rules-of-hooks
+  284:31  error    React Hook "useTransform" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function  react-hooks/rules-of-hooks
+  285:37  error    React Hook "useTransform" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function  react-hooks/rules-of-hooks
+  286:37  error    React Hook "useTransform" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function  react-hooks/rules-of-hooks
+  287:35  error    React Hook "useTransform" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function  react-hooks/rules-of-hooks
+  288:37  error    React Hook "useTransform" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function  react-hooks/rules-of-hooks
+
+C:\DEV\ILLA\illa\components\HeroScrollFrames.tsx
+   6:10  warning  'cn' is defined but never used                                                                                                                                                                                                                                                           @typescript-eslint/no-unused-vars
+  50:17  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  55:17  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\DEV\ILLA\illa\components\ProductsShowcase.tsx
+  3:10  warning  'useRef' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\DEV\ILLA\illa\components\admin\AdminDashboard.tsx
+  4:91  warning  'XCircle' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\DEV\ILLA\illa\components\discounts\DiscountCard.tsx
+  4:28  warning  'Tag' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\DEV\ILLA\illa\components\discounts\RedeemModal.tsx
+  5:41  warning  'AlertCircle' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\DEV\ILLA\illa\components\discounts\StoreView.tsx
+  4:10  warning  'motion' is defined but never used  @typescript-eslint/no-unused-vars
+  5:10  warning  'Coins' is defined but never used   @typescript-eslint/no-unused-vars
+  5:26  warning  'Tag' is defined but never used     @typescript-eslint/no-unused-vars
+
+C:\DEV\ILLA\illa\components\hero\HeroEngine.tsx
+   86:5   warning  'priorityFrames' is assigned a value but never used                                                                @typescript-eslint/no-unused-vars
+  222:8   warning  React Hook useEffect has a missing dependency: 'scheduleDraw'. Either include it or remove the dependency array    react-hooks/exhaustive-deps
+  241:8   warning  React Hook useCallback has a missing dependency: 'draw'. Either include it or remove the dependency array          react-hooks/exhaustive-deps
+  298:22  warning  'bitmapError' is defined but never used                                                                            @typescript-eslint/no-unused-vars
+  327:8   warning  React Hook useCallback has a missing dependency: 'scheduleDraw'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  569:8   warning  React Hook useEffect has a missing dependency: 'draw'. Either include it or remove the dependency array            react-hooks/exhaustive-deps
+
+C:\DEV\ILLA\illa\components\hero\ScrollFrameCanvasEngine.tsx
+  146:22  warning  'bitmapErr' is defined but never used  @typescript-eslint/no-unused-vars
+  164:18  warning  'e' is defined but never used          @typescript-eslint/no-unused-vars
+
+C:\DEV\ILLA\illa\components\members\DailyMissions.tsx
+   5:41  warning  'LayoutGrid' is defined but never used               @typescript-eslint/no-unused-vars
+  17:11  warning  'onOpenModalRef' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\DEV\ILLA\illa\components\members\DashboardActionGrid.tsx
+  5:8  warning  'Link' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\DEV\ILLA\illa\components\members\DashboardHeader.tsx
+  233:45  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\DEV\ILLA\illa\components\members\FlashDrop.tsx
+  5:10  warning  'IceCream' is defined but never used     @typescript-eslint/no-unused-vars
+  5:68  warning  'X' is defined but never used            @typescript-eslint/no-unused-vars
+  5:83  warning  'AlertCircle' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\DEV\ILLA\illa\components\members\FullRankingModal.tsx
+  156:57  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\DEV\ILLA\illa\components\members\HudHeader.tsx
+  44:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\DEV\ILLA\illa\components\members\MembersDashboard.tsx
+  81:27  warning  'setSorvetesCount' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\DEV\ILLA\illa\components\members\MissionCard.tsx
+  83:17  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\DEV\ILLA\illa\components\members\OnlineCelebrationManager.tsx
+  142:8  warning  React Hook useEffect has missing dependencies: 'initialDelayMs' and 'pollIntervalMs'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\DEV\ILLA\illa\components\members\RecipesLibrary.tsx
+  45:37  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\DEV\ILLA\illa\components\members\RewardTimeline.tsx
+  7:47  warning  'Coins' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\DEV\ILLA\illa\components\members\SecretMenu.tsx
+  41:37  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\DEV\ILLA\illa\components\members\StorePromoCard.tsx
+  4:37  warning  'ShoppingBag' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\DEV\ILLA\illa\components\members\VipCard.tsx
+   16:7   warning  'MILESTONES' is assigned a value but never used                                                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+   73:35  warning  'referralCode' is defined but never used                                                                                                                                                                                                                                                 @typescript-eslint/no-unused-vars
+   73:49  warning  'referralCount' is defined but never used                                                                                                                                                                                                                                                @typescript-eslint/no-unused-vars
+   77:12  warning  'refCopied' is assigned a value but never used                                                                                                                                                                                                                                           @typescript-eslint/no-unused-vars
+  130:21  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\DEV\ILLA\illa\components\members\WeeklyLeaderboard.tsx
+  93:41  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\DEV\ILLA\illa\components\notifications\CinematicToastProvider.tsx
+   5:10  warning  'createSupabaseBrowser' is defined but never used         @typescript-eslint/no-unused-vars
+  36:20  warning  'type' is defined but never used                          @typescript-eslint/no-unused-vars
+  54:11  warning  'PROCESSING_INTERVAL' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\DEV\ILLA\illa\components\notifications\NotificationBell.tsx
+  53:8  warning  React Hook useEffect has missing dependencies: 'fetchCount' and 'supabase'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+Ô£û 82 problems (14 errors, 68 warnings)
+

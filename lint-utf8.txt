@@ -1,0 +1,24 @@
+﻿
+C:\DEV\ILLA\illa\components\members\DashboardHeader.tsx
+    4:22  warning  'Coins' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-unused-vars
+    4:59  warning  'Droplet' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+   48:13  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\DEV\ILLA\illa\components\members\DashboardHeader.tsx:48:13
+  46 |     useEffect(() => {
+  47 |         if (profile.level > prevLevelRef.current) {
+> 48 |             setLevelUpTrigger(true)
+     |             ^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  49 |             prevLevelRef.current = profile.level
+  50 |             // Auto reset animation trigger
+  51 |             setTimeout(() => setLevelUpTrigger(false), 3000)  react-hooks/set-state-in-effect
+  231:45  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     @next/next/no-img-element
+
+Ô£û 4 problems (1 error, 3 warnings)
+

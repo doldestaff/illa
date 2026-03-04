@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Tag, ArrowRight, Sparkles, ShoppingBag } from 'lucide-react'
+import { Tag, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 
 export default function StorePromoCard() {
@@ -70,10 +70,7 @@ export default function StorePromoCard() {
                             </div>
                         </div>
 
-                        {/* CTA Button (Visible on Desktop, hidden on mobile to reduce clutter or maybe keep?) */}
-                        <div className="hidden sm:flex items-center justify-center w-12 h-12 rounded-full bg-white text-purple-900 shadow-lg group-hover:scale-110 group-hover:bg-purple-50 transition-all duration-300">
-                            <ArrowRight size={20} />
-                        </div>
+
                     </div>
                 </div>
 

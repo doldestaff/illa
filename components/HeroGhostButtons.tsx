@@ -93,18 +93,78 @@ function DesktopButtons({ progress }: { progress: MotionValue<number> }) {
     )
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function MobileGhostButton({ btn, i, progress, lenis, positions }: { btn: typeof buttons[0], i: number, progress: MotionValue<number>, lenis: any, positions: any[] }) {
+    const isLeft = i % 2 === 0
+    const targetX = positions[i].x
+    const targetY = positions[i].y
+
+    const delayStart = 0.15 + (i * 0.04)
+    const expandEnd = Math.min(0.8, delayStart + 0.25)
+
+    const x = useTransform(progress, [0.15, expandEnd], [0, targetX])
+    const y = useTransform(progress, [0.15, expandEnd], [100, targetY])
+    const rotateX = useTransform(progress, [0, 0.5], [60, 0])
+    const rotateY = useTransform(progress, [0, 0.5], [isLeft ? -30 : 30, 0])
+    const scale = useTransform(progress, [0, 0.4], [0.5, 1])
+    const opacity = useTransform(progress, [0, 0.2, 0.8, 1], [0, 1, 1, 0])
+
+    const isAction = btn.label === 'QUEM SOMOS' || btn.label === 'CONTATO' || btn.label === 'FRANQUIAS' || btn.label === 'LOCALIZAÇÃO'
+
+    return (
+        <motion.a
+            href={btn.link}
+            target={isAction ? undefined : "_blank"}
+            rel={isAction ? undefined : "noreferrer"}
+            onClick={(e) => {
+                if (btn.label === 'QUEM SOMOS') {
+                    e.preventDefault()
+                    window.dispatchEvent(new CustomEvent('open-about-modal'))
+                } else if (btn.label === 'FRANQUIAS') {
+                    e.preventDefault()
+                    window.dispatchEvent(new CustomEvent('open-dev-modal'))
+                } else if (btn.label === 'LOCALIZAÇÃO') {
+                    e.preventDefault()
+                    if (lenis) {
+                        lenis.scrollTo('#locations', { offset: -50 })
+                    } else {
+                        const el = document.getElementById('locations')
+                        el?.scrollIntoView({ behavior: 'smooth' })
+                    }
+                }
+            }}
+            style={{ x, y, scale, rotateX, rotateY, opacity, zIndex: 20 - i }}
+            className={`
+                group absolute flex flex-col items-center justify-center gap-2 
+                w-[156px] h-[130px] p-4 
+                bg-illa-pink/95 
+                border-[2px] border-white/50 rounded-[1.5rem] 
+                shadow-[0_8px_16px_rgba(229,1,125,0.6),inset_0_1px_4px_rgba(255,255,255,0.3)]
+                text-white font-black tracking-wider text-center
+                pointer-events-auto cursor-pointer
+                hover:bg-illa-yellow hover:text-dark hover:border-transparent 
+                active:scale-95 active:bg-illa-yellow/90
+                transition-all duration-300 ease-out
+                ${isLeft ? 'origin-right' : 'origin-left'}
+                will-change-transform [transform:translateZ(0)]
+            `}
+        >
+            <btn.icon size={32} className="text-current drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)] transition-transform group-active:scale-90 duration-200" strokeWidth={2.5} />
+            <span className="text-[10px] drop-shadow-md leading-tight uppercase font-script transition-colors duration-300">{btn.label}</span>
+        </motion.a>
+    )
+}
+
 function MobileButtons({ progress }: { progress: MotionValue<number> }) {
     const lenis = useLenis()
 
-    // Grid Positions for Mobile (relative to center)
-    // Tighter spacing to fit 390px screens. Width=156px per button.
     const gapX = 82
     const gapY = 70
     const positions = [
-        { x: -gapX, y: -gapY }, // Top Left
-        { x: gapX, y: -gapY },  // Top Right
-        { x: -gapX, y: gapY },  // Bottom Left
-        { x: gapX, y: gapY }    // Bottom Right
+        { x: -gapX, y: -gapY },
+        { x: gapX, y: -gapY },
+        { x: -gapX, y: gapY },
+        { x: gapX, y: gapY }
     ]
 
     const fadeOpacity = useTransform(progress, [0.95, 1], [1, 0])
@@ -113,24 +173,13 @@ function MobileButtons({ progress }: { progress: MotionValue<number> }) {
     const auraScale = useTransform(progress, [0.15, 0.4], [0.5, 1.2])
     const auraOpacity = useTransform(progress, [0.15, 0.4, 0.8, 1], [0, 0.6, 0.6, 0])
 
-    // Scroll hint disappears instantly when user starts scrolling
     const scrollHintOpacity = useTransform(progress, [0, 0.05], [1, 0])
     const scrollHintY = useTransform(progress, [0, 0.05], [0, 10])
 
     return (
         <motion.div style={{ opacity: fadeOpacity }} className="absolute bottom-[2vh] left-0 right-0 z-20 flex justify-center items-center pointer-events-none [perspective:1000px]">
-
-            {/* Cinematic Scroll Hint (Mobile) */}
-            <motion.div
-                style={{ opacity: scrollHintOpacity, y: scrollHintY }}
-                className="absolute top-[40px] flex flex-col items-center gap-3 z-30"
-            >
-                <motion.div
-                    animate={{ y: [0, 8, 0], opacity: [0.3, 1, 0.3] }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                    className="w-[1px] h-8 bg-gradient-to-b from-transparent via-white to-transparent shadow-[0_0_8px_rgba(255,255,255,0.8)]"
-                />
-
+            <motion.div style={{ opacity: scrollHintOpacity, y: scrollHintY }} className="absolute top-[40px] flex flex-col items-center gap-3 z-30">
+                <motion.div animate={{ y: [0, 8, 0], opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }} className="w-[1px] h-8 bg-gradient-to-b from-transparent via-white to-transparent shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
                 <p className="text-white/80 uppercase font-bold tracking-[0.3em] text-[9px] text-center font-body flex flex-col items-center gap-0.5 drop-shadow-md">
                     <span className="opacity-70 text-[8px]">Descubra a Illa</span>
                     <span className="text-white">Deslize</span>
@@ -138,116 +187,98 @@ function MobileButtons({ progress }: { progress: MotionValue<number> }) {
             </motion.div>
 
             <motion.div style={{ y: yFloat }} className="relative w-full max-w-[360px] h-[300px] flex justify-center items-center">
-
-                {/* Massive glowing aura - Solid fast rendering */}
-                <motion.div
-                    style={{ scale: auraScale, opacity: auraOpacity }}
-                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] pointer-events-none z-0 flex items-center justify-center"
-                >
+                <motion.div style={{ scale: auraScale, opacity: auraOpacity }} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] pointer-events-none z-0 flex items-center justify-center">
                     <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(255,107,107,0.7)_0%,rgba(255,202,40,0.5)_40%,transparent_75%)] rounded-full" />
                     <div className="absolute w-[50%] h-[50%] bg-[radial-gradient(circle,rgba(255,213,79,0.9)_0%,transparent_70%)] rounded-full" />
                 </motion.div>
 
-                {buttons.map((btn, i) => {
-                    const isLeft = i % 2 === 0
-                    const targetX = positions[i].x
-                    const targetY = positions[i].y
-
-                    // Staggered animation start for each button
-                    const delayStart = 0.15 + (i * 0.04)
-                    const expandEnd = Math.min(0.8, delayStart + 0.25)
-
-                    // Explosive 3D fanning fly-out
-                    const x = useTransform(progress, [0.15, expandEnd], [0, targetX])
-                    const y = useTransform(progress, [0.15, expandEnd], [100, targetY])
-                    const rotateX = useTransform(progress, [0, 0.5], [60, 0])
-                    const rotateY = useTransform(progress, [0, 0.5], [isLeft ? -30 : 30, 0])
-                    const scale = useTransform(progress, [0, 0.4], [0.5, 1])
-                    const opacity = useTransform(progress, [0, 0.2, 0.8, 1], [0, 1, 1, 0])
-
-                    const isAction = btn.label === 'QUEM SOMOS' || btn.label === 'CONTATO' || btn.label === 'FRANQUIAS' || btn.label === 'LOCALIZAÇÃO'
-
-                    return (
-                        <motion.a
-                            key={btn.label}
-                            href={btn.link}
-                            target={isAction ? undefined : "_blank"}
-                            rel={isAction ? undefined : "noreferrer"}
-                            onClick={(e) => {
-                                if (btn.label === 'QUEM SOMOS') {
-                                    e.preventDefault()
-                                    window.dispatchEvent(new CustomEvent('open-about-modal'))
-                                } else if (btn.label === 'FRANQUIAS') {
-                                    e.preventDefault()
-                                    window.dispatchEvent(new CustomEvent('open-dev-modal'))
-                                } else if (btn.label === 'LOCALIZAÇÃO') {
-                                    e.preventDefault()
-                                    if (lenis) {
-                                        lenis.scrollTo('#locations', { offset: -50 })
-                                    } else {
-                                        const el = document.getElementById('locations')
-                                        el?.scrollIntoView({ behavior: 'smooth' })
-                                    }
-                                }
-                            }}
-                            style={{ x, y, scale, rotateX, rotateY, opacity, zIndex: 20 - i }}
-                            className={`
-                                group absolute flex flex-col items-center justify-center gap-2 
-                                w-[156px] h-[130px] p-4 
-                                bg-illa-pink/95 
-                                border-[2px] border-white/50 rounded-[1.5rem] 
-                                shadow-[0_8px_16px_rgba(229,1,125,0.6),inset_0_1px_4px_rgba(255,255,255,0.3)]
-                                text-white font-black tracking-wider text-center
-                                pointer-events-auto cursor-pointer
-                                hover:bg-illa-yellow hover:text-dark hover:border-transparent 
-                                active:scale-95 active:bg-illa-yellow/90
-                                transition-all duration-300 ease-out
-                                ${isLeft ? 'origin-right' : 'origin-left'}
-                                will-change-transform [transform:translateZ(0)]
-                            `}
-                        >
-                            <btn.icon size={32} className="text-current drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)] transition-transform group-active:scale-90 duration-200" strokeWidth={2.5} />
-                            <span className="text-[10px] drop-shadow-md leading-tight uppercase font-script transition-colors duration-300">{btn.label}</span>
-                        </motion.a>
-                    )
-                })}
+                {buttons.map((btn, i) => (
+                    <MobileGhostButton key={btn.label} btn={btn} i={i} progress={progress} lenis={lenis} positions={positions} />
+                ))}
             </motion.div>
         </motion.div>
+    )
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function TabletGhostButton({ btn, i, progress, lenis }: { btn: typeof buttons[0], i: number, progress: MotionValue<number>, lenis: any }) {
+    const isLeft = i % 2 === 0
+    const isTop = i < 2
+
+    const targetX = isLeft ? -150 : 150
+    const targetY = isTop ? -90 : 90
+
+    const delayStart = 0.15 + (i * 0.04)
+    const expandEnd = Math.min(0.8, delayStart + 0.25)
+
+    const x = useTransform(progress, [0.15, expandEnd], [0, targetX])
+    const y = useTransform(progress, [0.15, expandEnd], [100, targetY])
+    const rotateX = useTransform(progress, [0.15, expandEnd], [60, 0])
+    const rotateY = useTransform(progress, [0.15, expandEnd], [isLeft ? 45 : -45, 0])
+    const scale = useTransform(progress, [0.15, expandEnd - 0.05, expandEnd], [0.2, 1.1, 1])
+    const opacity = useTransform(progress, [delayStart, delayStart + 0.1], [0, 1])
+
+    const isAction = btn.label === 'QUEM SOMOS' || btn.label === 'CONTATO' || btn.label === 'FRANQUIAS' || btn.label === 'LOCALIZAÇÃO'
+
+    return (
+        <motion.a
+            href={btn.link}
+            target={isAction ? undefined : "_blank"}
+            rel={isAction ? undefined : "noreferrer"}
+            onClick={(e) => {
+                if (btn.label === 'QUEM SOMOS') {
+                    e.preventDefault()
+                    window.dispatchEvent(new CustomEvent('open-about-modal'))
+                } else if (btn.label === 'FRANQUIAS') {
+                    e.preventDefault()
+                    window.dispatchEvent(new CustomEvent('open-dev-modal'))
+                } else if (btn.label === 'LOCALIZAÇÃO') {
+                    e.preventDefault()
+                    if (lenis) {
+                        lenis.scrollTo('#locations', { offset: -50 })
+                    } else {
+                        const el = document.getElementById('locations')
+                        el?.scrollIntoView({ behavior: 'smooth' })
+                    }
+                }
+            }}
+            style={{ x, y, scale, rotateX, rotateY, opacity }}
+            className="
+                group absolute flex flex-col items-center justify-center gap-4 
+                w-[240px] h-[140px] p-6 z-10
+                bg-illa-pink/95 
+                border-[3px] border-white/60 rounded-[2.5rem] 
+                text-white font-black tracking-widest text-center
+                pointer-events-auto cursor-pointer
+                hover:bg-illa-yellow hover:text-dark hover:border-transparent 
+                hover:scale-105 hover:z-50
+                active:scale-95 active:bg-illa-yellow/90
+                transition-all duration-300 ease-out
+                shadow-[0_12px_30px_-6px_rgba(229,1,125,0.7),inset_0_2px_8px_rgba(255,255,255,0.3)]
+                hover:shadow-[0_0_80px_rgba(255,223,0,0.8),inset_0_4px_16px_rgba(255,255,255,0.8)]
+                will-change-transform [transform:translateZ(0)]
+            "
+        >
+            <btn.icon size={48} className="text-current drop-shadow-md transition-transform group-hover:scale-110 duration-300" strokeWidth={2.5} />
+            <span className="text-sm drop-shadow-lg leading-tight uppercase font-script text-[1.1rem] transition-colors duration-300">{btn.label}</span>
+        </motion.a>
     )
 }
 
 function TabletButtons({ progress }: { progress: MotionValue<number> }) {
     const lenis = useLenis()
 
-    // Fade out entirely at the very end of the scroll
     const fadeOpacity = useTransform(progress, [0.95, 1], [1, 0])
-
-    // Overall container floats up slowly
     const yFloat = useTransform(progress, [0.15, 0.8], [0, -120])
-
     const auraScale = useTransform(progress, [0.15, 0.4], [0.5, 1.2])
     const auraOpacity = useTransform(progress, [0.15, 0.4, 0.8, 1], [0, 0.6, 0.6, 0])
-
-    // Scroll hint disappears instantly when user starts scrolling
     const scrollHintOpacity = useTransform(progress, [0, 0.05], [1, 0])
-    // Pushes down slightly as it fades out
     const scrollHintY = useTransform(progress, [0, 0.05], [0, 20])
 
     return (
         <motion.div style={{ opacity: fadeOpacity }} className="absolute bottom-[5vh] md:bottom-[15vh] left-0 right-0 z-20 flex justify-center items-center pointer-events-none [perspective:1200px]">
-
-            {/* Massive Cinematic Scroll Hint (Visible only initially) */}
-            <motion.div
-                style={{ opacity: scrollHintOpacity, y: scrollHintY }}
-                className="absolute top-[80px] flex flex-col items-center gap-4 z-30"
-            >
-                {/* Breathing dot/line animation */}
-                <motion.div
-                    animate={{ y: [0, 10, 0], opacity: [0.3, 1, 0.3] }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                    className="w-[1px] h-12 bg-gradient-to-b from-transparent via-white to-transparent shadow-[0_0_10px_rgba(255,255,255,0.8)]"
-                />
-
+            <motion.div style={{ opacity: scrollHintOpacity, y: scrollHintY }} className="absolute top-[80px] flex flex-col items-center gap-4 z-30">
+                <motion.div animate={{ y: [0, 10, 0], opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }} className="w-[1px] h-12 bg-gradient-to-b from-transparent via-white to-transparent shadow-[0_0_10px_rgba(255,255,255,0.8)]" />
                 <p className="text-white/80 uppercase font-bold tracking-[0.4em] text-[10px] md:text-sm text-center font-body flex flex-col items-center gap-1 drop-shadow-xl">
                     <span className="opacity-70 text-[10px]">Descubra o Universo Illa</span>
                     <span className="text-white">Deslize para baixo</span>
@@ -255,85 +286,14 @@ function TabletButtons({ progress }: { progress: MotionValue<number> }) {
             </motion.div>
 
             <motion.div style={{ y: yFloat }} className="relative w-full max-w-[640px] h-[350px] flex justify-center items-center">
-
-                {/* Massive glowing aura behind buttons - Fast CSS Radial Gradients */}
-                <motion.div
-                    style={{ scale: auraScale, opacity: auraOpacity }}
-                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] md:w-[700px] md:h-[700px] pointer-events-none z-0 flex items-center justify-center"
-                >
-                    {/* Layer 1: Wide soft pink/orange spread */}
+                <motion.div style={{ scale: auraScale, opacity: auraOpacity }} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] md:w-[700px] md:h-[700px] pointer-events-none z-0 flex items-center justify-center">
                     <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(255,107,107,0.7)_0%,rgba(255,202,40,0.5)_40%,transparent_75%)] rounded-full" />
-                    {/* Layer 2: Inner hot yellow core for depth */}
                     <div className="absolute w-[50%] h-[50%] bg-[radial-gradient(circle,rgba(255,213,79,0.9)_0%,transparent_70%)] rounded-full" />
                 </motion.div>
 
-                {buttons.map((btn, i) => {
-                    const isLeft = i % 2 === 0
-                    const isTop = i < 2
-
-                    // Massive spacing for 2x2 grid (Tablet)
-                    const targetX = isLeft ? -150 : 150
-                    const targetY = isTop ? -90 : 90
-
-                    // Staggered animation start for each button
-                    const delayStart = 0.15 + (i * 0.04)
-                    const expandEnd = Math.min(0.8, delayStart + 0.25)
-
-                    // Explosive 3D fanning fly-out
-                    const x = useTransform(progress, [0.15, expandEnd], [0, targetX])
-                    const y = useTransform(progress, [0.15, expandEnd], [100, targetY])
-                    const rotateX = useTransform(progress, [0.15, expandEnd], [60, 0])
-                    const rotateY = useTransform(progress, [0.15, expandEnd], [isLeft ? 45 : -45, 0])
-                    const scale = useTransform(progress, [0.15, expandEnd - 0.05, expandEnd], [0.2, 1.1, 1])
-                    const opacity = useTransform(progress, [delayStart, delayStart + 0.1], [0, 1])
-
-                    const isAction = btn.label === 'QUEM SOMOS' || btn.label === 'CONTATO' || btn.label === 'FRANQUIAS' || btn.label === 'LOCALIZAÇÃO'
-
-                    return (
-                        <motion.a
-                            key={btn.label}
-                            href={btn.link}
-                            target={isAction ? undefined : "_blank"}
-                            rel={isAction ? undefined : "noreferrer"}
-                            onClick={(e) => {
-                                if (btn.label === 'QUEM SOMOS') {
-                                    e.preventDefault()
-                                    window.dispatchEvent(new CustomEvent('open-about-modal'))
-                                } else if (btn.label === 'FRANQUIAS') {
-                                    e.preventDefault()
-                                    window.dispatchEvent(new CustomEvent('open-dev-modal'))
-                                } else if (btn.label === 'LOCALIZAÇÃO') {
-                                    e.preventDefault()
-                                    if (lenis) {
-                                        lenis.scrollTo('#locations', { offset: -50 })
-                                    } else {
-                                        const el = document.getElementById('locations')
-                                        el?.scrollIntoView({ behavior: 'smooth' })
-                                    }
-                                }
-                            }}
-                            style={{ x, y, scale, rotateX, rotateY, opacity }}
-                            className="
-                                group absolute flex flex-col items-center justify-center gap-4 
-                                w-[240px] h-[140px] p-6 z-10
-                                bg-illa-pink/95 
-                                border-[3px] border-white/60 rounded-[2.5rem] 
-                                text-white font-black tracking-widest text-center
-                                pointer-events-auto cursor-pointer
-                                hover:bg-illa-yellow hover:text-dark hover:border-transparent 
-                                hover:scale-105 hover:z-50
-                                active:scale-95 active:bg-illa-yellow/90
-                                transition-all duration-300 ease-out
-                                shadow-[0_12px_30px_-6px_rgba(229,1,125,0.7),inset_0_2px_8px_rgba(255,255,255,0.3)]
-                                hover:shadow-[0_0_80px_rgba(255,223,0,0.8),inset_0_4px_16px_rgba(255,255,255,0.8)]
-                                will-change-transform [transform:translateZ(0)]
-                            "
-                        >
-                            <btn.icon size={48} className="text-current drop-shadow-md transition-transform group-hover:scale-110 duration-300" strokeWidth={2.5} />
-                            <span className="text-sm drop-shadow-lg leading-tight uppercase font-script text-[1.1rem] transition-colors duration-300">{btn.label}</span>
-                        </motion.a>
-                    )
-                })}
+                {buttons.map((btn, i) => (
+                    <TabletGhostButton key={btn.label} btn={btn} i={i} progress={progress} lenis={lenis} />
+                ))}
             </motion.div>
         </motion.div>
     )
