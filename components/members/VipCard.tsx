@@ -134,7 +134,7 @@ export default function VipCard({ referralCode, referralCount, vipPayload, onLoa
                 <div className="absolute inset-x-0 top-0 bottom-[120px] z-10 flex flex-col">
 
                     {/* QR Code Container - positioned over the white square on the webp art */}
-                    <div className="absolute top-[36%] left-1/2 -translate-x-1/2 w-[35%] aspect-square flex items-center justify-center group/qr cursor-pointer">
+                    <div className="absolute top-[37.2%] left-[51.5%] -translate-x-1/2 w-[35%] aspect-square flex items-center justify-center group/qr cursor-pointer">
                         {loading || !vip ? (
                             <div className="w-full h-full flex items-center justify-center bg-white/10 backdrop-blur-sm rounded-2xl">
                                 <Loader2 size={24} className="animate-spin text-white/50" />
@@ -155,7 +155,7 @@ export default function VipCard({ referralCode, referralCount, vipPayload, onLoa
                 {/* Bottom Area - Code & Expiration close to the CHAVE DE ACESSO text on webp art */}
                 <div className="relative z-20 px-4 py-2 pb-6 flex flex-col justify-end bg-gradient-to-t from-[#0c0514] via-[#0c0514]/90 to-transparent -mt-[8rem]">
                     {/* Access Code Row */}
-                    <div className="flex items-center justify-between mb-3 mt-1 px-4">
+                    <div className="flex items-center justify-between mb-3 mt-4 px-4">
                         <span className="font-mono font-bold text-3xl tracking-[0.15em] text-white drop-shadow-md z-10">
                             {vip?.short_code ?? '••••••••'}
                         </span>

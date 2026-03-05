@@ -104,7 +104,7 @@ export function StoreLocations() {
                         viewport={{ once: true }}
                         className="w-full h-[300px] rounded-3xl overflow-hidden shadow-2xl border-4 border-white"
                     >
-                        <AnimatePresence mode="wait">
+                        <AnimatePresence>
                             <motion.div
                                 key={activeStore.id}
                                 initial={{ opacity: 0 }}
@@ -124,7 +124,11 @@ export function StoreLocations() {
                             <button
                                 key={store.id}
                                 type="button"
-                                onClick={() => setActiveStore(store)}
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    e.stopPropagation()
+                                    setActiveStore(store)
+                                }}
                                 className={cn(
                                     "flex-1 py-2.5 px-3 rounded-full text-sm font-bold transition-all duration-250 border",
                                     activeStore.id === store.id
@@ -138,7 +142,7 @@ export function StoreLocations() {
                     </div>
 
                     {/* Info card — active store details */}
-                    <AnimatePresence mode="wait">
+                    <AnimatePresence>
                         <motion.div
                             key={activeStore.id}
                             initial={{ opacity: 0, y: 8 }}
