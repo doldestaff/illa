@@ -295,12 +295,12 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                                 </div>
 
                                 {/* ÔöÇÔöÇ Row 2: Description ÔöÇÔöÇ */}
-                                <p className="text-white/60 font-medium text-sm md:text-base mb-6 max-w-sm">
+                                <p className="text-white/60 font-medium text-sm md:text-base mb-2 md:mb-6 max-w-sm">
                                     Explore seu painel ILLA e ganhe recompensas exclusivas.
                                 </p>
 
                                 {/* ÔöÇÔöÇ MOBILE-ONLY: Counters + XP Bar ÔöÇÔöÇ */}
-                                <div className="md:hidden w-full flex flex-col items-center mt-5">
+                                <div className="md:hidden w-full flex flex-col items-center mt-1">
                                     <div className="flex w-full overflow-hidden items-center justify-center gap-1.5 sm:gap-2 mb-6 px-1">
 
                                         {/* Drops ÔåÆ Ba├║ Gamer */}
