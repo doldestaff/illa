@@ -119,18 +119,14 @@ export function StoreLocations() {
                     </motion.div>
 
                     {/* Store pill tabs — thumb zone */}
-                    <div className="flex gap-2 justify-center px-1">
+                    <div className="flex gap-2 justify-center px-1 relative z-30">
                         {stores.map((store) => (
                             <button
                                 key={store.id}
                                 type="button"
-                                onClick={(e) => {
-                                    e.preventDefault()
-                                    e.stopPropagation()
-                                    setActiveStore(store)
-                                }}
+                                onClick={() => setActiveStore(store)}
                                 className={cn(
-                                    "flex-1 py-2.5 px-3 rounded-full text-sm font-bold transition-all duration-250 border",
+                                    "flex-1 py-2.5 px-3 rounded-full text-sm font-bold transition-all duration-250 border relative z-30",
                                     activeStore.id === store.id
                                         ? "bg-illa-pink text-white border-illa-pink shadow-md shadow-pink-200/50"
                                         : "bg-white text-dark/50 border-gray-200 hover:border-illa-pink/30"
@@ -180,13 +176,10 @@ export function StoreLocations() {
                             </div>
 
                             {/* CTAs */}
-                            <div className="flex gap-3 pl-[52px]">
+                            <div className="flex gap-3 pl-[52px] relative z-20">
                                 <button
                                     type="button"
-                                    onClick={(e) => {
-                                        e.stopPropagation()
-                                        window.open(activeStore.mapUrl, '_blank', 'noopener,noreferrer')
-                                    }}
+                                    onClick={() => window.open(activeStore.mapUrl, '_blank', 'noopener,noreferrer')}
                                     className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full bg-illa-pink text-white text-sm font-bold shadow-sm hover:shadow-md transition-all"
                                 >
                                     <Navigation size={14} />
@@ -194,10 +187,7 @@ export function StoreLocations() {
                                 </button>
                                 <button
                                     type="button"
-                                    onClick={(e) => {
-                                        e.stopPropagation()
-                                        window.open(activeStore.mapUrl, '_blank', 'noopener,noreferrer')
-                                    }}
+                                    onClick={() => window.open(activeStore.mapUrl, '_blank', 'noopener,noreferrer')}
                                     className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-full border border-gray-200 text-dark/60 text-sm font-bold hover:border-illa-pink/30 hover:text-illa-pink transition-all"
                                 >
                                     <ExternalLink size={14} />
@@ -282,7 +272,6 @@ export function StoreLocations() {
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="text-sm font-bold flex items-center gap-2 text-gray-400 hover:text-illa-pink transition-colors"
-                                            onClick={(e) => e.stopPropagation()}
                                         >
                                             Abrir no Google Maps
                                         </a>
