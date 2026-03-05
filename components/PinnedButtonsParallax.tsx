@@ -405,10 +405,10 @@ export function PinnedButtonsParallax() {
                             }}
                             className={cn(
                                 'absolute inset-0 m-auto overflow-hidden',
-                                'w-[85vw] max-w-[360px] md:max-w-[520px] h-[360px] md:h-[480px]',
+                                'w-[85vw] max-w-[360px] md:max-w-[460px] h-[360px] md:h-[420px]',
                                 'bg-white/80 border border-white/60',
                                 'rounded-[3rem] shadow-[0_8px_48px_0_rgba(255,255,255,0.4),0_2px_8px_0_rgba(0,0,0,0.08)]',
-                                'flex flex-col items-center justify-center text-center p-6 md:p-10',
+                                'flex flex-col items-center justify-center text-center p-6 md:p-8',
                                 'cursor-pointer group',
                                 'hover:bg-white/45 hover:border-white/80 hover:shadow-[0_12px_60px_0_rgba(255,255,255,0.6)]',
                                 'transition-shadow duration-500',
@@ -425,29 +425,29 @@ export function PinnedButtonsParallax() {
                             <div className="card-content relative z-10 flex flex-col items-center gap-4 md:gap-6">
                                 <div
                                     className={cn(
-                                        'card-icon w-20 h-20 md:w-28 md:h-28 rounded-full flex items-center justify-center',
+                                        'card-icon w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center',
                                         'bg-white/90 shadow-lg ring-2 ring-white/50',
                                         'text-illa-pink',
                                         'group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 ease-out',
                                     )}
                                 >
-                                    <card.icon size={32} className="md:w-[48px] md:h-[48px]" strokeWidth={1.5} />
+                                    <card.icon size={32} className="md:w-10 md:h-10" strokeWidth={1.5} />
                                 </div>
 
                                 <div className="space-y-3">
                                     <h3
-                                        className="font-bold text-3xl md:text-5xl font-script text-transparent uppercase tracking-tight"
+                                        className="font-bold text-3xl md:text-4xl font-script text-transparent uppercase tracking-tight"
                                         style={{ WebkitTextStroke: '1.5px #E5017D' }}
                                     >
                                         {card.title}
                                     </h3>
-                                    <p className="text-[#2D2D30] font-medium leading-relaxed max-w-[270px] md:max-w-[320px] mx-auto text-sm md:text-base tracking-wide opacity-80 transition-opacity group-hover:opacity-100">
+                                    <p className="text-[#2D2D30] font-medium leading-relaxed max-w-[270px] md:max-w-[280px] mx-auto text-sm md:text-base tracking-wide opacity-80 transition-opacity group-hover:opacity-100">
                                         {card.description}
                                     </p>
                                 </div>
 
-                                <div className="mt-2 md:mt-4 flex items-center gap-2 text-xs md:text-sm font-bold uppercase tracking-[0.15em] text-white bg-illa-pink/85 px-6 py-3 md:px-8 md:py-4 rounded-full shadow-[0_4px_12px_rgba(229,1,125,0.2)] group-hover:bg-illa-pink group-hover:shadow-[0_8px_24px_rgba(229,1,125,0.4)] transition-all duration-300 transform group-hover:-translate-y-0.5">
-                                    {card.label} <ArrowRight size={14} className="md:w-5 md:h-5 md:ml-1 group-hover:translate-x-0.5 transition-transform" />
+                                <div className="mt-2 md:mt-4 flex items-center gap-2 text-xs md:text-sm font-bold uppercase tracking-[0.15em] text-white bg-illa-pink/85 px-6 py-3 md:px-7 md:py-3.5 rounded-full shadow-[0_4px_12px_rgba(229,1,125,0.2)] group-hover:bg-illa-pink group-hover:shadow-[0_8px_24px_rgba(229,1,125,0.4)] transition-all duration-300 transform group-hover:-translate-y-0.5">
+                                    {card.label} <ArrowRight size={14} className="md:w-4 md:h-4 md:ml-1 group-hover:translate-x-0.5 transition-transform" />
                                 </div>
                             </div>
                         </a>
