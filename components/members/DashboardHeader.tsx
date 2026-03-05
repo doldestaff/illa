@@ -300,7 +300,7 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                                 </p>
 
                                 {/* ÔöÇÔöÇ MOBILE-ONLY: Counters + XP Bar ÔöÇÔöÇ */}
-                                <div className="md:hidden w-full flex flex-col items-center mt-1">
+                                <div className="md:hidden w-full flex flex-col items-center mt-2">
                                     <div className="flex w-full overflow-hidden items-center justify-center gap-1.5 sm:gap-2 mb-6 px-1">
 
                                         {/* Drops ÔåÆ Ba├║ Gamer */}
