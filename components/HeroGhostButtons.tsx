@@ -1,7 +1,7 @@
 'use client'
 
-import { motion, AnimatePresence, useTransform, MotionValue } from 'framer-motion'
-import { MessageCircle, MapPin, Info, Phone, ShoppingBag, Store, ChevronDown } from 'lucide-react'
+import { motion, useTransform, MotionValue } from 'framer-motion'
+import { MessageCircle, MapPin, ShoppingBag, Store } from 'lucide-react'
 import { useLenis } from 'lenis/react'
 
 interface HeroGhostButtonsProps {
@@ -93,9 +93,9 @@ function DesktopButtons({ progress }: { progress: MotionValue<number> }) {
     )
 }
 
+// iOS Fix: rotateX/rotateY removed — 3D perspective causes GPU overload on iOS Safari during native scroll
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function MobileGhostButton({ btn, i, progress, lenis, positions }: { btn: typeof buttons[0], i: number, progress: MotionValue<number>, lenis: any, positions: any[] }) {
-    const isLeft = i % 2 === 0
     const targetX = positions[i].x
     const targetY = positions[i].y
 
@@ -103,11 +103,9 @@ function MobileGhostButton({ btn, i, progress, lenis, positions }: { btn: typeof
     const expandEnd = Math.min(0.8, delayStart + 0.25)
 
     const x = useTransform(progress, [0.15, expandEnd], [0, targetX])
-    const y = useTransform(progress, [0.15, expandEnd], [100, targetY])
-    const rotateX = useTransform(progress, [0, 0.5], [60, 0])
-    const rotateY = useTransform(progress, [0, 0.5], [isLeft ? -30 : 30, 0])
-    const scale = useTransform(progress, [0, 0.4], [0.5, 1])
-    const opacity = useTransform(progress, [0, 0.2, 0.8, 1], [0, 1, 1, 0])
+    const y = useTransform(progress, [0.15, expandEnd], [20, targetY])
+    const scale = useTransform(progress, [0.15, expandEnd], [0.6, 1])
+    const opacity = useTransform(progress, [0.12, 0.22, 0.78, 0.9], [0, 1, 1, 0])
 
     const isAction = btn.label === 'QUEM SOMOS' || btn.label === 'CONTATO' || btn.label === 'FRANQUIAS' || btn.label === 'LOCALIZAÇÃO'
 
@@ -133,7 +131,7 @@ function MobileGhostButton({ btn, i, progress, lenis, positions }: { btn: typeof
                     }
                 }
             }}
-            style={{ x, y, scale, rotateX, rotateY, opacity, zIndex: 20 - i }}
+            style={{ x, y, scale, opacity, zIndex: 20 - i }}
             className={`
                 group absolute flex flex-col items-center justify-center gap-2 
                 w-[156px] h-[130px] p-4 
@@ -144,9 +142,8 @@ function MobileGhostButton({ btn, i, progress, lenis, positions }: { btn: typeof
                 pointer-events-auto cursor-pointer
                 hover:bg-illa-yellow hover:text-dark hover:border-transparent 
                 active:scale-95 active:bg-illa-yellow/90
-                transition-all duration-300 ease-out
-                ${isLeft ? 'origin-right' : 'origin-left'}
-                will-change-transform [transform:translateZ(0)]
+                transition-colors duration-300 ease-out
+                will-change-transform
             `}
         >
             <btn.icon size={32} className="text-current drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)] transition-transform group-active:scale-90 duration-200" strokeWidth={2.5} />
@@ -177,7 +174,8 @@ function MobileButtons({ progress }: { progress: MotionValue<number> }) {
     const scrollHintY = useTransform(progress, [0, 0.05], [0, 10])
 
     return (
-        <motion.div style={{ opacity: fadeOpacity }} className="absolute bottom-[2vh] left-0 right-0 z-20 flex justify-center items-center pointer-events-none [perspective:1000px]">
+        // iOS Fix: removed [perspective:1000px] — creates a 3D stacking context that crashes iOS GPU
+        <motion.div style={{ opacity: fadeOpacity }} className="absolute bottom-[2vh] left-0 right-0 z-20 flex justify-center items-center pointer-events-none">
             <motion.div style={{ opacity: scrollHintOpacity, y: scrollHintY }} className="absolute top-[40px] flex flex-col items-center gap-3 z-30">
                 <motion.div animate={{ y: [0, 8, 0], opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }} className="w-[1px] h-8 bg-gradient-to-b from-transparent via-white to-transparent shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
                 <p className="text-white/80 uppercase font-bold tracking-[0.3em] text-[9px] text-center font-body flex flex-col items-center gap-0.5 drop-shadow-md">
@@ -187,9 +185,9 @@ function MobileButtons({ progress }: { progress: MotionValue<number> }) {
             </motion.div>
 
             <motion.div style={{ y: yFloat }} className="relative w-full max-w-[360px] h-[300px] flex justify-center items-center">
-                <motion.div style={{ scale: auraScale, opacity: auraOpacity }} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] pointer-events-none z-0 flex items-center justify-center">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(255,107,107,0.7)_0%,rgba(255,202,40,0.5)_40%,transparent_75%)] rounded-full" />
-                    <div className="absolute w-[50%] h-[50%] bg-[radial-gradient(circle,rgba(255,213,79,0.9)_0%,transparent_70%)] rounded-full" />
+                {/* iOS Fix: aura uses CSS animation instead of framer-motion scale to reduce composite layers */}
+                <motion.div style={{ opacity: auraOpacity }} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] pointer-events-none z-0 flex items-center justify-center">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(255,107,107,0.6)_0%,rgba(255,202,40,0.4)_40%,transparent_75%)] rounded-full" />
                 </motion.div>
 
                 {buttons.map((btn, i) => (
@@ -211,12 +209,11 @@ function TabletGhostButton({ btn, i, progress, lenis }: { btn: typeof buttons[0]
     const delayStart = 0.15 + (i * 0.04)
     const expandEnd = Math.min(0.8, delayStart + 0.25)
 
+    // iOS Fix: rotateX/rotateY removed — 3D transforms cause GPU crash on iOS Safari during scroll
     const x = useTransform(progress, [0.15, expandEnd], [0, targetX])
-    const y = useTransform(progress, [0.15, expandEnd], [100, targetY])
-    const rotateX = useTransform(progress, [0.15, expandEnd], [60, 0])
-    const rotateY = useTransform(progress, [0.15, expandEnd], [isLeft ? 45 : -45, 0])
-    const scale = useTransform(progress, [0.15, expandEnd - 0.05, expandEnd], [0.2, 1.1, 1])
-    const opacity = useTransform(progress, [delayStart, delayStart + 0.1], [0, 1])
+    const y = useTransform(progress, [0.15, expandEnd], [40, targetY])
+    const scale = useTransform(progress, [0.15, expandEnd - 0.05, expandEnd], [0.5, 1.05, 1])
+    const opacity = useTransform(progress, [delayStart, delayStart + 0.15], [0, 1])
 
     const isAction = btn.label === 'QUEM SOMOS' || btn.label === 'CONTATO' || btn.label === 'FRANQUIAS' || btn.label === 'LOCALIZAÇÃO'
 
@@ -242,7 +239,7 @@ function TabletGhostButton({ btn, i, progress, lenis }: { btn: typeof buttons[0]
                     }
                 }
             }}
-            style={{ x, y, scale, rotateX, rotateY, opacity }}
+            style={{ x, y, scale, opacity }}
             className="
                 group absolute flex flex-col items-center justify-center gap-4 
                 w-[240px] h-[140px] p-6 z-10
@@ -253,10 +250,10 @@ function TabletGhostButton({ btn, i, progress, lenis }: { btn: typeof buttons[0]
                 hover:bg-illa-yellow hover:text-dark hover:border-transparent 
                 hover:scale-105 hover:z-50
                 active:scale-95 active:bg-illa-yellow/90
-                transition-all duration-300 ease-out
+                transition-colors duration-300 ease-out
                 shadow-[0_12px_30px_-6px_rgba(229,1,125,0.7),inset_0_2px_8px_rgba(255,255,255,0.3)]
                 hover:shadow-[0_0_80px_rgba(255,223,0,0.8),inset_0_4px_16px_rgba(255,255,255,0.8)]
-                will-change-transform [transform:translateZ(0)]
+                will-change-transform
             "
         >
             <btn.icon size={48} className="text-current drop-shadow-md transition-transform group-hover:scale-110 duration-300" strokeWidth={2.5} />
@@ -276,7 +273,8 @@ function TabletButtons({ progress }: { progress: MotionValue<number> }) {
     const scrollHintY = useTransform(progress, [0, 0.05], [0, 20])
 
     return (
-        <motion.div style={{ opacity: fadeOpacity }} className="absolute bottom-[5vh] md:bottom-[15vh] left-0 right-0 z-20 flex justify-center items-center pointer-events-none [perspective:1200px]">
+        // iOS Fix: removed [perspective:1200px] — creates 3D context that taxes iOS GPU alongside canvas
+        <motion.div style={{ opacity: fadeOpacity }} className="absolute bottom-[5vh] md:bottom-[15vh] left-0 right-0 z-20 flex justify-center items-center pointer-events-none">
             <motion.div style={{ opacity: scrollHintOpacity, y: scrollHintY }} className="absolute top-[80px] flex flex-col items-center gap-4 z-30">
                 <motion.div animate={{ y: [0, 10, 0], opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }} className="w-[1px] h-12 bg-gradient-to-b from-transparent via-white to-transparent shadow-[0_0_10px_rgba(255,255,255,0.8)]" />
                 <p className="text-white/80 uppercase font-bold tracking-[0.4em] text-[10px] md:text-sm text-center font-body flex flex-col items-center gap-1 drop-shadow-xl">

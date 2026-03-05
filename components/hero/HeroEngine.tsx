@@ -235,6 +235,8 @@ export function HeroEngine({
             state.current.pendingDraw = true
             requestAnimationFrame(() => {
                 state.current.pendingDraw = false
+                // iOS Fix: skip draw if dimensions not yet measured (prevents 0x0 canvas on first paint)
+                if (state.current.appWidth === 0 || state.current.appHeight === 0) return
                 draw(state.current.targetFrameIndex, true)
             })
         }
@@ -554,13 +556,16 @@ export function HeroEngine({
         window.addEventListener('scroll', handleScroll, { passive: true })
 
         // --- Critical Fix for Initial Render ---
-        // Force an immediate draw using the start index before any scroll calculation happens
+        // iOS Fix: defer initial draw via double-rAF to ensure resize handler has set appWidth/Height first
         window.requestAnimationFrame(() => {
-            if (onProgress) onProgress(0); // Ensure ghost buttons get initial progress = 0
-            draw(startIndex || 0, true);
-            // Then let the scroll handler update it if we are already scrolled down
-            handleScroll();
-        });
+            window.requestAnimationFrame(() => {
+                if (onProgress) onProgress(0)
+                if (state.current.appWidth > 0 && state.current.appHeight > 0) {
+                    draw(startIndex || 0, true)
+                }
+                handleScroll()
+            })
+        })
 
         return () => {
             window.removeEventListener('scroll', handleScroll)

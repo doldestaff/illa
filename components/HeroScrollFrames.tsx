@@ -72,7 +72,7 @@ export function HeroScrollFrames() {
             className="relative w-full z-10"
             style={{ height: `${SCROLL_HEIGHT_vh}vh` }}
         >
-            <div className="sticky top-0 w-full h-[100vh] min-h-[100dvh] overflow-hidden bg-[#111]">
+            <div className="sticky top-0 w-full h-[100dvh] min-h-[100dvh] overflow-hidden bg-[#111]">
 
                 {/* Unified Engine — inline manifest eliminates fetch waterfall */}
                 <HeroEngine
