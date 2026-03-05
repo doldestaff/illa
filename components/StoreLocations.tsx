@@ -124,11 +124,7 @@ export function StoreLocations() {
                             <button
                                 key={store.id}
                                 type="button"
-                                onClick={(e) => {
-                                    e.preventDefault()
-                                    e.stopPropagation()
-                                    setActiveStore(store)
-                                }}
+                                onClick={() => setActiveStore(store)}
                                 className={cn(
                                     "flex-1 py-2.5 px-3 rounded-full text-sm font-bold transition-all duration-250 border",
                                     activeStore.id === store.id

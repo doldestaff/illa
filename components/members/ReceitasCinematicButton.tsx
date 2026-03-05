@@ -26,19 +26,24 @@ export default function ReceitasCinematicButton() {
                     {/* Image Area - Cinematic Banner */}
                     <div className="w-full md:w-2/5 h-48 md:h-full relative overflow-hidden bg-black/50">
                         <Image
-                            src="/receitas-ocultas/receitas-banner.webp"
+                            src="/receitas-ocultas/receitas-bg-mobile.webp"
                             alt="Receitas Ocultas ILLA"
                             fill
                             priority
                             className="object-cover transition-transform duration-[3s] group-hover:scale-110"
-                            quality={90}
+                            quality={100}
                         />
-                        {/* Overlay Gradient for seamless blend */}
-                        <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#0B0B0D] via-transparent to-transparent opacity-90" />
+                        {/* Overlay Gradient for seamless blend - Maintaining modal cinematic feel */}
+                        <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#0B0B0D] via-[#0B0B0D]/80 to-transparent opacity-100" />
+                        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 via-transparent to-pink-500/10 opacity-60 group-hover:opacity-100 transition-opacity duration-700" />
                     </div>
 
                     {/* Text Area */}
                     <div className="w-full md:w-3/5 p-8 flex flex-col justify-center relative z-20">
+                        {/* Background Glow for Text Area - Cinematic Modal Aesthetic */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/[0.03] to-pink-500/[0.03] -z-10 pointer-events-none" />
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-amber-500/[0.02] blur-[100px] rounded-full -z-10 pointer-events-none group-hover:bg-amber-500/[0.05] transition-colors duration-700" />
+
                         <div className="flex flex-wrap md:flex-nowrap items-center gap-1.5 md:gap-2 mb-3">
                             <span className="px-1.5 md:px-3 py-0.5 md:py-1 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-400 text-[8px] md:text-xs font-black tracking-widest uppercase flex items-center gap-1 md:gap-1.5 shadow-[0_0_15px_rgba(245,158,11,0.2)] whitespace-nowrap shrink-0">
                                 <Sparkles className="w-2 md:w-3 h-2 md:h-3" />
