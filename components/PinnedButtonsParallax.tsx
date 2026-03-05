@@ -435,7 +435,10 @@ export function PinnedButtonsParallax() {
                                 </div>
 
                                 <div className="space-y-3">
-                                    <h3 className="font-bold text-3xl md:text-5xl font-script bg-clip-text text-transparent bg-gradient-to-br from-white via-white/95 to-white/70 [filter:drop-shadow(3px_3px_0px_#E5017D)] uppercase tracking-tight">
+                                    <h3
+                                        className="font-bold text-3xl md:text-5xl font-script text-white uppercase tracking-tight"
+                                        style={{ WebkitTextStroke: '1.5px #E5017D' }}
+                                    >
                                         {card.title}
                                     </h3>
                                     <p className="text-[#2D2D30] font-medium leading-relaxed max-w-[270px] md:max-w-[320px] mx-auto text-sm md:text-base tracking-wide opacity-80 transition-opacity group-hover:opacity-100">
