@@ -165,7 +165,8 @@ function MobileButtons({ progress }: { progress: MotionValue<number> }) {
     ]
 
     const fadeOpacity = useTransform(progress, [0.95, 1], [1, 0])
-    const yFloat = useTransform(progress, [0.15, 0.8], [0, -60])
+    // yFloat removed: floating the container while the hero itself is scroll-driven
+    // creates compound motion that jitters on mobile. Per-button animations are kept.
 
     // auraScale removed for iOS perf
     const auraOpacity = useTransform(progress, [0.15, 0.4, 0.8, 1], [0, 0.6, 0.6, 0])
@@ -184,7 +185,7 @@ function MobileButtons({ progress }: { progress: MotionValue<number> }) {
                 </p>
             </motion.div>
 
-            <motion.div style={{ y: yFloat }} className="relative w-full max-w-[360px] h-[300px] flex justify-center items-center">
+            <div className="relative w-full max-w-[360px] h-[300px] flex justify-center items-center">
                 {/* iOS Fix: aura uses CSS animation instead of framer-motion scale to reduce composite layers */}
                 <motion.div style={{ opacity: auraOpacity }} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] pointer-events-none z-0 flex items-center justify-center">
                     <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(255,107,107,0.6)_0%,rgba(255,202,40,0.4)_40%,transparent_75%)] rounded-full" />
@@ -193,7 +194,7 @@ function MobileButtons({ progress }: { progress: MotionValue<number> }) {
                 {buttons.map((btn, i) => (
                     <MobileGhostButton key={btn.label} btn={btn} i={i} progress={progress} lenis={lenis} positions={positions} />
                 ))}
-            </motion.div>
+            </div>
         </motion.div>
     )
 }

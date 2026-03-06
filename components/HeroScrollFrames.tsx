@@ -42,9 +42,9 @@ export function HeroScrollFrames() {
     if (isMobile === null || isTablet === null) return (
         <section
             className="relative w-full z-10"
-            style={{ height: '100vh' }}
+            style={{ height: `${MOBILE_HEIGHT_vh}vh` }}
         >
-            <div className="sticky top-0 w-full h-[100vh] min-h-[100dvh] overflow-hidden bg-[#111]">
+            <div className="sticky top-0 w-full overflow-hidden bg-[#111]" style={{ height: '100svh' }}>
                 {/* SSR skeleton — high priority poster to prevent flash, but SYNCHRONOUS decoding so iOS doesn't panic on hydration switch */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -73,7 +73,10 @@ export function HeroScrollFrames() {
             className="relative w-full z-10"
             style={{ height: `${SCROLL_HEIGHT_vh}vh` }}
         >
-            <div className="sticky top-0 w-full h-[100dvh] min-h-[100dvh] overflow-hidden bg-[#111]">
+            {/* svh = small viewport height: stable value that does NOT change when the
+                Android Chrome URL bar shows/hides. Using dvh (dynamic) here would cause
+                the sticky container to resize mid-scroll → hero jump bug. */}
+            <div className="sticky top-0 w-full overflow-hidden bg-[#111]" style={{ height: '100svh' }}>
 
                 {/* Unified Engine — inline manifest eliminates fetch waterfall */}
                 <HeroEngine

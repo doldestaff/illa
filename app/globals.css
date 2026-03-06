@@ -138,7 +138,10 @@
 html,
 body {
   overscroll-behavior: none;
-  /* Explicit touch-action is removed as it severely conflicts with mobile Safari rendering limits on 100vh sticky nodes */
+  /* pan-y: tells iOS Safari this is a vertical scroll surface.
+     Prevents horizontal swipe detection overhead that caused scroll jitter.
+     Safe to use alongside overscroll-behavior: none. */
+  touch-action: pan-y;
 }
 
 body {

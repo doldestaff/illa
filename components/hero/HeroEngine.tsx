@@ -161,52 +161,46 @@ export function HeroEngine({
         return () => { active = false }
     }, [manifestUrl, inlineManifest, manualFrames])
 
-    // --- 2. Resize Handler (Stable & Debounced) ---
+    // --- 2. Resize Handler (Split: immediate dimension update + debounced redraw) ---
     useEffect(() => {
-        let resizeTimer: NodeJS.Timeout
+        let redrawTimer: NodeJS.Timeout
 
         const handleResize = () => {
-            clearTimeout(resizeTimer)
-            resizeTimer = setTimeout(() => {
-                const h = window.visualViewport ? window.visualViewport.height : window.innerHeight
-                const w = window.visualViewport ? window.visualViewport.width : window.innerWidth
+            // CRITICAL: Update dimensions IMMEDIATELY — no debounce.
+            // URL bar hide/show on Android Chrome changes visualViewport.height instantly.
+            // The scroll handler fires synchronously, so appHeight must always be current.
+            const h = window.visualViewport ? window.visualViewport.height : window.innerHeight
+            const w = window.visualViewport ? window.visualViewport.width : window.innerWidth
 
-                // Only update if dimensions actually changed significantly (prevent URL bar hide jitter)
-                if (Math.abs(state.current.appHeight - h) < 60 &&
-                    Math.abs(state.current.appWidth - w) < 1) return
+            state.current.appHeight = h
+            state.current.appWidth = w
+            state.current.isMobile = w < 768
+            state.current.isTablet = w >= 768 && w < 1024
 
-                state.current.appHeight = h
-                state.current.appWidth = w
+            const isBackgroundMode = scrollMode === 'document'
+            state.current.cache.setLimit((state.current.isMobile || state.current.isTablet) ? (isBackgroundMode ? 90 : 100) : 100)
 
-                // Mobile & Tablet detection for perf & math
-                state.current.isMobile = w < 768
-                state.current.isTablet = w >= 768 && w < 1024
+            if (containerRef.current) {
+                containerRef.current.style.setProperty('--app-h', `${h}px`)
+            }
 
-                // PERFORMANCE: Background areas like members dash have 82 frames.
-                // We MUST set the cache equal or slightly larger to prevent reload-thrashing looping.
-                const isBackgroundMode = scrollMode === 'document'
-                state.current.cache.setLimit((state.current.isMobile || state.current.isTablet) ? (isBackgroundMode ? 90 : 100) : 100)
-
-                if (containerRef.current) {
-                    containerRef.current.style.setProperty('--app-h', `${h}px`)
-                }
-
-                // Force redraw on resize
-                scheduleDraw()
-            }, 150) // Debounce 150ms for stability
+            // Debounce only the expensive canvas resize + redraw
+            // (prevents too-frequent canvas resizing during continuous resize events)
+            clearTimeout(redrawTimer)
+            redrawTimer = setTimeout(() => scheduleDraw(), 150)
         }
 
         window.addEventListener('resize', handleResize)
         if (window.visualViewport) window.visualViewport.addEventListener('resize', handleResize)
 
-        // Initial call without debounce
+        // Initial call
         const h = window.visualViewport ? window.visualViewport.height : window.innerHeight
         const w = window.visualViewport ? window.visualViewport.width : window.innerWidth
         state.current.appHeight = h
         state.current.appWidth = w
         state.current.isMobile = w < 768
         state.current.isTablet = w >= 768 && w < 1024
-        setIsMobileHero(w < 768 || (w >= 768 && w < 1024)) // Let tablet also skip the poster fade sequence
+        setIsMobileHero(w < 768 || (w >= 768 && w < 1024))
 
         const isBackgroundMode = scrollMode === 'document'
         state.current.cache.setLimit((state.current.isMobile || state.current.isTablet) ? (isBackgroundMode ? 90 : 100) : 100)
@@ -216,7 +210,7 @@ export function HeroEngine({
         return () => {
             window.removeEventListener('resize', handleResize)
             if (window.visualViewport) window.visualViewport.removeEventListener('resize', handleResize)
-            clearTimeout(resizeTimer)
+            clearTimeout(redrawTimer)
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [scrollMode])
@@ -521,8 +515,10 @@ export function HeroEngine({
                     let progress = 0
 
                     if (scrollMode === 'viewport') {
-                        // No forced reflow — use cached appHeight and known section height
-                        const vh = state.current.appHeight || window.innerHeight
+                        // FIX: Always read fresh viewport height — do NOT use cached appHeight here.
+                        // On Android Chrome, the URL bar hide/show changes visualViewport.height instantly.
+                        // Using the stale appHeight would cause jump bugs when the bar appears/disappears.
+                        const vh = (window.visualViewport ? window.visualViewport.height : window.innerHeight) || window.innerHeight
                         const totalH = vh * ((scrollSectionHeightVh || 500) / 100)
                         const scrollable = totalH - vh
                         progress = scrollable > 0 ? Math.max(0, Math.min(1, scrollY / scrollable)) : 0
@@ -531,7 +527,8 @@ export function HeroEngine({
                         const docH = Math.max(
                             document.body.scrollHeight, document.documentElement.scrollHeight
                         )
-                        const limit = docH - (state.current.appHeight || window.innerHeight)
+                        const vh = (window.visualViewport ? window.visualViewport.height : window.innerHeight) || window.innerHeight
+                        const limit = docH - vh
                         progress = limit > 0 ? Math.max(0, Math.min(1, scrollY / limit)) : 0
                     }
 
