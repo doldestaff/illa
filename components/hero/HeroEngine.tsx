@@ -83,7 +83,6 @@ export function HeroEngine({
     manualFrames,
     posterUrl,
     className,
-    priorityFrames = [],
     scrollMode = 'viewport',
     scrollSectionHeightVh = 500,
     onProgress,
@@ -219,6 +218,7 @@ export function HeroEngine({
             if (window.visualViewport) window.visualViewport.removeEventListener('resize', handleResize)
             clearTimeout(resizeTimer)
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [scrollMode])
 
     // Helper to get URL
@@ -240,6 +240,7 @@ export function HeroEngine({
                 draw(state.current.targetFrameIndex, true)
             })
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const loadFrame = useCallback(async (index: number, priority = false) => {
@@ -297,7 +298,7 @@ export function HeroEngine({
                 } else {
                     throw new Error('Skip Bitmap on Mobile')
                 }
-            } catch (bitmapError) {
+            } catch {
                 // Fallback to Image element if createImageBitmap fails or is unsupported
                 frameSource = await new Promise<HTMLImageElement>((resolve, reject) => {
                     const img = new Image()
@@ -326,6 +327,7 @@ export function HeroEngine({
         } finally {
             state.current.inflight.delete(index)
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [manifest, getUrl, scrollMode])
 
     // Initial Load
@@ -571,6 +573,7 @@ export function HeroEngine({
             window.removeEventListener('scroll', handleScroll)
             if (lerpRafId) cancelAnimationFrame(lerpRafId)
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [manifest, scrollMode, scrollSectionHeightVh, startIndex, onProgress])
 
     // --- 6. Background Preloader ---

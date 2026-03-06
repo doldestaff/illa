@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { Sparkles, ArrowRight, Play, Film } from 'lucide-react'
+import { Sparkles, ArrowRight, Play } from 'lucide-react'
 import Image from 'next/image'
 
 export default function ReceitasCinematicButton() {

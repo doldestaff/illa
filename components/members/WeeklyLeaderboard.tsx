@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { useState } from 'react'
 import type { LeaderboardEntry } from '@/lib/gamification-types'
 import { Trophy, Medal, ChevronRight } from 'lucide-react'

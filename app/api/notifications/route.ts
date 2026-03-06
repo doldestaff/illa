@@ -30,7 +30,7 @@ export async function GET(request: Request) {
     }
 
     // Also get unread count
-    const { count, error: countError } = await supabase
+    const { count } = await supabase
         .from('notifications')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', user.id)

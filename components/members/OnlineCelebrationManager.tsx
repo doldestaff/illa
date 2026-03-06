@@ -5,7 +5,7 @@ import type { CelebrationWindow, CelebrationClaimResult } from '@/lib/gamificati
 import { motion, AnimatePresence } from 'framer-motion'
 import { Clock, AlertCircle, ChevronRight, Coins, X } from 'lucide-react'
 import GlobalCoin from '@/components/ui/GlobalCoin'
-import Link from 'next/link'
+
 
 interface Props {
     onClaim: (result: CelebrationClaimResult) => void

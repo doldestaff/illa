@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 'use client'
 
 import type { RecipeItem } from '@/lib/gamification-types'
@@ -24,8 +25,8 @@ export default function RecipesLibrary({ recipes, onToggle }: Props) {
                     <div
                         key={recipe.id}
                         className={`relative rounded-2xl border bg-white/80 backdrop-blur-sm p-4 transition-all ${recipe.is_locked
-                                ? 'border-gray-200/50 opacity-70'
-                                : 'border-gray-200/60 hover:shadow-md'
+                            ? 'border-gray-200/50 opacity-70'
+                            : 'border-gray-200/60 hover:shadow-md'
                             }`}
                     >
                         {recipe.is_locked && (
@@ -82,8 +83,8 @@ export default function RecipesLibrary({ recipes, onToggle }: Props) {
                                 <button
                                     onClick={() => onToggle(recipe.id, 'saved', !recipe.saved)}
                                     className={`p-2 rounded-xl transition-all ${recipe.saved
-                                            ? 'bg-blue-50 text-blue-500'
-                                            : 'text-gray-300 hover:text-blue-400 hover:bg-blue-50/50'
+                                        ? 'bg-blue-50 text-blue-500'
+                                        : 'text-gray-300 hover:text-blue-400 hover:bg-blue-50/50'
                                         }`}
                                     title="Salvar"
                                 >
@@ -92,8 +93,8 @@ export default function RecipesLibrary({ recipes, onToggle }: Props) {
                                 <button
                                     onClick={() => onToggle(recipe.id, 'favorited', !recipe.favorited)}
                                     className={`p-2 rounded-xl transition-all ${recipe.favorited
-                                            ? 'bg-red-50 text-red-500'
-                                            : 'text-gray-300 hover:text-red-400 hover:bg-red-50/50'
+                                        ? 'bg-red-50 text-red-500'
+                                        : 'text-gray-300 hover:text-red-400 hover:bg-red-50/50'
                                         }`}
                                     title="Favoritar"
                                 >
@@ -102,8 +103,8 @@ export default function RecipesLibrary({ recipes, onToggle }: Props) {
                                 <button
                                     onClick={() => onToggle(recipe.id, 'done', !recipe.done)}
                                     className={`p-2 rounded-xl transition-all ${recipe.done
-                                            ? 'bg-emerald-50 text-emerald-500'
-                                            : 'text-gray-300 hover:text-emerald-400 hover:bg-emerald-50/50'
+                                        ? 'bg-emerald-50 text-emerald-500'
+                                        : 'text-gray-300 hover:text-emerald-400 hover:bg-emerald-50/50'
                                         }`}
                                     title="Feito"
                                 >

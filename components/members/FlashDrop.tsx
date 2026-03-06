@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import type { ActiveDrop, SurpriseDrop } from '@/lib/gamification-types'
-import { IceCream, Clock, PackageCheck, Loader2, Gift, HelpCircle, X, Zap, Radio, AlertCircle } from 'lucide-react'
+import { Clock, PackageCheck, Loader2, Gift, HelpCircle, Zap, Radio } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { RARITY_STYLES, SURPRISE_DROPS_CATALOG } from '@/lib/surprise-drops-catalog'
 

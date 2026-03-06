@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { motion, useScroll, useTransform } from 'framer-motion'
+
 
 /**
  * MembersScrollBackground — Ultra-lightweight background for the Members Dashboard.
@@ -21,14 +21,7 @@ const POSTER_MOBILE = '/members-bg/IllaMembers-mobile_001.webp'
 
 export default function MembersScrollBackground() {
     const [isMobile, setIsMobile] = useState(false)
-    const { scrollY } = useScroll()
 
-    // 0px (topo) → Escuro para legibilidade
-    // FIM da página → 0.2 (20% opacidade)
-    const overlayOpacity = useTransform(scrollY, [0, 800], [0.95, 0.2])
-
-    // A imagem também respira junto
-    const imageOpacity = useTransform(scrollY, [0, 800], [0.4, 0.8])
 
     // Detect mobile once on mount
     useEffect(() => {

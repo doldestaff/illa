@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -137,10 +138,10 @@ export default function FullRankingModal({ isOpen, onClose, currentUserId }: Ful
                                                 transition={{ delay: index * 0.02, ease: "easeOut" }}
                                                 key={entry.user_id}
                                                 className={`flex items-center gap-4 px-4 py-3.5 rounded-[1.2rem] border transition-all ${isCurrentUser
-                                                        ? 'bg-illa-pink/10 border-illa-pink/30 shadow-[0_0_20px_rgba(229,1,125,0.15)] ring-1 ring-illa-pink/20'
-                                                        : isTop3
-                                                            ? 'bg-white/[0.06] border-white/10 backdrop-blur-sm'
-                                                            : 'bg-transparent border-transparent hover:bg-white/[0.02]'
+                                                    ? 'bg-illa-pink/10 border-illa-pink/30 shadow-[0_0_20px_rgba(229,1,125,0.15)] ring-1 ring-illa-pink/20'
+                                                    : isTop3
+                                                        ? 'bg-white/[0.06] border-white/10 backdrop-blur-sm'
+                                                        : 'bg-transparent border-transparent hover:bg-white/[0.02]'
                                                     }`}
                                             >
                                                 <div className="w-8 flex justify-center shrink-0">
@@ -148,9 +149,9 @@ export default function FullRankingModal({ isOpen, onClose, currentUserId }: Ful
                                                 </div>
 
                                                 <div className={`relative w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 border bg-gradient-to-br overflow-hidden shadow-inner ${rank === 1 ? 'from-amber-300 to-yellow-500 border-yellow-200' :
-                                                        rank === 2 ? 'from-gray-300 to-gray-400 border-gray-100' :
-                                                            rank === 3 ? 'from-amber-600 to-amber-700 border-amber-500' :
-                                                                'from-gray-800 to-gray-900 border-white/10'
+                                                    rank === 2 ? 'from-gray-300 to-gray-400 border-gray-100' :
+                                                        rank === 3 ? 'from-amber-600 to-amber-700 border-amber-500' :
+                                                            'from-gray-800 to-gray-900 border-white/10'
                                                     }`}>
                                                     {entry.avatar_path ? (
                                                         <img

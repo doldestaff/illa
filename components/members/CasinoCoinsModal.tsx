@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Sparkles, Coins } from 'lucide-react'
+import { X, Sparkles } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import confetti from 'canvas-confetti'
 import GlobalCoin from '@/components/ui/GlobalCoin'
@@ -18,7 +18,7 @@ function SlotCounter({ value }: { value: number }) {
 
     useEffect(() => {
         // Start from 0 and spin up rapidly
-        let start = 0
+        const start = 0
         const duration = 2000 // 2 seconds spin
         const startTime = performance.now()
 

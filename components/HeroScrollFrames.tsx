@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { HeroGhostButtons } from './HeroGhostButtons'
 import { useMotionValue } from 'framer-motion'
-import { cn } from '@/lib/utils'
 import { HeroEngine } from './hero/HeroEngine'
 
 // PERF: Inline manifest data — eliminates 1 RTT fetch waterfall on first load
@@ -47,11 +46,13 @@ export function HeroScrollFrames() {
         >
             <div className="sticky top-0 w-full h-[100vh] min-h-[100dvh] overflow-hidden bg-[#111]">
                 {/* SSR skeleton — high priority poster to prevent flash, but SYNCHRONOUS decoding so iOS doesn't panic on hydration switch */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                     src="/hero/mobile/frames/hero-1-mobile_004.webp"
                     className="absolute inset-0 w-full h-full object-cover lg:hidden"
                     alt="Illa Loading"
                 />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                     src="/hero/desktop/frames/hero-1-desktop_002.webp"
                     className="absolute inset-0 w-full h-full object-cover hidden lg:block"

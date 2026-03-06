@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import type { LedgerEntry } from '@/lib/gamification-types'
 import { motion } from 'framer-motion'
 import {
-    Target, Zap, Gift, IceCream, PartyPopper, Coins, History
+    Target, Zap, Gift, IceCream, PartyPopper, History
 } from 'lucide-react'
 
 const KIND_CONFIG: Record<string, { icon: React.ComponentType<{ size?: number; className?: string }>; label: string; color: string }> = {

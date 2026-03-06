@@ -167,7 +167,7 @@ function MobileButtons({ progress }: { progress: MotionValue<number> }) {
     const fadeOpacity = useTransform(progress, [0.95, 1], [1, 0])
     const yFloat = useTransform(progress, [0.15, 0.8], [0, -60])
 
-    const auraScale = useTransform(progress, [0.15, 0.4], [0.5, 1.2])
+    // auraScale removed for iOS perf
     const auraOpacity = useTransform(progress, [0.15, 0.4, 0.8, 1], [0, 0.6, 0.6, 0])
 
     const scrollHintOpacity = useTransform(progress, [0, 0.05], [1, 0])

@@ -50,6 +50,7 @@ export function NotificationBell() {
         return () => {
             if (channel) supabase.removeChannel(channel)
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     // Close on click outside

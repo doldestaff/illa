@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Plus, Minus, IceCream, RefreshCw, LogOut, BarChart3, Users, Target, CheckCircle, XCircle, Coins, Droplet, Zap, Trash2, Clock, Gift, Search } from 'lucide-react'
+import { Plus, Minus, IceCream, RefreshCw, LogOut, BarChart3, Users, Target, CheckCircle, Coins, Droplet, Zap, Trash2, Clock, Gift, Search } from 'lucide-react'
 import { createSupabaseBrowser } from '@/lib/supabaseClient'
 import GlobalCoin from '@/components/ui/GlobalCoin'
 import { SURPRISE_DROPS_CATALOG, CATEGORY_LABELS, RARITY_STYLES } from '@/lib/surprise-drops-catalog'

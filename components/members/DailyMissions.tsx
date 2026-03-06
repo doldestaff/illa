@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react'
 import type { MissionInstance } from '@/lib/gamification-types'
-import { Compass, Sparkles, ArrowRight, LayoutGrid, CheckCircle2 } from 'lucide-react'
+import { Compass, Sparkles, ArrowRight, CheckCircle2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import MissionCard from './MissionCard'
 import MissionsModal from './MissionsModal'
@@ -14,7 +14,7 @@ function InteractiveMarquee({ children, onIndexChange }: { children: React.React
     // Interaction/Scroll state tracked purely in refs to avoid React renders
     const isInteractingRef = useRef(false)
     const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-    const onOpenModalRef = useRef<(() => void) | undefined>(undefined)
+
 
     useEffect(() => {
         const container = containerRef.current

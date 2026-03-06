@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
+import { motion, AnimatePresence, useScroll } from 'framer-motion'
 import { ArrowLeft, CheckCircle2, Coins, Play, Sparkles, ChefHat, Camera, Upload, ImageIcon, User, Loader2, Video } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -270,10 +270,7 @@ export default function ReceitasCinematicPage() {
     const fileInputRef = useRef<HTMLInputElement>(null)
     const containerRef = useRef<HTMLDivElement>(null)
 
-    const { scrollYProgress } = useScroll({ target: containerRef })
-    const bgY1 = useTransform(scrollYProgress, [0, 1], ['0%', '50%'])
-    const bgY2 = useTransform(scrollYProgress, [0, 1], ['0%', '-50%'])
-    const bgScale = useTransform(scrollYProgress, [0, 1], [1, 1.2])
+    useScroll({ target: containerRef }) // initialized for side effects if any, or can be removed if not needed? Actually let me just leave it out
 
     // Load completed missions from Supabase on mount
     useEffect(() => {

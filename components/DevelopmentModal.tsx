@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Hammer } from 'lucide-react'
+import { Hammer } from 'lucide-react'
 
 interface DevelopmentModalProps {
     isOpen: boolean

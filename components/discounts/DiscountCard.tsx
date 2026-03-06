@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { CircleDollarSign, Tag } from 'lucide-react'
+import { CircleDollarSign } from 'lucide-react'
 import Image from 'next/image'
 
 interface DiscountOffer {
@@ -60,8 +60,8 @@ export default function DiscountCard({ offer, userPoints, onRedeem, isRedeeming 
                     onClick={() => onRedeem(offer)}
                     disabled={!canAfford || isRedeeming}
                     className={`w-full py-3 rounded-xl font-bold text-sm tracking-wide transition-all ${canAfford
-                            ? 'bg-gradient-to-r from-illa-pink to-purple-600 text-white hover:shadow-lg hover:shadow-illa-pink/25 hover:scale-[1.02] active:scale-[0.98]'
-                            : 'bg-white/5 text-white/30 cursor-not-allowed'
+                        ? 'bg-gradient-to-r from-illa-pink to-purple-600 text-white hover:shadow-lg hover:shadow-illa-pink/25 hover:scale-[1.02] active:scale-[0.98]'
+                        : 'bg-white/5 text-white/30 cursor-not-allowed'
                         }`}
                 >
                     {isRedeeming ? 'Processando...' : canAfford ? 'TROCAR AGORA' : 'Saldo Insuficiente'}

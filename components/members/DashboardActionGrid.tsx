@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { User, Target, Store, ChevronRight } from 'lucide-react'
-import Link from 'next/link'
+
 
 const actions = [
     {

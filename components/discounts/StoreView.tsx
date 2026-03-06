@@ -1,8 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { Coins, History, Tag, LogIn, ArrowLeft, Sparkles } from 'lucide-react'
+import { History, LogIn, ArrowLeft, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 import DiscountCard from './DiscountCard'
 import RedeemModal from './RedeemModal'

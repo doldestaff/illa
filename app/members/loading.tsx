@@ -5,6 +5,7 @@ export default function Loading() {
         <div className="min-h-screen relative font-sans text-white overflow-x-hidden pb-32 bg-[#0B0B0D]">
             {/* Background: First frame image (mobile) + dark fallback (desktop) */}
             <div className="fixed inset-0 z-[-2] bg-[#0B0B0D]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                     src="/members-bg/IllaMembers-mobile_001.webp"
                     alt=""

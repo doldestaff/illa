@@ -143,7 +143,7 @@ export function ScrollFrameCanvasEngine({
                 } else {
                     throw new Error('Skip Bitmap on Mobile to prevent iOS Safari GPU crash')
                 }
-            } catch (bitmapErr) {
+            } catch {
                 bitmap = await new Promise<HTMLImageElement>((resolve, reject) => {
                     // Re-fetch if blob isn't available from the primary try block
                     fetch(url).then(r => r.blob()).then(fallbackBlob => {
@@ -161,7 +161,7 @@ export function ScrollFrameCanvasEngine({
             if (priority || Math.abs(state.current.lastFrameIndex - index) <= 1) {
                 if (drawFn) requestAnimationFrame(() => drawFn(state.current.lastFrameIndex, true))
             }
-        } catch (e) {
+        } catch {
             // Fallback
             const img = new Image()
             img.src = url

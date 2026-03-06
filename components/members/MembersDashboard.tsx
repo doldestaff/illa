@@ -78,7 +78,7 @@ interface Props {
 export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props) {
     const [snapshot, setSnapshot] = useState(initial)
     const [vipPayload, setVipPayload] = useState<VipPayload | null>(null)
-    const [sorvetesCount, setSorvetesCount] = useState(initial.sorvetes_free_count ?? 0)
+    const [sorvetesCount] = useState(initial.sorvetes_free_count ?? 0)
     const [activeModal, setActiveModal] = useState<'history' | 'scanner' | 'sorvetes' | 'invite' | null>(null)
     const progressTracked = useRef(false)
     const { isSupported, isSubscribed, subscribe } = usePushNotifications()
@@ -215,9 +215,7 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
             document.removeEventListener('visibilitychange', handleVisibilityChange)
             window.removeEventListener('popstate', handlePopState)
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
-
 
 
     // ── Update profile from any claim result (server is single source of truth) ──

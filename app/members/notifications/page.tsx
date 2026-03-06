@@ -1,13 +1,8 @@
 'use client'
 
-import Link from 'next/link'
-import Image from 'next/image'
-import { ArrowLeft, Bell, Check, Loader2, Trash2 } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
-import { createSupabaseBrowser } from '@/lib/supabaseClient'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { usePushNotifications } from '@/hooks/usePushNotifications'
-import { useCinematicToasts } from '@/components/notifications/CinematicToastProvider'
 
 interface NotificationItem {
     id: string
@@ -23,10 +18,7 @@ export default function NotificationsPage() {
     const [loading, setLoading] = useState(true)
 
     // New Hook
-    const { isSupported, isSubscribed, loading: pushLoading, toggle } = usePushNotifications()
-    const { showToast } = useCinematicToasts()
-
-    const supabase = createSupabaseBrowser()
+    const { isSupported, isSubscribed, toggle } = usePushNotifications()
 
     const fetchNotifications = async () => {
         try {
@@ -51,7 +43,7 @@ export default function NotificationsPage() {
             body: JSON.stringify({ all: true })
         })
         // Refresh local
-        setNotifications(prev => prev.map(n => ({ ...n, read_at: new Date().toISOString() })))
+        setNotifications((prev: NotificationItem[]) => prev.map((n: NotificationItem) => ({ ...n, read_at: new Date().toISOString() })))
     }
 
     return (
@@ -90,7 +82,7 @@ export default function NotificationsPage() {
                         </button>
                     </div>
 
-                    {notifications.map(n => (
+                    {notifications.map((n: NotificationItem) => (
                         <motion.div
                             key={n.id}
                             initial={{ opacity: 0, y: 10 }}
