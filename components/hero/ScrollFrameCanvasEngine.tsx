@@ -163,11 +163,22 @@ export function ScrollFrameCanvasEngine({
             }
         } catch {
             // Fallback
-            const img = new Image()
-            img.src = url
-            img.onload = () => {
+            try {
+                const img = new Image()
+                img.decoding = 'async'
+                img.src = url
+
+                await img.decode()
+
                 state.current.cache.add(index, img)
                 if (priority && drawFn) requestAnimationFrame(() => drawFn(state.current.lastFrameIndex, true))
+            } catch (decodeError) {
+                const img = new Image()
+                img.src = url
+                img.onload = () => {
+                    state.current.cache.add(index, img)
+                    if (priority && drawFn) requestAnimationFrame(() => drawFn(state.current.lastFrameIndex, true))
+                }
             }
         }
     }, [])

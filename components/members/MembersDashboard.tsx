@@ -246,7 +246,7 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
 
     // ── Mission claim handler ──
     const handleMissionClaim = useCallback(
-        async (instanceId: string) => {
+        async (instanceId: string, customReward?: { xp: number; points: number }) => {
             const res = await fetch('/api/missions/claim', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -269,17 +269,30 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                     })
                 }
 
-                setSnapshot((prev) => ({
-                    ...prev,
-                    missions: prev.missions.map((m) =>
-                        m.instance_id === instanceId ? { ...m, claimed: true } : m
-                    ),
-                }))
-                updateProfileFromClaim(data)
+                setSnapshot((prev) => {
+                    const newXp = customReward ? prev.profile.xp + customReward.xp : data.xp
+                    const newPoints = customReward ? prev.profile.points + customReward.points : data.points
+
+                    return {
+                        ...prev,
+                        missions: prev.missions.map((m) =>
+                            m.instance_id === instanceId ? { ...m, claimed: true } : m
+                        ),
+                        profile: {
+                            ...prev.profile,
+                            xp: newXp,
+                            points: newPoints,
+                            level: data.level ?? prev.profile.level,
+                            xp_into_level: data.xp_into_level ?? prev.profile.xp_into_level,
+                            xp_for_next_level: data.xp_for_next_level ?? prev.profile.xp_for_next_level,
+                            xp_to_next_level: data.xp_to_next_level ?? prev.profile.xp_to_next_level,
+                        }
+                    }
+                })
             }
             return data
         },
-        [snapshot, updateProfileFromClaim, isSupported, isSubscribed, subscribe]
+        [snapshot.missions, isSupported, isSubscribed, subscribe]
     )
 
     // ── Recipe toggle handler (also tracks recipe mission progress) ──

@@ -310,12 +310,27 @@ export function HeroEngine({
         } catch (e: unknown) {
             if ((e as Error).name === 'AbortError') return // Ignore aborted fetches
             // Fallback for Safari/Older browsers or error
-            const img = new Image()
-            img.src = url
-            img.onload = () => {
+            try {
+                const img = new Image()
+                img.decoding = 'async' // PERF: Force async decode
+                img.src = url
+
+                // Wait for the browser to decode the image on a worker thread
+                await img.decode()
+
                 if (!state.current.cache.has(index)) {
                     state.current.cache.add(index, img)
                     if (priority || Math.abs(state.current.targetFrameIndex - index) <= 1) scheduleDraw()
+                }
+            } catch (decodeError) {
+                // If decode() throws (e.g., unsupported format or broken image), fallback to standard onload
+                const img = new Image()
+                img.src = url
+                img.onload = () => {
+                    if (!state.current.cache.has(index)) {
+                        state.current.cache.add(index, img)
+                        if (priority || Math.abs(state.current.targetFrameIndex - index) <= 1) scheduleDraw()
+                    }
                 }
             }
         } finally {
@@ -615,9 +630,9 @@ export function HeroEngine({
             if ('requestIdleCallback' in window) {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
-                idleCallbackId = window.requestIdleCallback(() => setTimeout(loadNextBatch, 300))
+                idleCallbackId = window.requestIdleCallback(() => setTimeout(loadNextBatch, state.current.isMobile ? 800 : 300))
             } else {
-                idleCallbackId = setTimeout(loadNextBatch, 300)
+                idleCallbackId = setTimeout(loadNextBatch, state.current.isMobile ? 800 : 300)
             }
         }
 

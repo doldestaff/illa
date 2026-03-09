@@ -20,10 +20,11 @@ interface Props {
     missions: MissionInstance[]
     claimingId: string | null
     claimedIds: Set<string>
-    onClaim: (id: string) => void
+    onClaim: (id: string, customReward?: { xp: number; points: number }) => void
+    missionRewards: Record<string, { xp: number; coins: number }>
 }
 
-export default function MissionsModal({ isOpen, onClose, missions, claimingId, claimedIds, onClaim }: Props) {
+export default function MissionsModal({ isOpen, onClose, missions, claimingId, claimedIds, onClaim, missionRewards }: Props) {
     const mounted = useIsClientMounted()
 
     // Lock body scroll when open
@@ -151,6 +152,7 @@ export default function MissionsModal({ isOpen, onClose, missions, claimingId, c
                                                     claiming={claimingId === mission.instance_id}
                                                     onClaim={onClaim}
                                                     colorTheme={['pink', 'yellow', 'white'][index % 3] as 'pink' | 'yellow' | 'white'}
+                                                    rewards={missionRewards[mission.instance_id]}
                                                 />
                                             </motion.div>
                                         )

@@ -170,7 +170,7 @@ function InteractiveMarquee({ children, onIndexChange }: { children: React.React
 
 interface Props {
     missions: MissionInstance[]
-    onClaim: (instanceId: string) => Promise<{ success: boolean }>
+    onClaim: (instanceId: string, customReward?: { xp: number; points: number }) => Promise<{ success: boolean }>
 }
 
 export default function DailyMissions({ missions, onClaim }: Props) {
@@ -181,16 +181,27 @@ export default function DailyMissions({ missions, onClaim }: Props) {
         new Set(missions.filter((m) => m.claimed).map((m) => m.instance_id))
     )
 
+    const [missionRewards] = useState(() => {
+        const rewards: Record<string, { xp: number, coins: number }> = {}
+        missions.forEach(m => {
+            rewards[m.instance_id] = {
+                xp: Math.floor(Math.random() * (200 - 50 + 1)) + 50,
+                coins: Math.floor(Math.random() * (20 - 5 + 1)) + 5
+            }
+        })
+        return rewards
+    })
+
     const completedCount = missions.filter((m) => m.completed).length
     const totalCount = missions.length
     const allCompleted = totalCount > 0 && completedCount === totalCount
 
     const [activeIndex, setActiveIndex] = useState(0)
 
-    const handleClaim = useCallback(async (instanceId: string) => {
+    const handleClaim = useCallback(async (instanceId: string, customReward?: { xp: number; points: number }) => {
         setClaimingId(instanceId)
         try {
-            const result = await onClaim(instanceId)
+            const result = await onClaim(instanceId, customReward)
             if (result.success) {
                 setClaimedIds((prev) => new Set([...prev, instanceId]))
                 setShowPopup(true)
@@ -274,6 +285,7 @@ export default function DailyMissions({ missions, onClaim }: Props) {
                                     canClaim={canClaim}
                                     claiming={claimingId === mission.instance_id}
                                     onClaim={handleClaim}
+                                    rewards={missionRewards[mission.instance_id]}
                                 />
                             </div>
                         )
@@ -317,6 +329,7 @@ export default function DailyMissions({ missions, onClaim }: Props) {
                 claimingId={claimingId}
                 claimedIds={claimedIds}
                 onClaim={handleClaim}
+                missionRewards={missionRewards}
             />
 
             {/* Mission Completion Centered Popup */}
