@@ -24,7 +24,7 @@ export default function ReceitasCinematicButton() {
                     <div className="absolute top-0 left-1/4 w-full h-full bg-orange-500/20 blur-[80px] rounded-full pointer-events-none group-hover:bg-amber-500/30 transition-colors duration-700" />
 
                     {/* Image Area - Cinematic Banner */}
-                    <div className="w-full md:w-2/5 h-48 md:h-full relative overflow-hidden bg-black/50">
+                    <div className="w-full md:w-2/5 h-48 md:h-full relative overflow-hidden bg-black/50 order-1 md:order-2">
                         <Image
                             src="/receitas-ocultas/receitas-bg-mobile.webp"
                             alt="Receitas Ocultas ILLA"
@@ -47,13 +47,13 @@ export default function ReceitasCinematicButton() {
                     </div>
 
                     {/* Text Area */}
-                    <div className="w-full md:w-3/5 p-8 flex flex-col justify-center relative z-20">
+                    <div className="w-full md:w-3/5 p-8 flex flex-col justify-center relative z-20 order-2 md:order-1">
                         {/* Background Glow for Text Area - Cinematic Modal Aesthetic */}
                         <div className="absolute inset-0 bg-gradient-to-br from-amber-500/[0.03] to-pink-500/[0.03] -z-10 pointer-events-none" />
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-amber-500/[0.02] blur-[100px] rounded-full -z-10 pointer-events-none group-hover:bg-amber-500/[0.05] transition-colors duration-700" />
 
-                        <div className="flex flex-wrap md:flex-nowrap items-center gap-1.5 md:gap-2 mb-3">
-                            <span className="px-1.5 md:px-3 py-0.5 md:py-1 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-400 text-[8px] md:text-xs font-black tracking-widest uppercase flex items-center gap-1 md:gap-1.5 shadow-[0_0_15px_rgba(245,158,11,0.2)] whitespace-nowrap shrink-0">
+                        <div className="flex flex-wrap md:flex-nowrap items-center gap-1.5 mb-3">
+                            <span className="px-1.5 md:px-3 py-0.5 md:py-1 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-400 text-[8px] md:text-xs font-black tracking-widest uppercase flex items-center gap-1 shadow-[0_0_15px_rgba(245,158,11,0.2)] whitespace-nowrap shrink-0">
                                 <Sparkles className="w-2 md:w-3 h-2 md:h-3" />
                                 APENAS PARA MEMBROS
                             </span>
