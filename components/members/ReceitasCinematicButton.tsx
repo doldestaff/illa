@@ -18,7 +18,7 @@ export default function ReceitasCinematicButton() {
                 <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-amber-400 via-orange-500 to-pink-500 blur-xl opacity-20 group-hover:opacity-60 transition-opacity duration-1000 animate-pulse" />
 
                 {/* Inner Content */}
-                <div className="relative h-full w-full bg-[#0B0B0D] rounded-[22px] overflow-hidden flex flex-col md:flex-row items-center border border-white/10 z-10">
+                <div className="relative h-full w-full bg-[#0B0B0D] rounded-[22px] overflow-hidden flex flex-col md:flex-row items-stretch border border-white/10 z-10">
 
                     {/* Background Glow */}
                     <div className="absolute top-0 left-1/4 w-full h-full bg-orange-500/20 blur-[80px] rounded-full pointer-events-none group-hover:bg-amber-500/30 transition-colors duration-700" />
