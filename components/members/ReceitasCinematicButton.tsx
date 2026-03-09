@@ -26,26 +26,30 @@ export default function ReceitasCinematicButton() {
                     {/* Image Area - Cinematic Banner */}
                     <div className="w-full md:w-2/5 h-48 md:h-full relative overflow-hidden bg-black/50 order-1 md:order-2">
                         {/* Mobile Image */}
-                        <Image
-                            src="/receitas-ocultas/receitas-bg-mobile.webp"
-                            alt="Receitas Ocultas ILLA"
-                            fill
-                            priority
-                            className="object-cover transition-transform duration-[3s] group-hover:scale-110 md:hidden"
-                            quality={100}
-                        />
+                        <div className="block md:hidden absolute inset-0">
+                            <Image
+                                src="/receitas-ocultas/receitas-bg-mobile.webp"
+                                alt="Receitas Ocultas ILLA"
+                                fill
+                                priority
+                                className="object-cover transition-transform duration-[3s] group-hover:scale-110"
+                                quality={100}
+                            />
+                        </div>
                         {/* Desktop Image */}
-                        <Image
-                            src="/receitas-ocultas/receitas-banner.webp"
-                            alt="Receitas Ocultas ILLA"
-                            fill
-                            priority
-                            className="object-cover transition-transform duration-[3s] group-hover:scale-110 hidden md:block"
-                            quality={100}
-                        />
+                        <div className="hidden md:block absolute inset-0">
+                            <Image
+                                src="/receitas-ocultas/receitas-banner.webp"
+                                alt="Receitas Ocultas ILLA"
+                                fill
+                                priority
+                                className="object-cover transition-transform duration-[3s] group-hover:scale-110"
+                                quality={100}
+                            />
+                        </div>
                         {/* Overlay Gradient for seamless blend - Maintaining modal cinematic feel */}
-                        <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-l from-[#0B0B0D] via-[#0B0B0D]/80 to-transparent opacity-100" />
-                        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 via-transparent to-pink-500/10 opacity-60 group-hover:opacity-100 transition-opacity duration-700" />
+                        <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#0B0B0D] via-[#0B0B0D]/80 to-transparent opacity-100" />
+                        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 via-transparent to-pink-500/10 opacity-60 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
                     </div>
 
                     {/* Text Area */}
