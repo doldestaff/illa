@@ -25,6 +25,7 @@ export default function ReceitasCinematicButton() {
 
                     {/* Image Area - Cinematic Banner */}
                     <div className="w-full md:w-2/5 h-48 md:h-full relative overflow-hidden bg-black/50 order-1 md:order-2">
+                        {/* Mobile Image */}
                         <Image
                             src="/receitas-ocultas/receitas-bg-mobile.webp"
                             alt="Receitas Ocultas ILLA"
@@ -33,6 +34,7 @@ export default function ReceitasCinematicButton() {
                             className="object-cover transition-transform duration-[3s] group-hover:scale-110 md:hidden"
                             quality={100}
                         />
+                        {/* Desktop Image */}
                         <Image
                             src="/receitas-ocultas/receitas-banner.webp"
                             alt="Receitas Ocultas ILLA"
