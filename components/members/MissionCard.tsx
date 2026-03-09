@@ -4,6 +4,7 @@
 import { motion } from 'framer-motion'
 import { CheckCircle, Sparkles, Loader2 } from 'lucide-react'
 import type { MissionInstance } from '@/lib/gamification-types'
+import GlobalCoin from '@/components/ui/GlobalCoin'
 
 interface MissionCardProps {
     mission: MissionInstance
@@ -146,7 +147,12 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                             <div className="absolute bottom-3 left-3 flex items-center gap-2 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 shadow-lg z-20">
                                 <span className="text-[10px] font-black tracking-wider text-amber-400">+{rewards.xp} XP</span>
                                 <div className="w-[1px] h-3 bg-white/20" />
-                                <span className="text-[10px] font-black tracking-wider text-amber-200">+{rewards.coins} 🍦</span>
+                                <div className="flex items-center gap-0.5 text-amber-200">
+                                    <span className="text-[10px] font-black tracking-wider">+{rewards.coins}</span>
+                                    <div className="scale-[0.6] origin-left -my-2 -mr-2">
+                                        <GlobalCoin size="sm" />
+                                    </div>
+                                </div>
                             </div>
                         )}
                     </div>
