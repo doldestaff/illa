@@ -24,31 +24,27 @@ export default function ReceitasCinematicButton() {
                     <div className="absolute top-0 left-1/4 w-full h-full bg-orange-500/20 blur-[80px] rounded-full pointer-events-none group-hover:bg-amber-500/30 transition-colors duration-700" />
 
                     {/* Image Area - Cinematic Banner */}
-                    <div className="w-full md:w-2/5 h-48 md:h-full relative overflow-hidden bg-black/50 order-1 md:order-2">
+                    <div className="w-full md:w-2/5 min-h-[220px] md:min-h-[300px] relative overflow-hidden bg-zinc-900/50 order-1 md:order-2 flex-shrink-0 flex">
                         {/* Mobile Image */}
-                        <div className="block md:hidden absolute inset-0">
-                            <Image
-                                src="/receitas-ocultas/receitas-bg-mobile.webp"
-                                alt="Receitas Ocultas ILLA"
-                                fill
-                                priority
-                                className="object-cover transition-transform duration-[3s] group-hover:scale-110"
-                                quality={100}
-                            />
-                        </div>
+                        <Image
+                            src="/receitas-ocultas/receitas-bg-mobile.webp"
+                            alt="Receitas Ocultas ILLA"
+                            fill
+                            priority
+                            className="object-cover transition-transform duration-[3s] group-hover:scale-110 md:hidden"
+                            quality={100}
+                        />
                         {/* Desktop Image */}
-                        <div className="hidden md:block absolute inset-0">
-                            <Image
-                                src="/receitas-ocultas/receitas-banner.webp"
-                                alt="Receitas Ocultas ILLA"
-                                fill
-                                priority
-                                className="object-cover transition-transform duration-[3s] group-hover:scale-110"
-                                quality={100}
-                            />
-                        </div>
+                        <Image
+                            src="/receitas-ocultas/receitas-banner.webp"
+                            alt="Receitas Ocultas ILLA"
+                            fill
+                            priority
+                            className="object-cover transition-transform duration-[3s] group-hover:scale-110 hidden md:block"
+                            quality={100}
+                        />
                         {/* Overlay Gradient for seamless blend - Maintaining modal cinematic feel */}
-                        <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#0B0B0D] via-[#0B0B0D]/80 to-transparent opacity-100" />
+                        <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#0B0B0D] via-[#0B0B0D]/20 to-transparent opacity-100 pointer-events-none" />
                         <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 via-transparent to-pink-500/10 opacity-60 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
                     </div>
 
