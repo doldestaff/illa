@@ -242,7 +242,7 @@ export function InstagramFeed() {
                 <motion.div
                     initial={{ opacity: 0, y: 28 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
+                    viewport={{ once: true, amount: 0.1 }}
                     transition={{ type: 'spring', bounce: 0.25 }}
                     className="mb-8"
                 >
@@ -282,7 +282,7 @@ export function InstagramFeed() {
                 <motion.div
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
-                    viewport={{ once: true }}
+                    viewport={{ once: true, amount: 0.1 }}
                     className="mt-6 text-center"
                 >
                     <a

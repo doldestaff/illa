@@ -13,6 +13,7 @@ export function HeroScrollFrames() {
     // Mount state
     const [isMobile, setIsMobile] = useState<boolean | null>(null)
     const [isTablet, setIsTablet] = useState<boolean | null>(null)
+    const [viewportHeight, setViewportHeight] = useState<number | null>(null)
 
     // Stable Refs
     const buttonProgress = useMotionValue(0)
@@ -21,8 +22,11 @@ export function HeroScrollFrames() {
     useEffect(() => {
         const checkMobile = () => {
             const w = window.innerWidth
+            // Use innerHeight instead of visualViewport to prevent keyboard from shrinking it
+            const h = window.innerHeight
             setIsMobile(w < 768)
             setIsTablet(w >= 768 && w < 1024)
+            setViewportHeight(h)
         }
         checkMobile()
         window.addEventListener('resize', checkMobile)
@@ -44,7 +48,10 @@ export function HeroScrollFrames() {
             className="relative w-full z-10"
             style={{ height: `${MOBILE_HEIGHT_vh}vh` }}
         >
-            <div className="sticky top-0 w-full overflow-hidden bg-[#111]" style={{ height: '100svh' }}>
+            <div
+                className="sticky top-0 w-full overflow-hidden bg-[#111]"
+                style={{ height: viewportHeight ? `${viewportHeight}px` : '100svh' }}
+            >
                 {/* SSR skeleton — high priority poster to prevent flash, but SYNCHRONOUS decoding so iOS doesn't panic on hydration switch */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -73,10 +80,14 @@ export function HeroScrollFrames() {
             className="relative w-full z-10"
             style={{ height: `${SCROLL_HEIGHT_vh}vh` }}
         >
-            {/* svh = small viewport height: stable value that does NOT change when the
-                Android Chrome URL bar shows/hides. Using dvh (dynamic) here would cause
-                the sticky container to resize mid-scroll → hero jump bug. */}
-            <div className="sticky top-0 w-full overflow-hidden bg-[#111]" style={{ height: '100svh' }}>
+            {/* We anchor the sticky container using exact JS pixel height.
+                If we use svh, dvh, or flex units, iOS/Android browser URL bar retraction
+                will physically stretch the container and pull the canvas up/down during
+                a scroll animation. Anchoring it to `innerHeight` prevents all jumping. */}
+            <div
+                className="sticky top-0 w-full overflow-hidden bg-[#111]"
+                style={{ height: viewportHeight ? `${viewportHeight}px` : '100svh' }}
+            >
 
                 {/* Unified Engine — inline manifest eliminates fetch waterfall */}
                 <HeroEngine
