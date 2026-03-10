@@ -58,91 +58,8 @@ function InteractiveMarquee({ children, onIndexChange }: { children: React.React
         return () => observer.disconnect()
     }, [])
 
-    useEffect(() => {
-        const container = containerRef.current
-        if (!container || !isVisible) return
-
-        let animationId: number
-        let lastTime = performance.now()
-        const targetSpeed = 1.2 // Increased for a more dynamic/energetic feel
-        let currentSpeed = targetSpeed
-
-        const scroll = (currentTime: number) => {
-            const deltaTime = Math.min(currentTime - lastTime, 64) // Cap delta to avoid jumps
-            lastTime = currentTime
-
-            // Rapid lerp for immediate response but smooth feel
-            const isHovered = isInteractingRef.current
-            const target = isHovered ? 0 : targetSpeed
-            currentSpeed += (target - currentSpeed) * 0.15
-
-            if (document.hidden) {
-                animationId = requestAnimationFrame(scroll)
-                return
-            }
-
-            // Execute scroll even at very low speeds to prevent "stuck" state
-            if (currentSpeed > 0.001) {
-                const thirdWidth = container.scrollWidth / 3
-                if (container.scrollLeft >= thirdWidth) {
-                    container.scrollLeft -= thirdWidth
-                }
-                container.scrollLeft += currentSpeed * (deltaTime / 16)
-
-                if (container.scrollLeft <= 0) {
-                    container.scrollLeft += thirdWidth
-                }
-            }
-
-            animationId = requestAnimationFrame(scroll)
-        }
-
-        animationId = requestAnimationFrame(scroll)
-        return () => cancelAnimationFrame(animationId)
-    }, [isVisible, children])
-
-    // Handle high-frequency events directly on the DOM node for max performance
-    useEffect(() => {
-        const container = containerRef.current
-        if (!container) return
-
-        const setInteracting = () => { isInteractingRef.current = true }
-        const clearInteracting = () => {
-            // Only clear if not actually hovering (on desktop)
-            const isHovering = container.matches(':hover')
-            if (!isHovering) isInteractingRef.current = false
-        }
-
-        // Debounced interaction end
-        const endInteraction = () => {
-            if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
-            scrollTimeoutRef.current = setTimeout(() => {
-                const isHovering = container.matches(':hover')
-                if (!isHovering) isInteractingRef.current = false
-                scrollTimeoutRef.current = null
-            }, 200)
-        }
-
-        container.addEventListener('pointerdown', setInteracting, { passive: true })
-        container.addEventListener('touchstart', setInteracting, { passive: true })
-        container.addEventListener('mouseenter', setInteracting, { passive: true })
-        container.addEventListener('mouseleave', clearInteracting, { passive: true })
-        container.addEventListener('pointerup', endInteraction, { passive: true })
-        container.addEventListener('touchend', endInteraction, { passive: true })
-
-        // CRITICAL: We DO NOT listen for 'scroll' here because container.scrollLeft += speed 
-        // triggers a 'scroll' event, creating an infinite pause loop.
-
-        return () => {
-            container.removeEventListener('pointerdown', setInteracting)
-            container.removeEventListener('touchstart', setInteracting)
-            container.removeEventListener('mouseenter', setInteracting)
-            container.removeEventListener('mouseleave', clearInteracting)
-            container.removeEventListener('pointerup', endInteraction)
-            container.removeEventListener('touchend', endInteraction)
-            if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
-        }
-    }, [])
+    // We removed the heavy JS requestAnimationFrame scroll loop to fix scroll jank on mobile.
+    // The container now relies purely on native hardware-accelerated CSS overflow scrolling.
 
     // New Observer to detect which card is centered for the slide counter
     useEffect(() => {
@@ -173,25 +90,14 @@ function InteractiveMarquee({ children, onIndexChange }: { children: React.React
     return (
         <div
             ref={containerRef}
-            className="flex overflow-x-auto gap-5 pb-8 py-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex overflow-x-auto gap-5 pb-8 py-4 snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             style={{
                 willChange: 'scroll-position',
                 WebkitOverflowScrolling: 'touch',
                 transform: 'translateZ(0)', // Force compositor layer
             }}
         >
-            {/* Inline style for webkit scrollbar hide fallback */}
-            <style dangerouslySetInnerHTML={{
-                __html: `
-                div::-webkit-scrollbar { display: none; }
-            `}} />
-            <div className="flex shrink-0 gap-5">
-                {children}
-            </div>
-            <div className="flex shrink-0 gap-5">
-                {children}
-            </div>
-            <div className="flex shrink-0 gap-5">
+            <div className="flex shrink-0 gap-5 px-4 md:px-0">
                 {children}
             </div>
         </div>

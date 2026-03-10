@@ -566,8 +566,7 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                     <motion.div
                         className="lg:col-span-7 xl:col-span-8 space-y-6"
                         initial="hidden"
-                        whileInView="visible"
-                        viewport={{ once: true, amount: 0.05 }}
+                        animate="visible"
                         variants={{
                             hidden: { opacity: 0 },
                             visible: {
