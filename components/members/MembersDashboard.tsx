@@ -601,10 +601,10 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                             {/* Active Drop (Removed per user request) */}
 
 
-                            {/* VIP Card */}
                             <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
                                 <VipCard
-                                    referralCode={snapshot.profile.referral_code}
+                                    profile={snapshot.profile}
+                                    avatarUrl={avatarUrl}
                                     referralCount={snapshot.referral_count}
                                     vipPayload={vipPayload}
                                     onLoadVip={handleVipLoad}

@@ -3,12 +3,13 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import type { VipPayload } from '@/lib/gamification-types'
+import type { VipPayload, MemberProfile } from '@/lib/gamification-types'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
-import { QrCode, Copy, Check, Loader2, Crown, Clock, X, IceCream, Tag, Zap } from 'lucide-react'
+import { QrCode, Copy, Check, Loader2, Crown, Clock, X, IceCream, Tag, Zap, Flame, Gift } from 'lucide-react'
 
 interface Props {
-    referralCode: string | null
+    profile: MemberProfile
+    avatarUrl: string | null
     referralCount: number
     vipPayload: VipPayload | null
     onLoadVip: () => Promise<VipPayload>
@@ -73,7 +74,7 @@ function QrCodeCanvas({ value, size = 140 }: { value: string; size?: number }) {
     return <canvas ref={canvasRef} className="rounded-xl mix-blend-multiply" style={{ width: size, height: size }} />
 }
 
-export default function VipCard({ referralCode, referralCount, vipPayload, onLoadVip, onShareCopy, onViewExclusive }: Props) {
+export default function VipCard({ profile, avatarUrl, referralCount, vipPayload, onLoadVip, onShareCopy, onViewExclusive }: Props) {
     const [loading, setLoading] = useState(false)
     const [vip, setVip] = useState(vipPayload)
     const [codeCopied, setCodeCopied] = useState(false)
@@ -198,7 +199,7 @@ export default function VipCard({ referralCode, referralCount, vipPayload, onLoa
                 </div>
             </div>
 
-            {/* Benefits Popup */}
+            {/* Liquid Digital Identity Modal */}
             <AnimatePresence>
                 {showBenefits && (
                     <>
@@ -208,106 +209,173 @@ export default function VipCard({ referralCode, referralCount, vipPayload, onLoa
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             onClick={() => setShowBenefits(false)}
-                            className="fixed inset-0 z-[200] bg-black/75 backdrop-blur-md"
+                            className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-xl"
                         />
 
-                        {/* Modal */}
-                        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 pointer-events-none">
+                        {/* Modal Container */}
+                        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6 pointer-events-none">
                             <motion.div
-                                initial={{ scale: 0.85, opacity: 0, y: 40 }}
+                                initial={{ scale: 0.9, opacity: 0, y: 40 }}
                                 animate={{ scale: 1, opacity: 1, y: 0 }}
-                                exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                                exit={{ scale: 0.95, opacity: 0, y: 20 }}
                                 transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-                                className="w-full max-w-[400px] pointer-events-auto relative overflow-hidden rounded-[2.5rem] bg-[#0c0514]/95 backdrop-blur-2xl border border-white/10 shadow-[0_20px_80px_rgba(0,0,0,0.8)]"
+                                className="w-full max-w-[420px] max-h-[90vh] overflow-y-auto no-scrollbar pointer-events-auto relative rounded-[2.5rem] bg-[#0c0514]/95 border border-white/10 shadow-[0_20px_80px_rgba(0,0,0,0.9)]"
                             >
-                                {/* Ambient glows */}
-                                <div className="absolute -top-20 -left-20 w-56 h-56 bg-amber-500/15 rounded-full blur-[60px] pointer-events-none" />
-                                <div className="absolute -bottom-20 -right-20 w-56 h-56 bg-rose-500/10 rounded-full blur-[60px] pointer-events-none" />
+                                {/* Immersive Glows */}
+                                <div className="absolute -top-32 -left-20 w-72 h-72 bg-amber-500/20 rounded-full blur-[80px] pointer-events-none" />
+                                <div className="absolute top-1/2 -right-20 w-64 h-64 bg-rose-500/15 rounded-full blur-[80px] pointer-events-none" />
 
                                 {/* Close button */}
                                 <button
                                     onClick={() => setShowBenefits(false)}
-                                    className="absolute top-5 right-5 z-20 p-2 rounded-full bg-white/5 hover:bg-white/15 text-white/40 hover:text-white transition-all border border-white/5"
+                                    className="absolute top-5 right-5 z-30 p-2 rounded-full bg-white/5 hover:bg-white/15 text-white/40 hover:text-white transition-all border border-white/5 backdrop-blur-md"
                                 >
-                                    <X size={16} />
+                                    <X size={18} />
                                 </button>
 
-                                {/* Header */}
-                                <div className="relative z-10 px-8 pt-10 pb-6 text-center">
-                                    <motion.div
-                                        initial={{ scale: 0 }}
-                                        animate={{ scale: 1 }}
-                                        transition={{ type: 'spring', delay: 0.1, damping: 12 }}
-                                        className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-amber-400 to-rose-500 flex items-center justify-center mb-4 shadow-[0_8px_30px_rgba(251,191,36,0.3)]"
+                                <div className="relative z-10 px-6 pt-10 pb-8 flex flex-col gap-8">
+                                    
+                                    {/* 1. Header Identity Stream */}
+                                    <motion.div 
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.1 }}
+                                        className="flex flex-col items-center text-center gap-3"
                                     >
-                                        <Crown size={30} className="text-white" fill="currentColor" />
-                                    </motion.div>
-                                    <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-white to-amber-200 tracking-tight">
-                                        ILLA Exclusive
-                                    </h3>
-                                    <p className="text-xs text-white/40 mt-1 uppercase tracking-widest font-bold">Seus benefícios VIP</p>
-                                </div>
-
-                                {/* Benefits List */}
-                                <div className="relative z-10 px-6 pb-6 space-y-3">
-                                    <motion.div
-                                        initial={{ opacity: 0, x: -20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: 0.2 }}
-                                        className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/5"
-                                    >
-                                        <div className="w-12 h-12 rounded-xl bg-cyan-500/15 flex items-center justify-center flex-shrink-0">
-                                            <IceCream size={22} className="text-cyan-400" />
-                                        </div>
-                                        <div>
-                                            <p className="font-bold text-sm text-white">Sorvetes & Picolés Free</p>
-                                            <p className="text-xs text-white/40">Troque moedas por produtos gratuitos</p>
-                                        </div>
-                                    </motion.div>
-
-                                    <motion.div
-                                        initial={{ opacity: 0, x: -20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: 0.3 }}
-                                        className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/5"
-                                    >
-                                        <div className="w-12 h-12 rounded-xl bg-emerald-500/15 flex items-center justify-center flex-shrink-0">
-                                            <Tag size={22} className="text-emerald-400" />
-                                        </div>
-                                        <div>
-                                            <p className="font-bold text-sm text-white">Super Descontos</p>
-                                            <p className="text-xs text-white/40">Promoções exclusivas para membros VIP</p>
-                                        </div>
-                                    </motion.div>
-
-                                    <motion.div
-                                        initial={{ opacity: 0, x: -20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: 0.4 }}
-                                        className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/5"
-                                    >
-                                        <div className="w-12 h-12 rounded-xl bg-amber-500/15 flex items-center justify-center flex-shrink-0">
-                                            <Zap size={22} className="text-amber-400" />
-                                        </div>
-                                        <div>
-                                            <p className="font-bold text-sm text-white">Acesso Antecipado</p>
-                                            <p className="text-xs text-white/40">Novos sabores e lançamentos antes de todos</p>
-                                        </div>
-                                    </motion.div>
-                                </div>
-
-                                {/* QR Code Section */}
-                                {vip && (
-                                    <div className="relative z-10 px-6 pb-8">
-                                        <div className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-white/5 border border-white/5">
-                                            <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Apresente na loja</p>
-                                            <div className="bg-white rounded-xl p-2">
-                                                <QrCodeCanvas value={`${origin}/vip/redeem?code=${vip.short_code}`} size={120} />
+                                        <div className="relative">
+                                            {avatarUrl ? (
+                                                <img src={avatarUrl} alt="Avatar" className="w-24 h-24 rounded-full object-cover border-2 border-amber-400/50 shadow-[0_0_30px_rgba(251,191,36,0.3)]" />
+                                            ) : (
+                                                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-amber-400/20 to-rose-500/20 border-2 border-white/10 flex items-center justify-center shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+                                                    <Crown size={32} className="text-amber-400/50" />
+                                                </div>
+                                            )}
+                                            {/* Level Badge Overlay */}
+                                            <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-500 to-rose-500 px-3 py-1 rounded-full border border-black shadow-lg">
+                                                <span className="text-[10px] sm:text-xs font-black text-white uppercase tracking-wider whitespace-nowrap">Lvl {profile.level}</span>
                                             </div>
-                                            <p className="font-mono font-bold text-lg text-white/80 tracking-[0.2em]">{vip.short_code}</p>
                                         </div>
+                                        
+                                        <div className="mt-2">
+                                            <h3 className="text-2xl font-black text-white tracking-tight">
+                                                {profile.full_name?.split(' ')[0] || 'Membro VIP'}
+                                            </h3>
+                                            <p className="text-xs text-amber-200/60 uppercase tracking-widest font-bold mt-1">Identidade Digital</p>
+                                        </div>
+                                    </motion.div>
+
+                                    {/* 2. Core Wealth Stream (Points/Coins) */}
+                                    <motion.div
+                                        initial={{ opacity: 0, scale: 0.9 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        transition={{ delay: 0.2, type: 'spring' }}
+                                        className="relative p-6 rounded-3xl bg-gradient-to-b from-white/[0.08] to-transparent border border-white/[0.08] overflow-hidden flex flex-col items-center justify-center text-center"
+                                    >
+                                        <div className="absolute inset-0 bg-gradient-to-tr from-amber-500/10 via-transparent to-rose-500/10 mix-blend-overlay" />
+                                        <span className="text-xs text-white/50 font-bold tracking-widest uppercase mb-1 relative z-10">Saldo Illa</span>
+                                        <div className="flex items-baseline gap-2 relative z-10">
+                                            <span className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500 drop-shadow-sm">
+                                                {profile.points.toLocaleString('pt-BR')}
+                                            </span>
+                                            <Crown size={20} className="text-amber-400" fill="currentColor" />
+                                        </div>
+                                    </motion.div>
+
+                                    {/* 3. Tactical Stats Stream */}
+                                    <div className="grid grid-cols-2 gap-3">
+                                        {/* XP Progress */}
+                                        <motion.div
+                                            initial={{ opacity: 0, x: -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: 0.3 }}
+                                            className="col-span-2 p-4 rounded-2xl bg-white/5 border border-white/5 flex flex-col gap-3"
+                                        >
+                                            <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider">
+                                                <span className="text-white/50">Progresso</span>
+                                                <span className="text-amber-400">{profile.xp_into_level} / {profile.xp_for_next_level} XP</span>
+                                            </div>
+                                            <div className="h-2 w-full bg-black/50 rounded-full overflow-hidden border border-white/10">
+                                                <motion.div 
+                                                    initial={{ width: 0 }}
+                                                    animate={{ width: `${Math.min(100, (profile.xp_into_level / (profile.xp_for_next_level || 1)) * 100)}%` }}
+                                                    transition={{ delay: 0.6, duration: 1, ease: 'easeOut' }}
+                                                    className="h-full bg-gradient-to-r from-amber-500 to-rose-500"
+                                                />
+                                            </div>
+                                        </motion.div>
+
+                                        {/* Drops */}
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: 0.4 }}
+                                            className="p-4 rounded-2xl bg-white/5 border border-white/5 flex flex-col items-center text-center gap-1"
+                                        >
+                                            <Gift size={20} className="text-rose-400 mb-1" />
+                                            <span className="text-2xl font-black text-white">{profile.drops}</span>
+                                            <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Drops Salvos</span>
+                                        </motion.div>
+
+                                        {/* Streak */}
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: 0.5 }}
+                                            className="p-4 rounded-2xl bg-white/5 border border-white/5 flex flex-col items-center text-center gap-1"
+                                        >
+                                            <Flame size={20} className="text-orange-500 mb-1" />
+                                            <div className="flex items-baseline gap-1">
+                                                <span className="text-2xl font-black text-white">{profile.streak_count}</span>
+                                                <span className="text-xs font-bold text-white/60">dias</span>
+                                            </div>
+                                            <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Ofensiva</span>
+                                        </motion.div>
                                     </div>
-                                )}
+
+                                    {/* 4. QR Code Validation Block */}
+                                    {vip && (
+                                        <motion.div
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            transition={{ delay: 0.6 }}
+                                            className="relative p-5 rounded-3xl bg-black/40 border border-white/10 flex flex-col items-center gap-4 mt-2"
+                                        >
+                                            <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent rounded-3xl pointer-events-none" />
+                                            <p className="text-[10px] font-bold text-amber-500/80 uppercase tracking-widest relative z-10">Acesso Presencial Exclusivo</p>
+                                            <div className="bg-white p-3 rounded-2xl relative z-10 shadow-[0_10px_40px_rgba(0,0,0,0.5)]">
+                                                <QrCodeCanvas value={`${origin}/vip/redeem?code=${vip.short_code}`} size={140} />
+                                            </div>
+                                            <div className="flex flex-col items-center relative z-10">
+                                                <p className="font-mono font-black text-2xl text-white tracking-[0.2em]">{vip.short_code}</p>
+                                                <p className="text-[10px] text-white/30 mt-1 uppercase tracking-wider">
+                                                    Expira em {new Date(vip.expires_at).toLocaleDateString('pt-BR')}
+                                                </p>
+                                            </div>
+                                        </motion.div>
+                                    )}
+
+                                    {/* 5. Legacy Benefits Reminder (Subtle) */}
+                                    <motion.div
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{ delay: 0.7 }}
+                                        className="pt-4 border-t border-white/10 flex items-center justify-center gap-6"
+                                    >
+                                        <div className="flex items-center gap-2 text-white/40">
+                                            <IceCream size={14} className="text-cyan-500/70" />
+                                            <span className="text-[10px] font-bold uppercase tracking-wider">Free</span>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-white/40">
+                                            <Tag size={14} className="text-emerald-500/70" />
+                                            <span className="text-[10px] font-bold uppercase tracking-wider">VIP</span>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-white/40">
+                                            <Zap size={14} className="text-amber-500/70" />
+                                            <span className="text-[10px] font-bold uppercase tracking-wider">Acesso</span>
+                                        </div>
+                                    </motion.div>
+
+                                </div>
                             </motion.div>
                         </div>
                     </>
