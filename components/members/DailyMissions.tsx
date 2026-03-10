@@ -2,10 +2,40 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react'
 import type { MissionInstance } from '@/lib/gamification-types'
-import { Compass, Sparkles, ArrowRight, CheckCircle2 } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
-import MissionCard from './MissionCard'
+import { Compass, Sparkles, ArrowRight, CheckCircle2, Star } from 'lucide-react'
+import { motion, AnimatePresence, animate } from 'framer-motion'
+import MissionCard, { resolveCardImage } from './MissionCard'
 import MissionsModal from './MissionsModal'
+import MissionHowToPopup from './MissionHowToPopup'
+import GlobalCoin from '../ui/GlobalCoin'
+
+// --- Animated Counter Helper ---
+function AnimatedCounter({ value, duration = 1.5, delay = 0 }: { value: number, duration?: number, delay?: number }) {
+    const nodeRef = useRef<HTMLSpanElement>(null);
+
+    useEffect(() => {
+        const node = nodeRef.current;
+        if (!node) return;
+
+        // Reset to 0 before animating
+        node.textContent = '0';
+
+        const timeout = setTimeout(() => {
+            const controls = animate(0, value, {
+                duration: duration,
+                ease: "easeOut",
+                onUpdate(v) {
+                    node.textContent = Math.floor(v).toLocaleString('pt-BR');
+                },
+            });
+            return () => controls.stop();
+        }, delay * 1000);
+
+        return () => clearTimeout(timeout);
+    }, [value, duration, delay]);
+
+    return <span ref={nodeRef}>0</span>;
+}
 
 function InteractiveMarquee({ children, onIndexChange }: { children: React.ReactNode, onIndexChange?: (index: number) => void }) {
     const containerRef = useRef<HTMLDivElement>(null)
@@ -171,12 +201,18 @@ function InteractiveMarquee({ children, onIndexChange }: { children: React.React
 interface Props {
     missions: MissionInstance[]
     onClaim: (instanceId: string, customReward?: { xp: number; points: number }) => Promise<{ success: boolean }>
+    onInviteClick?: () => void
 }
 
-export default function DailyMissions({ missions, onClaim }: Props) {
+export default function DailyMissions({ missions: initialMissions, onClaim, onInviteClick }: Props) {
+    const missions = initialMissions
+        .filter((mission, index, self) => index === self.findIndex((m) => resolveCardImage(m) === resolveCardImage(mission)))
+        .slice(0, 5) // Enforce exactly 5 cards
+
     const [claimingId, setClaimingId] = useState<string | null>(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [showPopup, setShowPopup] = useState(false)
+    const [claimedReward, setClaimedReward] = useState<{ xp: number; coins: number }>({ xp: 0, coins: 0 })
     const [claimedIds, setClaimedIds] = useState<Set<string>>(
         new Set(missions.filter((m) => m.claimed).map((m) => m.instance_id))
     )
@@ -197,22 +233,29 @@ export default function DailyMissions({ missions, onClaim }: Props) {
     const allCompleted = totalCount > 0 && completedCount === totalCount
 
     const [activeIndex, setActiveIndex] = useState(0)
+    const [howToMission, setHowToMission] = useState<MissionInstance | null>(null)
 
     const handleClaim = useCallback(async (instanceId: string, customReward?: { xp: number; points: number }) => {
         setClaimingId(instanceId)
         try {
+            // Determine rewards for the animation
+            const reward = customReward || missionRewards[instanceId] || { xp: 50, coins: 5 }
+            // Some apis return 'points', some 'coins', ensure we map it right
+            const rewardCoins = 'coins' in reward ? reward.coins : ('points' in reward ? reward.points : 0);
+            setClaimedReward({ xp: reward.xp, coins: rewardCoins })
+
             const result = await onClaim(instanceId, customReward)
             if (result.success) {
                 setClaimedIds((prev) => new Set([...prev, instanceId]))
                 setShowPopup(true)
-                setTimeout(() => setShowPopup(false), 3000)
+                setTimeout(() => setShowPopup(false), 4500) // Keep open slightly longer for the animation impact
             }
         } catch (err) {
             console.error('Claim failed:', err)
         } finally {
             setClaimingId(null)
         }
-    }, [onClaim])
+    }, [onClaim, missionRewards])
 
     if (missions.length === 0) return null
 
@@ -285,6 +328,7 @@ export default function DailyMissions({ missions, onClaim }: Props) {
                                     canClaim={canClaim}
                                     claiming={claimingId === mission.instance_id}
                                     onClaim={handleClaim}
+                                    onCardClick={(m) => setHowToMission(m)}
                                     rewards={missionRewards[mission.instance_id]}
                                 />
                             </div>
@@ -330,6 +374,8 @@ export default function DailyMissions({ missions, onClaim }: Props) {
                 claimedIds={claimedIds}
                 onClaim={handleClaim}
                 missionRewards={missionRewards}
+                onCardClick={(m) => setHowToMission(m)}
+                onInviteClick={onInviteClick}
             />
 
             {/* Mission Completion Centered Popup */}
@@ -344,32 +390,95 @@ export default function DailyMissions({ missions, onClaim }: Props) {
                         <motion.div
                             initial={{ scale: 0.5, y: 50, opacity: 0 }}
                             animate={{ scale: 1, y: 0, opacity: 1 }}
-                            exit={{ scale: 0.8, y: 20, opacity: 0 }}
-                            transition={{ type: 'spring', bounce: 0.5, duration: 0.6 }}
-                            className="bg-white px-8 py-8 rounded-[2rem] shadow-2xl flex flex-col items-center gap-3 text-center relative overflow-hidden max-w-[300px] w-full border-b-[8px] border-slate-100"
+                            exit={{ scale: 0.8, y: 30, opacity: 0, filter: 'blur(10px)' }}
+                            transition={{ type: 'spring', bounce: 0.5, duration: 0.7 }}
+                            className="bg-[#0c0a09]/95 backdrop-blur-3xl px-8 py-10 rounded-[2.5rem] shadow-[0_30px_100px_rgba(0,0,0,0.9)] flex flex-col items-center gap-4 text-center relative overflow-hidden max-w-[340px] w-full border border-white/10"
                         >
-                            <div className="absolute inset-0 bg-gradient-to-tr from-illa-pink/5 to-orange-400/5 opacity-50" />
+                            {/* Animated Background Rays */}
+                            <motion.div
+                                animate={{ rotate: 360 }}
+                                transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                                className="absolute inset-0 z-0 pointer-events-none opacity-40 select-none"
+                                style={{
+                                    background: 'conic-gradient(from 0deg, transparent 0%, rgba(229,1,125,0.2) 20%, transparent 40%, rgba(245,158,11,0.2) 60%, transparent 80%, rgba(229,1,125,0.2) 100%)'
+                                }}
+                            />
+
+                            <div className="absolute inset-0 bg-gradient-to-tr from-illa-pink/10 to-transparent opacity-50 z-0 pointer-events-none" />
+                            <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay z-0 pointer-events-none" />
 
                             <motion.div
-                                animate={{ scale: [1, 1.2, 1], rotate: [0, -10, 10, -5, 5, 0] }}
-                                transition={{ duration: 0.6, ease: 'easeOut' }}
-                                className="w-16 h-16 bg-gradient-to-tr from-illa-pink to-orange-400 rounded-full flex items-center justify-center shadow-lg relative z-10"
+                                initial={{ scale: 0 }}
+                                animate={{ scale: [0, 1.3, 1], rotate: [0, 10, -10, 0] }}
+                                transition={{ duration: 0.8, ease: 'easeOut', type: 'spring', bounce: 0.6 }}
+                                className="w-20 h-20 bg-gradient-to-tr from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(245,158,11,0.6)] relative z-10 border border-white/20"
                             >
-                                <CheckCircle2 className="text-white" size={36} strokeWidth={3} />
+                                <CheckCircle2 className="text-black" size={40} strokeWidth={3} />
                             </motion.div>
 
-                            <div className="relative z-10 mt-2">
-                                <h3 className="text-[28px] leading-tight font-black text-transparent bg-clip-text bg-gradient-to-r from-illa-pink to-orange-500 uppercase tracking-tight">
+                            <div className="relative z-10 mt-2 mb-2 w-full">
+                                <motion.h3
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.3 }}
+                                    className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-white/70 uppercase tracking-tight drop-shadow-md"
+                                >
                                     Missão<br />Concluída!
-                                </h3>
-                                <p className="font-bold text-black/40 text-sm mt-3 uppercase tracking-widest">
-                                    Moedas adicionadas
-                                </p>
+                                </motion.h3>
                             </div>
+
+                            {/* Rewards Box gamified */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                transition={{ delay: 0.4, type: "spring" }}
+                                className="w-full flex-col flex items-stretch gap-2.5 relative z-10 mt-2"
+                            >
+                                {/* XP Row */}
+                                {claimedReward.xp > 0 && (
+                                    <div className="flex items-center justify-between bg-white/[0.04] border border-white/10 p-3 rounded-2xl">
+                                        <div className="flex items-center gap-2">
+                                            <div className="bg-amber-500/20 text-amber-400 p-1.5 rounded-full">
+                                                <Star size={16} fill="currentColor" />
+                                            </div>
+                                            <span className="font-bold text-sm text-white/70 uppercase tracking-widest">Experiência</span>
+                                        </div>
+                                        <div className="text-xl font-black text-white flex items-baseline gap-1">
+                                            <span className="text-amber-400">+</span>
+                                            <AnimatedCounter value={claimedReward.xp} duration={2} delay={0.4} />
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Coins Row */}
+                                {claimedReward.coins > 0 && (
+                                    <div className="flex items-center justify-between bg-white/[0.04] border border-white/10 p-3 rounded-2xl">
+                                        <div className="flex items-center gap-2">
+                                            <div className="shrink-0 -ml-1">
+                                                <GlobalCoin size="sm" />
+                                            </div>
+                                            <span className="font-bold text-sm text-white/70 uppercase tracking-widest">Moedas ILLA</span>
+                                        </div>
+                                        <div className="text-xl font-black text-white flex items-baseline gap-1">
+                                            <span className="text-amber-400">+</span>
+                                            <AnimatedCounter value={claimedReward.coins} duration={2} delay={0.8} />
+                                        </div>
+                                    </div>
+                                )}
+                            </motion.div>
                         </motion.div>
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {/* Mission How-To Popup */}
+            <MissionHowToPopup
+                isOpen={!!howToMission}
+                onClose={() => setHowToMission(null)}
+                missionKind={howToMission?.kind ?? null}
+                missionTitle={howToMission?.title}
+                onInviteClick={onInviteClick}
+            />
         </div>
     )
 }

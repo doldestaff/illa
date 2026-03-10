@@ -32,6 +32,7 @@ export async function POST(request: Request) {
             )
 
         if (error) {
+            console.error('[API/TOGGLE] Supabase Upsert Error:', error)
             return NextResponse.json({ error: error.message }, { status: 400 })
         }
 

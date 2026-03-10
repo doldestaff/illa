@@ -12,6 +12,7 @@ interface MissionCardProps {
     canClaim: boolean
     claiming: boolean
     onClaim: (id: string, customReward?: { xp: number; points: number }) => void
+    onCardClick?: (mission: MissionInstance) => void
     colorTheme?: 'pink' | 'yellow' | 'white'
     rewards?: { xp: number; coins: number }
 }
@@ -31,14 +32,14 @@ const CARD_IMAGE_MAP: Record<string, string> = {
 }
 
 /** Fallback title-based matching for missions without slugified `kind` */
-function resolveCardImage(mission: MissionInstance): string {
+export function resolveCardImage(mission: MissionInstance): string {
     // 1. Try exact kind match
     const byKind = CARD_IMAGE_MAP[mission.kind]
     if (byKind) return byKind
 
     // 2. Fuzzy match by title keywords
     const titleLower = (mission.title || '').toLowerCase()
-    if (titleLower.includes('compartilhar') || titleLower.includes('link') || titleLower.includes('indicação'))
+    if (titleLower.includes('compartilhar') || titleLower.includes('link') || titleLower.includes('indicação') || titleLower.includes('indique'))
         return CARD_IMAGE_MAP['share_link']
     if (titleLower.includes('exclusiv') || titleLower.includes('cartão') || titleLower.includes('benefíc'))
         return CARD_IMAGE_MAP['view_exclusive']
@@ -46,20 +47,27 @@ function resolveCardImage(mission: MissionInstance): string {
         return CARD_IMAGE_MAP['view_recipes']
     if (titleLower.includes('visita') || titleLower.includes('entrar') || titleLower.includes('caçador'))
         return CARD_IMAGE_MAP['visit']
-    if (titleLower.includes('avalia') || titleLower.includes('crítico') || titleLower.includes('feedback'))
+    if (titleLower.includes('avalia') || titleLower.includes('crítico') || titleLower.includes('feedback') || titleLower.includes('self') || titleLower.includes('foto') || titleLower.includes('perfil'))
         return CARD_IMAGE_MAP['survey']
 
-    // 3. Default fallback (sequence-based or first available)
-    return CARD_IMAGE_MAP['view_recipes']
+    // 3. Default fallback to something that is not recipes (e.g. exclusive or survey)
+    return CARD_IMAGE_MAP['view_exclusive']
 }
 
-export default function MissionCard({ mission, isClaimed, canClaim, claiming, onClaim, rewards }: MissionCardProps) {
+export default function MissionCard({ mission, isClaimed, canClaim, claiming, onClaim, onCardClick, rewards }: MissionCardProps) {
     const cardImage = resolveCardImage(mission)
     const progressPercent = Math.min(100, Math.max(0, (mission.progress / mission.target) * 100))
     const isCompleted = progressPercent >= 100
 
     return (
-        <div className="flex flex-col w-full h-full gap-2">
+        <div
+            className="flex flex-col w-full h-full gap-2"
+            onClick={() => {
+                if (!isClaimed && !canClaim && onCardClick) {
+                    onCardClick(mission)
+                }
+            }}
+        >
             <motion.div
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}

@@ -193,6 +193,15 @@ export function SocialProof() {
             setRole('')
             setInstagram('')
             setTimeout(() => setSubmitted(false), 5000)
+
+            // Track mission progress for "survey" / "Crítico Gastronômico"
+            if (userId) {
+                fetch('/api/missions/progress', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ kind: 'survey' }),
+                }).catch(() => { /* non-critical */ })
+            }
         } catch {
             setFormError('Erro de conexão. Tente novamente.')
         } finally {

@@ -40,9 +40,6 @@ const SectionSkeleton = () => (
 const SecretMenu = dynamic(() => import('./SecretMenu'), {
     loading: () => <SectionSkeleton />,
 })
-const RecipesLibrary = dynamic(() => import('./RecipesLibrary'), {
-    loading: () => <SectionSkeleton />,
-})
 const WeeklyLeaderboard = dynamic(() => import('./WeeklyLeaderboard'), {
     loading: () => <SectionSkeleton />,
 })
@@ -327,14 +324,14 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                     const progressRes = await fetch('/api/missions/progress', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ kind: 'recipes' }),
+                        body: JSON.stringify({ kind: 'view_recipes' }),
                     })
                     const progressData = await progressRes.json()
                     if (progressData.updated) {
                         setSnapshot((prev) => ({
                             ...prev,
                             missions: prev.missions.map((m) =>
-                                m.kind === 'recipes'
+                                m.kind === 'view_recipes'
                                     ? {
                                         ...m,
                                         progress: progressData.progress,
@@ -413,11 +410,51 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                     drops_claimed_count: (prev.drops_claimed_count ?? 0) + 1,
                 }))
                 updateProfileFromClaim(data)
+
+                // Track mission progress for "Caçador de Relíquias"
+                fetch('/api/missions/progress', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ kind: 'visit' }),
+                }).then(async (res) => {
+                    const progressData = await res.json()
+                    if (progressData.updated) {
+                        setSnapshot((prev) => ({
+                            ...prev,
+                            missions: prev.missions.map((m) =>
+                                m.kind === 'visit'
+                                    ? { ...m, progress: progressData.progress, completed: progressData.completed }
+                                    : m
+                            ),
+                        }))
+                    }
+                }).catch(() => { /* non-critical */ })
             }
             return data
         },
         [updateProfileFromClaim]
     )
+
+    // ── View Exclusive (Fan Exclusive mission) ──
+    const handleViewExclusive = useCallback(async () => {
+        try {
+            await fetch('/api/missions/progress', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ kind: 'view_exclusive' }),
+            })
+            setSnapshot((prev) => ({
+                ...prev,
+                missions: prev.missions.map((m) =>
+                    m.kind === 'view_exclusive'
+                        ? { ...m, progress: m.target, completed: true }
+                        : m
+                ),
+            }))
+        } catch {
+            // Silent fail
+        }
+    }, [])
 
     // ── Sorvetes redeem handler (Restored for popup) ──
     const handleSorvetesRedeem = useCallback(
@@ -546,8 +583,11 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
 
                         {/* Daily Missions (Priority) */}
                         <motion.div id="missions" variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
-                            <DailyMissions missions={snapshot.missions} onClaim={handleMissionClaim} />
-                        </motion.div>
+                            <DailyMissions
+                                missions={snapshot.missions}
+                                onClaim={handleMissionClaim}
+                                onInviteClick={() => setActiveModal('invite')}
+                            />        </motion.div>
 
                         {/* Store Promo Card (New Feature) */}
                         <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
@@ -570,6 +610,7 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                                     vipPayload={vipPayload}
                                     onLoadVip={handleVipLoad}
                                     onShareCopy={handleShareCopy}
+                                    onViewExclusive={handleViewExclusive}
                                 />
                             </motion.div>
                         </motion.div>
@@ -583,15 +624,7 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                                 <SecretMenu items={snapshot.secret_menu} />
                             </motion.div>
 
-                            <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
-                                <RecipesLibrary
-                                    recipes={snapshot.recipes}
-                                    userLevel={snapshot.profile.level}
-                                    onToggle={handleRecipeToggle}
-                                />
-                            </motion.div>
-
-                            <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
+                            <motion.div id="recipes" variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
                                 <ReceitasCinematicButton />
                             </motion.div>
 

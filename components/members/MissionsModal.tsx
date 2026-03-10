@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Target, Sparkles } from 'lucide-react'
 import type { MissionInstance } from '@/lib/gamification-types'
-import MissionCard from './MissionCard'
+import MissionCard, { resolveCardImage } from './MissionCard'
 import { useSyncExternalStore } from 'react'
 import { createPortal } from 'react-dom'
 
@@ -22,10 +22,17 @@ interface Props {
     claimedIds: Set<string>
     onClaim: (id: string, customReward?: { xp: number; points: number }) => void
     missionRewards: Record<string, { xp: number; coins: number }>
+    onInviteClick?: () => void
+    onCardClick?: (mission: MissionInstance) => void
 }
 
-export default function MissionsModal({ isOpen, onClose, missions, claimingId, claimedIds, onClaim, missionRewards }: Props) {
+export default function MissionsModal({ isOpen, onClose, missions: rawMissions, claimingId, claimedIds, onClaim, missionRewards, onCardClick }: Props) {
     const mounted = useIsClientMounted()
+
+    // Deduplicate missions by resolved visual image
+    const missions = rawMissions
+        .filter((m, idx, arr) => idx === arr.findIndex((x) => resolveCardImage(x) === resolveCardImage(m)))
+        .slice(0, 5) // Enforce exactly 5 cards
 
     // Lock body scroll when open
     useEffect(() => {
@@ -151,6 +158,7 @@ export default function MissionsModal({ isOpen, onClose, missions, claimingId, c
                                                     canClaim={canClaim}
                                                     claiming={claimingId === mission.instance_id}
                                                     onClaim={onClaim}
+                                                    onCardClick={onCardClick}
                                                     colorTheme={['pink', 'yellow', 'white'][index % 3] as 'pink' | 'yellow' | 'white'}
                                                     rewards={missionRewards[mission.instance_id]}
                                                 />

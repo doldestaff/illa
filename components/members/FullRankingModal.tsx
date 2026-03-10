@@ -55,8 +55,8 @@ export default function FullRankingModal({ isOpen, onClose, currentUserId }: Ful
                     // Fallback purely by total XP if RPC fails
                     const { data: fallbackData } = await supabase
                         .from('profiles')
-                        .select('user_id:id, full_name, avatar_path, xp:points') // Assume points as XP fallback for demo
-                        .order('points', { ascending: false })
+                        .select('user_id:id, full_name, avatar_path, xp') // Real XP column
+                        .order('xp', { ascending: false })
                         .limit(100)
 
                     if (fallbackData) {

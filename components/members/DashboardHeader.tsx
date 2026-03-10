@@ -265,7 +265,7 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                             <div className="flex-1 min-w-0 w-full flex flex-col items-center md:items-start text-center md:text-left mt-2 md:mt-0">
 
                                 {/* ÔöÇÔöÇ Row 1: Name + LVL badge ÔöÇÔöÇ */}
-                                <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4 mb-2">
+                                <div className="flex flex-col items-center md:items-start md:gap-1 mb-2">
                                     <h1 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-white/70 tracking-tight drop-shadow-[0_2px_15px_rgba(255,255,255,0.2)]">
                                         {profile.full_name || 'Membro ILLA'}
                                     </h1>
@@ -280,7 +280,7 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                                             rotate: [0, -5, 5, 0]
                                         } : {}}
                                         transition={{ duration: 1.2, type: "spring", bounce: 0.5 }}
-                                        className="relative inline-flex shrink-0 w-fit items-center justify-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-illa-yellow to-amber-500 shadow-[0_4px_16px_rgba(245,158,11,0.4)] border border-white/50 transform hover:scale-105 transition-transform cursor-default mt-1 md:mt-0 whitespace-nowrap mx-auto md:mx-0"
+                                        className="relative inline-flex shrink-0 w-fit items-center justify-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-illa-yellow to-amber-500 shadow-[0_4px_16px_rgba(245,158,11,0.4)] border border-white/50 transform hover:scale-105 transition-transform cursor-default mt-1 whitespace-nowrap mx-auto md:mx-0"
                                     >
                                         {levelUpTrigger && (
                                             <motion.div

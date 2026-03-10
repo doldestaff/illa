@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence, useScroll } from 'framer-motion'
-import { ArrowLeft, CheckCircle2, Coins, Play, Sparkles, ChefHat, Camera, Upload, ImageIcon, User, Loader2, Video } from 'lucide-react'
+import { ArrowLeft, CheckCircle2, Coins, Play, Sparkles, ChefHat, Camera, Upload, ImageIcon, User, Loader2, Video, Heart } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { toast } from 'sonner'
@@ -23,7 +23,7 @@ interface RecipeMission {
 
 const MISSIONS: RecipeMission[] = [
     {
-        id: '1',
+        id: '11111111-1111-1111-1111-111111111111',
         title: 'Milkshake "Cinema de Pipoca"',
         subtitle: 'Fazer em dupla e brindar (sem álcool)',
         time: '7 min',
@@ -43,7 +43,7 @@ const MISSIONS: RecipeMission[] = [
         reward: 50
     },
     {
-        id: '2',
+        id: '22222222-2222-2222-2222-222222222222',
         title: 'Affogato "Café Gelado + ILLA"',
         subtitle: 'Sobremesa chique em 2 minutos (perfeita pra date)',
         time: '3 min',
@@ -62,7 +62,7 @@ const MISSIONS: RecipeMission[] = [
         reward: 50
     },
     {
-        id: '3',
+        id: '33333333-3333-3333-3333-333333333333',
         title: 'Sanduíche de Sorvete "Cookie Smash"',
         subtitle: 'Fazer 4 mini-sanduíches e dividir com amigos',
         time: '10 min',
@@ -81,7 +81,7 @@ const MISSIONS: RecipeMission[] = [
         reward: 75
     },
     {
-        id: '4',
+        id: '44444444-4444-4444-4444-444444444444',
         title: '"Banana Split" Turbo em Casa',
         subtitle: 'Montar a taça mais bonita',
         time: '12 min',
@@ -100,7 +100,7 @@ const MISSIONS: RecipeMission[] = [
         reward: 100
     },
     {
-        id: '5',
+        id: '55555555-5555-5555-5555-555555555555',
         title: 'Brownie de Caneca + Bola ILLA',
         subtitle: 'Sobremesa quente-frio em 1 caneca',
         time: '8 min',
@@ -122,7 +122,7 @@ const MISSIONS: RecipeMission[] = [
         reward: 75
     },
     {
-        id: '6',
+        id: '66666666-6666-6666-6666-666666666666',
         title: '"Float" de Guaraná (Refrigerante + ILLA)',
         subtitle: '1 litro vira 4 copos com cara de festa',
         time: '5 min',
@@ -141,7 +141,7 @@ const MISSIONS: RecipeMission[] = [
         reward: 50
     },
     {
-        id: '7',
+        id: '77777777-7777-7777-7777-777777777777',
         title: 'Parfait de Açaí ILLA "Camadas"',
         subtitle: 'Montar camadas e escolher "topping oficial do casal"',
         time: '10 min',
@@ -161,7 +161,7 @@ const MISSIONS: RecipeMission[] = [
         reward: 75
     },
     {
-        id: '8',
+        id: '88888888-8888-8888-8888-888888888888',
         title: '"Torta Gelada" de Biscoito',
         subtitle: 'Sobremesa de bandeja pra galera (Sem Forno)',
         time: '20 min + freezer',
@@ -181,7 +181,7 @@ const MISSIONS: RecipeMission[] = [
         reward: 150
     },
     {
-        id: '9',
+        id: '99999999-9999-9999-9999-999999999999',
         title: 'Picolé ILLA "DIP & CRUNCH"',
         subtitle: 'Transformar picolé em sobremesa premium',
         time: '15 min',
@@ -269,6 +269,8 @@ export default function ReceitasCinematicPage() {
     const [uploading, setUploading] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
     const containerRef = useRef<HTMLDivElement>(null)
+    const [savedRecipes, setSavedRecipes] = useState<Set<string>>(new Set())
+    const [activeTab, setActiveTab] = useState<'Todas' | 'Novas' | 'Favoritas'>('Todas')
 
     useScroll({ target: containerRef }) // initialized for side effects if any, or can be removed if not needed? Actually let me just leave it out
 
@@ -313,11 +315,69 @@ export default function ReceitasCinematicPage() {
                 setCompletedMissions(ids)
                 setTotalCoins(profile?.points ?? 0)
             }
+
+            // Load saved/favorited recipes
+            const { data: savedRows } = await supabase
+                .from('user_recipes')
+                .select('recipe_id')
+                .eq('user_id', user.id)
+                .eq('favorited', true)
+
+            if (!cancelled && savedRows) {
+                setSavedRecipes(new Set(savedRows.map(r => r.recipe_id)))
+            }
         }
 
         loadProgress()
         return () => { cancelled = true }
     }, [])
+
+    const handleSaveRecipe = async (missionId: string) => {
+        const supabase = createSupabaseBrowser()
+        const { data: { user } } = await supabase.auth.getUser()
+
+        if (!user) {
+            toast.info('Crie uma conta para salvar receitas e ganhar recompensas!', {
+                icon: <Heart className="text-rose-400" />,
+            })
+            return
+        }
+
+        const isAlreadySaved = savedRecipes.has(missionId)
+
+        // Use the toggle API to ensure it hits the same logic as the dashboard
+        const res = await fetch('/api/recipes/toggle', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ recipe_id: missionId, field: 'favorited', value: !isAlreadySaved }),
+        })
+        const data = await res.json()
+
+        if (!data.success) {
+            toast.error('Erro ao favoritar receita.')
+            return
+        }
+
+        const newSaved = new Set(savedRecipes)
+        if (isAlreadySaved) {
+            newSaved.delete(missionId)
+            toast('Receita removida dos favoritos', { icon: '💔' })
+        } else {
+            newSaved.add(missionId)
+            toast.success('Receita salva nos favoritos!', {
+                icon: <Heart className="text-rose-400" fill="currentColor" />,
+            })
+
+            // Track mission progress for view_recipes
+            fetch('/api/missions/progress', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ kind: 'view_recipes' }),
+            }).catch(() => { /* non-critical */ })
+        }
+
+        setSavedRecipes(newSaved)
+    }
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, mission: RecipeMission) => {
         const file = e.target.files?.[0]
@@ -527,11 +587,34 @@ export default function ReceitasCinematicPage() {
                     >
                         Complete missões deliciosas na sua própria casa, compartilhe sua experiência e ganhe moedas ILLA para trocar por prêmios.
                     </motion.p>
+
+                    {/* Tabs */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 }}
+                        className="flex justify-center items-center gap-2 mt-8 flex-wrap"
+                    >
+                        {(['Todas', 'Novas', 'Favoritas'] as const).map(tab => (
+                            <button
+                                key={tab}
+                                onClick={() => setActiveTab(tab)}
+                                className={`px-5 py-2.5 rounded-full text-sm font-bold tracking-widest uppercase transition-all ${activeTab === tab ? 'bg-amber-500 text-black shadow-[0_4px_20px_rgba(245,158,11,0.4)] scale-105' : 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white border border-white/5'}`}
+                            >
+                                {tab}
+                            </button>
+                        ))}
+                    </motion.div>
                 </div>
 
                 {/* Grid of Missions */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {MISSIONS.map((mission, idx) => {
+                    {MISSIONS.filter(mission => {
+                        if (activeTab === 'Todas') return true;
+                        if (activeTab === 'Favoritas') return savedRecipes.has(mission.id);
+                        if (activeTab === 'Novas') return !completedMissions.includes(mission.id);
+                        return true;
+                    }).map((mission, idx) => {
                         const isCompleted = completedMissions.includes(mission.id)
                         const isActive = activeMission === mission.id
 
@@ -561,9 +644,26 @@ export default function ReceitasCinematicPage() {
                                                 <div className="text-xs font-bold text-white/40 uppercase tracking-widest">Tempo: {mission.time}</div>
                                             </div>
                                         </div>
-                                        <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase ${isCompleted ? 'bg-green-500/10 text-green-500 border border-green-500/20' : 'bg-amber-500/10 text-amber-500 border border-amber-500/20'}`}>
-                                            <Coins className="w-3 h-3" />
-                                            {mission.reward}
+                                        <div className="flex items-center gap-2">
+                                            {/* Save/Favorite Button */}
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation()
+                                                    handleSaveRecipe(mission.id)
+                                                }}
+                                                className="p-2 rounded-full bg-white/5 hover:bg-rose-500/15 border border-white/5 transition-all group/heart"
+                                                title={savedRecipes.has(mission.id) ? 'Remover dos favoritos' : 'Salvar receita'}
+                                            >
+                                                <Heart
+                                                    size={16}
+                                                    className={`transition-colors ${savedRecipes.has(mission.id) ? 'text-rose-400 fill-rose-400' : 'text-white/40 group-hover/heart:text-rose-400'}`}
+                                                    fill={savedRecipes.has(mission.id) ? 'currentColor' : 'none'}
+                                                />
+                                            </button>
+                                            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase ${isCompleted ? 'bg-green-500/10 text-green-500 border border-green-500/20' : 'bg-amber-500/10 text-amber-500 border border-amber-500/20'}`}>
+                                                <Coins className="w-3 h-3" />
+                                                {mission.reward}
+                                            </div>
                                         </div>
                                     </div>
 

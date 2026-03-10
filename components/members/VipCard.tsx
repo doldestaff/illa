@@ -4,8 +4,8 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import type { VipPayload } from '@/lib/gamification-types'
-import { motion, useScroll, useTransform } from 'framer-motion'
-import { QrCode, Copy, Check, Loader2, Crown, Clock } from 'lucide-react'
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
+import { QrCode, Copy, Check, Loader2, Crown, Clock, X, IceCream, Tag, Zap } from 'lucide-react'
 
 interface Props {
     referralCode: string | null
@@ -13,6 +13,7 @@ interface Props {
     vipPayload: VipPayload | null
     onLoadVip: () => Promise<VipPayload>
     onShareCopy?: () => void
+    onViewExclusive?: () => void
 }
 
 const MILESTONES = [1, 3, 10]
@@ -72,11 +73,13 @@ function QrCodeCanvas({ value, size = 140 }: { value: string; size?: number }) {
     return <canvas ref={canvasRef} className="rounded-xl mix-blend-multiply" style={{ width: size, height: size }} />
 }
 
-export default function VipCard({ referralCode, referralCount, vipPayload, onLoadVip, onShareCopy }: Props) {
+export default function VipCard({ referralCode, referralCount, vipPayload, onLoadVip, onShareCopy, onViewExclusive }: Props) {
     const [loading, setLoading] = useState(false)
     const [vip, setVip] = useState(vipPayload)
     const [codeCopied, setCodeCopied] = useState(false)
     const [refCopied, setRefCopied] = useState(false)
+    const [showBenefits, setShowBenefits] = useState(false)
+    const benefitsTracked = useRef(false)
 
     // --- Scroll Reactive Lighting Setup ---
     const cardRef = useRef<HTMLDivElement>(null)
@@ -117,7 +120,7 @@ export default function VipCard({ referralCode, referralCount, vipPayload, onLoa
     const origin = typeof window !== 'undefined' ? window.location.origin : ''
 
     return (
-        <div className="space-y-6" ref={cardRef}>
+        <div className="space-y-6" ref={cardRef} id="vip">
             {/* Title */}
             <div className="flex items-center gap-2">
                 <Crown size={20} className="text-illa-yellow" fill="currentColor" />
@@ -128,7 +131,16 @@ export default function VipCard({ referralCode, referralCount, vipPayload, onLoa
             <div className="relative w-[calc(100%+1.5rem)] -ml-3 sm:w-full sm:mx-auto sm:max-w-[400px] filter drop-shadow-[0_10px_40px_rgba(0,0,0,0.8)] transition-transform hover:scale-[1.01] duration-500 perspective-1000 group rounded-[2rem] bg-[#0c0514] overflow-hidden border border-white/10">
 
                 {/* Background Image Native Shape - Shorter height to crop empty bottom space */}
-                <div className="relative w-full pt-[95%] sm:pt-[100%] bg-[#0c0514] overflow-hidden">
+                <div
+                    className="relative w-full pt-[95%] sm:pt-[100%] bg-[#0c0514] overflow-hidden cursor-pointer"
+                    onClick={() => {
+                        setShowBenefits(true)
+                        if (!benefitsTracked.current) {
+                            benefitsTracked.current = true
+                            onViewExclusive?.()
+                        }
+                    }}
+                >
                     <img src="/digital-card/digitalcard-illa.webp?v=update9" alt="ILLA Exclusive Digital Card" className="absolute inset-0 w-full h-[120%] object-cover object-top pointer-events-none z-0 scale-[1.02] -translate-y-[8%]" />
                 </div>
 
@@ -186,6 +198,121 @@ export default function VipCard({ referralCode, referralCount, vipPayload, onLoa
                 </div>
             </div>
 
-        </div>
+            {/* Benefits Popup */}
+            <AnimatePresence>
+                {showBenefits && (
+                    <>
+                        {/* Backdrop */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setShowBenefits(false)}
+                            className="fixed inset-0 z-[200] bg-black/75 backdrop-blur-md"
+                        />
+
+                        {/* Modal */}
+                        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 pointer-events-none">
+                            <motion.div
+                                initial={{ scale: 0.85, opacity: 0, y: 40 }}
+                                animate={{ scale: 1, opacity: 1, y: 0 }}
+                                exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                                transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+                                className="w-full max-w-[400px] pointer-events-auto relative overflow-hidden rounded-[2.5rem] bg-[#0c0514]/95 backdrop-blur-2xl border border-white/10 shadow-[0_20px_80px_rgba(0,0,0,0.8)]"
+                            >
+                                {/* Ambient glows */}
+                                <div className="absolute -top-20 -left-20 w-56 h-56 bg-amber-500/15 rounded-full blur-[60px] pointer-events-none" />
+                                <div className="absolute -bottom-20 -right-20 w-56 h-56 bg-rose-500/10 rounded-full blur-[60px] pointer-events-none" />
+
+                                {/* Close button */}
+                                <button
+                                    onClick={() => setShowBenefits(false)}
+                                    className="absolute top-5 right-5 z-20 p-2 rounded-full bg-white/5 hover:bg-white/15 text-white/40 hover:text-white transition-all border border-white/5"
+                                >
+                                    <X size={16} />
+                                </button>
+
+                                {/* Header */}
+                                <div className="relative z-10 px-8 pt-10 pb-6 text-center">
+                                    <motion.div
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: 1 }}
+                                        transition={{ type: 'spring', delay: 0.1, damping: 12 }}
+                                        className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-amber-400 to-rose-500 flex items-center justify-center mb-4 shadow-[0_8px_30px_rgba(251,191,36,0.3)]"
+                                    >
+                                        <Crown size={30} className="text-white" fill="currentColor" />
+                                    </motion.div>
+                                    <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-white to-amber-200 tracking-tight">
+                                        ILLA Exclusive
+                                    </h3>
+                                    <p className="text-xs text-white/40 mt-1 uppercase tracking-widest font-bold">Seus benefícios VIP</p>
+                                </div>
+
+                                {/* Benefits List */}
+                                <div className="relative z-10 px-6 pb-6 space-y-3">
+                                    <motion.div
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: 0.2 }}
+                                        className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/5"
+                                    >
+                                        <div className="w-12 h-12 rounded-xl bg-cyan-500/15 flex items-center justify-center flex-shrink-0">
+                                            <IceCream size={22} className="text-cyan-400" />
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-sm text-white">Sorvetes & Picolés Free</p>
+                                            <p className="text-xs text-white/40">Troque moedas por produtos gratuitos</p>
+                                        </div>
+                                    </motion.div>
+
+                                    <motion.div
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: 0.3 }}
+                                        className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/5"
+                                    >
+                                        <div className="w-12 h-12 rounded-xl bg-emerald-500/15 flex items-center justify-center flex-shrink-0">
+                                            <Tag size={22} className="text-emerald-400" />
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-sm text-white">Super Descontos</p>
+                                            <p className="text-xs text-white/40">Promoções exclusivas para membros VIP</p>
+                                        </div>
+                                    </motion.div>
+
+                                    <motion.div
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: 0.4 }}
+                                        className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/5"
+                                    >
+                                        <div className="w-12 h-12 rounded-xl bg-amber-500/15 flex items-center justify-center flex-shrink-0">
+                                            <Zap size={22} className="text-amber-400" />
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-sm text-white">Acesso Antecipado</p>
+                                            <p className="text-xs text-white/40">Novos sabores e lançamentos antes de todos</p>
+                                        </div>
+                                    </motion.div>
+                                </div>
+
+                                {/* QR Code Section */}
+                                {vip && (
+                                    <div className="relative z-10 px-6 pb-8">
+                                        <div className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-white/5 border border-white/5">
+                                            <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Apresente na loja</p>
+                                            <div className="bg-white rounded-xl p-2">
+                                                <QrCodeCanvas value={`${origin}/vip/redeem?code=${vip.short_code}`} size={120} />
+                                            </div>
+                                            <p className="font-mono font-bold text-lg text-white/80 tracking-[0.2em]">{vip.short_code}</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </motion.div>
+                        </div>
+                    </>
+                )}
+            </AnimatePresence>
+        </div >
     )
 }

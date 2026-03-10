@@ -65,26 +65,9 @@ function PremiumGoldenCloud({ children, isClaimed = false }: { children: React.R
                 </motion.span>
             ))}
 
-            {/* Premium Golden Bumps */}
-            <div className="absolute -top-6 left-[8%] w-[60px] h-[60px] rounded-full z-0 bg-gradient-to-br from-[#FFCF24] to-[#FFAD00] overflow-hidden">
-                <GoldenShimmer />
-            </div>
-            <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-[110px] h-[110px] rounded-full z-0 bg-gradient-to-b from-[#FFCF24] via-[#FFAD00] to-[#DF7A00] overflow-hidden">
-                <GoldenShimmer />
-            </div>
-            <div className="absolute -top-6 right-[8%] w-[65px] h-[65px] rounded-full z-0 bg-gradient-to-bl from-[#FFCF24] to-[#FFAD00] overflow-hidden">
-                <GoldenShimmer />
-            </div>
-
-            {/* Main Body Background (has overflow-hidden for texture, merges seamlessly via top shadow removal) */}
-            <div
-                className="absolute inset-x-0 bottom-0 top-0 rounded-[2.5rem] bg-[#FFCF24] bg-gradient-to-b from-transparent via-[#FFAD00] to-[#DF7A00] overflow-hidden z-10"
-                style={{
-                    boxShadow: 'inset 0 -12px 24px rgba(150,40,0,0.5)'
-                }}
-            >
-                <GoldenShimmer />
-                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.08] mix-blend-overlay pointer-events-none z-0" />
+            {/* Custom Image Background (Replacing the yellow CSS shape) */}
+            <div className="absolute inset-[-40px] z-0 pointer-events-none flex items-center justify-center">
+                <img src="/toast-bg.webp" alt="Background shape" className="w-[120%] h-[120%] object-contain scale-[1.1]" />
             </div>
 
             {/* Content Container (no overflow-hidden, allows coin to escape bounds) */}
