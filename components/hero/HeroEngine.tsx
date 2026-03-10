@@ -677,8 +677,7 @@ export function HeroEngine({
                         src={posterUrl}
                         className={cn(
                             "absolute inset-0 w-full h-full object-cover z-10",
-                            isMobileHero ? "transition-none" : "transition-opacity duration-500 ease-out",
-                            isLoaded ? "opacity-0 pointer-events-none" : "opacity-100"
+                            isLoaded ? "hidden" : "block"
                         )}
                         alt="Illa Loading"
                         style={{ pointerEvents: 'none' }}
@@ -692,10 +691,8 @@ export function HeroEngine({
                 style={{
                     willChange: 'contents',
                     imageRendering: (state.current.isMobile && scrollMode === 'document') ? 'pixelated' : 'auto',
-                    // Mobile: always visible from frame 0, no fade-in
-                    // Desktop: fade in once poster has been shown
-                    opacity: isMobileHero ? 1 : (isLoaded ? 1 : 0),
-                    transition: isMobileHero ? 'none' : 'opacity 500ms ease-out',
+                    // Always visible once loaded, no fade-in
+                    opacity: isLoaded ? 1 : 0,
                 }}
             />
         </div >
