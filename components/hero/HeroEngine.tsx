@@ -164,28 +164,39 @@ export function HeroEngine({
     // --- 2. Resize Handler (Split: immediate dimension update + debounced redraw) ---
     useEffect(() => {
         let redrawTimer: NodeJS.Timeout
+        // Track previous width to detect real resizes vs URL bar collapse
+        let prevWidth = window.visualViewport ? window.visualViewport.width : window.innerWidth
 
         const handleResize = () => {
             // CRITICAL: Update dimensions IMMEDIATELY — no debounce.
-            // URL bar hide/show on Android Chrome changes visualViewport.height instantly.
-            // The scroll handler fires synchronously, so appHeight must always be current.
             const h = window.visualViewport ? window.visualViewport.height : window.innerHeight
             const w = window.visualViewport ? window.visualViewport.width : window.innerWidth
 
-            state.current.appHeight = h
+            const widthChanged = Math.abs(w - prevWidth) > 1
+            const isMob = w < 768
+            const isTab = w >= 768 && w < 1024
+
             state.current.appWidth = w
-            state.current.isMobile = w < 768
-            state.current.isTablet = w >= 768 && w < 1024
+            state.current.isMobile = isMob
+            state.current.isTablet = isTab
+
+            // On mobile/tablet, ONLY update appHeight if the WIDTH actually changed
+            // (real rotation/resize). If only height changed, it's the URL bar collapsing
+            // and we MUST ignore it to prevent the canvas from jumping.
+            if (widthChanged || (!isMob && !isTab)) {
+                state.current.appHeight = h
+                prevWidth = w
+            }
 
             const isBackgroundMode = scrollMode === 'document'
-            state.current.cache.setLimit((state.current.isMobile || state.current.isTablet) ? (isBackgroundMode ? 90 : 100) : 100)
+            state.current.cache.setLimit((isMob || isTab) ? (isBackgroundMode ? 90 : 100) : 100)
 
             if (containerRef.current) {
-                containerRef.current.style.setProperty('--app-h', `${h}px`)
+                // Use the stable appHeight, not the raw h
+                containerRef.current.style.setProperty('--app-h', `${state.current.appHeight}px`)
             }
 
             // Debounce only the expensive canvas resize + redraw
-            // (prevents too-frequent canvas resizing during continuous resize events)
             clearTimeout(redrawTimer)
             redrawTimer = setTimeout(() => scheduleDraw(), 150)
         }
@@ -193,9 +204,10 @@ export function HeroEngine({
         window.addEventListener('resize', handleResize)
         if (window.visualViewport) window.visualViewport.addEventListener('resize', handleResize)
 
-        // Initial call
+        // Initial call — always set everything on first mount
         const h = window.visualViewport ? window.visualViewport.height : window.innerHeight
         const w = window.visualViewport ? window.visualViewport.width : window.innerWidth
+        prevWidth = w
         state.current.appHeight = h
         state.current.appWidth = w
         state.current.isMobile = w < 768
