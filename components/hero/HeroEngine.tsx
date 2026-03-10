@@ -406,7 +406,7 @@ export function HeroEngine({
             // Draw the nearest frame as a bridge
             const ctx = canvasRef.current?.getContext('2d', { alpha: false, desynchronized: true })
             if (ctx && canvasRef.current) {
-                const dpr = Math.min(window.devicePixelRatio || 1, state.current.isMobile ? 1.0 : 1.5)
+                const dpr = Math.min(window.devicePixelRatio || 1, (state.current.isMobile || state.current.isTablet) ? 1.0 : 1.5)
                 const w = state.current.appWidth
                 const h = state.current.appHeight
                 const targetW = Math.floor(w * dpr)
@@ -415,6 +415,8 @@ export function HeroEngine({
                     canvasRef.current.width = targetW
                     canvasRef.current.height = targetH
                     ctx.scale(dpr, dpr)
+                } else {
+                    ctx.clearRect(0, 0, w, h)
                 }
                 const iW = (nearest instanceof ImageBitmap) ? nearest.width : (nearest as HTMLImageElement).naturalWidth
                 const iH = (nearest instanceof ImageBitmap) ? nearest.height : (nearest as HTMLImageElement).naturalHeight
@@ -450,6 +452,9 @@ export function HeroEngine({
             canvas.height = targetH
             // Scale context once after resize
             ctx.scale(dpr, dpr)
+        } else {
+            // CRITICAL FIX: Clear the canvas before drawing the new frame to prevent WebP alpha/compression artifact buildup (tearing)
+            ctx.clearRect(0, 0, w, h)
         }
         // NOTE: We do NOT resetTransform/scale every frame for performance.
         // We assume the context state persists until resize clears it.
