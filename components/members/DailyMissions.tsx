@@ -406,29 +406,55 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
                             animate={{ scale: 1, y: 0, opacity: 1 }}
                             exit={{ scale: 0.8, y: 30, opacity: 0, filter: 'blur(10px)' }}
                             transition={{ type: 'spring', bounce: 0.5, duration: 0.7 }}
-                            className="bg-[#0c0a09]/95 backdrop-blur-3xl px-8 py-10 rounded-[2.5rem] shadow-[0_30px_100px_rgba(0,0,0,0.9)] flex flex-col items-center gap-4 text-center relative overflow-hidden max-w-[340px] w-full border border-white/10"
+                            className="flex flex-col items-center gap-4 text-center relative max-w-[340px] w-full"
                         >
-                            {/* Animated Background Rays */}
-                            <motion.div
-                                animate={{ rotate: 360 }}
-                                transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                                className="absolute inset-0 z-0 pointer-events-none opacity-40 select-none"
-                                style={{
-                                    background: 'conic-gradient(from 0deg, transparent 0%, rgba(229,1,125,0.2) 20%, transparent 40%, rgba(245,158,11,0.2) 60%, transparent 80%, rgba(229,1,125,0.2) 100%)'
-                                }}
-                            />
+                            {/* Gamified Star Bursts Particle Effect */}
+                            {[
+                                { emoji: '✨', x: -90, y: -80, delay: 0.1, size: 24, rot: 15 },
+                                { emoji: '🌟', x: 100, y: -65, delay: 0.2, size: 20, rot: -20 },
+                                { emoji: '💫', x: -100, y: 40, delay: 0.25, size: 22, rot: 10 },
+                                { emoji: '✨', x: 110, y: 45, delay: 0.3, size: 18, rot: -10 },
+                                { emoji: '🔥', x: -50, y: -110, delay: 0.15, size: 18, rot: 5 },
+                                { emoji: '💛', x: 65, y: -100, delay: 0.22, size: 16, rot: -5 },
+                                { emoji: '🎉', x: -85, y: 95, delay: 0.35, size: 24, rot: 20 },
+                                { emoji: '🎊', x: 85, y: 95, delay: 0.28, size: 22, rot: -15 },
+                            ].map((s, i) => (
+                                <motion.span
+                                    key={`burst-${i}`}
+                                    initial={{ opacity: 0, scale: 0, x: 0, y: 0, rotate: 0 }}
+                                    animate={{ opacity: [0, 1, 1, 0], scale: [0, 1.4, 1, 0.8], x: s.x, y: s.y, rotate: s.rot }}
+                                    transition={{ duration: 2, delay: s.delay, ease: 'easeOut', times: [0, 0.2, 0.7, 1] }}
+                                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 select-none pointer-events-none z-30 drop-shadow-md"
+                                    style={{ fontSize: s.size }}
+                                >
+                                    {s.emoji}
+                                </motion.span>
+                            ))}
 
-                            <div className="absolute inset-0 bg-gradient-to-tr from-illa-pink/10 to-transparent opacity-50 z-0 pointer-events-none" />
-                            <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay z-0 pointer-events-none" />
+                            {/* Custom Image Background Shape (WebP) replacing the rigid border container */}
+                            <div className="absolute inset-[-40px] z-0 pointer-events-none flex items-center justify-center drop-shadow-[0_20px_50px_rgba(229,1,125,0.3)]">
+                                <img src="/mission-complete.webp" alt="Background shape" className="w-[120%] h-[120%] object-contain scale-[1.15]" />
+                            </div>
 
-                            <motion.div
-                                initial={{ scale: 0 }}
-                                animate={{ scale: [0, 1.3, 1], rotate: [0, 10, -10, 0] }}
-                                transition={{ duration: 0.8, ease: 'easeOut', type: 'spring', bounce: 0.6 }}
-                                className="w-20 h-20 bg-gradient-to-tr from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(245,158,11,0.6)] relative z-10 border border-white/20"
-                            >
-                                <CheckCircle2 className="text-black" size={40} strokeWidth={3} />
-                            </motion.div>
+                            <div className="relative z-10 w-full px-8 py-10 flex flex-col items-center gap-4">
+                                {/* Animated Background Rays (Now within the content scope for localized flair) */}
+                                <motion.div
+                                    animate={{ rotate: 360 }}
+                                    transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                                    className="absolute inset-0 z-[-1] pointer-events-none opacity-30 select-none rounded-[2.5rem] overflow-hidden mix-blend-overlay"
+                                    style={{
+                                        background: 'conic-gradient(from 0deg, transparent 0%, rgba(229,1,125,0.4) 20%, transparent 40%, rgba(255,255,255,0.4) 60%, transparent 80%, rgba(229,1,125,0.4) 100%)'
+                                    }}
+                                />
+
+                                <motion.div
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: [0, 1.3, 1], rotate: [0, 10, -10, 0] }}
+                                    transition={{ duration: 0.8, ease: 'easeOut', type: 'spring', bounce: 0.6 }}
+                                    className="w-20 h-20 bg-gradient-to-tr from-amber-300 to-orange-500 rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(245,158,11,0.6)] relative z-20 border-2 border-white/40"
+                                >
+                                    <CheckCircle2 className="text-orange-950" size={42} strokeWidth={3} />
+                                </motion.div>
 
                             <div className="relative z-10 mt-2 mb-2 w-full">
                                 <motion.h3
@@ -480,6 +506,7 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
                                     </div>
                                 )}
                             </motion.div>
+                            </div>
                         </motion.div>
                     </motion.div>
                 )}
