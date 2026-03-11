@@ -5,7 +5,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import type { VipPayload, MemberProfile } from '@/lib/gamification-types'
 import { motion, AnimatePresence, useScroll, useTransform, type MotionValue } from 'framer-motion'
-import { QrCode, Copy, Check, Loader2, Crown, Clock, X, IceCream, Tag, Zap, Flame, Gift } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
+import { QrCode, Copy, Check, Loader2, Crown, Clock, X, IceCream, Tag, Zap, Flame, Gift, CheckCircle } from 'lucide-react'
 import { QRCodeSVG } from 'qrcode.react'
 
 interface Props {
@@ -48,13 +49,28 @@ export default function VipCard({ profile, avatarUrl, referralCount, vipPayload,
     const [codeCopied, setCodeCopied] = useState(false)
     const [refCopied, setRefCopied] = useState(false)
     const [showBenefits, setShowBenefits] = useState(false)
+    const [isValidated, setIsValidated] = useState(false)
     const benefitsTracked = useRef(false)
 
     // PERF: Detect mobile to disable scroll-reactive glare (fires per-frame)
     const [isMobile, setIsMobile] = useState(false)
     useEffect(() => {
         setIsMobile(window.innerWidth < 768)
-    }, [])
+
+        // REALTIME: Listen for scan success broadcast
+        const channel = supabase.channel('vip-notifications')
+            .on('broadcast', { event: 'vip-scan-success' }, ({ payload }) => {
+                if (payload.userId === profile.id) {
+                    setIsValidated(true)
+                    setTimeout(() => setIsValidated(false), 5000)
+                }
+            })
+            .subscribe()
+
+        return () => {
+            supabase.removeChannel(channel)
+        }
+    }, [profile.id])
 
     // --- Scroll Reactive Lighting Setup ---
     // PERF: Only create scroll listeners on desktop. On mobile this fires
@@ -145,6 +161,37 @@ export default function VipCard({ profile, avatarUrl, referralCount, vipPayload,
                                     <div className="absolute inset-0 pointer-events-none z-20 mix-blend-overlay bg-gradient-to-tr from-transparent via-white/20 to-transparent" />
                                 )}
                                 <QrCodeCanvas value={`${origin}/vip/redeem?code=${vip.short_code}`} size={200} />
+
+                                {/* Real-time Validation Pulse */}
+                                <AnimatePresence>
+                                    {isValidated && (
+                                        <motion.div
+                                            initial={{ opacity: 0, scale: 0.8 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            exit={{ opacity: 0, scale: 1.2 }}
+                                            className="absolute inset-x-0 -inset-y-4 z-[60] flex flex-col items-center justify-center pointer-events-none"
+                                        >
+                                            <motion.div
+                                                animate={{ 
+                                                    scale: [1, 1.2, 1],
+                                                    opacity: [0.5, 0.8, 0.5] 
+                                                }}
+                                                transition={{ repeat: Infinity, duration: 2 }}
+                                                className="absolute inset-0 bg-emerald-500/20 rounded-full blur-3xl"
+                                            />
+                                            <div className="bg-emerald-500/90 backdrop-blur-md p-3 rounded-full shadow-[0_0_40px_rgba(16,185,129,0.5)] border border-emerald-400/50">
+                                                <CheckCircle size={40} className="text-white" />
+                                            </div>
+                                            <motion.span 
+                                                initial={{ y: 10, opacity: 0 }}
+                                                animate={{ y: 0, opacity: 1 }}
+                                                className="mt-3 font-mono font-black text-emerald-400 text-sm tracking-[0.2em] drop-shadow-lg uppercase"
+                                            >
+                                                Verificado
+                                            </motion.span>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </div>
                         )}
                     </div>
