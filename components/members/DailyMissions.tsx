@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useRef, useEffect } from 'react'
+import React, { useState, useCallback, useRef, useEffect } from 'react'
 import type { MissionInstance } from '@/lib/gamification-types'
 import { Compass, Sparkles, ArrowRight, CheckCircle2, Star } from 'lucide-react'
 import { motion, AnimatePresence, animate } from 'framer-motion'
@@ -39,12 +39,12 @@ function AnimatedCounter({ value, duration = 1.5, delay = 0 }: { value: number, 
 
 function InteractiveMarquee({ children, onIndexChange }: { children: React.ReactNode, onIndexChange?: (index: number) => void }) {
     const containerRef = useRef<HTMLDivElement>(null)
+    const contentRef = useRef<HTMLDivElement>(null)
     const [isVisible, setIsVisible] = useState(false)
 
     // Interaction/Scroll state tracked purely in refs to avoid React renders
     const isInteractingRef = useRef(false)
     const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-
 
     useEffect(() => {
         const container = containerRef.current
@@ -58,10 +58,80 @@ function InteractiveMarquee({ children, onIndexChange }: { children: React.React
         return () => observer.disconnect()
     }, [])
 
-    // We removed the heavy JS requestAnimationFrame scroll loop to fix scroll jank on mobile.
-    // The container now relies purely on native hardware-accelerated CSS overflow scrolling.
+    // Auto-scroll loop
+    useEffect(() => {
+        const container = containerRef.current;
+        const inner = contentRef.current;
+        if (!container || !inner) return;
 
-    // New Observer to detect which card is centered for the slide counter
+        let animationFrameId: number;
+        let lastTimestamp = performance.now();
+        let scrollPos = container.scrollLeft;
+
+        // Initialize without snap so we can smoothly auto-scroll
+        container.style.scrollSnapType = 'none';
+
+        const scrollLoop = (timestamp: number) => {
+            const dt = timestamp - lastTimestamp;
+            lastTimestamp = timestamp;
+
+            // Cap extremely large dt (e.g. from tab being suspended)
+            const safeDt = Math.min(dt, 50);
+
+            if (isVisible && !isInteractingRef.current) {
+                const numOriginals = React.Children.count(children);
+                const childrenElements = inner.children;
+                
+                if (childrenElements.length >= numOriginals * 2 && numOriginals > 0) {
+                    const originalFirst = childrenElements[0] as HTMLElement;
+                    const cloneFirst = childrenElements[numOriginals] as HTMLElement;
+                    
+                    const loopWidth = cloneFirst.offsetLeft - originalFirst.offsetLeft;
+                    
+                    if (loopWidth > 0 && container.scrollWidth > container.clientWidth) {
+                        // Advance scroll position by ~40px/sec 
+                        scrollPos += 0.04 * safeDt;
+                        
+                        if (scrollPos >= loopWidth) {
+                            scrollPos -= loopWidth;
+                            container.scrollLeft = scrollPos;
+                        } else {
+                            const diff = Math.abs(container.scrollLeft - scrollPos);
+                            if (diff > 5) { // User or native momentum moved it
+                                scrollPos = container.scrollLeft;
+                            } else {
+                                container.scrollLeft = scrollPos;
+                            }
+                        }
+                    }
+                }
+            } else {
+                // Keep track of the actual position so it doesn't jump when resuming
+                scrollPos = container.scrollLeft;
+                
+                // If it loops while natively scrolling:
+                const numOriginals = React.Children.count(children);
+                const childrenElements = inner.children;
+                if (childrenElements.length >= numOriginals * 2 && numOriginals > 0) {
+                    const originalFirst = childrenElements[0] as HTMLElement;
+                    const cloneFirst = childrenElements[numOriginals] as HTMLElement;
+                    const loopWidth = cloneFirst.offsetLeft - originalFirst.offsetLeft;
+                    
+                    if (loopWidth > 0 && container.scrollLeft >= loopWidth) {
+                        // Resync quietly even when interacting!
+                        container.scrollLeft -= loopWidth;
+                        scrollPos = container.scrollLeft;
+                    }
+                }
+            }
+            animationFrameId = requestAnimationFrame(scrollLoop);
+        };
+
+        animationFrameId = requestAnimationFrame(scrollLoop);
+        return () => cancelAnimationFrame(animationFrameId);
+    }, [isVisible, children]);
+
+    // Observer to detect which card is centered for the slide counter
     useEffect(() => {
         if (!onIndexChange) return
         const container = containerRef.current
@@ -81,24 +151,62 @@ function InteractiveMarquee({ children, onIndexChange }: { children: React.React
             }
         }, { root: container, threshold: [0.4, 0.6, 0.8, 1.0] })
 
-        const items = container.querySelectorAll('.marquee-item')
-        items.forEach(item => observer.observe(item))
+        const inner = contentRef.current
+        if (inner) {
+            const items = inner.querySelectorAll('.marquee-item')
+            items.forEach(item => observer.observe(item))
+        }
 
         return () => observer.disconnect()
     }, [onIndexChange, children])
 
+    const handlePointerDown = () => {
+        isInteractingRef.current = true;
+        if (containerRef.current) {
+            containerRef.current.style.scrollSnapType = 'x mandatory';
+        }
+        if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+    }
+
+    const handlePointerUp = () => {
+        if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+        scrollTimeoutRef.current = setTimeout(() => {
+            isInteractingRef.current = false;
+            if (containerRef.current) {
+                containerRef.current.style.scrollSnapType = 'none';
+            }
+        }, 1500); // Resume auto-scroll naturally after releasing
+    }
+
+    const handleWheel = () => {
+        handlePointerDown();
+        handlePointerUp();
+    }
+
+    const childrenArray = React.Children.toArray(children);
+
     return (
         <div
             ref={containerRef}
-            className="flex overflow-x-auto gap-5 pb-8 py-4 snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex overflow-x-auto pb-8 py-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             style={{
                 willChange: 'scroll-position',
                 WebkitOverflowScrolling: 'touch',
                 transform: 'translateZ(0)', // Force compositor layer
             }}
+            onTouchStart={handlePointerDown}
+            onTouchEnd={handlePointerUp}
+            onTouchCancel={handlePointerUp}
+            onMouseDown={handlePointerDown}
+            onMouseUp={handlePointerUp}
+            onMouseLeave={handlePointerUp}
+            onWheel={handleWheel}
         >
-            <div className="flex shrink-0 gap-5 px-4 md:px-0">
-                {children}
+            <div ref={contentRef} className="flex shrink-0 gap-5 px-4 md:px-0 relative">
+                {childrenArray}
+                {childrenArray.map((child, i) => (
+                    React.isValidElement(child) ? React.cloneElement(child as React.ReactElement<Record<string, unknown>>, { key: `clone-${i}`, 'aria-hidden': "true" }) : child
+                ))}
             </div>
         </div>
     )
