@@ -104,11 +104,11 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
 
                 {/* 3. The "Matter" — PERF: hover uses CSS transition instead of framer-motion variants */}
                 <div
-                    className="relative w-full h-full rounded-[1.8rem] overflow-hidden bg-black/40 shadow-[0_12px_30px_rgba(0,0,0,0.5)] will-change-transform transition-transform duration-300 ease-out group-hover:scale-105 group-hover:-translate-y-[5px] active:scale-105 active:-translate-y-[5px]"
+                    className="relative w-full h-full rounded-[1.8rem] overflow-hidden bg-transparent will-change-transform transition-transform duration-300 ease-out group-hover:scale-105 group-hover:-translate-y-[5px] active:scale-105 active:-translate-y-[5px]"
                     style={{ transform: 'translateZ(0)' }}
                 >
-                    {/* Subtle Edge Glow instead of heavy border */}
-                    <div className="absolute inset-0 rounded-[1.8rem] border border-white/5 pointer-events-none z-20" />
+                    {/* Smoky Edge Glow instead of solid shape */}
+                    <div className="absolute inset-0 rounded-[1.8rem] shadow-[inset_0_0_40px_rgba(0,0,0,0.8),inset_0_0_15px_rgba(255,255,255,0.05)] border border-white/5 pointer-events-none z-20" />
                     {/* 1. Card WebP Image Layer */}
                     <img
                         src={cardImage}
