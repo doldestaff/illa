@@ -6,6 +6,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import type { VipPayload, MemberProfile } from '@/lib/gamification-types'
 import { motion, AnimatePresence, useScroll, useTransform, type MotionValue } from 'framer-motion'
 import { QrCode, Copy, Check, Loader2, Crown, Clock, X, IceCream, Tag, Zap, Flame, Gift } from 'lucide-react'
+import { QRCodeSVG } from 'qrcode.react'
 
 interface Props {
     profile: MemberProfile
@@ -20,58 +21,25 @@ interface Props {
 const MILESTONES = [1, 3, 10]
 
 function QrCodeCanvas({ value, size = 140 }: { value: string; size?: number }) {
-    const canvasRef = useRef<HTMLCanvasElement>(null)
-
-    useEffect(() => {
-        const canvas = canvasRef.current
-        if (!canvas) return
-        const ctx = canvas.getContext('2d')
-        if (!ctx) return
-
-        const cellSize = Math.floor(size / 25)
-        canvas.width = size
-        canvas.height = size
-        ctx.fillStyle = '#ffffff'
-        ctx.fillRect(0, 0, size, size)
-        ctx.fillStyle = '#0B0B0D'
-
-        let seed = 0
-        for (let i = 0; i < value.length; i++) {
-            seed = ((seed << 5) - seed + value.charCodeAt(i)) | 0
-        }
-
-        const drawFinder = (x: number, y: number) => {
-            for (let dy = 0; dy < 7; dy++) {
-                for (let dx = 0; dx < 7; dx++) {
-                    const isOuter = dy === 0 || dy === 6 || dx === 0 || dx === 6
-                    const isInner = dy >= 2 && dy <= 4 && dx >= 2 && dx <= 4
-                    if (isOuter || isInner) {
-                        ctx.fillRect((x + dx) * cellSize, (y + dy) * cellSize, cellSize, cellSize)
-                    }
-                }
-            }
-        }
-
-        drawFinder(1, 1)
-        drawFinder(17, 1)
-        drawFinder(1, 17)
-
-        for (let y = 0; y < 25; y++) {
-            for (let x = 0; x < 25; x++) {
-                if (
-                    (x >= 1 && x <= 7 && y >= 1 && y <= 7) ||
-                    (x >= 17 && x <= 23 && y >= 1 && y <= 7) ||
-                    (x >= 1 && x <= 7 && y >= 17 && y <= 23)
-                ) continue
-                seed = (seed * 1103515245 + 12345) & 0x7fffffff
-                if (seed % 3 === 0) {
-                    ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize)
-                }
-            }
-        }
-    }, [value, size])
-
-    return <canvas ref={canvasRef} className="rounded-xl mix-blend-multiply" style={{ width: size, height: size }} />
+    return (
+        <div className="bg-white p-1.5 rounded-xl shadow-inner flex items-center justify-center overflow-hidden">
+            <QRCodeSVG
+                value={value}
+                size={size}
+                level="M"
+                includeMargin={true}
+                className="w-full h-full"
+                imageSettings={{
+                    src: "/illa-logo-icon.png", // Optional: adding a subtle logo if exists, but strictly for branding.
+                    x: undefined,
+                    y: undefined,
+                    height: 24,
+                    width: 24,
+                    excavate: true,
+                }}
+            />
+        </div>
+    )
 }
 
 export default function VipCard({ profile, avatarUrl, referralCount, vipPayload, onLoadVip, onShareCopy, onViewExclusive }: Props) {
