@@ -163,3 +163,81 @@ body {
     background-image: none;
   }
 }
+
+/* ─── Performance-Optimized Animations (GPU compositor-thread only) ─── */
+
+/* Slide-in: uses only transform + opacity (no layout/paint) */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Shimmer sweep: translateX only (no background-position repaint) */
+@keyframes shimmer-slide {
+  from {
+    transform: translateX(-200%) skewX(-12deg);
+  }
+  to {
+    transform: translateX(200%) skewX(-12deg);
+  }
+}
+
+/* Soft glow: opacity only (compositor) */
+@keyframes glow-pulse-soft {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.5; }
+}
+
+/* Stagger utility classes for CSS-only entrance animations */
+.anim-fade-in-up {
+  opacity: 0;
+  animation: fade-in-up 0.5s ease-out forwards;
+}
+.anim-delay-1 { animation-delay: 0.08s; }
+.anim-delay-2 { animation-delay: 0.16s; }
+.anim-delay-3 { animation-delay: 0.24s; }
+.anim-delay-4 { animation-delay: 0.32s; }
+.anim-delay-5 { animation-delay: 0.40s; }
+.anim-delay-6 { animation-delay: 0.48s; }
+.anim-delay-7 { animation-delay: 0.56s; }
+.anim-delay-8 { animation-delay: 0.64s; }
+
+/* CSS shimmer for cards (replaces JS framer-motion shimmer loops) */
+.css-shimmer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.css-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%);
+  animation: shimmer-slide 4s linear infinite;
+  animation-delay: 1.5s;
+}
+
+/* Respect prefers-reduced-motion globally */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* On mobile: kill all infinite animations to prevent scroll jank */
+@media (max-width: 768px) {
+  .mobile-no-infinite {
+    animation-iteration-count: 1 !important;
+  }
+}

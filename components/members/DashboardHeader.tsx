@@ -13,6 +13,13 @@ import { NotificationBell } from '../notifications/NotificationBell'
 import { Loader2, Camera } from 'lucide-react'
 import GlobalCoin from '@/components/ui/GlobalCoin'
 
+// PERF: Detect mobile once for conditional rendering
+function useIsMobile() {
+    const [isMobile, setIsMobile] = useState(false)
+    useEffect(() => { setIsMobile(window.innerWidth < 768) }, [])
+    return isMobile
+}
+
 interface Props {
     profile: MemberProfile
     avatarUrl: string | null
@@ -34,6 +41,7 @@ const SHIMMER_Animation = {
 
 export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: Props) {
     const router = useRouter()
+    const isMobile = useIsMobile()
     const [showInventory, setShowInventory] = useState(false)
     const [inventoryTab, setInventoryTab] = useState<'sorvetes' | 'drops'>('sorvetes')
     const [uploadingAvatar, setUploadingAvatar] = useState(false)
@@ -144,7 +152,7 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
             <div
                 className="md:sticky md:top-4 z-40 mb-6 md:mb-8"
             >
-                <div className="relative rounded-[2.5rem] bg-gradient-to-b from-white-[0.08] via-black/40 to-black/80 md:from-white/[0.05] md:via-white/[0.01] md:to-black/80 backdrop-blur-[40px] border border-white/10 text-white p-6 md:p-10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.4)] ring-1 ring-white/20 group transition-all duration-500 hover:border-white/20">
+                <div className={`relative rounded-[2.5rem] bg-gradient-to-b from-white-[0.08] via-black/40 to-black/80 md:from-white/[0.05] md:via-white/[0.01] md:to-black/80 ${isMobile ? 'backdrop-blur-md' : 'backdrop-blur-[40px]'} border border-white/10 text-white p-6 md:p-10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.4)] ring-1 ring-white/20 group transition-all duration-500 hover:border-white/20`}>
 
                     {/* Background & Effects Wrapper (Contained) */}
                     <div className="absolute inset-0 overflow-hidden rounded-[2.5rem] pointer-events-none">
@@ -152,21 +160,38 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                         <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/10 to-transparent pointer-events-none mix-blend-overlay" />
 
                         {/* 1. Dynamic 'Vitral' Ambient Background (Smoky Neon Orbs) */}
+                        {/* PERF: On mobile, use static gradients instead of animate-pulse to save GPU */}
                         <div className="absolute inset-0 block">
-                            {/* Prismatic Orbs - Active on ALL devices (warm brand palette) */}
-                            <div
-                                className="absolute -top-[10%] -right-[10%] w-[120vw] md:w-[25rem] h-[50vh] md:h-[25rem] transform-gpu will-change-transform rounded-[100%] opacity-40 mix-blend-screen animate-pulse duration-[4000ms] z-0 blur-2xl"
-                                style={{ backgroundImage: 'radial-gradient(ellipse at center, rgba(229,1,125,0.4) 0%, rgba(244,63,94,0.3) 40%, transparent 70%)' }}
-                            />
-                            <div
-                                className="absolute top-[20%] -left-[10%] w-[100vw] md:w-[20rem] h-[40vh] md:h-[20rem] transform-gpu will-change-transform rounded-[100%] opacity-40 mix-blend-screen animate-pulse duration-[5000ms] z-0 blur-2xl"
-                                style={{ backgroundImage: 'radial-gradient(ellipse at center, rgba(245,158,11,0.4) 0%, rgba(234,88,12,0.3) 40%, transparent 70%)' }}
-                            />
-                            {/* Central Body Illuminator */}
-                            <div
-                                className="absolute top-[30%] left-[20%] w-[80vw] h-[60vh] transform-gpu will-change-transform rounded-[100%] opacity-20 mix-blend-screen animate-[pulse_6s_ease-in-out_infinite] z-0 blur-2xl"
-                                style={{ backgroundImage: 'radial-gradient(ellipse at center, rgba(255,255,255,0.15) 0%, transparent 70%)' }}
-                            />
+                            {isMobile ? (
+                                <>
+                                    {/* Static warm gradients — no animation loops on mobile */}
+                                    <div
+                                        className="absolute -top-[10%] -right-[10%] w-[120vw] h-[50vh] transform-gpu rounded-[100%] opacity-35 mix-blend-screen z-0 blur-2xl"
+                                        style={{ backgroundImage: 'radial-gradient(ellipse at center, rgba(229,1,125,0.4) 0%, rgba(244,63,94,0.3) 40%, transparent 70%)' }}
+                                    />
+                                    <div
+                                        className="absolute top-[20%] -left-[10%] w-[100vw] h-[40vh] transform-gpu rounded-[100%] opacity-35 mix-blend-screen z-0 blur-2xl"
+                                        style={{ backgroundImage: 'radial-gradient(ellipse at center, rgba(245,158,11,0.4) 0%, rgba(234,88,12,0.3) 40%, transparent 70%)' }}
+                                    />
+                                </>
+                            ) : (
+                                <>
+                                    {/* Desktop: Keep animated orbs (no scroll impact) */}
+                                    <div
+                                        className="absolute -top-[10%] -right-[10%] w-[120vw] md:w-[25rem] h-[50vh] md:h-[25rem] transform-gpu will-change-transform rounded-[100%] opacity-40 mix-blend-screen animate-pulse duration-[4000ms] z-0 blur-2xl"
+                                        style={{ backgroundImage: 'radial-gradient(ellipse at center, rgba(229,1,125,0.4) 0%, rgba(244,63,94,0.3) 40%, transparent 70%)' }}
+                                    />
+                                    <div
+                                        className="absolute top-[20%] -left-[10%] w-[100vw] md:w-[20rem] h-[40vh] md:h-[20rem] transform-gpu will-change-transform rounded-[100%] opacity-40 mix-blend-screen animate-pulse duration-[5000ms] z-0 blur-2xl"
+                                        style={{ backgroundImage: 'radial-gradient(ellipse at center, rgba(245,158,11,0.4) 0%, rgba(234,88,12,0.3) 40%, transparent 70%)' }}
+                                    />
+                                    {/* Central Body Illuminator */}
+                                    <div
+                                        className="absolute top-[30%] left-[20%] w-[80vw] h-[60vh] transform-gpu will-change-transform rounded-[100%] opacity-20 mix-blend-screen animate-[pulse_6s_ease-in-out_infinite] z-0 blur-2xl"
+                                        style={{ backgroundImage: 'radial-gradient(ellipse at center, rgba(255,255,255,0.15) 0%, transparent 70%)' }}
+                                    />
+                                </>
+                            )}
                         </div>
                     </div>
 
@@ -209,15 +234,28 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                                 onClick={() => fileInputRef.current?.click()}
                             >
                                 {/* Sleek Cinematic Spinning Neon Border */}
+                                {/* PERF: Static border on mobile; spinning on desktop */}
                                 <div className="absolute -inset-[3px] md:-inset-[4px] rounded-full overflow-hidden bg-black z-0 shadow-[0_0_30px_rgba(229,1,125,0.3)] pointer-events-none">
-                                    <motion.div
-                                        animate={{ rotate: 360 }}
-                                        transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                                        className="absolute -inset-[100%] opacity-90"
-                                        style={{
-                                            background: 'conic-gradient(from 0deg, transparent 60%, rgba(229,1,125,0.9) 80%, rgba(245,158,11,1) 100%)'
-                                        }}
-                                    />
+                                    {isMobile ? (
+                                        <>
+                                            {/* Static gradient border on mobile — no spinning conic-gradient */}
+                                            <div
+                                                className="absolute -inset-[100%] opacity-90"
+                                                style={{
+                                                    background: 'conic-gradient(from 220deg, transparent 60%, rgba(229,1,125,0.9) 80%, rgba(245,158,11,1) 100%)'
+                                                }}
+                                            />
+                                        </>
+                                    ) : (
+                                        <motion.div
+                                            animate={{ rotate: 360 }}
+                                            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                                            className="absolute -inset-[100%] opacity-90"
+                                            style={{
+                                                background: 'conic-gradient(from 0deg, transparent 60%, rgba(229,1,125,0.9) 80%, rgba(245,158,11,1) 100%)'
+                                            }}
+                                        />
+                                    )}
                                     <div className="absolute inset-[2px] bg-[url('/noise.png')] bg-cover bg-black rounded-full" />
                                 </div>
 

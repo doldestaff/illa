@@ -4,7 +4,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import type { VipPayload, MemberProfile } from '@/lib/gamification-types'
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
+import { motion, AnimatePresence, useScroll, useTransform, type MotionValue } from 'framer-motion'
 import { QrCode, Copy, Check, Loader2, Crown, Clock, X, IceCream, Tag, Zap, Flame, Gift } from 'lucide-react'
 
 interface Props {
@@ -82,7 +82,15 @@ export default function VipCard({ profile, avatarUrl, referralCount, vipPayload,
     const [showBenefits, setShowBenefits] = useState(false)
     const benefitsTracked = useRef(false)
 
+    // PERF: Detect mobile to disable scroll-reactive glare (fires per-frame)
+    const [isMobile, setIsMobile] = useState(false)
+    useEffect(() => {
+        setIsMobile(window.innerWidth < 768)
+    }, [])
+
     // --- Scroll Reactive Lighting Setup ---
+    // PERF: Only create scroll listeners on desktop. On mobile this fires
+    // a JS callback on EVERY scroll frame, competing with the compositor.
     const cardRef = useRef<HTMLDivElement>(null)
     const { scrollYProgress } = useScroll({
         target: cardRef,
@@ -90,6 +98,7 @@ export default function VipCard({ profile, avatarUrl, referralCount, vipPayload,
     })
 
     // Map scroll progress to glare movement (diagonally across the QR box)
+    // On mobile these MotionValues exist but won't be consumed by any motion.div
     const glareX = useTransform(scrollYProgress, [0, 1], ['-150%', '250%'])
     const glareY = useTransform(scrollYProgress, [0, 1], ['-100%', '200%'])
 
@@ -156,11 +165,17 @@ export default function VipCard({ profile, avatarUrl, referralCount, vipPayload,
                             </div>
                         ) : (
                             <div className="w-full h-full flex items-center justify-center relative">
-                                {/* Scroll-Reactive Glare Layer */}
-                                <motion.div
-                                    className="absolute inset-0 pointer-events-none z-20 mix-blend-overlay bg-gradient-to-r from-transparent via-white/80 to-transparent w-[150%] h-[150%] -rotate-45"
-                                    style={{ x: glareX, y: glareY }}
-                                />
+                                {/* Scroll-Reactive Glare Layer — PERF: disabled on mobile */}
+                                {!isMobile && (
+                                    <motion.div
+                                        className="absolute inset-0 pointer-events-none z-20 mix-blend-overlay bg-gradient-to-r from-transparent via-white/80 to-transparent w-[150%] h-[150%] -rotate-45"
+                                        style={{ x: glareX, y: glareY }}
+                                    />
+                                )}
+                                {/* On mobile: static subtle glare for premium feel */}
+                                {isMobile && (
+                                    <div className="absolute inset-0 pointer-events-none z-20 mix-blend-overlay bg-gradient-to-tr from-transparent via-white/20 to-transparent" />
+                                )}
                                 <QrCodeCanvas value={`${origin}/vip/redeem?code=${vip.short_code}`} size={160} />
                             </div>
                         )}

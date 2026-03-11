@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
+import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { CheckCircle, Sparkles, Loader2 } from 'lucide-react'
 import type { MissionInstance } from '@/lib/gamification-types'
@@ -59,8 +60,24 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
     const progressPercent = Math.min(100, Math.max(0, (mission.progress / mission.target) * 100))
     const isCompleted = progressPercent >= 100
 
+    // ── PERF: IntersectionObserver for viewport-aware entrance ──
+    const cardRef = useRef<HTMLDivElement>(null)
+    const [isVisible, setIsVisible] = useState(false)
+
+    useEffect(() => {
+        const el = cardRef.current
+        if (!el) return
+        const observer = new IntersectionObserver(
+            ([entry]) => { if (entry.isIntersecting) { setIsVisible(true); observer.disconnect() } },
+            { threshold: 0.1 }
+        )
+        observer.observe(el)
+        return () => observer.disconnect()
+    }, [])
+
     return (
         <div
+            ref={cardRef}
             className="flex flex-col w-full h-full gap-2"
             onClick={() => {
                 if (!isClaimed && !canClaim && onCardClick) {
@@ -68,41 +85,26 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                 }
             }}
         >
-            <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                whileHover={!isClaimed ? "hover" : "idle"}
-                // Keep the magical state active while user is holding their finger on the card
-                whileTap={!isClaimed ? "hover" : "idle"}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                className={`relative w-full group ${isClaimed ? 'opacity-50 grayscale saturate-50' : ''}`}
-                style={{ height: 'calc(100% - 16px)' }} // Subtract space for progress bar
+            {/* PERF: Use CSS animation for entrance instead of framer-motion JS loop */}
+            <div
+                className={`relative w-full group ${isClaimed ? 'opacity-50 grayscale saturate-50' : ''} ${isVisible ? 'anim-fade-in-up' : 'opacity-0'}`}
+                style={{ height: 'calc(100% - 16px)' }}
             >
-                {/* 1. Atmospheric Volumetric Light (Optimized for Mobile) */}
-                <motion.div
-                    animate={{
-                        opacity: [0.3, 0.5, 0.3],
+                {/* 1. Atmospheric Glow — PERF: CSS-only opacity animation (compositor thread) */}
+                <div
+                    className="absolute inset-[-5%] bg-gradient-to-tr from-illa-pink/20 via-orange-500/10 to-rose-600/20 rounded-[3rem] pointer-events-none -z-20 blur-[30px] will-change-[opacity]"
+                    style={{
+                        animation: 'glow-pulse-soft 5s linear infinite',
+                        transform: 'translateZ(0)',
                     }}
-                    transition={{
-                        duration: 5,
-                        repeat: Infinity,
-                        ease: "linear" // Linear is cheaper for GPU
-                    }}
-                    className="absolute inset-[-5%] bg-gradient-to-tr from-illa-pink/20 via-orange-500/10 to-rose-600/20 rounded-[3rem] pointer-events-none -z-20 blur-[30px] will-change-transform"
-                    style={{ transform: 'translateZ(0)' }} // Force GPU layer
                 />
 
-                {/* 2. Smoky Neon Effect (Simplified for performance) */}
+                {/* 2. Smoky Neon Effect (static — no JS animation needed) */}
                 <div className="absolute inset-0 bg-gradient-to-br from-rose-500/20 via-transparent to-illa-pink/20 rounded-[2rem] pointer-events-none -z-10 blur-[15px]" />
 
-                {/* 3. The "Matter" - Optimized Glassmorphism */}
-                <motion.div
-                    variants={{
-                        idle: { scale: 1, y: 0 },
-                        hover: { scale: 1.05, y: -5 }
-                    }}
-                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                    className="relative w-full h-full rounded-[1.8rem] overflow-hidden bg-black/40 shadow-[0_12px_30px_rgba(0,0,0,0.5)] will-change-transform"
+                {/* 3. The "Matter" — PERF: hover uses CSS transition instead of framer-motion variants */}
+                <div
+                    className="relative w-full h-full rounded-[1.8rem] overflow-hidden bg-black/40 shadow-[0_12px_30px_rgba(0,0,0,0.5)] will-change-transform transition-transform duration-300 ease-out group-hover:scale-105 group-hover:-translate-y-[5px] active:scale-105 active:-translate-y-[5px]"
                     style={{ transform: 'translateZ(0)' }}
                 >
                     {/* Subtle Edge Glow instead of heavy border */}
@@ -113,13 +115,12 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                         alt={mission.title}
                         className="absolute inset-0 w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-[1.05]"
                         draggable={false}
+                        loading="lazy"
                     />
 
-                    {/* 2. Soft Ambient Darkness on Hover for Contrast (ONLY if there is a claim button!) */}
-                    <motion.div
-                        variants={{ idle: { opacity: 0 }, hover: { opacity: canClaim ? 1 : 0 } }}
-                        transition={{ duration: 0.6 }}
-                        className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none"
+                    {/* 2. Soft Ambient Darkness on Hover for Contrast */}
+                    <div
+                        className={`absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none transition-opacity duration-600 ${canClaim ? 'group-hover:opacity-100 opacity-0' : 'opacity-0'}`}
                     />
 
                     {/* 3. Interactive Content Layer */}
@@ -165,35 +166,32 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                         )}
                     </div>
 
-                    {/* Magical Light Beams (Subtle) */}
-                    <motion.div
-                        variants={{ idle: { opacity: 0 }, hover: { opacity: 1 } }}
-                        transition={{ duration: 0.8 }}
-                        className="absolute inset-0 pointer-events-none mix-blend-overlay"
+                    {/* Magical Light Beams — PERF: CSS-only hover effect, no JS */}
+                    <div
+                        className="absolute inset-0 pointer-events-none mix-blend-overlay opacity-0 group-hover:opacity-100 transition-opacity duration-800"
                         style={{
                             background: 'radial-gradient(circle at 50% 0%, rgba(255,255,255,0.4) 0%, transparent 60%)'
                         }}
                     />
-                </motion.div>
-            </motion.div>
+                </div>
+            </div>
 
-            {/* 4. Progress Bar Below Card */}
+            {/* 4. Progress Bar Below Card — PERF: CSS animation instead of framer-motion */}
             <div className="w-full px-2">
                 <div className="flex justify-between items-center mb-1">
                     <span className="text-[9px] font-bold text-white/50 uppercase tracking-widest">Progresso</span>
                     <span className="text-[9px] font-bold text-white/70">{mission.progress} / {mission.target}</span>
                 </div>
                 <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden border border-white/5 relative">
-                    <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${progressPercent}%` }}
-                        transition={{ duration: 1, ease: 'easeOut', delay: 0.2 }}
-                        className={`h-full rounded-full relative overflow-hidden ${isClaimed ? 'bg-emerald-500/50' : isCompleted ? 'bg-gradient-to-r from-illa-pink to-orange-400' : 'bg-white/40'}`}
+                    <div
+                        className={`h-full rounded-full relative overflow-hidden transition-[width] duration-1000 ease-out ${isClaimed ? 'bg-emerald-500/50' : isCompleted ? 'bg-gradient-to-r from-illa-pink to-orange-400' : 'bg-white/40'}`}
+                        style={{ width: `${progressPercent}%` }}
                     >
+                        {/* PERF: CSS shimmer using transform-only (no JS loop) */}
                         {!isClaimed && progressPercent > 0 && progressPercent < 100 && (
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent w-[200%] animate-[shimmer_2s_infinite]" />
+                            <div className="css-shimmer" />
                         )}
-                    </motion.div>
+                    </div>
                 </div>
             </div>
         </div>
