@@ -24,14 +24,15 @@ export default function ReceitasCinematicButton() {
                     <div className="absolute top-0 left-1/4 w-full h-full bg-orange-500/20 blur-[80px] rounded-full pointer-events-none group-hover:bg-amber-500/30 transition-colors duration-700" />
 
                     {/* Image Area - Cinematic Banner */}
-                    <div className="w-full md:w-2/5 min-h-[220px] md:min-h-[300px] relative overflow-hidden bg-zinc-900/50 order-1 md:order-2 flex-shrink-0 flex">
+                    <div className="w-full md:w-2/5 aspect-[16/10] sm:aspect-video md:aspect-auto md:min-h-[300px] relative overflow-hidden bg-zinc-900/50 order-1 md:order-2 flex-shrink-0 flex">
                         {/* Mobile Image */}
                         <Image
                             src="/receitas-ocultas/receitas-bg-mobile.webp"
                             alt="Receitas Ocultas ILLA"
                             fill
                             priority
-                            className="object-cover transition-transform duration-[3s] group-hover:scale-110 md:hidden"
+                            // Removed extreme scaling and fixed object-fit for mobile
+                            className="object-cover object-center transition-transform duration-[3s] md:hidden"
                             quality={100}
                         />
                         {/* Desktop Image */}
