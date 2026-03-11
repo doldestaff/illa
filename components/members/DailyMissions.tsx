@@ -406,7 +406,7 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
                             animate={{ scale: 1, y: 0, opacity: 1 }}
                             exit={{ scale: 0.8, y: 30, opacity: 0, filter: 'blur(10px)' }}
                             transition={{ type: 'spring', bounce: 0.5, duration: 0.7 }}
-                            className="flex flex-col items-center gap-4 text-center relative max-w-[340px] w-full"
+                            className="flex flex-col items-center justify-center p-8 gap-4 text-center relative max-w-[340px] w-[92vw] min-h-[420px]"
                         >
                             {/* Gamified Star Bursts Particle Effect */}
                             {[
@@ -432,11 +432,11 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
                             ))}
 
                             {/* Custom Image Background Shape (WebP) replacing the rigid border container */}
-                            <div className="absolute inset-[-40px] z-0 pointer-events-none flex items-center justify-center drop-shadow-[0_20px_50px_rgba(229,1,125,0.3)]">
-                                <img src="/mission-complete.webp" alt="Background shape" className="w-[120%] h-[120%] object-contain scale-[1.15]" />
+                            <div className="absolute inset-0 z-0 pointer-events-none drop-shadow-[0_20px_50px_rgba(229,1,125,0.25)] flex items-center justify-center">
+                                <img src="/mission-complete.webp" alt="Background shape" className="absolute w-[115%] h-[115%] sm:w-[125%] sm:h-[125%] max-w-none object-contain" />
                             </div>
 
-                            <div className="relative z-10 w-full px-8 py-10 flex flex-col items-center gap-4">
+                            <div className="relative z-10 w-full flex flex-col items-center pt-6 gap-3">
                                 {/* Animated Background Rays (Now within the content scope for localized flair) */}
                                 <motion.div
                                     animate={{ rotate: 360 }}
