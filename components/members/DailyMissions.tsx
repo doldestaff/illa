@@ -406,7 +406,7 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
                             animate={{ scale: 1, y: 0, opacity: 1 }}
                             exit={{ scale: 0.8, y: 30, opacity: 0, filter: 'blur(10px)' }}
                             transition={{ type: 'spring', bounce: 0.5, duration: 0.7 }}
-                            className="relative flex items-center justify-center max-w-[340px] w-[92vw] text-center"
+                            className="relative flex items-center justify-center max-w-[380px] w-[92vw] text-center"
                         >
                             {/* Gamified Star Bursts Particle Effect */}
                             {[
@@ -432,12 +432,12 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
                             ))}
 
                             {/* Background Shape dictates the total size */}
-                            <div className="relative w-full z-0 pointer-events-none drop-shadow-[0_20px_50px_rgba(229,1,125,0.25)] flex items-center justify-center">
-                                <img src="/mission-complete.webp" alt="Background shape" className="w-full h-auto object-contain" />
+                            <div className="relative w-full z-0 pointer-events-none drop-shadow-[0_20px_50px_rgba(229,1,125,0.25)] flex items-center justify-center overflow-visible">
+                                <img src="/mission-complete.webp" alt="Background shape" className="w-[110%] max-w-none h-auto object-contain scale-110" />
                             </div>
 
-                            {/* Safe Area constraint for content */}
-                            <div className="absolute inset-0 z-10 w-full h-full flex flex-col items-center justify-center pt-[20%] pb-[14%] px-[15%] gap-1.5 sm:gap-2">
+                            {/* Safe Area constraint for content - shifting stack up */}
+                            <div className="absolute inset-0 z-10 w-full h-full flex flex-col items-center justify-center pt-[12%] pb-[20%] px-[12%] gap-1 sm:gap-1.5">
                                 {/* Animated Background Rays (Localized to safe area) */}
                                 <motion.div
                                     animate={{ rotate: 360 }}
