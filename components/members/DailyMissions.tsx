@@ -406,7 +406,7 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
                             animate={{ scale: 1, y: 0, opacity: 1 }}
                             exit={{ scale: 0.8, y: 30, opacity: 0, filter: 'blur(10px)' }}
                             transition={{ type: 'spring', bounce: 0.5, duration: 0.7 }}
-                            className="flex flex-col items-center justify-center p-8 gap-4 text-center relative max-w-[340px] w-[92vw] min-h-[420px]"
+                            className="relative flex items-center justify-center max-w-[340px] w-[92vw] text-center"
                         >
                             {/* Gamified Star Bursts Particle Effect */}
                             {[
@@ -431,17 +431,18 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
                                 </motion.span>
                             ))}
 
-                            {/* Custom Image Background Shape (WebP) replacing the rigid border container */}
-                            <div className="absolute inset-0 z-0 pointer-events-none drop-shadow-[0_20px_50px_rgba(229,1,125,0.25)] flex items-center justify-center">
-                                <img src="/mission-complete.webp" alt="Background shape" className="absolute w-[115%] h-[115%] sm:w-[125%] sm:h-[125%] max-w-none object-contain" />
+                            {/* Background Shape dictates the total size */}
+                            <div className="relative w-full z-0 pointer-events-none drop-shadow-[0_20px_50px_rgba(229,1,125,0.25)] flex items-center justify-center">
+                                <img src="/mission-complete.webp" alt="Background shape" className="w-full h-auto object-contain" />
                             </div>
 
-                            <div className="relative z-10 w-full flex flex-col items-center pt-6 gap-3">
-                                {/* Animated Background Rays (Now within the content scope for localized flair) */}
+                            {/* Safe Area constraint for content */}
+                            <div className="absolute inset-0 z-10 w-full h-full flex flex-col items-center justify-center pt-[20%] pb-[14%] px-[15%] gap-1.5 sm:gap-2">
+                                {/* Animated Background Rays (Localized to safe area) */}
                                 <motion.div
                                     animate={{ rotate: 360 }}
                                     transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                                    className="absolute inset-0 z-[-1] pointer-events-none opacity-30 select-none rounded-[2.5rem] overflow-hidden mix-blend-overlay"
+                                    className="absolute inset-[15%] z-[-1] pointer-events-none opacity-30 select-none rounded-[2rem] overflow-hidden mix-blend-overlay"
                                     style={{
                                         background: 'conic-gradient(from 0deg, transparent 0%, rgba(229,1,125,0.4) 20%, transparent 40%, rgba(255,255,255,0.4) 60%, transparent 80%, rgba(229,1,125,0.4) 100%)'
                                     }}
@@ -449,63 +450,63 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
 
                                 <motion.div
                                     initial={{ scale: 0 }}
-                                    animate={{ scale: [0, 1.3, 1], rotate: [0, 10, -10, 0] }}
+                                    animate={{ scale: [0, 1.2, 1], rotate: [0, 10, -10, 0] }}
                                     transition={{ duration: 0.8, ease: 'easeOut', type: 'spring', bounce: 0.6 }}
-                                    className="w-20 h-20 bg-gradient-to-tr from-amber-300 to-orange-500 rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(245,158,11,0.6)] relative z-20 border-2 border-white/40"
+                                    className="w-14 h-14 sm:w-16 sm:h-16 shrink-0 bg-gradient-to-tr from-amber-300 to-orange-500 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(245,158,11,0.6)] relative z-20 border-2 border-white/40"
                                 >
-                                    <CheckCircle2 className="text-orange-950" size={42} strokeWidth={3} />
+                                    <CheckCircle2 className="text-orange-950" size={32} strokeWidth={3} />
                                 </motion.div>
 
-                            <div className="relative z-10 mt-2 mb-2 w-full">
-                                <motion.h3
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.3 }}
-                                    className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-white/70 uppercase tracking-tight drop-shadow-md"
+                                <div className="relative z-10 w-full mt-1 mb-1">
+                                    <motion.h3
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.3 }}
+                                        className="text-[20px] sm:text-[24px] leading-tight font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-white/70 uppercase tracking-tight drop-shadow-md"
+                                    >
+                                        Missão<br />Concluída!
+                                    </motion.h3>
+                                </div>
+
+                                {/* Rewards Box */}
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    transition={{ delay: 0.4, type: "spring" }}
+                                    className="w-full flex-col flex items-stretch gap-1.5 sm:gap-2 relative z-10"
                                 >
-                                    Missão<br />Concluída!
-                                </motion.h3>
-                            </div>
-
-                            {/* Rewards Box gamified */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                                animate={{ opacity: 1, y: 0, scale: 1 }}
-                                transition={{ delay: 0.4, type: "spring" }}
-                                className="w-full flex-col flex items-stretch gap-2.5 relative z-10 mt-2"
-                            >
-                                {/* XP Row */}
-                                {claimedReward.xp > 0 && (
-                                    <div className="flex items-center justify-between bg-white/[0.04] border border-white/10 p-3 rounded-2xl">
-                                        <div className="flex items-center gap-2">
-                                            <div className="bg-amber-500/20 text-amber-400 p-1.5 rounded-full">
-                                                <Star size={16} fill="currentColor" />
+                                    {/* XP Row */}
+                                    {claimedReward.xp > 0 && (
+                                        <div className="flex items-center justify-between bg-white/[0.04] border border-white/10 p-2 sm:p-2.5 rounded-xl">
+                                            <div className="flex items-center gap-1.5">
+                                                <div className="bg-amber-500/20 text-amber-400 p-1 rounded-full">
+                                                    <Star size={12} fill="currentColor" />
+                                                </div>
+                                                <span className="font-bold text-[9px] sm:text-[10px] text-white/70 uppercase tracking-widest leading-none mt-0.5">Experiência</span>
                                             </div>
-                                            <span className="font-bold text-sm text-white/70 uppercase tracking-widest">Experiência</span>
-                                        </div>
-                                        <div className="text-xl font-black text-white flex items-baseline gap-1">
-                                            <span className="text-amber-400">+</span>
-                                            <AnimatedCounter value={claimedReward.xp} duration={2} delay={0.4} />
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Coins Row */}
-                                {claimedReward.coins > 0 && (
-                                    <div className="flex items-center justify-between bg-white/[0.04] border border-white/10 p-3 rounded-2xl">
-                                        <div className="flex items-center gap-2">
-                                            <div className="shrink-0 -ml-1">
-                                                <GlobalCoin size="sm" />
+                                            <div className="text-sm sm:text-base font-black text-white flex items-baseline gap-0.5">
+                                                <span className="text-amber-400 text-xs">+</span>
+                                                <AnimatedCounter value={claimedReward.xp} duration={2} delay={0.4} />
                                             </div>
-                                            <span className="font-bold text-sm text-white/70 uppercase tracking-widest">Moedas ILLA</span>
                                         </div>
-                                        <div className="text-xl font-black text-white flex items-baseline gap-1">
-                                            <span className="text-amber-400">+</span>
-                                            <AnimatedCounter value={claimedReward.coins} duration={2} delay={0.8} />
+                                    )}
+
+                                    {/* Coins Row */}
+                                    {claimedReward.coins > 0 && (
+                                        <div className="flex items-center justify-between bg-white/[0.04] border border-white/10 p-2 sm:p-2.5 rounded-xl">
+                                            <div className="flex items-center gap-1.5">
+                                                <div className="shrink-0 -ml-0.5">
+                                                    <GlobalCoin size="sm" />
+                                                </div>
+                                                <span className="font-bold text-[9px] sm:text-[10px] text-white/70 uppercase tracking-widest leading-none mt-0.5">Moedas ILLA</span>
+                                            </div>
+                                            <div className="text-sm sm:text-base font-black text-white flex items-baseline gap-0.5">
+                                                <span className="text-amber-400 text-xs">+</span>
+                                                <AnimatedCounter value={claimedReward.coins} duration={2} delay={0.8} />
+                                            </div>
                                         </div>
-                                    </div>
-                                )}
-                            </motion.div>
+                                    )}
+                                </motion.div>
                             </div>
                         </motion.div>
                     </motion.div>
