@@ -14,6 +14,7 @@ interface Props {
 }
 
 import CasinoCoinsModal from './CasinoCoinsModal'
+import { useSoundSystem } from '@/components/providers/SoundProvider'
 
 // ─── Joyful Star-Burst Cloud (Claimed State) ─────────────────────────────────
 const STAR_BURSTS = [
@@ -103,6 +104,8 @@ export default function OnlineCelebrationManager({ onClaim, pollIntervalMs = 5 *
     const [showCasinoModal, setShowCasinoModal] = useState(false)
     const [totalCoins, setTotalCoins] = useState(0)
 
+    const { playCoinToastShow, playSecondaryClick, playCoinToastCelebration } = useSoundSystem()
+
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
     const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
@@ -117,6 +120,7 @@ export default function OnlineCelebrationManager({ onClaim, pollIntervalMs = 5 *
                 setWindow(data as CelebrationWindow)
                 setClaimed(false)
                 setError(null)
+                playCoinToastShow()
             } else {
                 setWindow(null)
             }
@@ -155,6 +159,7 @@ export default function OnlineCelebrationManager({ onClaim, pollIntervalMs = 5 *
 
     const handleClaim = useCallback(async () => {
         if (!window || claiming || claimed) return
+        playSecondaryClick()
         setClaiming(true)
         setError(null)
         try {
@@ -174,6 +179,7 @@ export default function OnlineCelebrationManager({ onClaim, pollIntervalMs = 5 *
                 setClaimed(true)
                 setTotalCoins(data.points) // Capture total points for Casino Modal
                 onClaim(data)
+                playCoinToastCelebration()
                 setTimeout(() => {
                     setWindow(null);
                     setClaimed(false);

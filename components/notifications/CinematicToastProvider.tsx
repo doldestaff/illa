@@ -1,9 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { createSupabaseBrowser } from '@/lib/supabaseClient'
+import { useSoundSystem } from '@/components/providers/SoundProvider'
 
 // Types
 export type NotificationKind = 'mission_claim' | 'drop' | 'discount' | 'sorvetes_free' | 'system'
@@ -18,7 +18,6 @@ export interface CinematicToast {
 
 interface CinematicToastContextType {
     showToast: (toast: Omit<CinematicToast, 'id'>) => void
-    playSfx: (type: 'popup' | 'success' | 'error') => void
 }
 
 const CinematicToastContext = createContext<CinematicToastContextType | undefined>(undefined)
@@ -31,17 +30,7 @@ export const useCinematicToasts = () => {
     return context
 }
 
-// ------------------------------------------------------------------
-// SFX Helper (Minimal - placeholder for now)
-// ------------------------------------------------------------------
-const playSound = (type: 'popup' | 'success' | 'error') => {
-    // In a real app, load Audio objects here.
-    // For MVP/Cinematic feel, we just log or try to play if file exists.
-    // const audio = new Audio(`/sfx/${type}.mp3`)
-    // audio.volume = 0.5
-    // audio.play().catch(() => {}) 
-    // (Disabled to avoid 404s until user adds files)
-}
+
 
 // ------------------------------------------------------------------
 // Provider
@@ -50,6 +39,7 @@ export const CinematicToastProvider = ({ children }: { children: ReactNode }) =>
     const [queue, setQueue] = useState<CinematicToast[]>([])
     const [activeToast, setActiveToast] = useState<CinematicToast | null>(null)
     const [isPaused, setIsPaused] = useState(false)
+    const { playCoinToastShow } = useSoundSystem()
 
     // Rate limit configuration
     const PROCESSING_INTERVAL = 15000 // 15s between toasts to avoid spam (premium feel)
@@ -78,9 +68,7 @@ export const CinematicToastProvider = ({ children }: { children: ReactNode }) =>
         }
     }, [])
 
-    const playSfx = useCallback((type: 'popup' | 'success' | 'error') => {
-        playSound(type)
-    }, [])
+
 
     // Queue Processor
     useEffect(() => {
@@ -93,8 +81,7 @@ export const CinematicToastProvider = ({ children }: { children: ReactNode }) =>
         }, 0)
 
         // Play sound
-        const sfxType = nextToast.priority >= 2 ? 'success' : 'popup'
-        playSound(sfxType)
+        playCoinToastShow()
 
         // Auto dismiss logic
         const duration = nextToast.priority >= 3 ? 6000 : 4000
@@ -112,7 +99,7 @@ export const CinematicToastProvider = ({ children }: { children: ReactNode }) =>
     // Render
     // ------------------------------------------------------------------
     return (
-        <CinematicToastContext.Provider value={{ showToast, playSfx }}>
+        <CinematicToastContext.Provider value={{ showToast }}>
             {children}
 
             {/* TOAST CONTAINER */}

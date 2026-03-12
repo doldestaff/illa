@@ -8,6 +8,7 @@ import MissionCard, { resolveCardImage } from './MissionCard'
 import MissionsModal from './MissionsModal'
 import MissionHowToPopup from './MissionHowToPopup'
 import GlobalCoin from '../ui/GlobalCoin'
+import { useSoundSystem } from '@/components/providers/SoundProvider'
 
 // --- Animated Counter Helper ---
 function AnimatedCounter({ value, duration = 1.5, delay = 0 }: { value: number, duration?: number, delay?: number }) {
@@ -249,6 +250,8 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
     const [activeIndex, setActiveIndex] = useState(0)
     const [howToMission, setHowToMission] = useState<MissionInstance | null>(null)
 
+    const { playMissionComplete, playCoinToastShow, playCoinToastCelebration } = useSoundSystem()
+
     const handleClaim = useCallback(async (instanceId: string, customReward?: { xp: number; points: number }) => {
         setClaimingId(instanceId)
         try {
@@ -262,6 +265,20 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
             if (result.success) {
                 setClaimedIds((prev) => new Set([...prev, instanceId]))
                 setShowPopup(true)
+                
+                // Play sounds for cinematic impact
+                playMissionComplete()
+                
+                // Delay slightly for the reward presentation
+                setTimeout(() => {
+                    playCoinToastShow()
+                }, 400)
+
+                // The "secondary" festive sound
+                setTimeout(() => {
+                    playCoinToastCelebration()
+                }, 1200)
+
                 setTimeout(() => setShowPopup(false), 4500) // Keep open slightly longer for the animation impact
             }
         } catch (err) {

@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import { CheckCircle, Sparkles, Loader2 } from 'lucide-react'
 import type { MissionInstance } from '@/lib/gamification-types'
 import GlobalCoin from '@/components/ui/GlobalCoin'
+import { useSoundSystem } from '@/components/providers/SoundProvider'
 
 interface MissionCardProps {
     mission: MissionInstance
@@ -56,6 +57,7 @@ export function resolveCardImage(mission: MissionInstance): string {
 }
 
 export default function MissionCard({ mission, isClaimed, canClaim, claiming, onClaim, onCardClick, rewards }: MissionCardProps) {
+    const { playSecondaryClick } = useSoundSystem()
     const cardImage = resolveCardImage(mission)
     const progressPercent = Math.min(100, Math.max(0, (mission.progress / mission.target) * 100))
     const isCompleted = progressPercent >= 100
@@ -133,7 +135,10 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                                 </div>
                             ) : canClaim ? (
                                 <motion.button
-                                    onClick={() => onClaim(mission.instance_id, rewards ? { xp: rewards.xp, points: rewards.coins } : undefined)}
+                                    onClick={() => {
+                                        playSecondaryClick()
+                                        onClaim(mission.instance_id, rewards ? { xp: rewards.xp, points: rewards.coins } : undefined)
+                                    }}
                                     disabled={claiming}
                                     whileHover={{ scale: 1.08 }}
                                     whileTap={{ scale: 0.92 }}
