@@ -160,7 +160,7 @@ export default function VipCard({ profile, avatarUrl, referralCount, vipPayload,
                                 {isMobile && (
                                     <div className="absolute inset-0 pointer-events-none z-20 mix-blend-overlay bg-gradient-to-tr from-transparent via-white/20 to-transparent" />
                                 )}
-                                <QrCodeCanvas value={`${origin}/vip/redeem?code=${vip.short_code}`} size={200} />
+                                <QrCodeCanvas value={vip.qr_payload ? JSON.stringify(vip.qr_payload) : `${origin}/vip/redeem?code=${vip.short_code}`} size={200} />
 
                                 {/* Real-time Validation Pulse */}
                                 <AnimatePresence>
@@ -373,7 +373,7 @@ export default function VipCard({ profile, avatarUrl, referralCount, vipPayload,
                                             <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent rounded-3xl pointer-events-none" />
                                             <p className="text-[10px] font-bold text-amber-500/80 uppercase tracking-widest relative z-10">Acesso Presencial Exclusivo</p>
                                             <div className="bg-white p-3 rounded-2xl relative z-10 shadow-[0_10px_40px_rgba(0,0,0,0.5)]">
-                                                <QrCodeCanvas value={`${origin}/vip/redeem?code=${vip.short_code}`} size={140} />
+                                                <QrCodeCanvas value={vip.qr_payload ? JSON.stringify(vip.qr_payload) : `${origin}/vip/redeem?code=${vip.short_code}`} size={140} />
                                             </div>
                                             <div className="flex flex-col items-center relative z-10">
                                                 <p className="font-mono font-black text-2xl text-white tracking-[0.2em]">{vip.short_code}</p>

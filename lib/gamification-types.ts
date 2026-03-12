@@ -89,10 +89,39 @@ export interface BirthdayState {
     days_until?: number
 }
 
+export interface ScannerQrPayload {
+    code: string
+    exp: string
+    profile: {
+        id: string
+        name: string
+        level: number
+        points: number
+        xp: number
+    }
+    discounts: Array<{
+        id: number
+        title: string
+        percent: number
+        voucher: string
+    }>
+    sorvetes: Array<{
+        id: string
+        voucher: string
+    }>
+    drops: Array<{
+        id: string
+        title: string
+        type: string
+        value: number
+    }>
+}
+
 export interface VipPayload {
     short_code: string
     expires_at: string
     token_id: string
+    qr_payload?: ScannerQrPayload
 }
 
 export interface MemberSnapshot {
