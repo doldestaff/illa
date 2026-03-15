@@ -189,7 +189,7 @@ function InteractiveMarquee({ children, onIndexChange }: { children: React.React
     return (
         <div
             ref={containerRef}
-            className="flex overflow-x-auto pb-8 pt-16 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex overflow-x-auto pb-[120px] pt-[120px] -my-[88px] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             style={{
                 willChange: 'scroll-position',
                 WebkitOverflowScrolling: 'touch',
@@ -221,6 +221,7 @@ interface Props {
 
 export default function DailyMissions({ missions: initialMissions, onClaim, onInviteClick }: Props) {
     const missions = initialMissions
+        .filter((m) => m.kind !== 'profile') // Remove the fallback/dupe mission that doesn't have a unique image
         .filter((mission, index, self) => index === self.findIndex((m) => resolveCardImage(m) === resolveCardImage(mission)))
         .slice(0, 5) // Enforce exactly 5 cards
 
