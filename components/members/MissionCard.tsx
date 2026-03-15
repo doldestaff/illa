@@ -169,7 +169,7 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                         </div>
                         {/* Floating Rewards Badge (Bottom Left) */}
                         {rewards && !isClaimed && (
-                            <div className="absolute bottom-3 left-3 flex items-center gap-2 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 shadow-lg z-20">
+                            <div className="absolute bottom-[52px] left-[32px] flex items-center gap-2 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 shadow-lg z-20">
                                 <span className="text-[10px] font-black tracking-wider text-amber-400">+{rewards.xp} XP</span>
                                 <div className="w-[1px] h-3 bg-white/20" />
                                 <div className="flex items-center gap-0.5 text-amber-200">
