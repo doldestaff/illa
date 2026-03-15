@@ -25,12 +25,12 @@ interface MissionCardProps {
  */
 const CARD_IMAGE_MAP: Record<string, string> = {
     // By mission kind slug
-    'share_link': '/mission-cards/compartilhar-link.webp',
-    'view_exclusive': '/mission-cards/fan-exclusive.webp',
+    'share_link': '/mission-cards/compartilhar-link-1.webp',
+    'view_exclusive': '/mission-cards/fan-exclusive-1.webp',
     'view_recipes': '/mission-cards/alquimia-de-sabor-1.webp',
-    'visit': '/mission-cards/cacador-de-reliquias.webp',
-    'survey': '/mission-cards/critico-gastromico.webp',
-    'profile': '/mission-cards/critico-gastromico.webp', // Fallback for profile
+    'visit': '/mission-cards/cacador-de-reliquias-1.webp',
+    'survey': '/mission-cards/critico-gastromico-1.webp',
+    'profile': '/mission-cards/critico-gastromico-1.webp', // Fallback for profile
 }
 
 /** Fallback title-based matching for missions without slugified `kind` */
@@ -93,7 +93,7 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                 style={{ height: 'calc(100% - 16px)' }}
             >
                 {/* 1. Atmospheric Glow — PERF: CSS-only opacity animation (compositor thread) */}
-                {!cardImage.includes('alquimia-de-sabor-1') && (
+                {!cardImage.includes('-1') && (
                     <div
                         className="absolute inset-[-5%] bg-gradient-to-tr from-illa-pink/20 via-orange-500/10 to-rose-600/20 rounded-[3rem] pointer-events-none -z-20 blur-[30px] will-change-[opacity]"
                         style={{
@@ -104,7 +104,7 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                 )}
 
                 {/* 2. Smoky Neon Effect (static — no JS animation needed) */}
-                {!cardImage.includes('alquimia-de-sabor-1') && (
+                {!cardImage.includes('-1') && (
                     <div className="absolute inset-0 bg-gradient-to-br from-rose-500/20 via-transparent to-illa-pink/20 rounded-[2rem] pointer-events-none -z-10 blur-[15px]" />
                 )}
 
@@ -114,7 +114,7 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                     style={{ transform: 'translateZ(0)' }}
                 >
                     {/* Smoky Edge Glow instead of solid shape */}
-                    {!cardImage.includes('alquimia-de-sabor-1') && (
+                    {!cardImage.includes('-1') && (
                         <div className="absolute inset-0 rounded-[1.8rem] shadow-[inset_0_0_40px_rgba(0,0,0,0.8),inset_0_0_15px_rgba(255,255,255,0.05)] border border-white/5 pointer-events-none z-20" />
                     )}
                     
@@ -123,7 +123,7 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                         src={cardImage}
                         alt={mission.title}
                         className={`absolute inset-0 w-full h-full transition-transform duration-[2s] z-[5] ${
-                            cardImage.includes('alquimia-de-sabor-1') 
+                            cardImage.includes('-1') 
                             ? 'object-contain scale-[1.90] -translate-y-4 group-hover:scale-[2.05]' 
                             : 'object-cover rounded-[1.8rem] group-hover:scale-[1.05]'
                         }`}
@@ -133,7 +133,7 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
 
                     {/* 2. Soft Ambient Darkness on Hover for Contrast */}
                     <div
-                        className={`absolute inset-0 rounded-[1.8rem] overflow-hidden bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none transition-opacity duration-600 ${canClaim && !cardImage.includes('alquimia-de-sabor-1') ? 'group-hover:opacity-100 opacity-0' : 'opacity-0'}`}
+                        className={`absolute inset-0 rounded-[1.8rem] overflow-hidden bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none transition-opacity duration-600 ${canClaim && !cardImage.includes('-1') ? 'group-hover:opacity-100 opacity-0' : 'opacity-0'}`}
                     />
 
                     {/* 3. Interactive Content Layer */}
@@ -183,7 +183,7 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                     </div>
 
                     {/* Magical Light Beams — PERF: CSS-only hover effect, no JS */}
-                    {!cardImage.includes('alquimia-de-sabor-1') && (
+                    {!cardImage.includes('-1') && (
                         <div
                             className="absolute inset-0 rounded-[1.8rem] overflow-hidden pointer-events-none mix-blend-overlay opacity-0 group-hover:opacity-100 transition-opacity duration-800"
                             style={{
