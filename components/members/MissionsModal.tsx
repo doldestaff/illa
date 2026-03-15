@@ -93,9 +93,14 @@ export default function MissionsModal({ isOpen, onClose, missions: rawMissions, 
 
                                 <div className="flex items-center gap-4">
                                     <div className="relative">
-                                        <div className="absolute inset-0 bg-amber-500/40 blur-xl rounded-full animate-pulse" />
-                                        <div className="relative w-[52px] h-[52px] rounded-2xl bg-gradient-to-br from-amber-400 via-orange-500 to-rose-600 shadow-lg shadow-amber-600/30 flex items-center justify-center border border-amber-300/40">
-                                            <Target size={26} className="text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]" />
+                                        <div className="absolute inset-0 bg-orange-500/30 blur-xl rounded-full animate-pulse" />
+                                        <div className="relative w-[56px] h-[56px] flex items-center justify-center">
+                                            <img 
+                                                src="/mission-cards/missions-icon.webp" 
+                                                alt="Missions" 
+                                                className="w-full h-full object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" 
+                                                draggable={false}
+                                            />
                                         </div>
                                     </div>
                                     <div className="flex-1">
@@ -119,10 +124,9 @@ export default function MissionsModal({ isOpen, onClose, missions: rawMissions, 
                                 )}
                             </div>
 
-                            {/* Scrollable Content */}
                             <div
                                 data-lenis-prevent
-                                className="flex-1 overflow-y-auto p-5 pb-8 space-y-3 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent"
+                                className="flex-1 overflow-y-auto px-5 pt-16 pb-24 space-y-16 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
                             >
                                 {[...missions]
                                     .sort((a, b) => {

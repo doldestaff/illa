@@ -313,10 +313,14 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
 
                 <div className="flex items-center gap-3 relative z-10">
                     <div className="relative">
-                        <div className="absolute inset-0 bg-amber-500/10 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                        <div className="w-12 h-12 bg-[#201d1a] border border-amber-900/40 shadow-[inset_0_2px_8px_rgba(0,0,0,0.4),0_2px_10px_rgba(0,0,0,0.3)] rounded-full flex items-center justify-center relative z-10 group-hover:scale-105 transition-transform duration-300">
-                            <div className="absolute inset-[2px] rounded-full border border-amber-500/10 bg-gradient-to-tr from-amber-700/10 to-amber-400/5" />
-                            <Compass size={22} className="text-amber-200 drop-shadow-[0_0_8px_rgba(251,191,36,0.3)] group-hover:rotate-12 transition-transform duration-500 relative z-10" />
+                        <div className="absolute inset-0 bg-orange-500/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        <div className="w-12 h-12 flex items-center justify-center relative z-10 group-hover:scale-110 transition-transform duration-300">
+                            <img 
+                                src="/mission-cards/missions-icon.webp" 
+                                alt="Missions Target" 
+                                className="w-full h-full object-contain drop-shadow-[0_4px_8px_rgba(0,0,0,0.6)]" 
+                                draggable={false}
+                            />
                         </div>
                     </div>
                     <div>
