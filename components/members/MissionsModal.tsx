@@ -94,7 +94,7 @@ export default function MissionsModal({ isOpen, onClose, missions: rawMissions, 
                                 <div className="flex items-center gap-4">
                                     <div className="relative">
                                         <div className="absolute inset-0 bg-orange-500/30 blur-xl rounded-full animate-pulse" />
-                                        <div className="relative w-[56px] h-[56px] flex items-center justify-center">
+                                        <div className="relative w-[72px] h-[72px] flex items-center justify-center">
                                             <img 
                                                 src="/mission-cards/missions-icon.webp" 
                                                 alt="Missions" 
@@ -161,7 +161,10 @@ export default function MissionsModal({ isOpen, onClose, missions: rawMissions, 
                                                     isClaimed={isClaimed}
                                                     canClaim={canClaim}
                                                     claiming={claimingId === mission.instance_id}
-                                                    onClaim={onClaim}
+                                                    onClaim={(id, customReward) => {
+                                                        onClose();
+                                                        onClaim(id, customReward);
+                                                    }}
                                                     onCardClick={onCardClick}
                                                     colorTheme={['pink', 'yellow', 'white'][index % 3] as 'pink' | 'yellow' | 'white'}
                                                     rewards={missionRewards[mission.instance_id]}
