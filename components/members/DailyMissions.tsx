@@ -221,7 +221,7 @@ interface Props {
 
 export default function DailyMissions({ missions: initialMissions, onClaim, onInviteClick }: Props) {
     const missions = initialMissions
-        .filter((m) => m.kind !== 'profile') // Remove the fallback/dupe mission that doesn't have a unique image
+        .filter((m) => m.kind !== 'profile' && !m.title.toLowerCase().includes('self')) // Remove missions without dedicated images
         .filter((mission, index, self) => index === self.findIndex((m) => resolveCardImage(m) === resolveCardImage(mission)))
         .slice(0, 5) // Enforce exactly 5 cards
 
