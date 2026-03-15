@@ -10,29 +10,28 @@ import mobileManifest from '@/public/hero/manifest.mobile.json'
 import desktopManifest from '@/public/hero/manifest.desktop.json'
 
 export function HeroScrollFrames() {
-    // Mount state — lazy initializers read from window on hydration (client-only component)
-    // CRITICAL: viewportHeight is captured ONCE via lazy init and NEVER updated.
+    // HYDRATION-SAFE: Initialize as null (matches SSR output), then set in useEffect.
+    // CRITICAL: viewportHeight is captured ONCE at mount and NEVER updated.
     // On mobile, the browser URL bar collapsing/expanding fires resize events that change
     // window.innerHeight. Locking it at mount prevents the sticky container from jumping.
-    const [isMobile, setIsMobile] = useState<boolean | null>(() =>
-        typeof window !== 'undefined' ? window.innerWidth < 768 : null
-    )
-    const [isTablet, setIsTablet] = useState<boolean | null>(() =>
-        typeof window !== 'undefined' ? (window.innerWidth >= 768 && window.innerWidth < 1024) : null
-    )
-    const [viewportHeight] = useState<number | null>(() =>
-        typeof window !== 'undefined' ? window.innerHeight : null
-    )
+    const [isMobile, setIsMobile] = useState<boolean | null>(null)
+    const [isTablet, setIsTablet] = useState<boolean | null>(null)
+    const [viewportHeight, setViewportHeight] = useState<number | null>(null)
 
     // Stable Refs
     const buttonProgress = useMotionValue(0)
 
-    // On resize, ONLY update breakpoints (mobile/tablet), never the height
+    // On mount: set initial values + listen for resize (breakpoints only, never height)
     useEffect(() => {
+        const w = window.innerWidth
+        setIsMobile(w < 768)
+        setIsTablet(w >= 768 && w < 1024)
+        setViewportHeight(window.innerHeight)
+
         const handleResize = () => {
-            const w = window.innerWidth
-            setIsMobile(w < 768)
-            setIsTablet(w >= 768 && w < 1024)
+            const rw = window.innerWidth
+            setIsMobile(rw < 768)
+            setIsTablet(rw >= 768 && rw < 1024)
         }
         window.addEventListener('resize', handleResize)
         return () => window.removeEventListener('resize', handleResize)

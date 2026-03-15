@@ -30,14 +30,6 @@ function QrCodeCanvas({ value, size = 140 }: { value: string; size?: number }) {
                 level="M"
                 includeMargin={true}
                 className="w-full h-full"
-                imageSettings={{
-                    src: "/illa-logo-icon.png", // Optional: adding a subtle logo if exists, but strictly for branding.
-                    x: undefined,
-                    y: undefined,
-                    height: 24,
-                    width: 24,
-                    excavate: true,
-                }}
             />
         </div>
     )

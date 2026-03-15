@@ -27,7 +27,7 @@ const CARD_IMAGE_MAP: Record<string, string> = {
     // By mission kind slug
     'share_link': '/mission-cards/compartilhar-link.webp',
     'view_exclusive': '/mission-cards/fan-exclusive.webp',
-    'view_recipes': '/mission-cards/alquimia-de-sabor.webp',
+    'view_recipes': '/mission-cards/alquimia-de-sabor-1.webp',
     'visit': '/mission-cards/cacador-de-reliquias.webp',
     'survey': '/mission-cards/critico-gastromico.webp',
     'profile': '/mission-cards/critico-gastromico.webp', // Fallback for profile
@@ -93,36 +93,47 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                 style={{ height: 'calc(100% - 16px)' }}
             >
                 {/* 1. Atmospheric Glow — PERF: CSS-only opacity animation (compositor thread) */}
-                <div
-                    className="absolute inset-[-5%] bg-gradient-to-tr from-illa-pink/20 via-orange-500/10 to-rose-600/20 rounded-[3rem] pointer-events-none -z-20 blur-[30px] will-change-[opacity]"
-                    style={{
-                        animation: 'glow-pulse-soft 5s linear infinite',
-                        transform: 'translateZ(0)',
-                    }}
-                />
+                {!cardImage.includes('alquimia-de-sabor-1') && (
+                    <div
+                        className="absolute inset-[-5%] bg-gradient-to-tr from-illa-pink/20 via-orange-500/10 to-rose-600/20 rounded-[3rem] pointer-events-none -z-20 blur-[30px] will-change-[opacity]"
+                        style={{
+                            animation: 'glow-pulse-soft 5s linear infinite',
+                            transform: 'translateZ(0)',
+                        }}
+                    />
+                )}
 
                 {/* 2. Smoky Neon Effect (static — no JS animation needed) */}
-                <div className="absolute inset-0 bg-gradient-to-br from-rose-500/20 via-transparent to-illa-pink/20 rounded-[2rem] pointer-events-none -z-10 blur-[15px]" />
+                {!cardImage.includes('alquimia-de-sabor-1') && (
+                    <div className="absolute inset-0 bg-gradient-to-br from-rose-500/20 via-transparent to-illa-pink/20 rounded-[2rem] pointer-events-none -z-10 blur-[15px]" />
+                )}
 
                 {/* 3. The "Matter" — PERF: hover uses CSS transition instead of framer-motion variants */}
                 <div
-                    className="relative w-full h-full rounded-[1.8rem] overflow-hidden bg-transparent will-change-transform transition-transform duration-300 ease-out group-hover:scale-105 group-hover:-translate-y-[5px] active:scale-105 active:-translate-y-[5px]"
+                    className="relative w-full h-full rounded-[1.8rem] bg-transparent will-change-transform transition-transform duration-300 ease-out group-hover:scale-105 group-hover:-translate-y-[5px] active:scale-105 active:-translate-y-[5px]"
                     style={{ transform: 'translateZ(0)' }}
                 >
                     {/* Smoky Edge Glow instead of solid shape */}
-                    <div className="absolute inset-0 rounded-[1.8rem] shadow-[inset_0_0_40px_rgba(0,0,0,0.8),inset_0_0_15px_rgba(255,255,255,0.05)] border border-white/5 pointer-events-none z-20" />
+                    {!cardImage.includes('alquimia-de-sabor-1') && (
+                        <div className="absolute inset-0 rounded-[1.8rem] shadow-[inset_0_0_40px_rgba(0,0,0,0.8),inset_0_0_15px_rgba(255,255,255,0.05)] border border-white/5 pointer-events-none z-20" />
+                    )}
+                    
                     {/* 1. Card WebP Image Layer */}
                     <img
                         src={cardImage}
                         alt={mission.title}
-                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-[1.05]"
+                        className={`absolute inset-0 w-full h-full transition-transform duration-[2s] z-[5] ${
+                            cardImage.includes('alquimia-de-sabor-1') 
+                            ? 'object-contain scale-[1.90] -translate-y-4 group-hover:scale-[2.05]' 
+                            : 'object-cover rounded-[1.8rem] group-hover:scale-[1.05]'
+                        }`}
                         draggable={false}
                         loading="lazy"
                     />
 
                     {/* 2. Soft Ambient Darkness on Hover for Contrast */}
                     <div
-                        className={`absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none transition-opacity duration-600 ${canClaim ? 'group-hover:opacity-100 opacity-0' : 'opacity-0'}`}
+                        className={`absolute inset-0 rounded-[1.8rem] overflow-hidden bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none transition-opacity duration-600 ${canClaim && !cardImage.includes('alquimia-de-sabor-1') ? 'group-hover:opacity-100 opacity-0' : 'opacity-0'}`}
                     />
 
                     {/* 3. Interactive Content Layer */}
@@ -172,12 +183,14 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                     </div>
 
                     {/* Magical Light Beams — PERF: CSS-only hover effect, no JS */}
-                    <div
-                        className="absolute inset-0 pointer-events-none mix-blend-overlay opacity-0 group-hover:opacity-100 transition-opacity duration-800"
-                        style={{
-                            background: 'radial-gradient(circle at 50% 0%, rgba(255,255,255,0.4) 0%, transparent 60%)'
-                        }}
-                    />
+                    {!cardImage.includes('alquimia-de-sabor-1') && (
+                        <div
+                            className="absolute inset-0 rounded-[1.8rem] overflow-hidden pointer-events-none mix-blend-overlay opacity-0 group-hover:opacity-100 transition-opacity duration-800"
+                            style={{
+                                background: 'radial-gradient(circle at 50% 0%, rgba(255,255,255,0.4) 0%, transparent 60%)'
+                            }}
+                        />
+                    )}
                 </div>
             </div>
 

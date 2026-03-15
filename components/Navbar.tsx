@@ -178,13 +178,13 @@ function NavbarInner() {
                     }}
                 >
                     <Link href="/" className="flex items-center gap-3 group relative z-50 pointer-events-auto">
-                        <div className="relative w-[200px] h-[60px] md:w-[450px] md:h-[135px] transition-transform group-hover:scale-105 filter drop-shadow-md -ml-2">
+                        <div className="relative w-[200px] h-[60px] md:w-[320px] md:h-[96px] lg:w-[450px] lg:h-[135px] transition-transform group-hover:scale-105 filter drop-shadow-md -ml-2">
                             <Image
                                 src="/brand/logo.png"
                                 alt="Illa Sorvetes"
                                 fill
                                 className="object-contain object-left"
-                                sizes="120px"
+                                sizes="(min-width: 1024px) 450px, (min-width: 768px) 320px, 200px"
                                 priority
                             />
                         </div>

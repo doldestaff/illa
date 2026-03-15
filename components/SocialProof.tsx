@@ -49,7 +49,7 @@ function ReviewCard({ review, index }: { review: Review; index: number }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: index * 0.1 }}
-            className="bg-white/10 p-8 rounded-2xl border border-white/10 hover:bg-white/15 transition-colors"
+            className="bg-white/10 p-6 md:p-6 lg:p-8 rounded-2xl border border-white/10 hover:bg-white/15 transition-colors"
         >
             <div className="flex gap-1 text-illa-yellow mb-4">
                 <StarRating rating={review.rating} />
@@ -250,7 +250,7 @@ export function SocialProof() {
                 ) : (
                     <>
                         {/* Top 3 Reviews */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-4">
                             {visibleReviews.map((r, i) => (
                                 <ReviewCard key={r.id} review={r} index={i} />
                             ))}
@@ -262,7 +262,7 @@ export function SocialProof() {
                                 ref={scrollRef}
                                 className="max-h-[400px] overflow-y-auto pr-2 space-y-4 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent"
                             >
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                     {olderReviews.map((r, i) => (
                                         <ReviewCard key={r.id} review={r} index={i + 3} />
                                     ))}

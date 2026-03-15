@@ -256,13 +256,13 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                                             }}
                                         />
                                     )}
-                                    <div className="absolute inset-[2px] bg-[url('/noise.png')] bg-cover bg-black rounded-full" />
+                                    <div className="absolute inset-[2px] bg-black rounded-full" />
                                 </div>
 
                                 {/* Subtle Ambient Backlight */}
                                 <div className="absolute -inset-2 bg-gradient-to-br from-illa-pink to-amber-500 rounded-full opacity-20 blur-xl group-hover/avatar:opacity-40 group-hover/avatar:blur-2xl transition duration-700 z-0 pointer-events-none" />
 
-                                <div className="relative z-10 w-36 h-36 md:w-36 md:h-36 lg:w-32 lg:h-32 xl:w-36 xl:h-36 rounded-full overflow-hidden border-2 border-black/80 bg-black/40 shadow-[0_0_30px_rgba(0,0,0,0.8)] backdrop-blur-md">
+                                <div className="relative z-10 w-36 h-36 md:w-28 md:h-28 lg:w-32 lg:h-32 xl:w-36 xl:h-36 rounded-full overflow-hidden border-2 border-black/80 bg-black/40 shadow-[0_0_30px_rgba(0,0,0,0.8)] backdrop-blur-md">
                                     {uploadingAvatar ? (
                                         <div className="w-full h-full bg-black/60 flex items-center justify-center">
                                             <Loader2 size={32} className="text-illa-pink animate-spin" />

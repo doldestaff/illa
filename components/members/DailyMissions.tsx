@@ -189,7 +189,7 @@ function InteractiveMarquee({ children, onIndexChange }: { children: React.React
     return (
         <div
             ref={containerRef}
-            className="flex overflow-x-auto pb-8 py-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex overflow-x-auto pb-8 pt-16 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             style={{
                 willChange: 'scroll-position',
                 WebkitOverflowScrolling: 'touch',
@@ -338,7 +338,7 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
             </div>
 
             {/* Unified Marquee Preview (Desktop & Mobile) - Disney Experience */}
-            <div className="relative group/mural py-8 -mx-4 px-4 w-full max-w-[100vw] overflow-hidden">
+            <div className="relative group/mural pb-8 pt-0 -mx-4 px-4 w-full max-w-[100vw]">
                 <InteractiveMarquee onIndexChange={setActiveIndex}>
                     {previewMissions.map((mission, index) => {
                         const isClaimed = claimedIds.has(mission.instance_id) || mission.claimed
@@ -466,9 +466,9 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
                                 />
 
                                 <motion.div
-                                    initial={{ scale: 0 }}
+                                    initial={{ scale: 0, rotate: 0 }}
                                     animate={{ scale: [0, 1.2, 1], rotate: [0, 10, -10, 0] }}
-                                    transition={{ duration: 0.8, ease: 'easeOut', type: 'spring', bounce: 0.6 }}
+                                    transition={{ duration: 0.8, ease: 'easeOut' }}
                                     className="w-14 h-14 sm:w-16 sm:h-16 shrink-0 bg-gradient-to-tr from-amber-300 to-orange-500 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(245,158,11,0.6)] relative z-20 border-2 border-white/40"
                                 >
                                     <CheckCircle2 className="text-orange-950" size={32} strokeWidth={3} />

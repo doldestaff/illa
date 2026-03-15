@@ -236,7 +236,7 @@ export function InstagramFeed() {
             <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[500px] h-[300px] rounded-full bg-illa-pink/20 blur-[100px] z-[2] pointer-events-none" />
 
             {/* ── Content ── */}
-            <div className="relative z-[3] container mx-auto px-4 md:px-6 max-w-lg">
+            <div className="relative z-[3] container mx-auto px-4 md:px-6 max-w-lg md:max-w-2xl lg:max-w-lg">
 
                 {/* Header */}
                 <motion.div

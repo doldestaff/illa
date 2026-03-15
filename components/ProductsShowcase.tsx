@@ -37,7 +37,7 @@ function ShowcaseMarquee() {
             {marqueeProducts.map((product, index) => (
                 <div
                     key={`${product.id}-${index}`}
-                    className={`group relative flex-shrink-0 w-[280px] h-[400px] rounded-[2.5rem] ${product.color} p-8 flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-illa-pink/20 cursor-pointer`}
+                    className={`group relative flex-shrink-0 w-[240px] h-[340px] md:w-[260px] md:h-[370px] lg:w-[280px] lg:h-[400px] rounded-[2.5rem] ${product.color} p-8 flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-illa-pink/20 cursor-pointer`}
                 >
                     <div className="relative w-full h-[75%] mb-2 mt-2">
                         <Image

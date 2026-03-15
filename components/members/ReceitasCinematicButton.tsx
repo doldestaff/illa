@@ -31,9 +31,10 @@ export default function ReceitasCinematicButton() {
                             alt="Receitas Ocultas ILLA"
                             fill
                             priority
+                            sizes="(max-width: 768px) 100vw, 0px"
                             // Removed extreme scaling and fixed object-fit for mobile
                             className="object-cover object-center transition-transform duration-[3s] md:hidden"
-                            quality={100}
+                            quality={85}
                         />
                         {/* Desktop Image */}
                         <Image
@@ -41,8 +42,9 @@ export default function ReceitasCinematicButton() {
                             alt="Receitas Ocultas ILLA"
                             fill
                             priority
+                            sizes="(min-width: 768px) 40vw, 0px"
                             className="object-cover transition-transform duration-[3s] group-hover:scale-110 hidden md:block"
-                            quality={100}
+                            quality={85}
                         />
                         {/* Overlay Gradient for seamless blend - Maintaining modal cinematic feel */}
                         <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#0B0B0D] via-[#0B0B0D]/20 to-transparent opacity-100 pointer-events-none" />

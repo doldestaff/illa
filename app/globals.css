@@ -121,8 +121,8 @@
     will-change: transform;
   }
 
-  /* No backdrop-blur on low-end — use this class on mobile-only cards */
-  @media (max-width: 768px) {
+  /* No backdrop-blur on low-end — use this class on mobile/tablet cards */
+  @media (max-width: 1024px) {
     .no-blur-mobile {
       backdrop-filter: none;
       -webkit-backdrop-filter: none;
@@ -235,8 +235,8 @@ body {
   }
 }
 
-/* On mobile: kill all infinite animations to prevent scroll jank */
-@media (max-width: 768px) {
+/* On mobile/tablet: kill all infinite animations to prevent scroll jank */
+@media (max-width: 1024px) {
   .mobile-no-infinite {
     animation-iteration-count: 1 !important;
   }

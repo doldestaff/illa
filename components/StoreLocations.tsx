@@ -201,7 +201,7 @@ export function StoreLocations() {
                 {/* ─────────────────────────────────────────── */}
                 {/* DESKTOP LAYOUT (unchanged)                 */}
                 {/* ─────────────────────────────────────────── */}
-                <div className="hidden md:grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+                <div className="hidden md:grid md:grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
 
                     {/* Store List */}
                     <div className="space-y-6">

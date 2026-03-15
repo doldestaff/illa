@@ -505,11 +505,11 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
             <div className="relative z-10 w-full max-w-[1536px] mx-auto px-4 md:px-8 lg:px-12 pt-6 pb-20">
 
                 {/* Responsive Grid Layout */}
-                <div className="flex flex-col lg:grid lg:grid-cols-12 gap-6 lg:gap-10">
+                <div className="flex flex-col md:grid md:grid-cols-12 gap-6 md:gap-8 lg:gap-10">
 
                     {/* LEFT COLUMN (Sticky Sidebar on Desktop/Large iPad) */}
-                    <div className="lg:col-span-5 xl:col-span-4 relative">
-                        <div className="lg:sticky lg:top-8 transition-all duration-300">
+                    <div className="md:col-span-5 xl:col-span-4 relative">
+                        <div className="md:sticky md:top-8 transition-all duration-300">
                             {/* HUD Header (User Stats) */}
                             <DashboardHeader profile={snapshot.profile} avatarUrl={avatarUrl} sorvetesCount={sorvetesCount} />
 
@@ -569,7 +569,7 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                     {/* RIGHT COLUMN (Scrollable Content) */}
                     {/* PERF: On mobile, use CSS animations instead of framer-motion stagger */}
                     {isMobile ? (
-                        <div className="lg:col-span-7 xl:col-span-8 space-y-6">
+                        <div className="md:col-span-7 xl:col-span-8 space-y-6">
 
                             {/* Quick Actions Grid */}
                             <DashboardActionGrid onAction={handleAction} />
@@ -635,7 +635,7 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                         </div>
                     ) : (
                         <motion.div
-                            className="lg:col-span-7 xl:col-span-8 space-y-6"
+                            className="md:col-span-7 xl:col-span-8 space-y-6"
                             initial="hidden"
                             animate="visible"
                             variants={{

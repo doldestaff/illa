@@ -378,7 +378,7 @@ export function PinnedButtonsParallax() {
 
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,_rgba(255,255,255,0.5)_0%,_transparent_70%)] pointer-events-none z-0" />
 
-                <div className="relative w-full max-w-md md:max-w-xl h-[380px] md:h-[480px] flex items-center justify-center [perspective:1000px]">
+                <div className="relative w-full max-w-md md:max-w-lg h-[380px] md:h-[480px] flex items-center justify-center [perspective:1000px]">
                     {cards.map((card, index) => (
                         <a
                             key={card.id}
@@ -405,7 +405,7 @@ export function PinnedButtonsParallax() {
                             }}
                             className={cn(
                                 'absolute inset-0 m-auto overflow-hidden',
-                                'w-[85vw] max-w-[360px] md:max-w-[460px] h-[360px] md:h-[420px]',
+                                'w-[85vw] max-w-[360px] md:max-w-[400px] h-[360px] md:h-[420px]',
                                 'bg-white/80 border border-white/60',
                                 'rounded-[3rem] shadow-[0_8px_48px_0_rgba(255,255,255,0.4),0_2px_8px_0_rgba(0,0,0,0.08)]',
                                 'flex flex-col items-center justify-center text-center p-6 md:p-8',
