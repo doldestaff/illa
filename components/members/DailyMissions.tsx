@@ -189,7 +189,7 @@ function InteractiveMarquee({ children, onIndexChange }: { children: React.React
     return (
         <div
             ref={containerRef}
-            className="flex overflow-x-auto pb-[120px] pt-[120px] -my-[88px] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex overflow-x-auto pb-[120px] pt-[100px] md:pt-[120px] -mt-[40px] md:-mt-[88px] -mb-[88px] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             style={{
                 willChange: 'scroll-position',
                 WebkitOverflowScrolling: 'touch',
