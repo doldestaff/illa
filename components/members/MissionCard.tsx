@@ -30,7 +30,7 @@ const CARD_IMAGE_MAP: Record<string, string> = {
     'view_recipes': '/mission-cards/alquimia-de-sabor-1.webp',
     'visit': '/mission-cards/cacador-de-reliquias-1.webp',
     'survey': '/mission-cards/critico-gastromico-1.webp',
-    'profile': '/mission-cards/critico-gastromico-1.webp', // Fallback for profile
+    'profile': '/mission-cards/compartilhar-link-1.webp', // Fallback for profile
 }
 
 /** Fallback title-based matching for missions without slugified `kind` */

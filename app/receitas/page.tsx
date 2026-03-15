@@ -24,7 +24,7 @@ interface RecipeMission {
 const MISSIONS: RecipeMission[] = [
     {
         id: '11111111-1111-1111-1111-111111111111',
-        title: 'Milkshake "Cinema de Pipoca"',
+        title: 'Milkshake "Super Pipoca"',
         subtitle: 'Fazer em dupla e brindar (sem álcool)',
         time: '7 min',
         difficulty: 'Fácil',
