@@ -73,13 +73,20 @@ export default function VipCard({
 
     // Load Vouchers when Modal opens
     useEffect(() => {
-        if (showBenefits && myVouchers.length === 0 && !loadingVouchers) {
-            setLoadingVouchers(true)
-            supabase.rpc('list_my_discounts', { p_limit: 10 }).then(({ data, error }) => {
-                if (!error && data) setMyVouchers(data)
-                setLoadingVouchers(false)
-            }).catch(() => setLoadingVouchers(false))
+        const fetchVouchers = async () => {
+            if (showBenefits && myVouchers.length === 0 && !loadingVouchers) {
+                setLoadingVouchers(true)
+                try {
+                    const { data, error } = await supabase.rpc('list_my_discounts', { p_limit: 10 })
+                    if (!error && data) setMyVouchers(data)
+                } catch (err) {
+                    console.error('Error fetching vouchers:', err)
+                } finally {
+                    setLoadingVouchers(false)
+                }
+            }
         }
+        fetchVouchers()
     }, [showBenefits, myVouchers.length, loadingVouchers])
 
 
