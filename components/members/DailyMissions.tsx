@@ -38,176 +38,45 @@ function AnimatedCounter({ value, duration = 1.5, delay = 0 }: { value: number, 
     return <span ref={nodeRef}>0</span>;
 }
 
-function InteractiveMarquee({ children, onIndexChange }: { children: React.ReactNode, onIndexChange?: (index: number) => void }) {
+function NativeMarquee({ children, onIndexChange }: { children: React.ReactNode, onIndexChange?: (index: number) => void }) {
     const containerRef = useRef<HTMLDivElement>(null)
-    const contentRef = useRef<HTMLDivElement>(null)
-    const [isVisible, setIsVisible] = useState(false)
 
-    // Interaction/Scroll state tracked purely in refs to avoid React renders
-    const isInteractingRef = useRef(false)
-    const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-
-    useEffect(() => {
-        const container = containerRef.current
-        if (!container) return
-
-        const observer = new IntersectionObserver(
-            ([entry]) => setIsVisible(entry.isIntersecting),
-            { threshold: 0.1 }
-        )
-        observer.observe(container)
-        return () => observer.disconnect()
-    }, [])
-
-    // Auto-scroll loop
-    useEffect(() => {
+    // Lighter scroll listener to update index without IntersectionObserver
+    const handleScroll = useCallback(() => {
+        if (!onIndexChange || !containerRef.current) return;
         const container = containerRef.current;
-        const inner = contentRef.current;
-        if (!container || !inner) return;
+        // Assume all children have roughly the same width. 
+        // We find the child closest to the center of the scroll view.
+        const scrollCenter = container.scrollLeft + container.clientWidth / 2;
+        let closestIndex = 0;
+        let minDistance = Infinity;
 
-        let animationFrameId: number;
-        let lastTimestamp = performance.now();
-        let scrollPos = container.scrollLeft;
-
-        // Initialize without snap so we can smoothly auto-scroll
-        container.style.scrollSnapType = 'none';
-
-        const scrollLoop = (timestamp: number) => {
-            const dt = timestamp - lastTimestamp;
-            lastTimestamp = timestamp;
-
-            // Cap extremely large dt (e.g. from tab being suspended)
-            const safeDt = Math.min(dt, 50);
-
-            if (isVisible && !isInteractingRef.current) {
-                const numOriginals = React.Children.count(children);
-                const childrenElements = inner.children;
-                
-                if (childrenElements.length >= numOriginals * 2 && numOriginals > 0) {
-                    const originalFirst = childrenElements[0] as HTMLElement;
-                    const cloneFirst = childrenElements[numOriginals] as HTMLElement;
-                    
-                    const loopWidth = cloneFirst.offsetLeft - originalFirst.offsetLeft;
-                    
-                    if (loopWidth > 0 && container.scrollWidth > container.clientWidth) {
-                        // Advance scroll position by ~40px/sec 
-                        scrollPos += 0.04 * safeDt;
-                        
-                        if (scrollPos >= loopWidth) {
-                            scrollPos -= loopWidth;
-                            container.scrollLeft = scrollPos;
-                        } else {
-                            const diff = Math.abs(container.scrollLeft - scrollPos);
-                            if (diff > 5) { // User or native momentum moved it
-                                scrollPos = container.scrollLeft;
-                            } else {
-                                container.scrollLeft = scrollPos;
-                            }
-                        }
-                    }
-                }
-            } else {
-                // Keep track of the actual position so it doesn't jump when resuming
-                scrollPos = container.scrollLeft;
-                
-                // If it loops while natively scrolling:
-                const numOriginals = React.Children.count(children);
-                const childrenElements = inner.children;
-                if (childrenElements.length >= numOriginals * 2 && numOriginals > 0) {
-                    const originalFirst = childrenElements[0] as HTMLElement;
-                    const cloneFirst = childrenElements[numOriginals] as HTMLElement;
-                    const loopWidth = cloneFirst.offsetLeft - originalFirst.offsetLeft;
-                    
-                    if (loopWidth > 0 && container.scrollLeft >= loopWidth) {
-                        // Resync quietly even when interacting!
-                        container.scrollLeft -= loopWidth;
-                        scrollPos = container.scrollLeft;
-                    }
-                }
+        const items = container.querySelectorAll('.marquee-item');
+        items.forEach((item, index) => {
+            const htmlItem = item as HTMLElement;
+            const itemCenter = htmlItem.offsetLeft + htmlItem.offsetWidth / 2;
+            const distance = Math.abs(scrollCenter - itemCenter);
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestIndex = index;
             }
-            animationFrameId = requestAnimationFrame(scrollLoop);
-        };
+        });
 
-        animationFrameId = requestAnimationFrame(scrollLoop);
-        return () => cancelAnimationFrame(animationFrameId);
-    }, [isVisible, children]);
-
-    // Observer to detect which card is centered for the slide counter
-    useEffect(() => {
-        if (!onIndexChange) return
-        const container = containerRef.current
-        if (!container) return
-
-        const observer = new IntersectionObserver((entries) => {
-            let maxRatio = 0
-            let targetIndex = -1
-            entries.forEach(entry => {
-                if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
-                    maxRatio = entry.intersectionRatio
-                    targetIndex = Number((entry.target as HTMLElement).dataset.index)
-                }
-            })
-            if (targetIndex >= 0) {
-                onIndexChange(targetIndex)
-            }
-        }, { root: container, threshold: [0.4, 0.6, 0.8, 1.0] })
-
-        const inner = contentRef.current
-        if (inner) {
-            const items = inner.querySelectorAll('.marquee-item')
-            items.forEach(item => observer.observe(item))
-        }
-
-        return () => observer.disconnect()
-    }, [onIndexChange, children])
-
-    const handlePointerDown = () => {
-        isInteractingRef.current = true;
-        if (containerRef.current) {
-            containerRef.current.style.scrollSnapType = 'x mandatory';
-        }
-        if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-    }
-
-    const handlePointerUp = () => {
-        if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-        scrollTimeoutRef.current = setTimeout(() => {
-            isInteractingRef.current = false;
-            if (containerRef.current) {
-                containerRef.current.style.scrollSnapType = 'none';
-            }
-        }, 1500); // Resume auto-scroll naturally after releasing
-    }
-
-    const handleWheel = () => {
-        handlePointerDown();
-        handlePointerUp();
-    }
-
-    const childrenArray = React.Children.toArray(children);
+        onIndexChange(closestIndex);
+    }, [onIndexChange]);
 
     return (
         <div
             ref={containerRef}
-            className="flex overflow-x-auto pb-[120px] pt-[100px] md:pt-[120px] -mt-[40px] md:-mt-[88px] -mb-[88px] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            onScroll={handleScroll}
+            className="flex overflow-x-auto pb-[120px] pt-[100px] md:pt-[120px] -mt-[40px] md:-mt-[88px] -mb-[88px] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory scroll-smooth"
             style={{
-                willChange: 'scroll-position',
                 WebkitOverflowScrolling: 'touch',
                 transform: 'translateZ(0)', // Force compositor layer
             }}
-            onTouchStart={handlePointerDown}
-            onTouchEnd={handlePointerUp}
-            onTouchCancel={handlePointerUp}
-            onMouseDown={handlePointerDown}
-            onMouseUp={handlePointerUp}
-            onMouseLeave={handlePointerUp}
-            onWheel={handleWheel}
         >
-            <div ref={contentRef} className="flex shrink-0 gap-5 px-4 md:px-0 relative">
-                {childrenArray}
-                {childrenArray.map((child, i) => (
-                    React.isValidElement(child) ? React.cloneElement(child as React.ReactElement<Record<string, unknown>>, { key: `clone-${i}`, 'aria-hidden': "true" }) : child
-                ))}
+            <div className="flex shrink-0 gap-5 px-4 md:px-0 relative">
+                {children}
             </div>
         </div>
     )
@@ -344,9 +213,9 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
                 </div>
             </div>
 
-            {/* Unified Marquee Preview (Desktop & Mobile) - Disney Experience */}
+            {/* Unified Marquee Preview (Desktop & Mobile) - Native Scroll Performance */}
             <div className="relative group/mural pb-8 pt-0 -mx-4 px-4 w-full max-w-[100vw]">
-                <InteractiveMarquee onIndexChange={setActiveIndex}>
+                <NativeMarquee onIndexChange={setActiveIndex}>
                     {previewMissions.map((mission, index) => {
                         const isClaimed = claimedIds.has(mission.instance_id) || mission.claimed
                         const isCompleted = mission.progress >= mission.target
@@ -355,10 +224,11 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
                         return (
                             <div
                                 key={`mission-${mission.instance_id}`}
-                                data-index={index}
-                                // Format: Wide horizontal card for the WebP content.
-                                // Increased margin/padding so the magical glow from MissionCard can escape freely.
                                 className="marquee-item w-[310px] sm:w-[340px] md:w-[380px] h-[180px] md:h-[220px] shrink-0 snap-center first:pl-2 md:first:pl-0 relative cursor-pointer"
+                                style={{
+                                    animation: `fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both`,
+                                    animationDelay: `${index * 0.1}s` // Native CSS staggering
+                                }}
                             >
                                 <MissionCard
                                     mission={mission}
@@ -372,7 +242,7 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
                             </div>
                         )
                     })}
-                </InteractiveMarquee>
+                </NativeMarquee>
             </div>
 
             {/* Clear Call to Action for Missions Panel */}

@@ -62,20 +62,7 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
     const progressPercent = Math.min(100, Math.max(0, (mission.progress / mission.target) * 100))
     const isCompleted = progressPercent >= 100
 
-    // ── PERF: IntersectionObserver for viewport-aware entrance ──
     const cardRef = useRef<HTMLDivElement>(null)
-    const [isVisible, setIsVisible] = useState(false)
-
-    useEffect(() => {
-        const el = cardRef.current
-        if (!el) return
-        const observer = new IntersectionObserver(
-            ([entry]) => { if (entry.isIntersecting) { setIsVisible(true); observer.disconnect() } },
-            { threshold: 0.1 }
-        )
-        observer.observe(el)
-        return () => observer.disconnect()
-    }, [])
 
     return (
         <div
@@ -87,9 +74,9 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                 }
             }}
         >
-            {/* PERF: Use CSS animation for entrance instead of framer-motion JS loop */}
+            {/* PERF: Fully CSS accelerated rendering, no IntersectionObserver overhead anymore */}
             <div
-                className={`relative w-full group ${isClaimed ? 'opacity-50 grayscale saturate-50' : ''} ${isVisible ? 'anim-fade-in-up' : 'opacity-0'}`}
+                className={`relative w-full group ${isClaimed ? 'opacity-50 grayscale saturate-50' : ''}`}
                 style={{ height: 'calc(100% - 16px)' }}
             >
                 {/* 1. Atmospheric Glow — PERF: CSS-only opacity animation (compositor thread) */}
