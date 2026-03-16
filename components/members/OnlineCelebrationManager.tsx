@@ -28,6 +28,7 @@ const STAR_BURSTS = [
     { emoji: '🎊', x: 55, y: 65, delay: 0.18, size: 16, rot: -15 },
 ]
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- Reserved for future premium shimmer usage
 function GoldenShimmer() {
     return (
         <motion.div
@@ -68,6 +69,7 @@ function PremiumGoldenCloud({ children, isClaimed = false }: { children: React.R
 
             {/* Custom Image Background (Replacing the yellow CSS shape) */}
             <div className="absolute inset-[-40px] z-0 pointer-events-none flex items-center justify-center">
+                {/* eslint-disable-next-line @next/next/no-img-element -- Decorative toast background shape */}
                 <img src="/toast-bg.webp" alt="Background shape" className="w-[120%] h-[120%] object-contain scale-[1.1]" />
             </div>
 
@@ -125,6 +127,7 @@ export default function OnlineCelebrationManager({ onClaim, pollIntervalMs = 5 *
                 setWindow(null)
             }
         } catch { /* Silent */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- playCoinToastShow is a stable ref from context
     }, [isVisible])
 
     useEffect(() => {
@@ -194,6 +197,7 @@ export default function OnlineCelebrationManager({ onClaim, pollIntervalMs = 5 *
         } finally {
             setClaiming(false)
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Sound functions are stable refs from context
     }, [window, claiming, claimed, onClaim])
 
     return (

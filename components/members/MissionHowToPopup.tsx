@@ -139,6 +139,7 @@ export default function MissionHowToPopup({ isOpen, onClose, missionKind, missio
                             <div className="relative w-full min-h-[480px] flex flex-col items-center justify-center drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
 
                                 {/* Parchment Background Image */}
+                                {/* eslint-disable-next-line @next/next/no-img-element -- Decorative parchment background */}
                                 <img 
                                     src="/mission-cards/pergaminho.webp" 
                                     alt="Pergaminho" 

@@ -35,20 +35,20 @@ export async function POST() {
                 xp: homeState.profile.xp || 0
             },
             discounts: (discounts || [])
-                .filter((d: any) => d.status === 'issued')
-                .map((d: any) => ({
+                .filter((d: { status: string }) => d.status === 'issued')
+                .map((d: { id: string; title: string; percent: number; voucher_code: string }) => ({
                     id: d.id,
                     title: d.title,
                     percent: d.percent,
                     voucher: d.voucher_code
                 })),
             sorvetes: (inventory?.sorvetes || [])
-                .filter((s: any) => s.is_valid)
-                .map((s: any) => ({
+                .filter((s: { is_valid: boolean }) => s.is_valid)
+                .map((s: { id: string; voucher_code: string }) => ({
                     id: s.id,
                     voucher: s.voucher_code
                 })),
-            drops: (inventory?.drops || []).map((d: any) => ({
+            drops: (inventory?.drops || []).map((d: { id: string; title: string; reward_type: string; reward_value: string }) => ({
                 id: d.id,
                 title: d.title,
                 type: d.reward_type,

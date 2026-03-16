@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { createSupabaseBrowser } from '@/lib/supabaseClient'
+// Removed unused createSupabaseBrowser import
 import { useSoundSystem } from '@/components/providers/SoundProvider'
 
 // Types
@@ -41,8 +41,7 @@ export const CinematicToastProvider = ({ children }: { children: ReactNode }) =>
     const [isPaused, setIsPaused] = useState(false)
     const { playCoinToastShow } = useSoundSystem()
 
-    // Rate limit configuration
-    const PROCESSING_INTERVAL = 15000 // 15s between toasts to avoid spam (premium feel)
+    // Rate limit: 15s between toasts to avoid spam (premium feel)
     // If priority 3 (WIN), show immediately? Let's stick to queue for consistency, or bump to front.
 
     const showToast = useCallback((toastData: Omit<CinematicToast, 'id'>) => {
@@ -93,6 +92,7 @@ export const CinematicToastProvider = ({ children }: { children: ReactNode }) =>
         }, duration)
 
         return () => clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- playCoinToastShow is a stable ref from context
     }, [queue, activeToast, isPaused])
 
     // ------------------------------------------------------------------

@@ -20,6 +20,7 @@ export function HeroScrollFrames() {
     // On mount: set initial values + listen for resize (breakpoints only, never height)
     useEffect(() => {
         const w = window.innerWidth
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- Initial hydration sync from window (external system)
         setIsMobile(w < 768)
         setIsTablet(w >= 768 && w < 1024)
 

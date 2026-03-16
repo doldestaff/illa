@@ -82,6 +82,7 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
 
     // PERF: Detect mobile for conditional animation rendering
     const [isMobile, setIsMobile] = useState(false)
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Syncing from external system (window dimensions)
     useEffect(() => { setIsMobile(window.innerWidth < 768) }, [])
 
 
@@ -297,6 +298,7 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
     )
 
     // ── Recipe toggle handler (also tracks recipe mission progress) ──
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Reserved for future recipe feature
     const handleRecipeToggle = useCallback(
         async (recipeId: string, field: 'saved' | 'favorited' | 'done', value: boolean) => {
             // Optimistic update

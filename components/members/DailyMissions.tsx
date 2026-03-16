@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useRef, useEffect } from 'react'
 import type { MissionInstance } from '@/lib/gamification-types'
-import { Compass, Sparkles, ArrowRight, CheckCircle2, Star } from 'lucide-react'
+import { Sparkles, ArrowRight, CheckCircle2, Star } from 'lucide-react'
 import { motion, AnimatePresence, animate } from 'framer-motion'
 import MissionCard, { resolveCardImage } from './MissionCard'
 import MissionsModal from './MissionsModal'
@@ -287,6 +287,7 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
         } finally {
             setClaimingId(null)
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Sound functions are stable refs from context
     }, [onClaim, missionRewards])
 
     if (missions.length === 0) return null
@@ -316,6 +317,7 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
                     <div className="relative">
                         <div className="absolute inset-0 bg-orange-500/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                         <div className="w-12 h-12 flex items-center justify-center relative z-10 group-hover:scale-110 transition-transform duration-300">
+                            {/* eslint-disable-next-line @next/next/no-img-element -- Decorative game icon */}
                             <img 
                                 src="/mission-cards/missions-icon.webp" 
                                 alt="Missions Target" 
@@ -455,6 +457,7 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
 
                             {/* Background Shape dictates the total size */}
                             <div className="relative w-full z-0 pointer-events-none drop-shadow-[0_20px_50px_rgba(229,1,125,0.25)] flex items-center justify-center overflow-visible">
+                                {/* eslint-disable-next-line @next/next/no-img-element -- Decorative background shape */}
                                 <img src="/mission-complete.webp" alt="Background shape" className="w-[110%] max-w-none h-auto object-contain scale-110" />
                             </div>
 

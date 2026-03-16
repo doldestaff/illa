@@ -98,7 +98,8 @@ export function HeroEngine({
     const [isLoaded, setIsLoaded] = useState(false)
     const [debugText, setDebugText] = useState('')
     // On mobile we skip the poster fade entirely — canvas is always shown
-    const [isMobileHero, setIsMobileHero] = useState(false)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- setter is used in scroll handler, value reserved for future mobile-specific rendering
+    const [_isMobileHero, setIsMobileHero] = useState(false)
     // Refs for Loop
     const state = useRef({
         cache: new FrameCache(),
@@ -334,7 +335,7 @@ export function HeroEngine({
                     state.current.cache.add(index, img)
                     if (priority || Math.abs(state.current.targetFrameIndex - index) <= 1) scheduleDraw()
                 }
-            } catch (decodeError) {
+            } catch {
                 // If decode() throws (e.g., unsupported format or broken image), fallback to standard onload
                 const img = new Image()
                 img.src = url

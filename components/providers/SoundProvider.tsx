@@ -1,7 +1,6 @@
 'use client'
 
 import React, { createContext, useContext, useEffect, useCallback, useRef } from 'react'
-import { usePathname } from 'next/navigation'
 
 // Define the sound keys mapped to explicit file paths
 const SOUND_FILES = {
@@ -40,7 +39,7 @@ export function useSoundSystem() {
 }
 
 export function SoundProvider({ children }: { children: React.ReactNode }) {
-  const audioPools = useRef<Record<SoundKey, HTMLAudioElement[]>>({} as any)
+  const audioPools = useRef<Record<SoundKey, HTMLAudioElement[]>>({} as Record<SoundKey, HTMLAudioElement[]>)
   const isEnabled = useRef(true)
 
   // Initialize pool on mount
@@ -81,6 +80,7 @@ export function SoundProvider({ children }: { children: React.ReactNode }) {
     
     if (audio) {
       // Small reset to allow overlapping punchy sounds correctly
+      // eslint-disable-next-line react-hooks/immutability -- Mutating external DOM Audio element, not React state
       audio.currentTime = 0
       audio.volume = 0.5 // Safe default volume for cinematic effects
       audio.play().catch((err) => {

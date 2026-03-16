@@ -7,9 +7,8 @@ import Link from 'next/link'
 export default function StorePromoCard() {
     // PERF: Detect mobile once to disable heavy JS animations
     const [isMobile, setIsMobile] = useState(false)
-    useEffect(() => {
-        setIsMobile(window.innerWidth < 768)
-    }, [])
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Syncing from external system (window dimensions)
+    useEffect(() => { setIsMobile(window.innerWidth < 768) }, [])
 
     return (
         <Link href="/descontos" className="block group relative">

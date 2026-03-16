@@ -47,6 +47,7 @@ export default function VipCard({ profile, avatarUrl, referralCount, vipPayload,
     // PERF: Detect mobile to disable scroll-reactive glare (fires per-frame)
     const [isMobile, setIsMobile] = useState(false)
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- Syncing from external system (window dimensions)
         setIsMobile(window.innerWidth < 768)
 
         // REALTIME: Listen for scan success broadcast

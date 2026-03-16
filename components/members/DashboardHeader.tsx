@@ -16,6 +16,7 @@ import GlobalCoin from '@/components/ui/GlobalCoin'
 // PERF: Detect mobile once for conditional rendering
 function useIsMobile() {
     const [isMobile, setIsMobile] = useState(false)
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Syncing from external system (window dimensions)
     useEffect(() => { setIsMobile(window.innerWidth < 768) }, [])
     return isMobile
 }

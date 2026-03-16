@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Target, Sparkles } from 'lucide-react'
+import { X, Sparkles } from 'lucide-react'
 import type { MissionInstance } from '@/lib/gamification-types'
 import MissionCard, { resolveCardImage } from './MissionCard'
 import { useSyncExternalStore } from 'react'
@@ -95,6 +95,7 @@ export default function MissionsModal({ isOpen, onClose, missions: rawMissions, 
                                     <div className="relative">
                                         <div className="absolute inset-0 bg-orange-500/30 blur-xl rounded-full animate-pulse" />
                                         <div className="relative w-[72px] h-[72px] flex items-center justify-center">
+                                            {/* eslint-disable-next-line @next/next/no-img-element -- Decorative game icon */}
                                             <img 
                                                 src="/mission-cards/missions-icon.webp" 
                                                 alt="Missions" 

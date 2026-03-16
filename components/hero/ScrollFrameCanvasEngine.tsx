@@ -172,7 +172,7 @@ export function ScrollFrameCanvasEngine({
 
                 state.current.cache.add(index, img)
                 if (priority && drawFn) requestAnimationFrame(() => drawFn(state.current.lastFrameIndex, true))
-            } catch (decodeError) {
+            } catch {
                 const img = new Image()
                 img.src = url
                 img.onload = () => {
