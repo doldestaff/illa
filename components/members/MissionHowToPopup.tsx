@@ -133,31 +133,28 @@ export default function MissionHowToPopup({ isOpen, onClose, missionKind, missio
                             animate={{ scale: 1, opacity: 1, y: 0 }}
                             exit={{ scale: 0.9, opacity: 0, y: 15 }}
                             transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-                            className="w-full max-w-[380px] pointer-events-auto relative overflow-hidden"
+                            className="w-full max-w-[380px] pointer-events-auto relative"
                         >
-                            {/* Card Container Premium Gamified */}
-                            <div className="relative rounded-[2.5rem] bg-[#0c0a09]/95 backdrop-blur-3xl border border-white/[0.08] shadow-[0_30px_100px_rgba(0,0,0,0.9)] overflow-hidden">
+                            {/* Parchment Container */}
+                            <div className="relative w-full min-h-[480px] flex flex-col items-center justify-center drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
 
-                                {/* Ambient Dark Glow Centralized */}
-                                <div className="absolute left-1/2 top-0 -translate-x-1/2 w-3/4 h-1/2 bg-gradient-to-b from-illa-pink/20 to-transparent blur-3xl opacity-50 pointer-events-none" />
-                                <div className="absolute left-1/2 bottom-0 -translate-x-1/2 w-full h-1/2 bg-gradient-to-t from-amber-500/10 to-transparent blur-3xl opacity-40 pointer-events-none" />
-
-                                {/* Top highlight border */}
-                                <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
-
-                                {/* Noise overlay */}
-                                <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] pointer-events-none mix-blend-overlay" />
+                                {/* Parchment Background Image */}
+                                <img 
+                                    src="/mission-cards/pergaminho.webp" 
+                                    alt="Pergaminho" 
+                                    className="absolute inset-0 w-[110%] h-[110%] -left-[5%] -top-[5%] object-fill -z-10 pointer-events-none"
+                                />
 
                                 {/* Close button */}
                                 <button
                                     onClick={onClose}
-                                    className="absolute top-5 right-5 z-20 p-2 rounded-full bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all border border-white/5 active:scale-95"
+                                    className="absolute top-10 right-8 sm:right-10 z-20 p-2 rounded-full bg-black/10 hover:bg-black/20 text-black/50 hover:text-black transition-all active:scale-95"
                                 >
-                                    <X size={16} />
+                                    <X size={18} />
                                 </button>
 
                                 {/* Content */}
-                                <div className="relative z-10 px-8 pt-10 pb-8 flex flex-col items-center text-center">
+                                <div className="relative z-10 w-full px-12 sm:px-14 pt-16 pb-16 flex flex-col items-center text-center">
 
                                     {/* Icon with glow matching accent */}
                                     <motion.div
@@ -166,9 +163,9 @@ export default function MissionHowToPopup({ isOpen, onClose, missionKind, missio
                                         transition={{ type: 'spring', delay: 0.1, damping: 12, stiffness: 200 }}
                                         className="relative mb-6"
                                     >
-                                        <div className="absolute inset-0 bg-white/10 blur-xl rounded-full scale-150" />
-                                        <div className={`w-20 h-20 rounded-full bg-gradient-to-br from-white/10 to-white/5 border border-white/10 flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.6)] relative z-10 backdrop-blur-md`}>
-                                            <div className="absolute inset-0 rounded-full bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
+                                        <div className="absolute inset-0 bg-amber-900/10 blur-xl rounded-full scale-150" />
+                                        <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-amber-100 to-amber-200/50 border border-amber-900/10 flex items-center justify-center shadow-[0_8px_20px_rgba(0,0,0,0.15)] relative z-10`}>
+                                            <div className="absolute inset-0 rounded-full bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
                                             {howTo.icon}
                                         </div>
                                     </motion.div>
@@ -178,21 +175,21 @@ export default function MissionHowToPopup({ isOpen, onClose, missionKind, missio
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: 0.15 }}
-                                        className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-white/70 mb-2 tracking-tight drop-shadow-sm"
+                                        className="text-xl sm:text-2xl font-black text-amber-950 mb-2 tracking-tight drop-shadow-[0_1px_1px_rgba(255,255,255,0.5)]"
                                     >
                                         {howTo.title}
                                     </motion.h3>
 
                                     {/* Mission-specific title */}
                                     {missionTitle && (
-                                        <motion.p
+                                        <motion.div
                                             initial={{ opacity: 0 }}
                                             animate={{ opacity: 1 }}
                                             transition={{ delay: 0.2 }}
-                                            className="text-xs font-bold text-white/30 uppercase tracking-widest mb-4"
+                                            className="text-[10px] sm:text-xs font-black text-amber-900/50 uppercase tracking-widest mb-3"
                                         >
                                             {missionTitle}
-                                        </motion.p>
+                                        </motion.div>
                                     )}
 
                                     {/* Instruction */}
@@ -200,7 +197,7 @@ export default function MissionHowToPopup({ isOpen, onClose, missionKind, missio
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: 0.25 }}
-                                        className="text-sm text-white/60 leading-relaxed mb-8 max-w-[280px]"
+                                        className="text-[13px] sm:text-sm text-amber-950/70 font-medium leading-relaxed mb-6 max-w-[260px] drop-shadow-[0_1px_1px_rgba(255,255,255,0.3)]"
                                     >
                                         {howTo.instruction}
                                     </motion.p>
@@ -227,10 +224,10 @@ export default function MissionHowToPopup({ isOpen, onClose, missionKind, missio
                                                 }
                                             }
                                         }}
-                                        className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-black text-sm font-black tracking-widest uppercase shadow-[0_4px_20px_rgba(245,158,11,0.4)] border border-amber-300/30 flex items-center justify-center gap-2 transition-all hover:shadow-[0_8px_30px_rgba(245,158,11,0.6)] group"
+                                        className="w-[90%] sm:w-full py-3 sm:py-4 rounded-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white text-xs sm:text-sm font-black tracking-widest uppercase shadow-[0_4px_15px_rgba(217,119,6,0.5)] border border-amber-400/30 flex items-center justify-center gap-2 transition-all hover:shadow-[0_6px_20px_rgba(217,119,6,0.6)] group"
                                     >
                                         {howTo.actionLabel}
-                                        <ArrowRight size={16} strokeWidth={3} className="text-black/70 group-hover:translate-x-1 group-hover:text-black transition-all" />
+                                        <ArrowRight size={16} strokeWidth={3} className="text-white/80 group-hover:translate-x-1 group-hover:text-white transition-all" />
                                     </motion.button>
                                 </div>
                             </div>
