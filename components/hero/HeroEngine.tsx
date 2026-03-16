@@ -169,9 +169,10 @@ export function HeroEngine({
         let prevWidth = window.visualViewport ? window.visualViewport.width : window.innerWidth
 
         const handleResize = () => {
-            // CRITICAL: Update dimensions IMMEDIATELY — no debounce.
-            const h = window.visualViewport ? window.visualViewport.height : window.innerHeight
-            const w = window.visualViewport ? window.visualViewport.width : window.innerWidth
+            // CRITICAL: Update dimensions IMMEDIATELY — measuring the DOM element directly.
+            // This safely bypasses visualViewport/URL-bar collapse differences on mobile.
+            const h = containerRef.current ? containerRef.current.clientHeight : (window.visualViewport ? window.visualViewport.height : window.innerHeight)
+            const w = containerRef.current ? containerRef.current.clientWidth : (window.visualViewport ? window.visualViewport.width : window.innerWidth)
 
             const widthChanged = Math.abs(w - prevWidth) > 1
             const isMob = w < 768
@@ -206,8 +207,8 @@ export function HeroEngine({
         if (window.visualViewport) window.visualViewport.addEventListener('resize', handleResize)
 
         // Initial call — always set everything on first mount
-        const h = window.visualViewport ? window.visualViewport.height : window.innerHeight
-        const w = window.visualViewport ? window.visualViewport.width : window.innerWidth
+        const h = containerRef.current ? containerRef.current.clientHeight : (window.visualViewport ? window.visualViewport.height : window.innerHeight)
+        const w = containerRef.current ? containerRef.current.clientWidth : (window.visualViewport ? window.visualViewport.width : window.innerWidth)
         prevWidth = w
         state.current.appHeight = h
         state.current.appWidth = w

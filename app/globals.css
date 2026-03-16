@@ -138,13 +138,10 @@
 html,
 body {
   overscroll-behavior: none;
-  /* pan-y: tells iOS Safari this is a vertical scroll surface.
-     Prevents horizontal swipe detection overhead that caused scroll jitter.
-     Safe to use alongside overscroll-behavior: none. */
+  /* touch-action: pan-y; tells iOS Safari this is a vertical scroll surface.
+     Prevents horizontal swipe detection overhead that caused scroll jitter. */
   touch-action: pan-y;
-  /* Use dvh (dynamic viewport height) so the page fills the full
-     visible viewport, including when the mobile URL bar collapses. */
-  min-height: 100dvh;
+  min-height: 100vh;
 }
 
 body {

@@ -14,10 +14,10 @@ export function HeroScrollFrames() {
     const [isMobile, setIsMobile] = useState<boolean | null>(null)
     const [isTablet, setIsTablet] = useState<boolean | null>(null)
 
-    // MOBILE FIX: Freeze viewport height in pixels at mount time.
-    // This state NEVER changes when only height changes (URL bar collapse).
-    // Only updates on real width changes (rotation/resize).
-    const [frozenVhState, setFrozenVhState] = useState<number>(0)
+    // MOBILE FIX: Freeze viewport height in pixels by measuring a pure 100vh element.
+    // This value NEVER changes when the URL bar collapses (unlike 100dvh or window.innerHeight).
+    const [realVhPx, setRealVhPx] = useState<number>(0)
+    const stickyRef = useRef<HTMLDivElement>(null)
     const prevWidthRef = useRef<number>(0)
     // Force a single re-render after mount to apply frozen height
     const [mountReady, setMountReady] = useState(false)
@@ -34,8 +34,10 @@ export function HeroScrollFrames() {
             setIsMobile(w < 768)
             setIsTablet(w >= 768 && w < 1024)
 
-            // Freeze the viewport height in pixels
-            setFrozenVhState(h)
+            // Measure the actual layout size of the 100vh sticky container
+            if (stickyRef.current) {
+                setRealVhPx(stickyRef.current.clientHeight)
+            }
             prevWidthRef.current = w
             setMountReady(true)
         })
@@ -49,7 +51,9 @@ export function HeroScrollFrames() {
             // CRITICAL: Only update frozen height if WIDTH actually changed
             // (real rotation/resize). Height-only changes = URL bar collapse → ignore.
             if (Math.abs(rw - prevWidthRef.current) > 1) {
-                setFrozenVhState(rh)
+                if (stickyRef.current) {
+                    setRealVhPx(stickyRef.current.clientHeight)
+                }
                 prevWidthRef.current = rw
             }
         }
@@ -99,20 +103,24 @@ export function HeroScrollFrames() {
     const useMobileFrames = isMobile || isTablet
     const manifest = useMobileFrames ? mobileManifest : desktopManifest
 
-    // Convert vh config to frozen pixels using the mount-time viewport height
-    const sectionHeightPx = frozenVhState * (SCROLL_HEIGHT_vh / 100)
+    // Convert vh config to real layout pixels to ensure exactly proportional scroll depth
+    const sectionStyle = realVhPx > 0 
+        ? { height: `${realVhPx * (SCROLL_HEIGHT_vh / 100)}px` }
+        : { height: `${SCROLL_HEIGHT_vh}vh` }
 
     return (
         <section
             className="relative w-full z-10 bg-[#111]"
-            style={{ height: `${sectionHeightPx}px` }}
+            style={sectionStyle}
         >
-            {/* Sticky container uses 100svh with 100dvh fallback.
-                This ensures it fills the viewport when the URL bar collapses (preventing gaps).
-                The inner canvas will use object-fit: cover to stretch without distorting. */}
+            {/* Sticky container uses 100vh constant.
+                On mobile, 100vh is statically resolved to the maximum viewport size (URL bar hidden).
+                This ensures it NEVER resizes during scroll, completely eliminating image jumping, shifting, 
+                and the recalculation of object-fit centers, while also leaving no black gaps! */}
             <div
+                ref={stickyRef}
                 className="sticky top-0 w-full overflow-hidden bg-[#111]"
-                style={{ height: '100svh', minHeight: '100dvh' }}
+                style={{ height: '100vh' }}
             >
 
                 {/* Unified Engine — inline manifest eliminates fetch waterfall */}
