@@ -19,6 +19,9 @@ DECLARE v_new_xp int;
 v_new_points int;
 v_new_drops int;
 BEGIN -- Update the user's profile atomically
+-- Bypass guard trigger for trusted RPC
+PERFORM set_config('app.bypass_reward_guard', 'true', true);
+
 UPDATE profiles
 SET xp = COALESCE(xp, 0) + p_xp_amount,
     points = COALESCE(points, 0) + p_points_amount,

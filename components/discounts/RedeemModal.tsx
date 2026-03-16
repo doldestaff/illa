@@ -181,7 +181,7 @@ export default function RedeemModal({ isOpen, onClose, offer, userPoints, onConf
                                             </motion.div>
                                         </div>
 
-                                        <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-teal-200 mb-2 tracking-tight drop-shadow-lg">Surpresa Liberada!</h2>
+                                        <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-teal-200 mb-2 tracking-tight drop-shadow-lg">Voucher Liberado!</h2>
                                         <p className="text-white/60 text-sm mb-8 leading-relaxed max-w-[280px]">
                                             Seu voucher brilha em suas mãos. Copie o código abaixo e aproveite a magia ILLA.
                                         </p>

@@ -143,7 +143,7 @@ export default function MissionHowToPopup({ isOpen, onClose, missionKind, missio
                                 <img 
                                     src="/mission-cards/pergaminho.webp" 
                                     alt="Pergaminho" 
-                                    className="absolute md:inset-0 w-[120%] h-[110%] -left-[10%] md:w-[110%] md:-left-[5%] -top-[5%] object-fill -z-10 pointer-events-none"
+                                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[48%] w-[125%] h-[115%] md:w-[110%] md:h-[110%] object-fill -z-10 pointer-events-none"
                                 />
 
                                 {/* Close button */}

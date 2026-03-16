@@ -15,9 +15,9 @@ export function HeroScrollFrames() {
     const [isTablet, setIsTablet] = useState<boolean | null>(null)
 
     // MOBILE FIX: Freeze viewport height in pixels at mount time.
-    // This ref NEVER changes when only height changes (URL bar collapse).
+    // This state NEVER changes when only height changes (URL bar collapse).
     // Only updates on real width changes (rotation/resize).
-    const frozenVh = useRef<number>(0)
+    const [frozenVhState, setFrozenVhState] = useState<number>(0)
     const prevWidthRef = useRef<number>(0)
     // Force a single re-render after mount to apply frozen height
     const [mountReady, setMountReady] = useState(false)
@@ -30,15 +30,15 @@ export function HeroScrollFrames() {
         const w = window.innerWidth
         const h = window.innerHeight
 
-        // eslint-disable-next-line react-hooks/set-state-in-effect -- Initial hydration sync from window (external system)
-        setIsMobile(w < 768)
-        setIsTablet(w >= 768 && w < 1024)
+        requestAnimationFrame(() => {
+            setIsMobile(w < 768)
+            setIsTablet(w >= 768 && w < 1024)
 
-        // Freeze the viewport height in pixels
-        frozenVh.current = h
-        prevWidthRef.current = w
-        // eslint-disable-next-line react-hooks/set-state-in-effect -- One-time mount sync
-        setMountReady(true)
+            // Freeze the viewport height in pixels
+            setFrozenVhState(h)
+            prevWidthRef.current = w
+            setMountReady(true)
+        })
 
         const handleResize = () => {
             const rw = window.innerWidth
@@ -49,7 +49,7 @@ export function HeroScrollFrames() {
             // CRITICAL: Only update frozen height if WIDTH actually changed
             // (real rotation/resize). Height-only changes = URL bar collapse → ignore.
             if (Math.abs(rw - prevWidthRef.current) > 1) {
-                frozenVh.current = rh
+                setFrozenVhState(rh)
                 prevWidthRef.current = rw
             }
         }
@@ -100,7 +100,7 @@ export function HeroScrollFrames() {
     const manifest = useMobileFrames ? mobileManifest : desktopManifest
 
     // Convert vh config to frozen pixels using the mount-time viewport height
-    const sectionHeightPx = frozenVh.current * (SCROLL_HEIGHT_vh / 100)
+    const sectionHeightPx = frozenVhState * (SCROLL_HEIGHT_vh / 100)
 
     return (
         <section
@@ -112,7 +112,7 @@ export function HeroScrollFrames() {
                 no scroll progress recalculation, no image jumping. */}
             <div
                 className="sticky top-0 w-full overflow-hidden bg-[#111]"
-                style={{ height: `${frozenVh.current}px` }}
+                style={{ height: `${frozenVhState}px` }}
             >
 
                 {/* Unified Engine — inline manifest eliminates fetch waterfall */}
