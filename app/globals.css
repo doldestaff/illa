@@ -142,10 +142,9 @@ body {
      Prevents horizontal swipe detection overhead that caused scroll jitter.
      Safe to use alongside overscroll-behavior: none. */
   touch-action: pan-y;
-  /* Prevent white gap: use svh (small viewport height) which is constant
-     and does NOT change when the mobile browser URL bar collapses.
-     This keeps the page layout stable during scroll. */
-  min-height: 100svh;
+  /* Use dvh (dynamic viewport height) so the page fills the full
+     visible viewport, including when the mobile URL bar collapses. */
+  min-height: 100dvh;
 }
 
 body {
