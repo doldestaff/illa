@@ -146,16 +146,9 @@ export default function MissionHowToPopup({ isOpen, onClose, missionKind, missio
                                     className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[48%] w-[125%] h-[115%] md:w-[110%] md:h-[110%] object-fill -z-10 pointer-events-none"
                                 />
 
-                                {/* Close button */}
-                                <button
-                                    onClick={onClose}
-                                    className="absolute top-12 right-10 sm:right-12 z-20 p-2 rounded-full bg-amber-900/10 hover:bg-amber-900/20 text-amber-950/60 hover:text-amber-950 transition-all active:scale-95 shadow-[0_2px_8px_rgba(255,255,255,0.4)] backdrop-blur-sm"
-                                >
-                                    <X size={20} strokeWidth={2.5} />
-                                </button>
 
                                 {/* Content */}
-                                <div className="relative z-10 w-full px-12 sm:px-14 pt-20 pb-16 flex flex-col items-center text-center">
+                                <div className="relative z-10 w-full px-14 sm:px-20 pt-20 pb-16 flex flex-col items-center text-center mx-auto max-w-[320px]">
 
                                     {/* Icon with glow matching accent */}
                                     <motion.div
@@ -176,7 +169,7 @@ export default function MissionHowToPopup({ isOpen, onClose, missionKind, missio
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: 0.15 }}
-                                        className="text-xl sm:text-2xl font-black text-amber-950 mb-2 tracking-tight drop-shadow-[0_1px_1px_rgba(255,255,255,0.5)]"
+                                        className="text-[18px] sm:text-xl font-black text-amber-950 mb-2 tracking-tight drop-shadow-[0_1px_1px_rgba(255,255,255,0.5)] leading-tight px-2"
                                     >
                                         {howTo.title}
                                     </motion.h3>
@@ -198,7 +191,7 @@ export default function MissionHowToPopup({ isOpen, onClose, missionKind, missio
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: 0.25 }}
-                                        className="text-[13px] sm:text-base text-amber-950/90 font-medium leading-relaxed mb-8 max-w-[280px] drop-shadow-[0_1px_1px_rgba(255,255,255,0.7)]"
+                                        className="text-[12px] sm:text-[14px] text-amber-950/90 font-medium leading-relaxed mb-8 max-w-[220px] sm:max-w-[240px] drop-shadow-[0_1px_1px_rgba(255,255,255,0.7)]"
                                     >
                                         {howTo.instruction}
                                     </motion.p>
