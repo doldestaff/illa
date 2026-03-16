@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { HeroGhostButtons } from './HeroGhostButtons'
 import { useMotionValue } from 'framer-motion'
 import { HeroEngine } from './hero/HeroEngine'
@@ -14,20 +14,44 @@ export function HeroScrollFrames() {
     const [isMobile, setIsMobile] = useState<boolean | null>(null)
     const [isTablet, setIsTablet] = useState<boolean | null>(null)
 
+    // MOBILE FIX: Freeze viewport height in pixels at mount time.
+    // This ref NEVER changes when only height changes (URL bar collapse).
+    // Only updates on real width changes (rotation/resize).
+    const frozenVh = useRef<number>(0)
+    const prevWidthRef = useRef<number>(0)
+    // Force a single re-render after mount to apply frozen height
+    const [mountReady, setMountReady] = useState(false)
+
     // Stable Refs
     const buttonProgress = useMotionValue(0)
 
-    // On mount: set initial values + listen for resize (breakpoints only, never height)
+    // On mount: set initial values + listen for resize (breakpoints only)
     useEffect(() => {
         const w = window.innerWidth
+        const h = window.innerHeight
+
         // eslint-disable-next-line react-hooks/set-state-in-effect -- Initial hydration sync from window (external system)
         setIsMobile(w < 768)
         setIsTablet(w >= 768 && w < 1024)
 
+        // Freeze the viewport height in pixels
+        frozenVh.current = h
+        prevWidthRef.current = w
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- One-time mount sync
+        setMountReady(true)
+
         const handleResize = () => {
             const rw = window.innerWidth
+            const rh = window.innerHeight
             setIsMobile(rw < 768)
             setIsTablet(rw >= 768 && rw < 1024)
+
+            // CRITICAL: Only update frozen height if WIDTH actually changed
+            // (real rotation/resize). Height-only changes = URL bar collapse → ignore.
+            if (Math.abs(rw - prevWidthRef.current) > 1) {
+                frozenVh.current = rh
+                prevWidthRef.current = rw
+            }
         }
         window.addEventListener('resize', handleResize)
         return () => window.removeEventListener('resize', handleResize)
@@ -43,14 +67,14 @@ export function HeroScrollFrames() {
     const TABLET_HEIGHT_vh = 400
     const DESKTOP_HEIGHT_vh = 500
 
-    if (isMobile === null || isTablet === null) return (
+    if (isMobile === null || isTablet === null || !mountReady) return (
         <section
             className="relative w-full z-10 bg-[#111]"
             style={{ height: `${MOBILE_HEIGHT_vh}vh` }}
         >
             <div
                 className="sticky top-0 w-full overflow-hidden bg-[#111]"
-                style={{ height: '100dvh' }}
+                style={{ height: '100vh' }}
             >
                 {/* SSR skeleton — high priority poster to prevent flash, but SYNCHRONOUS decoding so iOS doesn't panic on hydration switch */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -75,19 +99,20 @@ export function HeroScrollFrames() {
     const useMobileFrames = isMobile || isTablet
     const manifest = useMobileFrames ? mobileManifest : desktopManifest
 
+    // Convert vh config to frozen pixels using the mount-time viewport height
+    const sectionHeightPx = frozenVh.current * (SCROLL_HEIGHT_vh / 100)
+
     return (
         <section
             className="relative w-full z-10 bg-[#111]"
-            style={{ height: `${SCROLL_HEIGHT_vh}vh` }}
+            style={{ height: `${sectionHeightPx}px` }}
         >
-            {/* The sticky container uses CSS dvh so it dynamically fills
-                the viewport when the mobile browser URL bar collapses.
-                The inner HeroEngine canvas CSS-stretches to fill via w-full h-full,
-                while its pixel buffer stays frozen to prevent frame jumping.
-                The ~5-15% stretch during URL bar transition is imperceptible. */}
+            {/* Sticky container uses frozen pixel height from mount time.
+                Never changes when URL bar collapses → no canvas stretch,
+                no scroll progress recalculation, no image jumping. */}
             <div
                 className="sticky top-0 w-full overflow-hidden bg-[#111]"
-                style={{ height: '100dvh' }}
+                style={{ height: `${frozenVh.current}px` }}
             >
 
                 {/* Unified Engine — inline manifest eliminates fetch waterfall */}

@@ -548,19 +548,20 @@ export function HeroEngine({
                     let progress = 0
 
                     if (scrollMode === 'viewport') {
-                        // FIX: Always read fresh viewport height — do NOT use cached appHeight here.
-                        // On Android Chrome, the URL bar hide/show changes visualViewport.height instantly.
-                        // Using the stale appHeight would cause jump bugs when the bar appears/disappears.
-                        const vh = (window.visualViewport ? window.visualViewport.height : window.innerHeight) || window.innerHeight
+                        // DEFINITIVE FIX: Use FROZEN appHeight for scroll progress math.
+                        // On mobile, appHeight is locked at mount and only updates on width changes.
+                        // This ensures the same scrollY always maps to the same progress/frame,
+                        // regardless of URL bar collapse changing the actual viewport height.
+                        const vh = state.current.appHeight || window.innerHeight
                         const totalH = vh * ((scrollSectionHeightVh || 500) / 100)
                         const scrollable = totalH - vh
                         progress = scrollable > 0 ? Math.max(0, Math.min(1, scrollY / scrollable)) : 0
                     } else {
-                        // Document mode — only 2 reads needed
+                        // Document mode — use frozen height for consistency
                         const docH = Math.max(
                             document.body.scrollHeight, document.documentElement.scrollHeight
                         )
-                        const vh = (window.visualViewport ? window.visualViewport.height : window.innerHeight) || window.innerHeight
+                        const vh = state.current.appHeight || window.innerHeight
                         const limit = docH - vh
                         progress = limit > 0 ? Math.max(0, Math.min(1, scrollY / limit)) : 0
                     }
