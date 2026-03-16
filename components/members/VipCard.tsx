@@ -17,6 +17,10 @@ interface Props {
     onLoadVip: () => Promise<VipPayload>
     onShareCopy?: () => void
     onViewExclusive?: () => void
+    missionsCompleted?: number
+    totalMissions?: number
+    sorvetesCount?: number
+    dropsClaimed?: number
 }
 
 const MILESTONES = [1, 3, 10]
@@ -35,7 +39,7 @@ function QrCodeCanvas({ value, size = 140 }: { value: string; size?: number }) {
     )
 }
 
-export default function VipCard({ profile, avatarUrl, referralCount, vipPayload, onLoadVip, onShareCopy, onViewExclusive }: Props) {
+export default function VipCard({ profile, avatarUrl, referralCount, vipPayload, onLoadVip, onShareCopy, onViewExclusive, missionsCompleted = 0, totalMissions = 0, sorvetesCount = 0, dropsClaimed = 0 }: Props) {
     const [loading, setLoading] = useState(false)
     const [vip, setVip] = useState(vipPayload)
     const [codeCopied, setCodeCopied] = useState(false)
@@ -304,63 +308,103 @@ export default function VipCard({ profile, avatarUrl, referralCount, vipPayload,
                                         </div>
                                     </motion.div>
 
-                                    {/* 3. Tactical Stats Stream */}
-                                    <div className="grid grid-cols-2 gap-3">
-                                        {/* XP Progress */}
-                                        <motion.div
-                                            initial={{ opacity: 0, x: -20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: 0.3 }}
-                                            className="col-span-2 p-4 rounded-2xl bg-white/5 border border-white/5 flex flex-col gap-3"
-                                        >
-                                            <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider">
-                                                <span className="text-white/50">Progresso</span>
-                                                <span className="text-amber-400">{profile.xp_into_level} / {profile.xp_for_next_level} XP</span>
+                                    {/* 3. Inventário — Clear organized grid */}
+                                    <motion.div
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{ delay: 0.25 }}
+                                        className="flex flex-col gap-2"
+                                    >
+                                        <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest px-1">Meu Inventário</p>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            {/* Missions Progress */}
+                                            <div className="p-4 rounded-2xl bg-white/5 border border-white/5 flex flex-col items-center text-center gap-1">
+                                                <Zap size={20} className="text-amber-400 mb-1" />
+                                                <span className="text-2xl font-black text-white">{missionsCompleted}<span className="text-sm text-white/40">/{totalMissions}</span></span>
+                                                <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Missões</span>
                                             </div>
-                                            <div className="h-2 w-full bg-black/50 rounded-full overflow-hidden border border-white/10">
-                                                <motion.div 
-                                                    initial={{ width: 0 }}
-                                                    animate={{ width: `${Math.min(100, (profile.xp_into_level / (profile.xp_for_next_level || 1)) * 100)}%` }}
-                                                    transition={{ delay: 0.6, duration: 1, ease: 'easeOut' }}
-                                                    className="h-full bg-gradient-to-r from-amber-500 to-rose-500"
-                                                />
-                                            </div>
-                                        </motion.div>
 
-                                        {/* Drops */}
+                                            {/* Sorvetes Free */}
+                                            <div className="p-4 rounded-2xl bg-white/5 border border-white/5 flex flex-col items-center text-center gap-1">
+                                                <IceCream size={20} className="text-cyan-400 mb-1" />
+                                                <span className="text-2xl font-black text-white">{sorvetesCount}</span>
+                                                <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Sorvetes Free</span>
+                                            </div>
+
+                                            {/* Drops Coletados */}
+                                            <div className="p-4 rounded-2xl bg-white/5 border border-white/5 flex flex-col items-center text-center gap-1">
+                                                <Gift size={20} className="text-rose-400 mb-1" />
+                                                <span className="text-2xl font-black text-white">{dropsClaimed}</span>
+                                                <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Drops Coletados</span>
+                                            </div>
+
+                                            {/* Streak */}
+                                            <div className="p-4 rounded-2xl bg-white/5 border border-white/5 flex flex-col items-center text-center gap-1">
+                                                <Flame size={20} className="text-orange-500 mb-1" />
+                                                <div className="flex items-baseline gap-1">
+                                                    <span className="text-2xl font-black text-white">{profile.streak_count}</span>
+                                                    <span className="text-xs font-bold text-white/60">dias</span>
+                                                </div>
+                                                <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Ofensiva</span>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+
+                                    {/* 4. XP Progress */}
+                                    <motion.div
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: 0.35 }}
+                                        className="p-4 rounded-2xl bg-white/5 border border-white/5 flex flex-col gap-3"
+                                    >
+                                        <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider">
+                                            <span className="text-white/50">Progresso</span>
+                                            <span className="text-amber-400">{profile.xp_into_level} / {profile.xp_for_next_level} XP</span>
+                                        </div>
+                                        <div className="h-2 w-full bg-black/50 rounded-full overflow-hidden border border-white/10">
+                                            <motion.div 
+                                                initial={{ width: 0 }}
+                                                animate={{ width: `${Math.min(100, (profile.xp_into_level / (profile.xp_for_next_level || 1)) * 100)}%` }}
+                                                transition={{ delay: 0.6, duration: 1, ease: 'easeOut' }}
+                                                className="h-full bg-gradient-to-r from-amber-500 to-rose-500"
+                                            />
+                                        </div>
+                                    </motion.div>
+
+                                    {/* 5. Active Vouchers from QR payload */}
+                                    {vip?.qr_payload?.discounts && vip.qr_payload.discounts.length > 0 && (
                                         <motion.div
-                                            initial={{ opacity: 0, y: 20 }}
-                                            animate={{ opacity: 1, y: 0 }}
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
                                             transition={{ delay: 0.4 }}
-                                            className="p-4 rounded-2xl bg-white/5 border border-white/5 flex flex-col items-center text-center gap-1"
+                                            className="flex flex-col gap-2"
                                         >
-                                            <Gift size={20} className="text-rose-400 mb-1" />
-                                            <span className="text-2xl font-black text-white">{profile.drops}</span>
-                                            <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Drops Salvos</span>
-                                        </motion.div>
-
-                                        {/* Streak */}
-                                        <motion.div
-                                            initial={{ opacity: 0, y: 20 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: 0.5 }}
-                                            className="p-4 rounded-2xl bg-white/5 border border-white/5 flex flex-col items-center text-center gap-1"
-                                        >
-                                            <Flame size={20} className="text-orange-500 mb-1" />
-                                            <div className="flex items-baseline gap-1">
-                                                <span className="text-2xl font-black text-white">{profile.streak_count}</span>
-                                                <span className="text-xs font-bold text-white/60">dias</span>
+                                            <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest px-1">Vouchers Ativos</p>
+                                            <div className="flex flex-col gap-2">
+                                                {vip.qr_payload.discounts.map((d) => (
+                                                    <div key={d.id} className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-700/10 border border-emerald-500/20 flex items-center justify-center">
+                                                                <Tag size={16} className="text-emerald-400" />
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-sm font-bold text-white">{d.title}</p>
+                                                                <p className="text-[10px] text-white/40 font-mono tracking-wider">{d.voucher}</p>
+                                                            </div>
+                                                        </div>
+                                                        <span className="text-lg font-black text-emerald-400">{d.percent}%</span>
+                                                    </div>
+                                                ))}
                                             </div>
-                                            <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Ofensiva</span>
                                         </motion.div>
-                                    </div>
+                                    )}
 
-                                    {/* 4. QR Code Validation Block */}
+                                    {/* 6. QR Code Validation Block */}
                                     {vip && (
                                         <motion.div
                                             initial={{ opacity: 0 }}
                                             animate={{ opacity: 1 }}
-                                            transition={{ delay: 0.6 }}
+                                            transition={{ delay: 0.5 }}
                                             className="relative p-5 rounded-3xl bg-black/40 border border-white/10 flex flex-col items-center gap-4 mt-2"
                                         >
                                             <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent rounded-3xl pointer-events-none" />
@@ -376,27 +420,6 @@ export default function VipCard({ profile, avatarUrl, referralCount, vipPayload,
                                             </div>
                                         </motion.div>
                                     )}
-
-                                    {/* 5. Legacy Benefits Reminder (Subtle) */}
-                                    <motion.div
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        transition={{ delay: 0.7 }}
-                                        className="pt-4 border-t border-white/10 flex items-center justify-center gap-6"
-                                    >
-                                        <div className="flex items-center gap-2 text-white/40">
-                                            <IceCream size={14} className="text-cyan-500/70" />
-                                            <span className="text-[10px] font-bold uppercase tracking-wider">Free</span>
-                                        </div>
-                                        <div className="flex items-center gap-2 text-white/40">
-                                            <Tag size={14} className="text-emerald-500/70" />
-                                            <span className="text-[10px] font-bold uppercase tracking-wider">VIP</span>
-                                        </div>
-                                        <div className="flex items-center gap-2 text-white/40">
-                                            <Zap size={14} className="text-amber-500/70" />
-                                            <span className="text-[10px] font-bold uppercase tracking-wider">Acesso</span>
-                                        </div>
-                                    </motion.div>
 
                                 </div>
                             </motion.div>

@@ -62,7 +62,6 @@ export default function RedeemModal({ isOpen, onClose, offer, userPoints, onConf
                                 {/* Base Glass */}
                                 <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a1a]/90 to-black/95 backdrop-blur-2xl z-10" />
 
-                                {/* Floating Orbs */}
                                 <motion.div
                                     animate={{
                                         translateY: ['-10%', '10%', '-10%'],
@@ -81,7 +80,7 @@ export default function RedeemModal({ isOpen, onClose, offer, userPoints, onConf
                                     }}
                                     transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
                                     className="absolute -bottom-[30%] -right-[20%] w-[120%] h-[100%] rounded-[100%] mix-blend-screen opacity-30 blur-[80px] z-0"
-                                    style={{ backgroundImage: 'radial-gradient(circle at center, rgba(168,85,247,0.5) 0%, transparent 70%)' }}
+                                    style={{ backgroundImage: 'radial-gradient(circle at center, rgba(251,191,36,0.4) 0%, transparent 70%)' }}
                                 />
 
                                 {/* Shimmer Texture */}
@@ -117,9 +116,9 @@ export default function RedeemModal({ isOpen, onClose, offer, userPoints, onConf
                                             </motion.div>
                                         </div>
 
-                                        <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/70 mb-2 tracking-tight drop-shadow-lg">Magia Prestes a Acontecer</h2>
+                                        <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/70 mb-2 tracking-tight drop-shadow-lg">Confirmar Resgate</h2>
                                         <p className="text-white/60 text-sm mb-8 leading-relaxed max-w-[280px]">
-                                            Você vai usar <strong className="text-amber-400 font-bold">{offer.cost_points} moedas</strong> para liberar o voucher maravilhoso de <strong>{offer.title}</strong>.
+                                            Você vai usar <strong className="text-amber-400 font-bold">{offer.cost_points} moedas</strong> para resgatar o voucher de <strong>{offer.title}</strong>.
                                         </p>
 
                                         {/* Ticket Receipt Styler */}
@@ -148,7 +147,7 @@ export default function RedeemModal({ isOpen, onClose, offer, userPoints, onConf
                                             whileTap={{ scale: 0.98 }}
                                             onClick={onConfirm}
                                             disabled={isRedeeming}
-                                            className="relative w-full py-4 rounded-2xl bg-gradient-to-r from-illa-pink via-purple-500 to-illa-pink text-white font-black tracking-widest uppercase shadow-[0_10px_20px_rgba(229,1,125,0.3)] disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden group/btn bg-[length:200%_auto] hover:animate-[shimmer_2s_linear_infinite]"
+                                            className="relative w-full py-4 rounded-2xl bg-gradient-to-r from-illa-pink to-rose-600 text-white font-black tracking-widest uppercase shadow-[0_10px_20px_rgba(229,1,125,0.3)] disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden group/btn"
                                         >
                                             {/* Button Inner Glow */}
                                             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
@@ -158,7 +157,7 @@ export default function RedeemModal({ isOpen, onClose, offer, userPoints, onConf
                                                 ) : (
                                                     <>
                                                         <Sparkles size={18} className="text-white group-hover/btn:animate-spin" />
-                                                        CONFIRMAR MAGIA
+                                                        RESGATAR VOUCHER
                                                     </>
                                                 )}
                                             </div>
@@ -183,7 +182,7 @@ export default function RedeemModal({ isOpen, onClose, offer, userPoints, onConf
 
                                         <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-teal-200 mb-2 tracking-tight drop-shadow-lg">Voucher Liberado!</h2>
                                         <p className="text-white/60 text-sm mb-8 leading-relaxed max-w-[280px]">
-                                            Seu voucher brilha em suas mãos. Copie o código abaixo e aproveite a magia ILLA.
+                                            Copie o código abaixo e apresente na loja para aproveitar seu desconto.
                                         </p>
 
                                         {/* Golden Ticket Output */}
@@ -195,7 +194,7 @@ export default function RedeemModal({ isOpen, onClose, offer, userPoints, onConf
                                         >
                                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-150%] animate-[shimmer_3s_infinite]" />
                                             <div className="bg-black/60 backdrop-blur-xl rounded-2xl p-6 border border-white/5 h-full flex flex-col items-center relative z-10">
-                                                <p className="text-[10px] text-white/40 uppercase tracking-[0.2em] font-bold mb-2">Voucher Mágico</p>
+                                                <p className="text-[10px] text-white/40 uppercase tracking-[0.2em] font-bold mb-2">Seu Voucher</p>
                                                 <code className="text-3xl font-mono font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-500 tracking-widest drop-shadow-[0_0_15px_rgba(251,191,36,0.3)] mb-4">{redemptionResult.voucher_code}</code>
 
                                                 <button

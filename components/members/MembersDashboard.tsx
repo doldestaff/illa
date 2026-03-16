@@ -593,6 +593,10 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                                     onLoadVip={handleVipLoad}
                                     onShareCopy={handleShareCopy}
                                     onViewExclusive={handleViewExclusive}
+                                    missionsCompleted={snapshot.missions.filter(m => m.completed || m.claimed).length}
+                                    totalMissions={snapshot.missions.length}
+                                    sorvetesCount={sorvetesCount}
+                                    dropsClaimed={snapshot.drops_claimed_count ?? 0}
                                 />
                             </div>
 
