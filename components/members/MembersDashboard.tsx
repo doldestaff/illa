@@ -74,7 +74,7 @@ interface Props {
 export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props) {
     const [snapshot, setSnapshot] = useState(initial)
     const [vipPayload, setVipPayload] = useState<VipPayload | null>(null)
-    const [sorvetesCount] = useState(initial.sorvetes_free_count ?? 0)
+    const sorvetesCount = snapshot.sorvetes_free_count ?? 0
     const [activeModal, setActiveModal] = useState<'history' | 'scanner' | 'sorvetes' | 'invite' | null>(null)
     const progressTracked = useRef(false)
     const { isSupported, isSubscribed, subscribe } = usePushNotifications()
@@ -593,9 +593,9 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                                     onLoadVip={handleVipLoad}
                                     onShareCopy={handleShareCopy}
                                     onViewExclusive={handleViewExclusive}
-                                    missionsCompleted={snapshot.missions.filter(m => m.completed || m.claimed).length}
-                                    totalMissions={snapshot.missions.length}
-                                    sorvetesCount={sorvetesCount}
+                                    missionsCompleted={(snapshot.missions ?? []).filter(m => m.completed || m.claimed).length}
+                                    totalMissions={snapshot.missions?.length ?? 0}
+                                    sorvetesCount={snapshot.sorvetes_free_count ?? 0}
                                     dropsClaimed={snapshot.drops_claimed_count ?? 0}
                                 />
                             </div>
