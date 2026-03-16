@@ -122,7 +122,7 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                     <img
                         src={cardImage}
                         alt={mission.title}
-                        className={`absolute inset-0 w-full h-full transition-transform duration-[2s] z-[5] ${
+                        className={`absolute inset-0 w-full h-full transition-transform duration-[2s] z-[5] text-transparent ${
                             cardImage.includes('-1') 
                             ? 'object-contain scale-[1.90] -translate-y-4 group-hover:scale-[2.05]' 
                             : 'object-cover rounded-[1.8rem] group-hover:scale-[1.05]'

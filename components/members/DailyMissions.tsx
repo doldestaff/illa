@@ -319,7 +319,7 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
                             <img 
                                 src="/mission-cards/missions-icon.webp" 
                                 alt="Missions Target" 
-                                className="w-full h-full object-contain drop-shadow-[0_4px_8px_rgba(0,0,0,0.6)]" 
+                                className="w-full h-full object-contain drop-shadow-[0_4px_8px_rgba(0,0,0,0.6)] text-transparent" 
                                 draggable={false}
                             />
                         </div>
