@@ -38,45 +38,115 @@ function AnimatedCounter({ value, duration = 1.5, delay = 0 }: { value: number, 
     return <span ref={nodeRef}>0</span>;
 }
 
-function NativeMarquee({ children, onIndexChange }: { children: React.ReactNode, onIndexChange?: (index: number) => void }) {
+function ContinuousMarquee({ children }: { children: React.ReactNode }) {
     const containerRef = useRef<HTMLDivElement>(null)
+    const contentRef = useRef<HTMLDivElement>(null)
 
-    // Lighter scroll listener to update index without IntersectionObserver
-    const handleScroll = useCallback(() => {
-        if (!onIndexChange || !containerRef.current) return;
+    // Interaction tracking
+    const isInteractingRef = useRef(false)
+    const interactTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+    const scrollPosRef = useRef(0)
+
+    useEffect(() => {
         const container = containerRef.current;
-        // Assume all children have roughly the same width. 
-        // We find the child closest to the center of the scroll view.
-        const scrollCenter = container.scrollLeft + container.clientWidth / 2;
-        let closestIndex = 0;
-        let minDistance = Infinity;
+        const inner = contentRef.current;
+        if (!container || !inner) return;
 
-        const items = container.querySelectorAll('.marquee-item');
-        items.forEach((item, index) => {
-            const htmlItem = item as HTMLElement;
-            const itemCenter = htmlItem.offsetLeft + htmlItem.offsetWidth / 2;
-            const distance = Math.abs(scrollCenter - itemCenter);
-            if (distance < minDistance) {
-                minDistance = distance;
-                closestIndex = index;
+        let animationFrameId: number;
+        let lastTimestamp = performance.now();
+
+        container.style.scrollSnapType = 'none';
+
+        const scrollLoop = (timestamp: number) => {
+            const dt = timestamp - lastTimestamp;
+            lastTimestamp = timestamp;
+            const safeDt = Math.min(dt, 50);
+
+            const numOriginals = React.Children.count(children);
+            const childrenElements = inner.children;
+            
+            if (childrenElements.length >= numOriginals * 2 && numOriginals > 0) {
+                const originalFirst = childrenElements[0] as HTMLElement;
+                const cloneFirst = childrenElements[numOriginals] as HTMLElement;
+                const loopWidth = cloneFirst.offsetLeft - originalFirst.offsetLeft;
+
+                if (loopWidth > 0) {
+                    const itemWidth = loopWidth / numOriginals;
+                    const offsetIndex = Math.floor((container.scrollLeft + (container.clientWidth / 2)) / itemWidth);
+                    const activeIdx = Math.abs(offsetIndex) % numOriginals;
+                    
+                    const counterEl = document.getElementById('marquee-counter-current');
+                    if (counterEl && counterEl.textContent !== String(activeIdx + 1)) {
+                        counterEl.textContent = String(activeIdx + 1);
+                    }
+                }
+
+                if (!isInteractingRef.current) {
+                    if (loopWidth > 0 && container.scrollWidth > container.clientWidth) {
+                        scrollPosRef.current += 0.05 * safeDt; // 60fps ~ 3px/frame smoothly
+                        
+                        if (scrollPosRef.current >= loopWidth) {
+                            scrollPosRef.current -= loopWidth;
+                        }
+                        
+                        container.scrollLeft = scrollPosRef.current;
+                    }
+                } else {
+                    scrollPosRef.current = container.scrollLeft;
+                    if (loopWidth > 0 && container.scrollLeft >= loopWidth) {
+                        container.scrollLeft -= loopWidth;
+                        scrollPosRef.current = container.scrollLeft;
+                    }
+                }
             }
-        });
+            
+            animationFrameId = requestAnimationFrame(scrollLoop);
+        };
 
-        onIndexChange(closestIndex);
-    }, [onIndexChange]);
+        animationFrameId = requestAnimationFrame(scrollLoop);
+        return () => cancelAnimationFrame(animationFrameId);
+    }, [children]);
+
+    const handlePointerDown = () => {
+        isInteractingRef.current = true;
+        if (interactTimeoutRef.current) clearTimeout(interactTimeoutRef.current);
+        if (containerRef.current) containerRef.current.style.scrollSnapType = 'x mandatory';
+    }
+
+    const handlePointerUp = () => {
+        if (interactTimeoutRef.current) clearTimeout(interactTimeoutRef.current);
+        interactTimeoutRef.current = setTimeout(() => {
+            isInteractingRef.current = false;
+            if (containerRef.current) {
+                containerRef.current.style.scrollSnapType = 'none';
+                scrollPosRef.current = containerRef.current.scrollLeft;
+            }
+        }, 1500); 
+    }
+
+    const childrenArray = React.Children.toArray(children);
 
     return (
         <div
             ref={containerRef}
-            onScroll={handleScroll}
-            className="flex overflow-x-auto pb-[120px] pt-[100px] md:pt-[120px] -mt-[40px] md:-mt-[88px] -mb-[88px] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory scroll-smooth"
+            className="flex overflow-x-auto pb-[120px] pt-[100px] md:pt-[120px] -mt-[40px] md:-mt-[88px] -mb-[88px] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             style={{
+                willChange: 'scroll-position',
                 WebkitOverflowScrolling: 'touch',
-                transform: 'translateZ(0)', // Force compositor layer
+                transform: 'translateZ(0)', 
             }}
+            onTouchStart={handlePointerDown}
+            onTouchEnd={handlePointerUp}
+            onTouchCancel={handlePointerUp}
+            onMouseDown={handlePointerDown}
+            onMouseUp={handlePointerUp}
+            onMouseLeave={handlePointerUp}
         >
-            <div className="flex shrink-0 gap-5 px-4 md:px-0 relative">
-                {children}
+            <div ref={contentRef} className="flex shrink-0 gap-5 px-4 md:px-0 relative">
+                {childrenArray}
+                {childrenArray.map((child, i) => (
+                    React.isValidElement(child) ? React.cloneElement(child as React.ReactElement<Record<string, unknown>>, { key: `clone-${i}`, 'aria-hidden': "true" }) : child
+                ))}
             </div>
         </div>
     )
@@ -117,7 +187,6 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
     const totalCount = missions.length
     const allCompleted = totalCount > 0 && completedCount === totalCount
 
-    const [activeIndex, setActiveIndex] = useState(0)
     const [howToMission, setHowToMission] = useState<MissionInstance | null>(null)
 
     const { playMissionComplete, playCoinToastShow, playCoinToastCelebration } = useSoundSystem()
@@ -208,14 +277,14 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
 
                 <div className="flex items-center gap-3 relative z-10">
                     <div className="px-4 py-2 rounded-full border backdrop-blur-md bg-[#25252a]/60 border-white/10 text-white/70 shadow-inner group-hover:border-white/20 transition-all duration-300">
-                        <span className="text-sm font-bold tracking-wider">{activeIndex + 1} <span className="opacity-50">/</span> {previewMissions.length}</span>
+                        <span className="text-sm font-bold tracking-wider"><span id="marquee-counter-current">1</span> <span className="opacity-50">/</span> {previewMissions.length}</span>
                     </div>
                 </div>
             </div>
 
-            {/* Unified Marquee Preview (Desktop & Mobile) - Native Scroll Performance */}
+            {/* Unified Marquee Preview (Continuous Loop) */}
             <div className="relative group/mural pb-8 pt-0 -mx-4 px-4 w-full max-w-[100vw]">
-                <NativeMarquee onIndexChange={setActiveIndex}>
+                <ContinuousMarquee>
                     {previewMissions.map((mission, index) => {
                         const isClaimed = claimedIds.has(mission.instance_id) || mission.claimed
                         const isCompleted = mission.progress >= mission.target
@@ -242,7 +311,7 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
                             </div>
                         )
                     })}
-                </NativeMarquee>
+                </ContinuousMarquee>
             </div>
 
             {/* Clear Call to Action for Missions Panel */}
