@@ -148,7 +148,7 @@ export default function MissionHowToPopup({ isOpen, onClose, missionKind, missio
 
 
                                 {/* Content */}
-                                <div className="relative z-10 w-full px-14 sm:px-20 pt-20 pb-16 flex flex-col items-center text-center mx-auto max-w-[320px]">
+                                <div className="relative z-10 w-full px-14 sm:px-20 pt-20 pb-16 flex flex-col items-center text-center mx-auto max-w-[320px] -translate-y-[20px]">
 
                                     {/* Icon with glow matching accent */}
                                     <motion.div
