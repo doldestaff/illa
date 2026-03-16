@@ -13,6 +13,9 @@ export function HeroScrollFrames() {
     // HYDRATION-SAFE: Initialize as null (matches SSR output), then set in useEffect.
     const [isMobile, setIsMobile] = useState<boolean | null>(null)
     const [isTablet, setIsTablet] = useState<boolean | null>(null)
+    // MOBILE FIX: Freeze section height in px at mount time so scroll range
+    // never changes when the mobile browser URL bar collapses/expands.
+    const [frozenHeight, setFrozenHeight] = useState<number | null>(null)
 
     // Stable Refs
     const buttonProgress = useMotionValue(0)
@@ -23,6 +26,14 @@ export function HeroScrollFrames() {
         // eslint-disable-next-line react-hooks/set-state-in-effect -- Initial hydration sync from window (external system)
         setIsMobile(w < 768)
         setIsTablet(w >= 768 && w < 1024)
+
+        // MOBILE FIX: Lock section height in px so `vh` changes from URL bar
+        // collapse do NOT alter the scroll range mid-scroll.
+        if (w < 1024) {
+            const frozenVh = window.innerHeight
+            // eslint-disable-next-line react-hooks/set-state-in-effect -- Syncing from external system (window dimensions)
+            setFrozenHeight(frozenVh)
+        }
 
         const handleResize = () => {
             const rw = window.innerWidth
@@ -50,7 +61,7 @@ export function HeroScrollFrames() {
         >
             <div
                 className="sticky top-0 w-full overflow-hidden bg-[#111]"
-                style={{ height: '100svh', minHeight: '100dvh' }}
+                style={{ height: '100svh' }}
             >
                 {/* SSR skeleton — high priority poster to prevent flash, but SYNCHRONOUS decoding so iOS doesn't panic on hydration switch */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -78,7 +89,7 @@ export function HeroScrollFrames() {
     return (
         <section
             className="relative w-full z-10"
-            style={{ height: `${SCROLL_HEIGHT_vh}vh` }}
+            style={{ height: frozenHeight ? `${frozenHeight * (SCROLL_HEIGHT_vh / 100)}px` : `${SCROLL_HEIGHT_vh}vh` }}
         >
             {/* The sticky container uses CSS svh/dvh so it dynamically fills
                 the viewport when the mobile browser URL bar collapses.
@@ -86,7 +97,7 @@ export function HeroScrollFrames() {
                 (via appHeight in state.current) to prevent frame jumping. */}
             <div
                 className="sticky top-0 w-full overflow-hidden bg-[#111]"
-                style={{ height: '100svh', minHeight: '100dvh' }}
+                style={{ height: '100svh' }}
             >
 
                 {/* Unified Engine — inline manifest eliminates fetch waterfall */}
