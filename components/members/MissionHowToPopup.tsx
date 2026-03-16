@@ -143,19 +143,19 @@ export default function MissionHowToPopup({ isOpen, onClose, missionKind, missio
                                 <img 
                                     src="/mission-cards/pergaminho.webp" 
                                     alt="Pergaminho" 
-                                    className="absolute inset-0 w-[110%] h-[110%] -left-[5%] -top-[5%] object-fill -z-10 pointer-events-none"
+                                    className="absolute md:inset-0 w-[120%] h-[110%] -left-[10%] md:w-[110%] md:-left-[5%] -top-[5%] object-fill -z-10 pointer-events-none"
                                 />
 
                                 {/* Close button */}
                                 <button
                                     onClick={onClose}
-                                    className="absolute top-10 right-8 sm:right-10 z-20 p-2 rounded-full bg-black/10 hover:bg-black/20 text-black/50 hover:text-black transition-all active:scale-95"
+                                    className="absolute top-12 right-10 sm:right-12 z-20 p-2 rounded-full bg-amber-900/10 hover:bg-amber-900/20 text-amber-950/60 hover:text-amber-950 transition-all active:scale-95 shadow-[0_2px_8px_rgba(255,255,255,0.4)] backdrop-blur-sm"
                                 >
-                                    <X size={18} />
+                                    <X size={20} strokeWidth={2.5} />
                                 </button>
 
                                 {/* Content */}
-                                <div className="relative z-10 w-full px-12 sm:px-14 pt-16 pb-16 flex flex-col items-center text-center">
+                                <div className="relative z-10 w-full px-12 sm:px-14 pt-20 pb-16 flex flex-col items-center text-center">
 
                                     {/* Icon with glow matching accent */}
                                     <motion.div
@@ -187,7 +187,7 @@ export default function MissionHowToPopup({ isOpen, onClose, missionKind, missio
                                             initial={{ opacity: 0 }}
                                             animate={{ opacity: 1 }}
                                             transition={{ delay: 0.2 }}
-                                            className="text-[10px] sm:text-xs font-black text-amber-900/50 uppercase tracking-widest mb-3"
+                                            className="text-[10px] sm:text-xs font-black text-amber-900/80 uppercase tracking-widest mb-3 drop-shadow-[0_1px_0px_rgba(255,255,255,0.5)]"
                                         >
                                             {missionTitle}
                                         </motion.div>
@@ -198,7 +198,7 @@ export default function MissionHowToPopup({ isOpen, onClose, missionKind, missio
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: 0.25 }}
-                                        className="text-[13px] sm:text-sm text-amber-950/70 font-medium leading-relaxed mb-6 max-w-[260px] drop-shadow-[0_1px_1px_rgba(255,255,255,0.3)]"
+                                        className="text-[13px] sm:text-base text-amber-950/90 font-medium leading-relaxed mb-8 max-w-[280px] drop-shadow-[0_1px_1px_rgba(255,255,255,0.7)]"
                                     >
                                         {howTo.instruction}
                                     </motion.p>
