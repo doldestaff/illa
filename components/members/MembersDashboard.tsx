@@ -9,7 +9,6 @@ import type {
     SorvetesRedemption,
     VipPayload,
 } from '@/lib/gamification-types'
-import { motion } from 'framer-motion'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import DashboardHeader from './DashboardHeader'
@@ -79,11 +78,6 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
     const [activeModal, setActiveModal] = useState<'history' | 'scanner' | 'sorvetes' | 'invite' | null>(null)
     const progressTracked = useRef(false)
     const { isSupported, isSubscribed, subscribe } = usePushNotifications()
-
-    // PERF: Detect mobile for conditional animation rendering
-    const [isMobile, setIsMobile] = useState(false)
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- Syncing from external system (window dimensions)
-    useEffect(() => { setIsMobile(window.innerWidth < 768) }, [])
 
 
 
@@ -569,11 +563,10 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                     </div>
 
                     {/* RIGHT COLUMN (Scrollable Content) */}
-                    {/* PERF: On mobile, use CSS animations instead of framer-motion stagger */}
-                    {isMobile ? (
-                        <div className="md:col-span-7 xl:col-span-8 space-y-6">
+                    {/* PERF: Unified high-performance CSS animations for instant SSR load, no JS unmount hydration flashes. */}
+                    <div className="md:col-span-7 xl:col-span-8 space-y-6">
 
-                            {/* Quick Actions Grid */}
+                        {/* Quick Actions Grid */}
                             <DashboardActionGrid onAction={handleAction} />
 
                             {/* Daily Missions */}
@@ -635,95 +628,6 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                                 </Link>
                             </div>
                         </div>
-                    ) : (
-                        <motion.div
-                            className="md:col-span-7 xl:col-span-8 space-y-6"
-                            initial="hidden"
-                            animate="visible"
-                            variants={{
-                                hidden: { opacity: 0 },
-                                visible: {
-                                    opacity: 1,
-                                    transition: { staggerChildren: 0.08, delayChildren: 0.1 },
-                                },
-                            }}
-                        >
-
-
-                            {/* Quick Actions Grid (Premium) */}
-                            <DashboardActionGrid onAction={handleAction} />
-
-                            {/* Daily Missions (Priority) */}
-                            <motion.div id="missions" variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
-                                <DailyMissions
-                                    missions={snapshot.missions}
-                                    onClaim={handleMissionClaim}
-                                    onInviteClick={() => setActiveModal('invite')}
-                                />
-                            </motion.div>
-
-                            {/* Store Promo Card (New Feature) */}
-                            <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
-                                <StorePromoCard />
-                            </motion.div>
-
-                            {/* Secondary Content Grid */}
-                            <motion.div
-                                className="flex flex-col gap-6"
-                                variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } }}
-                            >
-
-                                <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
-                                    <VipCard
-                                        profile={snapshot.profile}
-                                        avatarUrl={avatarUrl}
-                                        referralCount={snapshot.referral_count}
-                                        vipPayload={vipPayload}
-                                        onLoadVip={handleVipLoad}
-                                        onShareCopy={handleShareCopy}
-                                        onViewExclusive={handleViewExclusive}
-                                    />
-                                </motion.div>
-                            </motion.div>
-
-                            {/* Wide Modules */}
-                            <motion.div
-                                className="space-y-6"
-                                variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } }}
-                            >
-                                <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
-                                    <SecretMenu items={snapshot.secret_menu} />
-                                </motion.div>
-
-                                <motion.div id="recipes" variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
-                                    <ReceitasCinematicButton />
-                                </motion.div>
-
-                                <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
-                                    <WeeklyLeaderboard
-                                        leaderboard={snapshot.leaderboard}
-                                        currentUserId={snapshot.profile.id}
-                                        currentUserXP={snapshot.profile.xp}
-                                    />
-                                </motion.div>
-
-                                <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
-                                    <BirthdayModule birthday={snapshot.birthday} />
-                                </motion.div>
-
-
-                            </motion.div>
-
-                            <div className="md:hidden text-center py-8">
-                                <Link
-                                    href="/members/profile"
-                                    className="text-sm text-white/40 hover:text-illa-pink transition-colors underline underline-offset-4"
-                                >
-                                    Editar perfil completo →
-                                </Link>
-                            </div>
-                        </motion.div>
-                    )}
                 </div>
             </div>
 

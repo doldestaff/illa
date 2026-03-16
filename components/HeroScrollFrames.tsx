@@ -107,12 +107,12 @@ export function HeroScrollFrames() {
             className="relative w-full z-10 bg-[#111]"
             style={{ height: `${sectionHeightPx}px` }}
         >
-            {/* Sticky container uses frozen pixel height from mount time.
-                Never changes when URL bar collapses → no canvas stretch,
-                no scroll progress recalculation, no image jumping. */}
+            {/* Sticky container uses 100svh with 100dvh fallback.
+                This ensures it fills the viewport when the URL bar collapses (preventing gaps).
+                The inner canvas will use object-fit: cover to stretch without distorting. */}
             <div
                 className="sticky top-0 w-full overflow-hidden bg-[#111]"
-                style={{ height: `${frozenVhState}px` }}
+                style={{ height: '100svh', minHeight: '100dvh' }}
             >
 
                 {/* Unified Engine — inline manifest eliminates fetch waterfall */}
