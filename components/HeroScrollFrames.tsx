@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { HeroGhostButtons } from './HeroGhostButtons'
+import { ScrollStimulants } from './ScrollStimulants'
 import { useMotionValue } from 'framer-motion'
 import { HeroEngine } from './hero/HeroEngine'
 
@@ -137,6 +138,7 @@ export function HeroScrollFrames() {
 
                 <div className="absolute inset-0 pointer-events-none z-20">
                     <HeroGhostButtons progress={buttonProgress} isMobile={isMobile} isTablet={isTablet} />
+                    <ScrollStimulants progress={buttonProgress} isMobile={isMobile} isTablet={isTablet} />
                 </div>
             </div>
         </section>
