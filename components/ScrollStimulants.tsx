@@ -151,7 +151,7 @@ export function ScrollStimulants({ progress, isMobile, isTablet }: ScrollStimula
             {/* Desktop & Tablet Luminous Side Bar & Arrows Container */}
             <div className="absolute inset-0 z-[100] pointer-events-none container mx-auto px-4">
                 {/* Ghost duplicate of the Navbar's right side. Ensures PERFECT centering under Login/Minha Conta button */}
-                <div className="absolute right-4 top-[calc(35%+70px)] -translate-y-1/2 hidden md:flex items-center gap-4">
+                <div className="absolute right-4 top-[calc(35%+20px)] -translate-y-1/2 hidden md:flex items-center gap-4">
                     
                     {/* Anchor point: Fake Login Button */}
                     <div className="relative invisible flex items-center gap-2 px-6 py-2 rounded-full border border-white/20 text-sm font-bold tracking-wide">
