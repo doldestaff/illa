@@ -689,30 +689,14 @@ export function HeroEngine({
                 </div>
             )}
 
-            {/* Poster: graceful fallback to prevent initial black screen — transition removed on mobile to prevent cross-fade bridge */}
-            {
-                posterUrl && (
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img
-                        src={posterUrl}
-                        className={cn(
-                            "absolute inset-0 w-full h-full object-cover z-10",
-                            isLoaded ? "hidden" : "block"
-                        )}
-                        alt="Illa Loading"
-                        style={{ pointerEvents: 'none' }}
-                    />
-                )
-            }
-
             <canvas
                 ref={canvasRef}
                 className="absolute inset-0 block w-full h-full object-cover z-0"
                 style={{
                     willChange: 'contents',
                     imageRendering: (state.current.isMobile && scrollMode === 'document') ? 'pixelated' : 'auto',
-                    // Always visible once loaded, no fade-in
-                    opacity: isLoaded ? 1 : 0,
+                    // Always visible, no fade-in to prevent black screen flashes
+                    opacity: 1,
                 }}
             />
         </div >
