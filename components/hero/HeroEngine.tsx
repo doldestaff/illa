@@ -689,9 +689,21 @@ export function HeroEngine({
                 </div>
             )}
 
+            {/* Poster: Always visible beneath the canvas. Prevents black screen on load. 
+                Canvas draws over it exactly matching frame 0, eliminating cross-fades entirely. */}
+            {posterUrl && (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                    src={posterUrl}
+                    className="absolute inset-0 w-full h-full object-cover z-0"
+                    alt="Illa Loading"
+                    style={{ pointerEvents: 'none' }}
+                />
+            )}
+
             <canvas
                 ref={canvasRef}
-                className="absolute inset-0 block w-full h-full object-cover z-0"
+                className="absolute inset-0 block w-full h-full object-cover z-10"
                 style={{
                     willChange: 'contents',
                     imageRendering: (state.current.isMobile && scrollMode === 'document') ? 'pixelated' : 'auto',

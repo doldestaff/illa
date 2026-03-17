@@ -138,62 +138,64 @@ export function ScrollStimulants({ progress, isMobile, isTablet }: ScrollStimula
 
     return (
         <>
-            {/* Desktop Luminous Side Bar & Arrows Container */}
-            <div className="absolute right-0 md:right-0 lg:right-[250px] top-[calc(35%+70px)] -translate-y-1/2 z-[100] pointer-events-none flex items-center gap-4 lg:gap-8">
-                {/* Desktop Luminous Side Bar */}
-                <motion.div 
-                    style={{ opacity: barOpacity }}
-                    className="relative h-[50vh] w-[16px] bg-white/20 rounded-full overflow-hidden shadow-[0_0_30px_rgba(255,202,40,0.4)] backdrop-blur-md border border-white/20"
-                >
+            {/* Desktop & Tablet Luminous Side Bar & Arrows Container */}
+            <div className="absolute inset-0 z-[100] pointer-events-none container mx-auto px-4">
+                {/* Scrollbar anchored perfectly under the Login button */}
+                <div className="absolute right-[160px] md:right-[220px] top-[calc(35%+70px)] -translate-y-1/2">
+                    {/* Desktop Luminous Side Bar */}
                     <motion.div 
-                        style={{ scaleY: barScaleY, originY: 0 }}
-                        className="w-full h-full bg-gradient-to-b from-illa-pink via-white to-illa-yellow shadow-[0_0_25px_rgba(255,255,255,0.9)]"
-                    />
-                    
-                    {/* Floating Glow Tip */}
-                    <motion.div 
-                        style={{ top: glowTipTop }}
-                        className="absolute left-1/2 -translate-x-1/2 w-8 h-8 bg-white rounded-full blur-[10px] opacity-90"
-                    />
-                </motion.div>
+                        style={{ opacity: barOpacity }}
+                        className="relative h-[50vh] w-[16px] bg-white/20 rounded-full overflow-hidden shadow-[0_0_30px_rgba(255,202,40,0.4)] backdrop-blur-md border border-white/20"
+                    >
+                        <motion.div 
+                            style={{ scaleY: barScaleY, originY: 0 }}
+                            className="w-full h-full bg-gradient-to-b from-illa-pink via-white to-illa-yellow shadow-[0_0_25px_rgba(255,255,255,0.9)]"
+                        />
+                        
+                        {/* Floating Glow Tip */}
+                        <motion.div 
+                            style={{ top: glowTipTop }}
+                            className="absolute left-1/2 -translate-x-1/2 w-8 h-8 bg-white rounded-full blur-[10px] opacity-90"
+                        />
+                    </motion.div>
 
-                {/* Idle Warning Overlay - Desktop Arrows */}
-                <AnimatePresence>
-                    {isIdle && (
-                        <motion.div
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -20 }}
-                            className="flex flex-col items-center gap-0"
-                        >
-                            {[0, 1, 2].map((i) => (
-                                <motion.div
-                                    key={i}
-                                    animate={{ 
-                                        opacity: [0.1, 1, 0.1],
-                                        y: [-12, 12]
-                                    }}
-                                    transition={{ 
-                                        duration: 1.5, 
-                                        repeat: Infinity, 
-                                        ease: "easeInOut",
-                                        delay: i * 0.2
-                                    }}
-                                    className="-my-4"
-                                >
-                                    <ChevronDown 
-                                        size={64} 
-                                        strokeWidth={4}
-                                        className="drop-shadow-[0_0_16px_rgba(229,1,125,1)]"
-                                        style={{ color: i === 0 ? '#E5017D' : i === 1 ? '#FF8A65' : '#FFC107' }}
-                                    />
-                                </motion.div>
-                            ))}
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+                    {/* Idle Warning Overlay - Desktop Arrows */}
+                    <AnimatePresence>
+                        {isIdle && (
+                            <motion.div
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -20 }}
+                                className="absolute left-full ml-4 md:ml-8 top-1/2 -translate-y-1/2 flex flex-col items-center gap-0"
+                            >
+                                {[0, 1, 2].map((i) => (
+                                    <motion.div
+                                        key={i}
+                                        animate={{ 
+                                            opacity: [0.1, 1, 0.1],
+                                            y: [-12, 12]
+                                        }}
+                                        transition={{ 
+                                            duration: 1.5, 
+                                            repeat: Infinity, 
+                                            ease: "easeInOut",
+                                            delay: i * 0.2
+                                        }}
+                                        className="-my-4"
+                                    >
+                                        <ChevronDown 
+                                            size={64} 
+                                            strokeWidth={4}
+                                            className="drop-shadow-[0_0_16px_rgba(229,1,125,1)]"
+                                            style={{ color: i === 0 ? '#E5017D' : i === 1 ? '#FF8A65' : '#FFC107' }}
+                                        />
+                                    </motion.div>
+                                ))}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
             </div>
-
         </>
     )
 }
