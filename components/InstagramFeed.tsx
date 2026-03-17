@@ -141,7 +141,7 @@ function PostModal({ post, onClose }: { post: InstaPost; onClose: () => void }) 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] bg-black/75 backdrop-blur-md flex items-center justify-center p-4"
+            className="fixed inset-0 z-[200] bg-black/75 backdrop-blur-md flex items-center justify-center p-4 md:p-8"
             onClick={onClose}
         >
             <motion.div
@@ -150,48 +150,57 @@ function PostModal({ post, onClose }: { post: InstaPost; onClose: () => void }) 
                 exit={{ scale: 0.88, opacity: 0, y: 24 }}
                 transition={{ type: 'spring', bounce: 0.35, duration: 0.45 }}
                 onClick={e => e.stopPropagation()}
-                className="relative bg-white rounded-[2.2rem] overflow-hidden shadow-[0_32px_80px_rgba(0,0,0,0.5)] w-full max-w-sm max-h-[88vh] flex flex-col"
+                className="relative bg-white rounded-[2.2rem] overflow-hidden shadow-[0_32px_80px_rgba(0,0,0,0.5)] w-full max-w-sm md:max-w-4xl max-h-[88vh] md:max-h-[85vh] flex flex-col md:flex-row md:min-h-[500px]"
             >
-                {/* Close */}
+                {/* Close Button */}
                 <button
                     onClick={onClose}
-                    className="absolute top-3.5 right-3.5 z-30 bg-black/40 hover:bg-black/70 text-white rounded-full p-2 transition-colors backdrop-blur-sm border border-white/20"
+                    className="absolute top-3.5 right-3.5 md:top-5 md:right-5 z-30 bg-black/40 md:bg-gray-100 hover:bg-black/70 md:hover:bg-gray-200 text-white md:text-gray-600 rounded-full p-2 transition-colors backdrop-blur-sm border border-white/20 md:border-transparent"
                     aria-label="Fechar"
                 >
-                    <X size={15} />
+                    <X size={16} />
                 </button>
 
-                {/* Thumbnail */}
-                <div className="relative aspect-[4/4.5] shrink-0">
-                    <Image src={post.imageUrl} alt={post.caption.slice(0, 60)} fill className="object-cover" sizes="440px" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                    <div className="absolute bottom-3 left-4 flex items-center gap-1.5">
-                        <Heart size={14} className="text-white fill-white drop-shadow" />
-                        <span className="text-white font-bold text-sm drop-shadow">{post.likes.toLocaleString('pt-BR')}</span>
+                {/* Thumbnail Side */}
+                <div className="relative aspect-[4/4.5] md:aspect-auto md:w-[55%] shrink-0 bg-black">
+                    <Image src={post.imageUrl} alt={post.caption.slice(0, 60)} fill className="object-cover" sizes="(min-width: 768px) 55vw, 440px" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                    <div className="absolute bottom-3 left-4 md:bottom-6 md:left-6 flex items-center gap-1.5 z-10">
+                        <Heart size={16} className="text-white fill-white drop-shadow" />
+                        <span className="text-white font-bold text-sm md:text-base drop-shadow">{post.likes.toLocaleString('pt-BR')}</span>
                     </div>
                 </div>
 
-                {/* Content */}
-                <div className="flex flex-col p-5 overflow-y-auto flex-1 min-h-0">
-                    <div className="flex items-center gap-2.5 mb-3">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#E1306C] via-[#C13584] to-[#F77737] flex items-center justify-center shrink-0 shadow">
-                            <Instagram size={15} className="text-white" />
+                {/* Content Side */}
+                <div className="flex flex-col p-5 md:p-8 overflow-y-auto flex-1 md:w-[45%] bg-white">
+                     {/* Header */}
+                     <div className="flex items-center gap-3 mb-4 md:mb-6 md:mt-1 pb-4 border-b border-gray-100 shrink-0">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#E1306C] via-[#C13584] to-[#F77737] flex items-center justify-center shrink-0 shadow-sm">
+                            <Instagram size={18} className="text-white" />
                         </div>
                         <div>
-                            <p className="font-bold text-sm text-gray-900 leading-none">illasorvetesoficial</p>
-                            <p className="text-xs text-gray-400 mt-0.5">Maceió, AL</p>
+                            <p className="font-bold text-sm md:text-base text-gray-900 leading-none">illasorvetesoficial</p>
+                            <p className="text-xs md:text-sm text-gray-400 mt-1">Maceió, AL</p>
                         </div>
                     </div>
-                    <p className="text-sm text-gray-600 leading-relaxed mb-5 flex-1">{post.caption}</p>
-                    <a
-                        href={post.postUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#E1306C] via-[#C13584] to-[#F77737] text-white font-bold py-3.5 rounded-2xl hover:shadow-lg hover:shadow-pink-300/40 hover:scale-[1.02] active:scale-[0.98] transition-all text-sm"
-                    >
-                        {post.type === 'reel' ? <Play size={15} className="fill-white" /> : <ExternalLink size={15} />}
-                        {post.type === 'reel' ? 'Assistir o Reel' : 'Ver no Instagram'}
-                    </a>
+
+                    {/* Caption */}
+                    <div className="flex-1 md:flex-none">
+                        <p className="text-sm md:text-[15px] text-gray-700 leading-relaxed mb-6 md:mb-8 whitespace-pre-wrap">{post.caption}</p>
+                    </div>
+                    
+                    {/* Action Button */}
+                    <div className="mt-auto pt-2 shrink-0">
+                        <a
+                            href={post.postUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#E1306C] via-[#C13584] to-[#F77737] text-white font-bold py-3.5 md:py-4 rounded-2xl hover:shadow-xl hover:shadow-pink-300/40 hover:scale-[1.02] active:scale-[0.98] transition-all text-sm md:text-base"
+                        >
+                            {post.type === 'reel' ? <Play size={18} className="fill-white" /> : <ExternalLink size={18} />}
+                            {post.type === 'reel' ? 'Assistir o Reel' : 'Ver no Instagram'}
+                        </a>
+                    </div>
                 </div>
             </motion.div>
         </motion.div>
