@@ -81,13 +81,12 @@ export function HeroScrollFrames() {
         const section = sectionRef.current
         if (!section) return
 
-        // Calculate the scroll target: bottom of the hero section
+        // Calculate the scroll target: end of hero section
         const sectionBottom = section.offsetTop + section.offsetHeight
-        // Target: just past the hero so the next content section is visible
-        const scrollTarget = sectionBottom - (window.innerHeight * 0.9)
+        const scrollTarget = sectionBottom
 
         if (lenis) {
-            lenis.scrollTo(scrollTarget, { duration: 1.6, easing: (t: number) => 1 - Math.pow(1 - t, 3) })
+            lenis.scrollTo(scrollTarget, { duration: 0.9, easing: (t: number) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2 })
         } else {
             window.scrollTo({ top: scrollTarget, behavior: 'smooth' })
         }
@@ -133,8 +132,8 @@ export function HeroScrollFrames() {
     }, [isMobile, triggerAutoReveal])
 
     // --- Render ---
-    // Config
-    const MOBILE_HEIGHT_vh = 350
+    // Config — MOBILE: 180vh for ultra-light, fast animation (down from 350vh)
+    const MOBILE_HEIGHT_vh = 180
     const TABLET_HEIGHT_vh = 400
     const DESKTOP_HEIGHT_vh = 500
 
