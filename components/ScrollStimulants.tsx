@@ -151,7 +151,7 @@ export function ScrollStimulants({ progress, isMobile, isTablet }: ScrollStimula
             {/* Desktop & Tablet Luminous Side Bar & Arrows Container */}
             <div className="absolute inset-0 z-[100] pointer-events-none container mx-auto px-4">
                 {/* Ghost duplicate of the Navbar's right side. Ensures PERFECT centering under Login/Minha Conta button */}
-                <div className="absolute right-4 top-[calc(35%+20px)] -translate-y-1/2 hidden md:flex items-center gap-4">
+                <div className="absolute right-4 top-[calc(35%-30px)] -translate-y-1/2 hidden md:flex items-center gap-4">
                     
                     {/* Anchor point: Fake Login Button */}
                     <div className="relative invisible flex items-center gap-2 px-6 py-2 rounded-full border border-white/20 text-sm font-bold tracking-wide">
@@ -172,7 +172,7 @@ export function ScrollStimulants({ progress, isMobile, isTablet }: ScrollStimula
                             {/* Desktop Luminous Side Bar */}
                             <motion.div 
                                 style={{ opacity: barOpacity }}
-                                className="relative h-[50vh] w-[16px] bg-white/20 rounded-full overflow-hidden shadow-[0_0_30px_rgba(255,202,40,0.4)] backdrop-blur-md border border-white/20"
+                                className="relative h-[40vh] w-[16px] bg-white/20 rounded-full overflow-hidden shadow-[0_0_30px_rgba(255,202,40,0.4)] backdrop-blur-md border border-white/20"
                             >
                                 <motion.div 
                                     style={{ scaleY: barScaleY, originY: 0 }}
