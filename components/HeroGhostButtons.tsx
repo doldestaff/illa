@@ -100,7 +100,8 @@ function MobileGhostButton({ btn, i, progress, lenis, positions }: { btn: typeof
     const targetY = positions[i].y
 
     const delayStart = 0.15 + (i * 0.04)
-    const expandEnd = Math.min(0.8, delayStart + 0.25)
+    // Accelerated animation: 0.12 scroll distance instead of 0.25
+    const expandEnd = Math.min(0.8, delayStart + 0.12)
 
     const x = useTransform(progress, [0.15, expandEnd], [0, targetX])
     const y = useTransform(progress, [0.15, expandEnd], [20, targetY])
@@ -171,17 +172,19 @@ function MobileButtons({ progress }: { progress: MotionValue<number> }) {
     // auraScale removed for iOS perf
     const auraOpacity = useTransform(progress, [0.15, 0.4, 0.8, 1], [0, 0.6, 0.6, 0])
 
-    const scrollHintOpacity = useTransform(progress, [0, 0.05], [1, 0])
-    const scrollHintY = useTransform(progress, [0, 0.05], [0, 10])
+    // Extended visibility: fade out happens later [0.05 -> 0.15]
+    const scrollHintOpacity = useTransform(progress, [0.05, 0.15], [1, 0])
+    const scrollHintY = useTransform(progress, [0.05, 0.15], [0, 15])
 
     return (
         // iOS Fix: removed [perspective:1000px] — creates a 3D stacking context that crashes iOS GPU
         <motion.div style={{ opacity: fadeOpacity }} className="absolute bottom-[2vh] left-0 right-0 z-20 flex justify-center items-center pointer-events-none">
             <motion.div style={{ opacity: scrollHintOpacity, y: scrollHintY }} className="absolute top-[40px] flex flex-col items-center gap-3 z-30">
-                <motion.div animate={{ y: [0, 8, 0], opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }} className="w-[1px] h-8 bg-gradient-to-b from-transparent via-white to-transparent shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
-                <p className="text-white/80 uppercase font-bold tracking-[0.3em] text-[9px] text-center font-body flex flex-col items-center gap-0.5 drop-shadow-md">
-                    <span className="opacity-70 text-[8px]">Descubra a Illa</span>
-                    <span className="text-white">Deslize</span>
+                {/* Longer line (h-12), higher contrast opacity cycle */}
+                <motion.div animate={{ y: [0, 12, 0], opacity: [0.4, 1, 0.4] }} transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }} className="w-[1.5px] h-12 bg-gradient-to-b from-transparent via-white to-transparent shadow-[0_0_12px_rgba(255,255,255,0.9)]" />
+                <p className="text-white/90 uppercase font-black tracking-[0.5em] text-[12px] text-center font-body flex flex-col items-center gap-1 drop-shadow-lg">
+                    <span className="opacity-80 text-[10px]">Descubra a Illa</span>
+                    <span className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]">Deslize</span>
                 </p>
             </motion.div>
 
@@ -208,7 +211,8 @@ function TabletGhostButton({ btn, i, progress, lenis }: { btn: typeof buttons[0]
     const targetY = isTop ? -90 : 90
 
     const delayStart = 0.15 + (i * 0.04)
-    const expandEnd = Math.min(0.8, delayStart + 0.25)
+    // Accelerated animation: 0.15 scroll distance instead of 0.25 (tablets have higher physical scroll length)
+    const expandEnd = Math.min(0.8, delayStart + 0.15)
 
     // iOS Fix: rotateX/rotateY removed — 3D transforms cause GPU crash on iOS Safari during scroll
     const x = useTransform(progress, [0.15, expandEnd], [0, targetX])
@@ -270,17 +274,19 @@ function TabletButtons({ progress }: { progress: MotionValue<number> }) {
     const yFloat = useTransform(progress, [0.15, 0.8], [0, -120])
     const auraScale = useTransform(progress, [0.15, 0.4], [0.5, 1.2])
     const auraOpacity = useTransform(progress, [0.15, 0.4, 0.8, 1], [0, 0.6, 0.6, 0])
-    const scrollHintOpacity = useTransform(progress, [0, 0.05], [1, 0])
-    const scrollHintY = useTransform(progress, [0, 0.05], [0, 20])
+    // Extended visibility: fade out happens later [0.05 -> 0.15]
+    const scrollHintOpacity = useTransform(progress, [0.05, 0.15], [1, 0])
+    const scrollHintY = useTransform(progress, [0.05, 0.15], [0, 20])
 
     return (
         // iOS Fix: removed [perspective:1200px] — creates 3D context that taxes iOS GPU alongside canvas
         <motion.div style={{ opacity: fadeOpacity }} className="absolute bottom-[5vh] md:bottom-[15vh] left-0 right-0 z-20 flex justify-center items-center pointer-events-none">
             <motion.div style={{ opacity: scrollHintOpacity, y: scrollHintY }} className="absolute top-[80px] flex flex-col items-center gap-4 z-30">
-                <motion.div animate={{ y: [0, 10, 0], opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }} className="w-[1px] h-12 bg-gradient-to-b from-transparent via-white to-transparent shadow-[0_0_10px_rgba(255,255,255,0.8)]" />
-                <p className="text-white/80 uppercase font-bold tracking-[0.4em] text-[10px] md:text-sm text-center font-body flex flex-col items-center gap-1 drop-shadow-xl">
-                    <span className="opacity-70 text-[10px]">Descubra o Universo Illa</span>
-                    <span className="text-white">Deslize para baixo</span>
+                {/* Longer line (h-16), higher contrast opacity cycle */}
+                <motion.div animate={{ y: [0, 16, 0], opacity: [0.4, 1, 0.4] }} transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }} className="w-[1.5px] h-16 bg-gradient-to-b from-transparent via-white to-transparent shadow-[0_0_12px_rgba(255,255,255,0.9)]" />
+                <p className="text-white/90 uppercase font-black tracking-[0.5em] text-[12px] md:text-[15px] text-center font-body flex flex-col items-center gap-1.5 drop-shadow-xl">
+                    <span className="opacity-80 text-[11px] md:text-[13px]">Descubra o Universo Illa</span>
+                    <span className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]">Deslize para baixo</span>
                 </p>
             </motion.div>
 
