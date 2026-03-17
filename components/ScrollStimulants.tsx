@@ -139,7 +139,7 @@ export function ScrollStimulants({ progress, isMobile, isTablet }: ScrollStimula
     return (
         <>
             {/* Desktop Luminous Side Bar & Arrows Container */}
-            <div className="absolute right-8 md:right-12 lg:right-[500px] top-[calc(35%+50px)] -translate-y-1/2 z-[100] pointer-events-none flex items-center gap-4 lg:gap-8">
+            <div className="absolute right-0 md:right-0 lg:right-[450px] top-[calc(35%+70px)] -translate-y-1/2 z-[100] pointer-events-none flex items-center gap-4 lg:gap-8">
                 {/* Desktop Luminous Side Bar */}
                 <motion.div 
                     style={{ opacity: barOpacity }}
