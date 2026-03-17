@@ -2,7 +2,9 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { motion, useTransform, useSpring, MotionValue, AnimatePresence, useMotionValueEvent } from 'framer-motion'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { ChevronDown, ChevronUp, User, LogIn, ShoppingBag, Tag } from 'lucide-react'
+import { createSupabaseBrowser } from '@/lib/supabaseClient'
+import type { User as SupabaseUser } from '@supabase/supabase-js'
 
 interface ScrollStimulantsProps {
     progress: MotionValue<number>
@@ -14,6 +16,7 @@ export function ScrollStimulants({ progress, isMobile, isTablet }: ScrollStimula
     const [isIdle, setIsIdle] = useState(false)
     const idleTimeoutRef = useRef<NodeJS.Timeout | null>(null)
     const lastProgressRef = useRef(0)
+    const [user, setUser] = useState<SupabaseUser | null>(null)
 
     // Spring-smoothed progress for the luminous bar
     const smoothProgress = useSpring(progress, { stiffness: 100, damping: 30, restDelta: 0.001 })
@@ -24,6 +27,13 @@ export function ScrollStimulants({ progress, isMobile, isTablet }: ScrollStimula
     
     const [isMouseOverButtons, setIsMouseOverButtons] = useState(false)
     const [isPastHint, setIsPastHint] = useState(false)
+
+    useEffect(() => {
+        const supabase = createSupabaseBrowser()
+        supabase.auth.getUser().then(({ data }) => setUser(data.user))
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => setUser(session?.user ?? null))
+        return () => subscription.unsubscribe()
+    }, [])
 
     // Sync state for determining if "Descubra ILLA Deslize" has faded out
     useMotionValueEvent(progress, "change", (latest) => {
@@ -140,60 +150,90 @@ export function ScrollStimulants({ progress, isMobile, isTablet }: ScrollStimula
         <>
             {/* Desktop & Tablet Luminous Side Bar & Arrows Container */}
             <div className="absolute inset-0 z-[100] pointer-events-none container mx-auto px-4">
-                {/* Scrollbar anchored perfectly under the Login button */}
-                <div className="absolute right-[160px] md:right-[220px] top-[calc(35%+70px)] -translate-y-1/2">
-                    {/* Desktop Luminous Side Bar */}
-                    <motion.div 
-                        style={{ opacity: barOpacity }}
-                        className="relative h-[50vh] w-[16px] bg-white/20 rounded-full overflow-hidden shadow-[0_0_30px_rgba(255,202,40,0.4)] backdrop-blur-md border border-white/20"
-                    >
-                        <motion.div 
-                            style={{ scaleY: barScaleY, originY: 0 }}
-                            className="w-full h-full bg-gradient-to-b from-illa-pink via-white to-illa-yellow shadow-[0_0_25px_rgba(255,255,255,0.9)]"
-                        />
-                        
-                        {/* Floating Glow Tip */}
-                        <motion.div 
-                            style={{ top: glowTipTop }}
-                            className="absolute left-1/2 -translate-x-1/2 w-8 h-8 bg-white rounded-full blur-[10px] opacity-90"
-                        />
-                    </motion.div>
-
-                    {/* Idle Warning Overlay - Desktop Arrows */}
-                    <AnimatePresence>
-                        {isIdle && (
-                            <motion.div
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: -20 }}
-                                className="absolute left-full ml-4 md:ml-8 top-1/2 -translate-y-1/2 flex flex-col items-center gap-0"
-                            >
-                                {[0, 1, 2].map((i) => (
-                                    <motion.div
-                                        key={i}
-                                        animate={{ 
-                                            opacity: [0.1, 1, 0.1],
-                                            y: [-12, 12]
-                                        }}
-                                        transition={{ 
-                                            duration: 1.5, 
-                                            repeat: Infinity, 
-                                            ease: "easeInOut",
-                                            delay: i * 0.2
-                                        }}
-                                        className="-my-4"
-                                    >
-                                        <ChevronDown 
-                                            size={64} 
-                                            strokeWidth={4}
-                                            className="drop-shadow-[0_0_16px_rgba(229,1,125,1)]"
-                                            style={{ color: i === 0 ? '#E5017D' : i === 1 ? '#FF8A65' : '#FFC107' }}
-                                        />
-                                    </motion.div>
-                                ))}
-                            </motion.div>
+                {/* Ghost duplicate of the Navbar's right side. Ensures PERFECT centering under Login/Minha Conta button */}
+                <div className="absolute right-4 top-[calc(35%+70px)] -translate-y-1/2 hidden md:flex items-center gap-4">
+                    
+                    {/* Anchor point: Fake Login Button */}
+                    <div className="relative invisible flex items-center gap-2 px-6 py-2 rounded-full border border-white/20 text-sm font-bold tracking-wide">
+                        {user ? (
+                            <>
+                                <User size={18} />
+                                MINHA CONTA
+                            </>
+                        ) : (
+                            <>
+                                <LogIn size={18} />
+                                LOGIN
+                            </>
                         )}
-                    </AnimatePresence>
+
+                        {/* VISIBLE SCROLLBAR PERFECTLY CENTERED IN THE INVISIBLE BUTTON */}
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 visible flex flex-col items-center pointer-events-none">
+                            {/* Desktop Luminous Side Bar */}
+                            <motion.div 
+                                style={{ opacity: barOpacity }}
+                                className="relative h-[50vh] w-[16px] bg-white/20 rounded-full overflow-hidden shadow-[0_0_30px_rgba(255,202,40,0.4)] backdrop-blur-md border border-white/20"
+                            >
+                                <motion.div 
+                                    style={{ scaleY: barScaleY, originY: 0 }}
+                                    className="w-full h-full bg-gradient-to-b from-illa-pink via-white to-illa-yellow shadow-[0_0_25px_rgba(255,255,255,0.9)]"
+                                />
+                                
+                                {/* Floating Glow Tip */}
+                                <motion.div 
+                                    style={{ top: glowTipTop }}
+                                    className="absolute left-1/2 -translate-x-1/2 w-8 h-8 bg-white rounded-full blur-[10px] opacity-90"
+                                />
+                            </motion.div>
+
+                            {/* Idle Warning Overlay - Desktop Arrows */}
+                            <AnimatePresence>
+                                {isIdle && (
+                                    <motion.div
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: -20 }}
+                                        className="absolute left-full ml-4 md:ml-8 top-1/2 -translate-y-1/2 flex flex-col items-center gap-0"
+                                    >
+                                        {[0, 1, 2].map((i) => (
+                                            <motion.div
+                                                key={i}
+                                                animate={{ 
+                                                    opacity: [0.1, 1, 0.1],
+                                                    y: [-12, 12]
+                                                }}
+                                                transition={{ 
+                                                    duration: 1.5, 
+                                                    repeat: Infinity, 
+                                                    ease: "easeInOut",
+                                                    delay: i * 0.2
+                                                }}
+                                                className="-my-4"
+                                            >
+                                                <ChevronDown 
+                                                    size={64} 
+                                                    strokeWidth={4}
+                                                    className="drop-shadow-[0_0_16px_rgba(229,1,125,1)]"
+                                                    style={{ color: i === 0 ? '#E5017D' : i === 1 ? '#FF8A65' : '#FFC107' }}
+                                                />
+                                            </motion.div>
+                                        ))}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+                    </div>
+
+                    {/* Fake invisible Pedir Agora button */}
+                    <div className="invisible px-6 py-2 rounded-full font-bold flex items-center gap-2">
+                        <ShoppingBag size={18} />
+                        Pedir Agora
+                    </div>
+
+                    {/* Fake invisible Loja de Descontos button */}
+                    <div className="invisible p-2.5 rounded-full border border-white/20 flex items-center justify-center">
+                        <Tag size={18} />
+                    </div>
                 </div>
             </div>
         </>
