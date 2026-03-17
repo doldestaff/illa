@@ -57,7 +57,7 @@ export function resolveCardImage(mission: MissionInstance): string {
 }
 
 export default function MissionCard({ mission, isClaimed, canClaim, claiming, onClaim, onCardClick, rewards }: MissionCardProps) {
-    const { playSecondaryClick } = useSoundSystem()
+    const { playGlobalClick, playSecondaryClick } = useSoundSystem()
     const cardImage = resolveCardImage(mission)
     const progressPercent = Math.min(100, Math.max(0, (mission.progress / mission.target) * 100))
     const isCompleted = progressPercent >= 100
@@ -67,12 +67,7 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
     return (
         <div
             ref={cardRef}
-            className="flex flex-col w-full h-full gap-2"
-            onClick={() => {
-                if (!isClaimed && !canClaim && onCardClick) {
-                    onCardClick(mission)
-                }
-            }}
+            className="flex flex-col w-full h-full gap-2 relative"
         >
             {/* PERF: Fully CSS accelerated rendering, no IntersectionObserver overhead anymore */}
             <div
@@ -123,8 +118,19 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                         className={`absolute inset-0 rounded-[1.8rem] overflow-hidden bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none transition-opacity duration-600 ${canClaim && !cardImage.includes('-1') ? 'group-hover:opacity-100 opacity-0' : 'opacity-0'}`}
                     />
 
+                    {/* 2.5. Clickable Surface Overlay (Behind Content) */}
+                    <div 
+                        className="absolute inset-0 z-[8] rounded-[1.8rem] cursor-pointer"
+                        onClick={() => {
+                            if (!isClaimed && onCardClick) {
+                                playGlobalClick()
+                                onCardClick(mission)
+                            }
+                        }}
+                    />
+
                     {/* 3. Interactive Content Layer */}
-                    <div className="relative z-10 h-full flex flex-col justify-between p-0">
+                    <div className="relative z-10 h-full flex flex-col justify-between p-0 pointer-events-none">
                         <div className="flex justify-end p-4">
                             {isClaimed ? (
                                 <div className="flex items-center gap-1.5 text-emerald-800 font-black text-[10px] bg-emerald-100/90 px-3 py-1.5 rounded-full border border-emerald-200 shadow-md backdrop-blur-sm uppercase tracking-wider">
@@ -132,15 +138,13 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                                     <span>Completo</span>
                                 </div>
                             ) : canClaim ? (
-                                <motion.button
+                                <button
                                     onClick={() => {
-                                        playSecondaryClick()
+                                        playGlobalClick()
                                         onClaim(mission.instance_id, rewards ? { xp: rewards.xp, points: rewards.coins } : undefined)
                                     }}
                                     disabled={claiming}
-                                    whileHover={{ scale: 1.08 }}
-                                    whileTap={{ scale: 0.92 }}
-                                    className="relative overflow-hidden flex items-center justify-center gap-1.5 focus:outline-none bg-gradient-to-br from-illa-pink to-rose-600 text-white text-[11px] font-black tracking-widest uppercase px-4 py-2 rounded-full shadow-[0_4px_16px_rgba(229,1,125,0.5)] border border-white/30 transition-transform disabled:opacity-70 disabled:cursor-not-allowed group/btn"
+                                    className="pointer-events-auto relative overflow-hidden flex items-center justify-center gap-1.5 focus:outline-none bg-gradient-to-br from-illa-pink to-rose-600 text-white text-[11px] font-black tracking-widest uppercase px-4 py-2 rounded-full shadow-[0_4px_16px_rgba(229,1,125,0.5)] border border-white/30 transition-transform duration-200 hover:scale-105 active:scale-[0.92] disabled:opacity-70 disabled:cursor-not-allowed group/btn"
                                 >
                                     <div className="absolute inset-0 bg-white/30 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700 ease-in-out mix-blend-overlay" />
                                     {claiming ? (
@@ -151,7 +155,7 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                                             Coletar
                                         </>
                                     )}
-                                </motion.button>
+                                </button>
                             ) : null}
                         </div>
                         {/* Floating Rewards Badge (Bottom Left) */}

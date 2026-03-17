@@ -126,7 +126,8 @@ END IF;
 -- Generate Voucher Code: "DESC-{PERCENT}-{RANDOM}"
 v_voucher_code := 'DESC-' || v_offer.percent || '-' || upper(substr(md5(random()::text), 1, 6));
 v_expires_at := now() + interval '30 days';
--- Deduct Points
+-- Deduct Points (bypass guard trigger for trusted RPC)
+PERFORM set_config('app.bypass_reward_guard', 'true', true);
 UPDATE public.profiles
 SET points = points - v_offer.cost_points
 WHERE id = v_user_id;

@@ -96,6 +96,7 @@ const DEFAULT_HOWTO: MissionHowTo = {
 }
 
 import { useRouter } from 'next/navigation'
+import { useSoundSystem } from '@/components/providers/SoundProvider'
 
 interface Props {
     isOpen: boolean
@@ -108,6 +109,7 @@ interface Props {
 export default function MissionHowToPopup({ isOpen, onClose, missionKind, missionTitle, onInviteClick }: Props) {
     const mounted = useIsClientMounted()
     const router = useRouter()
+    const { playSecondaryClick } = useSoundSystem()
 
     if (!mounted) return null
 
@@ -122,7 +124,10 @@ export default function MissionHowToPopup({ isOpen, onClose, missionKind, missio
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        onClick={onClose}
+                        onClick={() => {
+                            playSecondaryClick()
+                            onClose()
+                        }}
                         className="fixed inset-0 z-[200] bg-black/70 backdrop-blur-md"
                     />
 

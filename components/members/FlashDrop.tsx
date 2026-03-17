@@ -105,8 +105,11 @@ export default function FlashDrop({ drop, onClaim }: Props) {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="relative h-full min-h-[280px] w-full bg-gradient-to-b from-white to-pink-50/50 backdrop-blur-2xl border border-white/60 rounded-[2.5rem] flex flex-col items-center justify-center px-4 py-6 text-center overflow-hidden shadow-[0_8px_40px_rgba(229,1,125,0.08)]"
+                        className="relative h-full min-h-[280px] w-full bg-[#111116] border border-white/5 rounded-[2.5rem] flex flex-col items-center justify-center px-4 py-6 text-center overflow-hidden shadow-2xl shadow-black/80"
                     >
+                        {/* 0. Ambient Dark Glow */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-[#1a1114] via-[#111116] to-[#111116] opacity-80" />
+
                         {/* 1. Soft Bubbly Glows Background */}
                         <motion.div
                             animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
@@ -174,7 +177,7 @@ export default function FlashDrop({ drop, onClaim }: Props) {
                                 <motion.div
                                     animate={{ y: [-5, 5, -5], scale: [0.95, 1.05, 0.95] }}
                                     transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                                    className="relative z-20 bg-white p-4 rounded-full shadow-[0_10px_30px_rgba(229,1,125,0.15)] border-2 border-pink-100 flex items-center justify-center"
+                                    className="relative z-20 bg-white/5 p-4 rounded-full shadow-[0_10px_30px_rgba(229,1,125,0.2)] border border-white/10 backdrop-blur-md flex items-center justify-center"
                                 >
                                     <Gift size={28} className="text-illa-pink" strokeWidth={2.5} />
                                 </motion.div>
@@ -186,7 +189,7 @@ export default function FlashDrop({ drop, onClaim }: Props) {
                                     animate={{ opacity: 1, y: 0 }}
                                     className="flex items-center justify-center"
                                 >
-                                    <h3 className="text-lg font-bold text-gray-800 tracking-wide font-script">
+                                    <h3 className="text-lg font-bold text-white tracking-wide font-script">
                                         Scanneando novos drops...
                                     </h3>
                                 </motion.div>
@@ -198,7 +201,7 @@ export default function FlashDrop({ drop, onClaim }: Props) {
                                     }}
                                     className="group/hint flex flex-col items-center gap-3"
                                 >
-                                    <p className="text-sm font-bold text-gray-500 flex items-center justify-center gap-1 group-hover/hint:text-illa-pink transition-colors">
+                                    <p className="text-sm font-bold text-gray-400 flex items-center justify-center gap-1 group-hover/hint:text-illa-pink transition-colors">
                                         <span className="relative">
                                             Fique de olho
                                             <motion.span
@@ -215,7 +218,7 @@ export default function FlashDrop({ drop, onClaim }: Props) {
                                     <motion.div
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
-                                        className="bg-white/80 backdrop-blur-sm border border-pink-100 rounded-full px-5 py-3 flex items-center gap-2 shadow-sm hover:shadow-md transition-all mt-2"
+                                        className="bg-white/5 backdrop-blur-md border border-white/10 rounded-full px-5 py-3 flex items-center gap-2 hover:bg-white/10 transition-all mt-2"
                                     >
                                         <Radio size={14} className="text-illa-pink animate-pulse" />
                                         <span className="text-[11px] font-black text-illa-pink uppercase tracking-wider">Ativar Notificações</span>
@@ -232,10 +235,10 @@ export default function FlashDrop({ drop, onClaim }: Props) {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.9 }}
                         transition={{ type: "spring", bounce: 0.5, duration: 0.6 }}
-                        className="relative h-full bg-white border-2 border-pink-200 text-dark p-6 shadow-2xl shadow-pink-500/20 rounded-[2.5rem] overflow-hidden flex flex-col"
+                        className="relative h-full bg-[#111116] border border-white/10 p-6 shadow-2xl shadow-pink-500/20 rounded-[2.5rem] overflow-hidden flex flex-col"
                     >
                         {/* Soft celebration background */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-pink-50 via-white to-pink-100/50" />
+                        <div className="absolute inset-0 bg-gradient-to-br from-[#1a1114] via-[#111116] to-[#111116]" />
 
                         {/* Bouncing Confetti blobs */}
                         <motion.div
@@ -254,7 +257,7 @@ export default function FlashDrop({ drop, onClaim }: Props) {
                             <motion.div
                                 initial={{ x: -20, opacity: 0 }}
                                 animate={{ x: 0, opacity: 1 }}
-                                className="flex items-center gap-2 bg-pink-100 px-3 py-1.5 rounded-full border border-pink-200"
+                                className="flex items-center gap-2 bg-illa-pink/20 px-3 py-1.5 rounded-full border border-illa-pink/30"
                             >
                                 <span className="relative flex h-2.5 w-2.5">
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-illa-pink opacity-50"></span>
@@ -265,7 +268,7 @@ export default function FlashDrop({ drop, onClaim }: Props) {
 
                             <button
                                 onClick={() => setShowWizard(true)}
-                                className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center transition-colors"
+                                className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-gray-400 flex items-center justify-center transition-colors"
                             >
                                 <HelpCircle size={16} />
                             </button>
@@ -277,22 +280,22 @@ export default function FlashDrop({ drop, onClaim }: Props) {
                             <motion.div
                                 animate={{ y: [-3, 3, -3], rotate: [-2, 2, -2] }}
                                 transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-                                className="bg-white p-4 rounded-3xl shadow-lg border border-pink-100 mb-2"
+                                className="bg-white/5 p-4 rounded-3xl shadow-[0_10px_30px_rgba(229,1,125,0.2)] border border-white/10 mb-2 backdrop-blur-md"
                             >
                                 <Gift size={40} className="text-illa-pink drop-shadow-sm" strokeWidth={2} />
                             </motion.div>
 
                             <div>
-                                <h2 className="text-2xl font-black text-gray-800 drop-shadow-sm font-script mb-1">
+                                <h2 className="text-2xl font-black text-white drop-shadow-sm font-script mb-1">
                                     Opa, Drop liberado!
                                 </h2>
-                                <p className="text-sm font-medium text-gray-500 leading-tight">
+                                <p className="text-sm font-medium text-gray-400 leading-tight">
                                     {drop.title}
                                 </p>
                             </div>
 
                             {/* Rewards Box (Cute Pill) */}
-                            <div className="bg-pink-50 rounded-2xl p-3 px-6 border border-pink-100 inline-flex flex-col items-center">
+                            <div className="bg-illa-pink/10 rounded-2xl p-3 px-6 border border-illa-pink/20 inline-flex flex-col items-center backdrop-blur-sm">
                                 <div className="text-[10px] font-bold uppercase text-pink-400 mb-0.5 tracking-wider">Você ganha</div>
                                 <div className="text-2xl font-black text-illa-pink drop-shadow-sm flex items-baseline gap-1">
                                     +{drop.reward_value} <span className="text-sm text-pink-400">{drop.reward_type === 'points' ? 'PTS' : 'XP'}</span>
@@ -300,7 +303,7 @@ export default function FlashDrop({ drop, onClaim }: Props) {
                             </div>
 
                             {/* Countdown (Soft Pill) */}
-                            <div className="flex items-center justify-center gap-2 font-mono text-xs font-bold text-gray-500 bg-gray-100 rounded-full px-4 py-1.5">
+                            <div className="flex items-center justify-center gap-2 font-mono text-xs font-bold text-gray-300 bg-white/10 rounded-full px-4 py-1.5 border border-white/5">
                                 <Clock size={14} className="text-gray-400" />
                                 <span>{timeLeft} restantes</span>
                             </div>
@@ -347,11 +350,11 @@ export default function FlashDrop({ drop, onClaim }: Props) {
                             initial={{ scale: 0.9, y: 20, opacity: 0 }}
                             animate={{ scale: 1, y: 0, opacity: 1 }}
                             exit={{ scale: 0.9, y: 10, opacity: 0 }}
-                            className="w-full max-w-[340px] max-h-[85vh] bg-white border border-pink-100 shadow-2xl shadow-pink-100 rounded-[2rem] p-6 text-center flex flex-col relative overflow-y-auto"
+                            className="w-full max-w-[340px] max-h-[85vh] bg-[#111116] border border-white/10 shadow-2xl shadow-black rounded-[2rem] p-6 text-center flex flex-col relative overflow-y-auto"
                             onClick={(e) => e.stopPropagation()}
                         >
                             {/* Decorative background glow */}
-                            <div className="absolute -top-24 -left-24 w-48 h-48 bg-pink-100/50 rounded-full blur-3xl pointer-events-none" />
+                            <div className="absolute -top-24 -left-24 w-48 h-48 bg-illa-pink/20 rounded-full blur-3xl pointer-events-none" />
 
                             <AnimatePresence mode="wait">
                                 {wizardStep === 'guide' ? (
@@ -361,7 +364,7 @@ export default function FlashDrop({ drop, onClaim }: Props) {
                                         animate={{ opacity: 1, x: 0 }}
                                         exit={{ opacity: 0, x: -20 }}
                                         className="flex flex-col flex-1 justify-center items-center gap-5">
-                                        <div className="w-16 h-16 mx-auto rounded-full bg-pink-50 flex flex-shrink-0 items-center justify-center relative overflow-hidden">
+                                        <div className="w-16 h-16 mx-auto rounded-full bg-white/5 flex flex-shrink-0 items-center justify-center relative overflow-hidden border border-white/10">
                                             <motion.div
                                                 animate={{
                                                     scale: [1, 1.2, 1],
@@ -373,8 +376,8 @@ export default function FlashDrop({ drop, onClaim }: Props) {
                                             <Gift size={36} className="text-illa-pink relative z-10" strokeWidth={2.5} />
                                         </div>
                                         <div className="text-center">
-                                            <h3 className="text-xl font-black text-gray-800 font-script leading-tight">Como o Scanner Funciona?</h3>
-                                            <p className="text-sm font-medium text-gray-500 mt-3 leading-relaxed">
+                                            <h3 className="text-xl font-black text-white font-script leading-tight">Como o Scanner Funciona?</h3>
+                                            <p className="text-sm font-medium text-gray-400 mt-3 leading-relaxed">
                                                 Fique sempre de olho nesta caixinha! Os <span className="text-illa-pink font-bold">Drops Surpresa</span> aparecem sem aviso e por tempo limitado.
                                                 <br /><br />
                                                 Quando um drop aparecer, corra: você terá poucos minutos para resgatar antes que ele fuja!
@@ -396,7 +399,7 @@ export default function FlashDrop({ drop, onClaim }: Props) {
                                         animate={{ opacity: 1, x: 0 }}
                                         exit={{ opacity: 0, x: -20 }}
                                         className="flex flex-col flex-1 justify-center items-center gap-5">
-                                        <div className="w-16 h-16 mx-auto rounded-full bg-blue-50 flex flex-shrink-0 items-center justify-center relative">
+                                        <div className="w-16 h-16 mx-auto rounded-full bg-blue-500/10 flex flex-shrink-0 items-center justify-center relative border border-blue-500/20">
                                             <motion.div
                                                 animate={{ rotate: [0, 15, -15, 0] }}
                                                 transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
@@ -410,8 +413,8 @@ export default function FlashDrop({ drop, onClaim }: Props) {
                                             />
                                         </div>
                                         <div className="text-center">
-                                            <h3 className="text-xl font-black text-gray-800 font-script leading-tight">Ative as Notificações!</h3>
-                                            <p className="text-sm font-medium text-gray-500 mt-3 leading-relaxed">
+                                            <h3 className="text-xl font-black text-white font-script leading-tight">Ative as Notificações!</h3>
+                                            <p className="text-sm font-medium text-gray-400 mt-3 leading-relaxed">
                                                 Não quer perder nenhum drop surpresa?
                                                 <br /><br />
                                                 Ative as notificações para ser avisado <span className="text-blue-500 font-bold">na mesma hora</span> quando um novo drop estiver disponível no celular!
