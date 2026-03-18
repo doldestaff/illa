@@ -1,23 +1,39 @@
 'use client'
 
-import { useState, MouseEvent, useEffect } from 'react'
+import { useState, MouseEvent, useEffect, useSyncExternalStore } from 'react'
 import { motion, useTransform, MotionValue, AnimatePresence } from 'framer-motion'
 import { MessageCircle, MapPin, ShoppingBag, Store, X, ArrowRight, ChevronUp } from 'lucide-react'
 import { useLenis } from 'lenis/react'
+import { createPortal } from 'react-dom'
+
+function subscribe() { return () => { } }
+function useIsClientMounted() {
+    return useSyncExternalStore(subscribe, () => true, () => false)
+}
 
 // ─── External Link Warning Modal ────────────────────────────────────────────
 function ExternalLinkWarningModal({ isOpen, link, onClose }: { isOpen: boolean, link: string | null, onClose: () => void }) {
-    if (!isOpen) return null
+    const mounted = useIsClientMounted()
+    const [lastLink, setLastLink] = useState<string | null>(null)
 
-    return (
+    useEffect(() => {
+        if (link) setLastLink(link)
+    }, [link])
+
+    if (!mounted) return null
+
+    const displayLink = link || lastLink
+
+    return createPortal(
         <AnimatePresence>
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
-                onClick={onClose}
-            >
+            {isOpen && displayLink && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 pointer-events-auto"
+                    onClick={onClose}
+                >
                 <motion.div
                     initial={{ scale: 0.9, y: 20, opacity: 0 }}
                     animate={{ scale: 1, y: 0, opacity: 1 }}
@@ -64,8 +80,10 @@ function ExternalLinkWarningModal({ isOpen, link, onClose }: { isOpen: boolean, 
                         </button>
                     </div>
                 </motion.div>
-            </motion.div>
-        </AnimatePresence>
+                </motion.div>
+            )}
+        </AnimatePresence>,
+        document.body
     )
 }
 
@@ -145,8 +163,20 @@ function HeroButtonPopup({ btn, isOpen, onClose, lenis }: {
         }
     }, [isOpen, lenis])
 
-    if (!btn) return null
-    const data = buttonPopups[btn.label]
+    const mounted = useIsClientMounted()
+    
+    // Store the last active data so the exit animation has content to render
+    const [lastData, setLastData] = useState<ButtonPopupData | null>(null)
+    useEffect(() => {
+        if (btn && buttonPopups[btn.label]) {
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+            setLastData(buttonPopups[btn.label])
+        }
+    }, [btn])
+
+    if (!mounted) return null
+
+    const data = btn ? buttonPopups[btn.label] : lastData
     if (!data) return null
 
     const Icon = data.icon
@@ -170,7 +200,7 @@ function HeroButtonPopup({ btn, isOpen, onClose, lenis }: {
         }
     }
 
-    return (
+    return createPortal(
         <AnimatePresence>
             {isOpen && (
                 <motion.div
@@ -178,7 +208,7 @@ function HeroButtonPopup({ btn, isOpen, onClose, lenis }: {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.2 }}
-                    className="fixed inset-0 z-[9990] flex items-end justify-center p-4 pb-8"
+                    className="fixed inset-0 z-[9990] flex items-end justify-center p-4 pb-8 pointer-events-auto"
                     style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(6px)' }}
                     onClick={onClose}
                 >
@@ -255,7 +285,8 @@ function HeroButtonPopup({ btn, isOpen, onClose, lenis }: {
                     </motion.div>
                 </motion.div>
             )}
-        </AnimatePresence>
+        </AnimatePresence>,
+        document.body
     )
 }
 
