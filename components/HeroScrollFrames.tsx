@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react'
 import { HeroGhostButtons } from './HeroGhostButtons'
 import { ScrollStimulants } from './ScrollStimulants'
 import { useMotionValue, animate } from 'framer-motion'
+import { useLenis } from 'lenis/react'
 import { HeroEngine } from './hero/HeroEngine'
 
 // PERF: Inline manifest data — eliminates 1 RTT fetch waterfall on first load
@@ -27,6 +28,7 @@ export function HeroScrollFrames() {
     const [trapState, setTrapState] = useState<'IDLE' | 'PLAYING' | 'COMPLETED' | 'RELEASED' | 'PLAYING_REVERSE'>('RELEASED')
     const mobileProgress = useMotionValue(0)
     const touchStart = useRef(0)
+    const lenis = useLenis()
 
     // Stable Refs
     const buttonProgress = useMotionValue(0)
@@ -193,9 +195,19 @@ export function HeroScrollFrames() {
                     if (isLocked) {
                         e.preventDefault()
                         handleTrapInteraction(e.deltaY)
-                    } else if (trapState === 'COMPLETED' && e.deltaY < 0 && typeof window !== 'undefined' && window.scrollY <= 0) {
-                        e.preventDefault()
-                        handleTrapInteraction(e.deltaY)
+                    } else if (trapState === 'COMPLETED' && typeof window !== 'undefined' && window.scrollY <= 0) {
+                        if (e.deltaY < 0) {
+                            e.preventDefault()
+                            handleTrapInteraction(e.deltaY)
+                        } else if (e.deltaY > 0) {
+                            e.preventDefault()
+                            if (lenis) {
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                ;(lenis as any).scrollTo(window.innerHeight, { duration: 1.5, easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) })
+                            } else {
+                                window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })
+                            }
+                        }
                     }
                 }}
                 onTouchStart={(e) => {
@@ -208,8 +220,17 @@ export function HeroScrollFrames() {
                     const deltaY = touchStart.current - e.changedTouches[0].clientY
                     if (isLocked) {
                         handleTrapInteraction(deltaY)
-                    } else if (trapState === 'COMPLETED' && deltaY < -20 && typeof window !== 'undefined' && window.scrollY <= 0) {
-                        handleTrapInteraction(deltaY)
+                    } else if (trapState === 'COMPLETED' && typeof window !== 'undefined' && window.scrollY <= 0) {
+                        if (deltaY < -20) {
+                            handleTrapInteraction(deltaY)
+                        } else if (deltaY > 20) {
+                            if (lenis) {
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                ;(lenis as any).scrollTo(window.innerHeight, { duration: 1.5, easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) })
+                            } else {
+                                window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })
+                            }
+                        }
                     }
                 }}
             >

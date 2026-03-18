@@ -25,34 +25,39 @@ function ExternalLinkWarningModal({ isOpen, link, onClose }: { isOpen: boolean, 
                     className="relative w-full max-w-sm bg-white rounded-[2rem] p-6 sm:p-8 flex flex-col items-center gap-6 shadow-2xl overflow-hidden"
                     onClick={(e) => e.stopPropagation()}
                 >
-                    {/* Decorative Background */}
-                    <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-br from-illa-pink to-pink-400 opacity-20" />
-                    <div className="absolute -top-12 -right-12 w-32 h-32 rounded-full bg-illa-yellow/20 blur-xl" />
+                    <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-br from-illa-pink via-pink-400 to-illa-yellow opacity-20 blur-md" />
+                    <div className="absolute -top-12 -right-12 w-40 h-40 rounded-full bg-illa-yellow/30 blur-2xl" />
+                    <div className="absolute -bottom-12 -left-12 w-40 h-40 rounded-full bg-illa-pink/20 blur-2xl" />
 
-                    <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-illa-pink to-pink-500 shadow-[0_8px_16px_rgba(229,1,125,0.4)] flex items-center justify-center text-white mb-2 rotate-3">
-                        <MessageCircle size={32} strokeWidth={2.5} className="drop-shadow-sm" />
-                    </div>
+                    <motion.div 
+                        initial={{ scale: 0.5, rotate: -15 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        transition={{ type: "spring", damping: 15, stiffness: 300, delay: 0.1 }}
+                        className="relative w-20 h-20 rounded-[1.5rem] bg-gradient-to-br from-illa-pink to-pink-500 shadow-[0_12px_24px_rgba(229,1,125,0.4)] flex items-center justify-center text-white mb-2"
+                    >
+                        <MessageCircle size={40} strokeWidth={2.5} className="drop-shadow-md" />
+                    </motion.div>
 
-                    <div className="text-center relative z-10">
-                        <h3 className="text-2xl font-black text-slate-800 mb-3 tracking-tight">Saindo do Universo Illa?</h3>
-                        <p className="text-sm font-medium text-slate-500 leading-relaxed px-2">
-                            Você está sendo redirecionado para um link externo. Deseja continuar ou permanecer no site?
+                    <div className="text-center relative z-10 flex flex-col gap-2">
+                        <h3 className="text-[26px] font-black tracking-tight bg-gradient-to-br from-slate-800 to-slate-600 bg-clip-text text-transparent leading-tight">Saindo do Universo Illa?</h3>
+                        <p className="text-[15px] font-medium text-slate-500 leading-relaxed px-1">
+                            Você está sendo redirecionado para um link externo. Deseja continuar ou permanecer no site mágico?
                         </p>
                     </div>
 
                     <div className="flex flex-col w-full gap-3 mt-2 relative z-10">
-                        <a
-                            href={link || "#"}
-                            target="_blank"
-                            rel="noreferrer"
-                            onClick={onClose}
-                            className="w-full py-4 bg-illa-pink text-white font-bold rounded-xl text-sm flex items-center justify-center transition-transform hover:scale-[1.02] active:scale-[0.98] shadow-md shadow-illa-pink/30 hover:shadow-illa-pink/50"
+                        <button
+                            onClick={() => {
+                                window.open(link || '#', '_blank', 'noopener,noreferrer')
+                                setTimeout(onClose, 300)
+                            }}
+                            className="w-full py-4 bg-illa-pink text-white font-black tracking-wide rounded-2xl text-[15px] flex items-center justify-center transition-all hover:scale-[1.03] active:scale-[0.97] shadow-lg shadow-illa-pink/40 hover:shadow-illa-pink/60 hover:bg-pink-500"
                         >
                             Sim, continuar para fora
-                        </a>
+                        </button>
                         <button
                             onClick={onClose}
-                            className="w-full py-4 text-slate-600 font-bold rounded-xl text-sm flex items-center justify-center transition-colors hover:bg-slate-100 active:bg-slate-200"
+                            className="w-full py-4 text-slate-600 font-bold tracking-wide rounded-2xl text-[15px] flex items-center justify-center transition-colors hover:bg-slate-100 active:bg-slate-200"
                         >
                             Não, ficar no site
                         </button>
@@ -239,7 +244,7 @@ function MobileButtons({ progress, onLinkClick }: { progress: MotionValue<number
 
     return (
         <>
-            <motion.div style={{ opacity: scrollHintOpacity, y: scrollHintY }} className="absolute bottom-[8vh] left-0 right-0 flex flex-col items-center gap-4 z-30 pointer-events-none">
+            <motion.div style={{ opacity: scrollHintOpacity, y: scrollHintY }} className="absolute bottom-[calc(8vh+50px)] left-0 right-0 flex flex-col items-center gap-4 z-30 pointer-events-none">
                 <motion.div animate={{ y: [0, 24, 0], opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }} className="w-[2px] h-16 bg-gradient-to-b from-transparent via-white to-transparent shadow-[0_0_15px_rgba(255,255,255,1)]" />
                 <p className="text-white/90 uppercase font-black tracking-[0.6em] text-[13px] text-center font-body flex flex-col items-center gap-2 drop-shadow-xl">
                     <span className="opacity-90 text-[11px]">Descubra a Illa</span>

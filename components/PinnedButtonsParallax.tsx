@@ -126,6 +126,17 @@ export function PinnedButtonsParallax() {
     const [isTablet, setIsTablet] = useState(false)
     const [isMobile, setIsMobile] = useState(false)
 
+    const audioRef = useRef<HTMLAudioElement | null>(null)
+    const activeCardRef = useRef<number>(-1)
+
+    // Preload the swoosh audio
+    useEffect(() => {
+        const audio = new Audio('/audio/session2/swoosh-1.mp3')
+        audio.preload = 'auto'
+        audio.volume = 0.25
+        audioRef.current = audio
+    }, [])
+
     // Detect tablet (768-1024px) and mobile (<768px) viewports
     useEffect(() => {
         const check = () => {
@@ -271,6 +282,15 @@ export function PinnedButtonsParallax() {
             } else {
                 // MOMENTUM CENTER (30% to 70%)
                 glowIntensity = 0.5 + 0.3 * Math.sin(((localP - 0.3) / 0.4) * Math.PI) // Peak neon in center
+                // 🔊 Fire swoosh when this card becomes the focused one (only once per card)
+                if (activeCardRef.current !== i) {
+                    activeCardRef.current = i
+                    const audio = audioRef.current
+                    if (audio) {
+                        audio.currentTime = 0
+                        audio.play().catch(() => {})
+                    }
+                }
             }
 
             // Always clickable when reasonably visible, overlapping is handled natively by z-index
