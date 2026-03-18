@@ -68,7 +68,8 @@ export function HeroScrollFrames() {
 
     // --- Render ---
     // Config
-    const MOBILE_HEIGHT_vh = 140
+    // Increased mobile height (220vh) makes the scroll physically "heavier"
+    const MOBILE_HEIGHT_vh = 220 
     const TABLET_HEIGHT_vh = 400
     const DESKTOP_HEIGHT_vh = 500
 
@@ -134,6 +135,10 @@ export function HeroScrollFrames() {
                     startIndex={0}
                     debug={typeof window !== 'undefined' && window.location.search.includes('debugHero')}
                     className="z-10"
+                    // 0.75 means the animation reaches 100% when the user is 75% through the 220vh track.
+                    // The last 25% (55vh) is a "brake pad" that absorbs their swipe momentum, parking them
+                    // perfectly at the end of the Hero instead of immediately pushing Section 2 up.
+                    endBuffer={useMobileFrames ? 0.75 : 1.0}
                 />
 
                 <div className="absolute inset-0 pointer-events-none z-20">

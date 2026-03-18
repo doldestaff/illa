@@ -31,6 +31,8 @@ export interface HeroEngineProps {
     startIndex?: number
     debug?: boolean
     objectFit?: 'cover' | 'contain'
+    // E.g., 0.8 means the animation finishes 80% through the scroll area (leaving 20% as a dead zone buffer).
+    endBuffer?: number
 }
 
 interface Manifest {
@@ -106,7 +108,8 @@ export function HeroEngine({
     onProgress,
     startIndex = 0,
     debug = false,
-    objectFit = 'cover'
+    objectFit = 'cover',
+    endBuffer = 1.0
 }: HeroEngineProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const containerRef = useRef<HTMLDivElement>(null)
@@ -595,7 +598,8 @@ export function HeroEngine({
                             const vh = state.current.appHeight || window.innerHeight
                             const totalH = vh * ((scrollSectionHeightVh || 500) / 100)
                             const scrollable = totalH - vh
-                            progress = scrollable > 0 ? Math.max(0, Math.min(1, scrollY / scrollable)) : 0
+                            const scrollRatio = scrollable > 0 ? scrollY / scrollable : 0
+                            progress = Math.max(0, Math.min(1, scrollRatio / endBuffer))
                         } else {
                             // Document mode — use frozen height for consistency
                             const docH = Math.max(
@@ -603,7 +607,8 @@ export function HeroEngine({
                             )
                             const vh = state.current.appHeight || window.innerHeight
                             const limit = docH - vh
-                            progress = limit > 0 ? Math.max(0, Math.min(1, scrollY / limit)) : 0
+                            const scrollRatio = limit > 0 ? scrollY / limit : 0
+                            progress = Math.max(0, Math.min(1, scrollRatio / endBuffer))
                         }
                     }
 
