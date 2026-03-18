@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Plus, Minus, IceCream, RefreshCw, LogOut, BarChart3, Users, Target, CheckCircle, Coins, Droplet, Zap, Trash2, Clock, Gift, Search } from 'lucide-react'
+import { Plus, Minus, IceCream, RefreshCw, LogOut, BarChart3, Users, Target, CheckCircle, Droplet, Zap, Trash2, Clock, Gift, Search, MessageSquare, Eye, EyeOff, Star, Coins } from 'lucide-react'
 import { createSupabaseBrowser } from '@/lib/supabaseClient'
 import GlobalCoin from '@/components/ui/GlobalCoin'
 import { SURPRISE_DROPS_CATALOG, CATEGORY_LABELS, RARITY_STYLES } from '@/lib/surprise-drops-catalog'
@@ -14,6 +14,18 @@ interface UserSorvetes {
     xp: number
     points: number
     drops: number
+}
+
+interface AdminReview {
+    id: string
+    name: string
+    role: string
+    instagram: string
+    text: string
+    rating: number
+    created_at: string
+    user_id: string | null
+    approved: boolean
 }
 
 interface UserMission {
@@ -34,11 +46,59 @@ export default function AdminDashboard() {
     const [view, setView] = useState<'table' | 'chart'>('table')
 
     // === TABS: Sorvetes | Loja | Missões | Saldo | Drops ===
-    const [activeTab, setActiveTab] = useState<'sorvetes' | 'loja' | 'missoes' | 'balance' | 'drops'>('sorvetes')
+    const [activeTab, setActiveTab] = useState<'sorvetes' | 'loja' | 'missoes' | 'balance' | 'drops' | 'reviews'>('sorvetes')
 
     // === DATA STATES ===
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [discountStats, setDiscountStats] = useState<any>(null)
+
+    // === REVIEWS STATE ===
+    const [reviews, setReviews] = useState<AdminReview[]>([])
+    const [reviewsLoading, setReviewsLoading] = useState(false)
+    const [reviewsFilter, setReviewsFilter] = useState<'all' | 'visible' | 'hidden'>('all')
+    const [reviewSearch, setReviewSearch] = useState('')
+    const [togglingReview, setTogglingReview] = useState<string | null>(null)
+    const [deletingReview, setDeletingReview] = useState<string | null>(null)
+
+    const fetchReviews = useCallback(async () => {
+        setReviewsLoading(true)
+        try {
+            const res = await fetch('/api/admin/reviews')
+            if (res.ok) {
+                const data = await res.json()
+                setReviews(Array.isArray(data) ? data : [])
+            }
+        } catch { /* silent */ } finally {
+            setReviewsLoading(false)
+        }
+    }, [])
+
+    const handleToggleReview = async (id: string, currentApproved: boolean) => {
+        setTogglingReview(id)
+        try {
+            const res = await fetch('/api/admin/reviews', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, approved: !currentApproved }),
+            })
+            if (res.ok) {
+                setReviews(prev => prev.map(r => r.id === id ? { ...r, approved: !currentApproved } : r))
+            }
+        } catch { /* silent */ } finally {
+            setTogglingReview(null)
+        }
+    }
+
+    const handleDeleteReview = async (id: string) => {
+        if (!confirm('Excluir este comentário permanentemente?')) return
+        setDeletingReview(id)
+        try {
+            const res = await fetch(`/api/admin/reviews?id=${id}`, { method: 'DELETE' })
+            if (res.ok) setReviews(prev => prev.filter(r => r.id !== id))
+        } catch { /* silent */ } finally {
+            setDeletingReview(null)
+        }
+    }
 
     // === BALANCE STATE ===
     const [balanceForm, setBalanceForm] = useState({ xp: 0, points: 0, drops: 0 })
@@ -193,10 +253,9 @@ export default function AdminDashboard() {
     }, [])
 
     useEffect(() => {
-        if (activeTab === 'loja') {
-            fetchDiscountStats()
-        }
-    }, [activeTab, fetchDiscountStats])
+        if (activeTab === 'loja') fetchDiscountStats()
+        if (activeTab === 'reviews') fetchReviews()
+    }, [activeTab, fetchDiscountStats, fetchReviews])
 
     // === MISSIONS LOGIC ===
     const fetchUserMissions = async (userId: string) => {
@@ -401,6 +460,13 @@ export default function AdminDashboard() {
                                 >
                                     Drops
                                 </button>
+                                <span className="text-white/20">|</span>
+                                <button
+                                    onClick={() => setActiveTab('reviews')}
+                                    className={`uppercase transition-colors ${activeTab === 'reviews' ? 'text-white' : 'text-white/40 hover:text-white'}`}
+                                >
+                                    Reviews
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -429,11 +495,12 @@ export default function AdminDashboard() {
                                 else if (activeTab === 'loja') fetchDiscountStats()
                                 else if (activeTab === 'missoes' && selectedUserId) fetchUserMissions(selectedUserId)
                                 else if (activeTab === 'drops') fetchDrops()
+                                else if (activeTab === 'reviews') fetchReviews()
                             }}
                             title="Atualizar"
                             className="p-2 rounded-lg bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-all"
                         >
-                            <RefreshCw size={16} className={(loading || missionsLoading) ? 'animate-spin' : ''} />
+                            <RefreshCw size={16} className={(loading || missionsLoading || reviewsLoading) ? 'animate-spin' : ''} />
                         </button>
 
                         <button
@@ -1250,6 +1317,172 @@ export default function AdminDashboard() {
                         )}
                     </div>
                 )}
+
+                {/* === REVIEWS VIEW === */}
+                {activeTab === 'reviews' && (() => {
+                    const filtered = reviews.filter(r => {
+                        const matchFilter = reviewsFilter === 'all' ? true : reviewsFilter === 'visible' ? r.approved : !r.approved
+                        const matchSearch = reviewSearch === '' || r.name.toLowerCase().includes(reviewSearch.toLowerCase()) || r.text.toLowerCase().includes(reviewSearch.toLowerCase())
+                        return matchFilter && matchSearch
+                    })
+                    const visibleCount = reviews.filter(r => r.approved).length
+                    const hiddenCount = reviews.filter(r => !r.approved).length
+
+                    return (
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-4">
+                            {/* Header */}
+                            <div className="flex items-center gap-3 mb-2">
+                                <div className="w-10 h-10 rounded-xl bg-illa-pink/20 flex items-center justify-center">
+                                    <MessageSquare size={20} className="text-illa-pink" />
+                                </div>
+                                <div>
+                                    <h2 className="text-lg font-bold">Quem prova, ama!</h2>
+                                    <p className="text-xs text-white/40">Gerencie os comentários exibidos na home</p>
+                                </div>
+                            </div>
+
+                            {/* Stats Row */}
+                            <div className="grid grid-cols-3 gap-3">
+                                <div className="rounded-2xl bg-white/5 border border-white/10 p-4 text-center">
+                                    <div className="text-[10px] font-bold uppercase tracking-wider text-white/40 mb-1">Total</div>
+                                    <div className="text-2xl font-black tabular-nums">{reviews.length}</div>
+                                </div>
+                                <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/20 p-4 text-center">
+                                    <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-400/70 mb-1">Visíveis</div>
+                                    <div className="text-2xl font-black tabular-nums text-emerald-400">{visibleCount}</div>
+                                </div>
+                                <div className="rounded-2xl bg-red-500/10 border border-red-500/20 p-4 text-center">
+                                    <div className="text-[10px] font-bold uppercase tracking-wider text-red-400/70 mb-1">Ocultos</div>
+                                    <div className="text-2xl font-black tabular-nums text-red-400">{hiddenCount}</div>
+                                </div>
+                            </div>
+
+                            {/* Filters + Search */}
+                            <div className="flex flex-col sm:flex-row gap-3">
+                                <div className="flex gap-1 bg-white/5 rounded-xl p-1 border border-white/10">
+                                    {(['all', 'visible', 'hidden'] as const).map(f => (
+                                        <button
+                                            key={f}
+                                            onClick={() => setReviewsFilter(f)}
+                                            className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${reviewsFilter === f ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/70'}`}
+                                        >
+                                            {f === 'all' ? 'Todos' : f === 'visible' ? 'Visíveis' : 'Ocultos'}
+                                        </button>
+                                    ))}
+                                </div>
+                                <div className="relative flex-1">
+                                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
+                                    <input
+                                        type="text"
+                                        placeholder="Buscar por nome ou texto..."
+                                        value={reviewSearch}
+                                        onChange={e => setReviewSearch(e.target.value)}
+                                        className="w-full bg-white/5 border border-white/10 rounded-xl pl-9 pr-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-white/30 transition-colors"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Reviews List */}
+                            {reviewsLoading ? (
+                                <div className="flex items-center justify-center py-16">
+                                    <RefreshCw size={24} className="animate-spin text-white/30" />
+                                </div>
+                            ) : filtered.length === 0 ? (
+                                <div className="text-center py-16 text-white/30 text-sm">
+                                    Nenhum comentário encontrado.
+                                </div>
+                            ) : (
+                                <div className="space-y-3">
+                                    {filtered.map(review => (
+                                        <div
+                                            key={review.id}
+                                            className={`relative p-4 rounded-2xl border transition-all ${
+                                                review.approved
+                                                    ? 'bg-white/5 border-white/10'
+                                                    : 'bg-red-500/5 border-red-500/15 opacity-60'
+                                            }`}
+                                        >
+                                            {/* Status Badge */}
+                                            <span className={`absolute top-3 right-3 text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-full border ${
+                                                review.approved
+                                                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                                                    : 'bg-red-500/10 text-red-400 border-red-500/20'
+                                            }`}>
+                                                {review.approved ? 'Visível' : 'Oculto'}
+                                            </span>
+
+                                            <div className="flex items-start gap-3 pr-20">
+                                                <div className="flex-1 min-w-0">
+                                                    {/* Stars */}
+                                                    <div className="flex gap-0.5 mb-2">
+                                                        {[1, 2, 3, 4, 5].map(s => (
+                                                            <Star
+                                                                key={s}
+                                                                size={12}
+                                                                fill={review.rating >= s ? 'currentColor' : 'none'}
+                                                                className={review.rating >= s ? 'text-illa-yellow' : 'text-white/20'}
+                                                            />
+                                                        ))}
+                                                    </div>
+
+                                                    {/* Text */}
+                                                    <p className="text-sm italic text-white/80 mb-2 line-clamp-3">&ldquo;{review.text}&rdquo;</p>
+
+                                                    {/* Author */}
+                                                    <div className="flex items-center gap-2 flex-wrap">
+                                                        <span className="text-xs font-bold text-white">{review.name}</span>
+                                                        {review.role && <span className="text-[10px] text-white/40">{review.role}</span>}
+                                                        {review.instagram && (
+                                                            <span className="text-[10px] text-white/30">@{review.instagram.replace('@', '')}</span>
+                                                        )}
+                                                        <span className="text-[10px] text-white/20 ml-auto">
+                                                            {new Date(review.created_at).toLocaleDateString('pt-BR')}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Actions */}
+                                            <div className="flex items-center gap-2 mt-3 pt-3 border-t border-white/5">
+                                                <button
+                                                    onClick={() => handleToggleReview(review.id, review.approved)}
+                                                    disabled={togglingReview === review.id}
+                                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all disabled:opacity-50 ${
+                                                        review.approved
+                                                            ? 'bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20'
+                                                            : 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20'
+                                                    }`}
+                                                >
+                                                    {togglingReview === review.id ? (
+                                                        <RefreshCw size={12} className="animate-spin" />
+                                                    ) : review.approved ? (
+                                                        <EyeOff size={12} />
+                                                    ) : (
+                                                        <Eye size={12} />
+                                                    )}
+                                                    {review.approved ? 'Ocultar' : 'Revelar'}
+                                                </button>
+
+                                                <button
+                                                    onClick={() => handleDeleteReview(review.id)}
+                                                    disabled={deletingReview === review.id}
+                                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-900/20 border border-red-900/30 text-red-500/70 hover:text-red-400 hover:bg-red-900/30 text-xs font-bold transition-all disabled:opacity-50 ml-auto"
+                                                >
+                                                    {deletingReview === review.id ? (
+                                                        <RefreshCw size={12} className="animate-spin" />
+                                                    ) : (
+                                                        <Trash2 size={12} />
+                                                    )}
+                                                    Excluir
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )
+                })()}
             </div>
         </div>
     )
