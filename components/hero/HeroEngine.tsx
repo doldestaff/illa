@@ -652,8 +652,13 @@ export function HeroEngine({
         }
 
         return () => {
-            if (unsubscribe) unsubscribe()
-            window.removeEventListener('scroll', handleScroll)
+            if (progressValue) {
+                // Decoupled Mode: Observe Framer Motion value changes natively
+                if (unsubscribe) unsubscribe()
+            } else {
+                // Native Mode: Observe window scroll
+                window.removeEventListener('scroll', handleScroll)
+            }
             if (lerpRafId) cancelAnimationFrame(lerpRafId)
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps

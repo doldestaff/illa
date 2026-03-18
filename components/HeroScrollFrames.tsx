@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { HeroGhostButtons } from './HeroGhostButtons'
 import { ScrollStimulants } from './ScrollStimulants'
-import { useMotionValue } from 'framer-motion'
+import { useMotionValue, animate } from 'framer-motion'
 import { HeroEngine } from './hero/HeroEngine'
 
 // PERF: Inline manifest data — eliminates 1 RTT fetch waterfall on first load
@@ -23,6 +23,11 @@ export function HeroScrollFrames() {
     // Force a single re-render after mount to apply frozen height
     const [mountReady, setMountReady] = useState(false)
 
+    // Cinematic Trap State (Mobile/Tablet)
+    const [trapState, setTrapState] = useState<'IDLE' | 'PLAYING' | 'COMPLETED' | 'RELEASED'>('RELEASED')
+    const mobileProgress = useMotionValue(0)
+    const touchStart = useRef(0)
+
     // Stable Refs
     const buttonProgress = useMotionValue(0)
 
@@ -32,8 +37,11 @@ export function HeroScrollFrames() {
         const h = window.innerHeight
 
         requestAnimationFrame(() => {
-            setIsMobile(w < 768)
-            setIsTablet(w >= 768 && w < 1024)
+            const mobile = w < 768
+            const tablet = w >= 768 && w < 1024
+            setIsMobile(mobile)
+            setIsTablet(tablet)
+            if (mobile || tablet) setTrapState('IDLE')
 
             // Measure the actual layout size of the 100vh sticky container
             if (stickyRef.current) {
@@ -66,11 +74,34 @@ export function HeroScrollFrames() {
         buttonProgress.set(progress)
     }
 
+    // Scroll Lock for Cinematic Trap
+    useEffect(() => {
+        if ((isMobile || isTablet) && trapState !== 'RELEASED') {
+            document.body.style.overflow = 'hidden'
+            return () => { document.body.style.overflow = '' }
+        }
+    }, [isMobile, isTablet, trapState])
+
+    const handleTrapInteraction = (deltaY: number) => {
+        if (deltaY > 20) {
+            if (trapState === 'IDLE') {
+                setTrapState('PLAYING')
+                animate(mobileProgress, 1, {
+                    duration: 5.08, // Exactly 122 frames at 24fps
+                    ease: 'linear',
+                    onComplete: () => setTrapState('COMPLETED')
+                })
+            } else if (trapState === 'COMPLETED') {
+                setTrapState('RELEASED')
+            }
+        }
+    }
+
     // --- Render ---
     // Config
-    // Increased mobile height (220vh) makes the scroll physically "heavier"
-    const MOBILE_HEIGHT_vh = 220 
-    const TABLET_HEIGHT_vh = 400
+    // Mobile cinematic trap fixes the section to exactly 100vh.
+    const MOBILE_HEIGHT_vh = 100
+    const TABLET_HEIGHT_vh = 100
     const DESKTOP_HEIGHT_vh = 500
 
     if (isMobile === null || isTablet === null || !mountReady) return (
@@ -115,6 +146,28 @@ export function HeroScrollFrames() {
             className="relative w-full z-10 bg-[#111]"
             style={sectionStyle}
         >
+            {/* Cinematic Trap Overlay Component */}
+            {trapState !== 'RELEASED' && (
+                <div
+                    className="absolute inset-0 z-50 pointer-events-auto"
+                    style={{ touchAction: 'none' }}
+                    onWheel={(e) => {
+                        e.preventDefault()
+                        handleTrapInteraction(e.deltaY)
+                    }}
+                    onTouchStart={(e) => {
+                        touchStart.current = e.touches[0].clientY
+                    }}
+                    onTouchMove={(e) => {
+                        e.preventDefault() // Hard prevent native rubber-banding
+                    }}
+                    onTouchEnd={(e) => {
+                        const deltaY = touchStart.current - e.changedTouches[0].clientY
+                        handleTrapInteraction(deltaY)
+                    }}
+                />
+            )}
+
             {/* Sticky container uses 100vh constant.
                 On mobile, 100vh is statically resolved to the maximum viewport size (URL bar hidden).
                 This ensures it NEVER resizes during scroll, completely eliminating image jumping, shifting, 
@@ -132,13 +185,12 @@ export function HeroScrollFrames() {
                     scrollMode="viewport"
                     scrollSectionHeightVh={SCROLL_HEIGHT_vh}
                     onProgress={handleProgress}
+                    // Pass mobileProgress to decouple from native scroll and drive by Framer Motion at 24fps
+                    progressValue={useMobileFrames ? mobileProgress : undefined}
                     startIndex={0}
                     debug={typeof window !== 'undefined' && window.location.search.includes('debugHero')}
                     className="z-10"
-                    // 0.75 means the animation reaches 100% when the user is 75% through the 220vh track.
-                    // The last 25% (55vh) is a "brake pad" that absorbs their swipe momentum, parking them
-                    // perfectly at the end of the Hero instead of immediately pushing Section 2 up.
-                    endBuffer={useMobileFrames ? 0.75 : 1.0}
+                    endBuffer={1.0}
                 />
 
                 <div className="absolute inset-0 pointer-events-none z-20">
