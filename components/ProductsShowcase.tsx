@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import { Wrench, X, Sparkles } from 'lucide-react'
@@ -11,8 +11,6 @@ const realProducts = Array.from({ length: 10 }, (_, i) => ({
     image: `/brand/product/product-${i + 1}.png`,
     color: i % 2 === 0 ? 'bg-pink-50' : 'bg-yellow-50',
 }))
-
-const marqueeProducts = [...realProducts, ...realProducts]
 
 function ShowcaseMarquee() {
     const [duration, setDuration] = useState(30)
@@ -48,7 +46,7 @@ function ShowcaseMarquee() {
                 {[0, 1].map((trackId) => (
                     <div
                         key={trackId}
-                        className="flex gap-8 shrink-0 pr-8"
+                        className="flex gap-8 shrink-0 pr-8 w-max"
                         style={{
                             animation: `marqueeScroll ${duration}s linear infinite`,
                             animationPlayState: isHovered ? 'paused' : 'running',

@@ -39,69 +39,47 @@ export function useSoundSystem() {
 }
 
 export function SoundProvider({ children }: { children: React.ReactNode }) {
-  const audioPools = useRef<Record<SoundKey, HTMLAudioElement[]>>({} as Record<SoundKey, HTMLAudioElement[]>)
+  const audioCtxRef = useRef<AudioContext | null>(null)
+  const buffersRef = useRef<Record<SoundKey, AudioBuffer | null>>({
+    click: null, coinToast1: null, secondaryClick: null, coinToast2: null, missionComplete: null
+  })
   const isEnabled = useRef(true)
-  const isUnlocked = useRef(false)
 
-  // Initialize pool on mount
   useEffect(() => {
-    // Preload audio objects for rapid playback
-    const loadSound = (key: SoundKey, src: string) => {
-      const pool: HTMLAudioElement[] = []
-      // Keep a small pool of 3 audio objects per sound to allow overlapping plays
-      for (let i = 0; i < 3; i++) {
-        const audio = new Audio(src)
-        audio.preload = 'auto'
-        pool.push(audio)
-      }
-      return pool
-    }
-
-    try {
-      audioPools.current = {
-        click: loadSound('click', SOUND_FILES.click),
-        coinToast1: loadSound('coinToast1', SOUND_FILES.coinToast1),
-        secondaryClick: loadSound('secondaryClick', SOUND_FILES.secondaryClick),
-        coinToast2: loadSound('coinToast2', SOUND_FILES.coinToast2),
-        missionComplete: loadSound('missionComplete', SOUND_FILES.missionComplete),
-      }
-    } catch (error) {
-      console.warn('Audio contextualization not supported or failed', error)
+    // Initialize Web Audio API to bypass iOS HTML5 Audio limitations (forced max volume, required unmuted dummy plays)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext
+    if (!AudioContextClass) {
       isEnabled.current = false
+      return
     }
 
-    // iOS Audio Unlock: On the first user interaction (touch/click),
-    // play+pause all audio elements to "warm" them for future programmatic playback.
-    // iOS WebKit requires at least one .play() call from a user gesture context, and it MUST NOT be muted.
+    const ctx = new AudioContextClass()
+    audioCtxRef.current = ctx
+
+    // Fetch and decode all sounds into memory buffers for zero-latency playback
+    const loadSound = async (key: SoundKey, url: string) => {
+      try {
+        const response = await fetch(url)
+        const arrayBuffer = await response.arrayBuffer()
+        const audioBuffer = await ctx.decodeAudioData(arrayBuffer)
+        buffersRef.current[key] = audioBuffer
+      } catch (err) {
+        console.warn(`Failed to load sound ${key}`, err)
+      }
+    }
+
+    Object.entries(SOUND_FILES).forEach(([key, url]) => {
+      loadSound(key as SoundKey, url)
+    })
+
+    // iOS Web Audio API unlock: resume the suspended context safely on first gesture
     const unlockAudio = () => {
-      if (isUnlocked.current) return
-      isUnlocked.current = true
-
-      Object.values(audioPools.current).forEach((pool) => {
-        pool.forEach((audio) => {
-          // Do NOT use muted=true, as muted autoplay doesn't unlock the audio context.
-          const playPromise = audio.play()
-          if (playPromise !== undefined) {
-            playPromise.then(() => {
-              // Vital delay: if you pause synchronously in the resolution tick, Safari cancels the unlock!
-              setTimeout(() => {
-                audio.pause()
-                audio.currentTime = 0
-              }, 50)
-            }).catch(() => {
-              // Ignore abort errors
-            })
-          }
-        })
-      })
-
-      // Clean up — only need to unlock once
-      document.removeEventListener('touchstart', unlockAudio, true)
-      document.removeEventListener('click', unlockAudio, true)
-      document.removeEventListener('touchend', unlockAudio, true)
+      if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
+        audioCtxRef.current.resume().catch(() => {})
+      }
     }
 
-    // Bind to multiple interaction events to ensure it catches the first intentional gesture
     document.addEventListener('touchstart', unlockAudio, { capture: true, once: true })
     document.addEventListener('touchend', unlockAudio, { capture: true, once: true })
     document.addEventListener('click', unlockAudio, { capture: true, once: true })
@@ -110,35 +88,43 @@ export function SoundProvider({ children }: { children: React.ReactNode }) {
       document.removeEventListener('touchstart', unlockAudio, true)
       document.removeEventListener('touchend', unlockAudio, true)
       document.removeEventListener('click', unlockAudio, true)
+      if (audioCtxRef.current) {
+        audioCtxRef.current.close().catch(() => {})
+      }
     }
   }, [])
 
-  const playSound = useCallback((key: SoundKey) => {
-    if (!isEnabled.current || typeof window === 'undefined') return
-    const pool = audioPools.current[key]
-    if (!pool) return
+  const playSound = useCallback((key: SoundKey, volume = 0.5) => {
+    if (!isEnabled.current || !audioCtxRef.current || !buffersRef.current[key]) return
 
-    // Find the first audio object that is mostly done playing or not playing
-    const audio = pool.find(a => a.paused || a.ended || a.currentTime > 0.3) || pool[0]
+    const ctx = audioCtxRef.current
     
-    if (audio) {
-      // Small reset to allow overlapping punchy sounds correctly
-      // eslint-disable-next-line react-hooks/immutability -- Mutating external DOM Audio element, not React state
-      audio.currentTime = 0
-      audio.volume = 0.5 // Safe default volume for cinematic effects
-      audio.play().catch((err) => {
-        // Suppress "play() failed because the user didn't interact" errors
-        console.debug('Audio play failed silently (expected on initial load)', err)
-      })
+    // Safety resume check
+    if (ctx.state === 'suspended') {
+      ctx.resume().catch(() => {})
+    }
+
+    try {
+      const source = ctx.createBufferSource()
+      source.buffer = buffersRef.current[key]
+
+      const gainNode = ctx.createGain()
+      gainNode.gain.value = volume
+
+      source.connect(gainNode)
+      gainNode.connect(ctx.destination)
+      source.start(0)
+    } catch (err) {
+      console.debug('Failed to play sound via buffer', err)
     }
   }, [])
 
-  // Action methods
-  const playGlobalClick = useCallback(() => playSound('click'), [playSound])
-  const playCoinToastShow = useCallback(() => playSound('coinToast1'), [playSound])
-  const playSecondaryClick = useCallback(() => playSound('secondaryClick'), [playSound])
-  const playCoinToastCelebration = useCallback(() => playSound('coinToast2'), [playSound])
-  const playMissionComplete = useCallback(() => playSound('missionComplete'), [playSound])
+  // Action methods with customized volumes
+  const playGlobalClick = useCallback(() => playSound('click', 0.5), [playSound])
+  const playCoinToastShow = useCallback(() => playSound('coinToast1', 0.6), [playSound])
+  const playSecondaryClick = useCallback(() => playSound('secondaryClick', 0.5), [playSound])
+  const playCoinToastCelebration = useCallback(() => playSound('coinToast2', 0.7), [playSound])
+  const playMissionComplete = useCallback(() => playSound('missionComplete', 0.7), [playSound])
 
   // Global Click Event Delegation
   useEffect(() => {
