@@ -648,26 +648,26 @@ export function HeroEngine({
                     return
                 }
 
-                // If active scrolling is using network, yield
-                if (state.current.inflight.size > 2) {
-                    idleCallbackId = setTimeout(loadNextBatch, 300)
+                // If active scrolling is using network, yield slightly
+                if (state.current.inflight.size > 5) {
+                    idleCallbackId = setTimeout(loadNextBatch, 100)
                     return
                 }
 
-                // Load 3 frames at a time silently
-                const batch = missingFrames.slice(0, 3)
+                // Load 6 frames at a time silently
+                const batch = missingFrames.slice(0, 6)
                 batch.forEach(i => loadFrame(i, false))
 
-                idleCallbackId = setTimeout(loadNextBatch, 100)
+                idleCallbackId = setTimeout(loadNextBatch, 50)
             }
 
             // Start preloading quickly after initial sequence settles
             if ('requestIdleCallback' in window) {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
-                idleCallbackId = window.requestIdleCallback(() => setTimeout(loadNextBatch, state.current.isMobile ? 800 : 300))
+                idleCallbackId = window.requestIdleCallback(() => setTimeout(loadNextBatch, 100))
             } else {
-                idleCallbackId = setTimeout(loadNextBatch, state.current.isMobile ? 800 : 300)
+                idleCallbackId = setTimeout(loadNextBatch, 100)
             }
         }
 
