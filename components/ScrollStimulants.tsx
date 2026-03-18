@@ -10,9 +10,10 @@ interface ScrollStimulantsProps {
     progress: MotionValue<number>
     isMobile: boolean
     isTablet?: boolean | null
+    isReleased?: boolean
 }
 
-export function ScrollStimulants({ progress, isMobile, isTablet }: ScrollStimulantsProps) {
+export function ScrollStimulants({ progress, isMobile, isTablet, isReleased }: ScrollStimulantsProps) {
     const [isIdle, setIsIdle] = useState(false)
     const idleTimeoutRef = useRef<NodeJS.Timeout | null>(null)
     const lastProgressRef = useRef(0)
@@ -56,16 +57,19 @@ export function ScrollStimulants({ progress, isMobile, isTablet }: ScrollStimula
 
     // Idle detection logic
     useEffect(() => {
+        if (isReleased) {
+            setIsIdle(false)
+            if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current)
+            return
+        }
+
         const resetIdleTimer = () => {
             setIsIdle(false)
             if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current)
             
-            // Only trigger idle warning if we are still in the Hero section (progress < 0.9)
-            if (progress.get() < 0.9) {
-                idleTimeoutRef.current = setTimeout(() => {
-                    setIsIdle(true)
-                }, 2000) // Reduced to 2.0 seconds of inactivity per request
-            }
+            idleTimeoutRef.current = setTimeout(() => {
+                setIsIdle(true)
+            }, 2000) // 2.0 seconds of inactivity triggers the arrows
         }
 
         const unsubscribe = progress.on('change', (p) => {
@@ -81,7 +85,7 @@ export function ScrollStimulants({ progress, isMobile, isTablet }: ScrollStimula
             unsubscribe()
             if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current)
         }
-    }, [progress])
+    }, [progress, isReleased])
 
     // Mobile synchronicity: wait for text to fade out between [0.05, 0.15], then fade the bar in.
     const mobileBarOpacity = useTransform(progress, [0, 0.1, 0.15, 0.95, 1], [0, 0, 1, 1, 0])

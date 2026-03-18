@@ -106,7 +106,8 @@ function MobileGhostButton({ btn, i, progress, lenis, positions }: { btn: typeof
     const x = useTransform(progress, [0.15, expandEnd], [0, targetX])
     const y = useTransform(progress, [0.15, expandEnd], [20, targetY])
     const scale = useTransform(progress, [0.15, expandEnd], [0.6, 1])
-    const opacity = useTransform(progress, [0.12, 0.22, 0.78, 0.9], [0, 1, 1, 0])
+    // ONLY fade in. Do not fade out at the end so they persist!
+    const opacity = useTransform(progress, [0.12, 0.22], [0, 1])
 
     const isAction = btn.label === 'QUEM SOMOS' || btn.label === 'CONTATO' || btn.label === 'FRANQUIAS' || btn.label === 'LOCALIZAÇÃO'
 
@@ -165,7 +166,6 @@ function MobileButtons({ progress }: { progress: MotionValue<number> }) {
         { x: gapX, y: gapY }
     ]
 
-    const fadeOpacity = useTransform(progress, [0.95, 1], [1, 0])
     // yFloat removed: floating the container while the hero itself is scroll-driven
     // creates compound motion that jitters on mobile. Per-button animations are kept.
 
@@ -178,7 +178,7 @@ function MobileButtons({ progress }: { progress: MotionValue<number> }) {
 
     return (
         // iOS Fix: removed [perspective:1000px] — creates a 3D stacking context that crashes iOS GPU
-        <motion.div style={{ opacity: fadeOpacity }} className="absolute bottom-[2vh] left-0 right-0 z-20 flex justify-center items-center pointer-events-none">
+        <motion.div className="absolute bottom-[2vh] left-0 right-0 z-20 flex justify-center items-center pointer-events-none">
             <motion.div style={{ opacity: scrollHintOpacity, y: scrollHintY }} className="absolute top-[40px] flex flex-col items-center gap-3 z-30">
                 {/* Longer line (h-12), higher contrast opacity cycle */}
                 <motion.div animate={{ y: [0, 12, 0], opacity: [0.4, 1, 0.4] }} transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }} className="w-[1.5px] h-12 bg-gradient-to-b from-transparent via-white to-transparent shadow-[0_0_12px_rgba(255,255,255,0.9)]" />

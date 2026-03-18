@@ -24,7 +24,7 @@ export function HeroScrollFrames() {
     const [mountReady, setMountReady] = useState(false)
 
     // Cinematic Trap State (Mobile/Tablet)
-    const [trapState, setTrapState] = useState<'IDLE' | 'PLAYING' | 'COMPLETED' | 'RELEASED'>('RELEASED')
+    const [trapState, setTrapState] = useState<'IDLE' | 'PLAYING' | 'COMPLETED' | 'RELEASED' | 'PLAYING_REVERSE'>('RELEASED')
     const mobileProgress = useMotionValue(0)
     const touchStart = useRef(0)
 
@@ -82,6 +82,20 @@ export function HeroScrollFrames() {
         }
     }, [isMobile, isTablet, trapState])
 
+    // Re-engage Cinematic Trap if user scrolls back to the very top of the page
+    useEffect(() => {
+        if ((isMobile || isTablet) && trapState === 'RELEASED') {
+            const handleNativeScroll = () => {
+                if (window.scrollY <= 0) {
+                    setTrapState('COMPLETED')
+                }
+            }
+            window.addEventListener('scroll', handleNativeScroll, { passive: true })
+            handleNativeScroll() // Check instantly
+            return () => window.removeEventListener('scroll', handleNativeScroll)
+        }
+    }, [isMobile, isTablet, trapState])
+
     const handleTrapInteraction = (deltaY: number) => {
         if (deltaY > 20) {
             if (trapState === 'IDLE') {
@@ -93,6 +107,16 @@ export function HeroScrollFrames() {
                 })
             } else if (trapState === 'COMPLETED') {
                 setTrapState('RELEASED')
+            }
+        } else if (deltaY < -20) {
+            // Sweeping DOWN physically (intent to scroll UP)
+            if (trapState === 'COMPLETED') {
+                setTrapState('PLAYING_REVERSE')
+                animate(mobileProgress, 0, {
+                    duration: 5.08,
+                    ease: 'linear',
+                    onComplete: () => setTrapState('IDLE')
+                })
             }
         }
     }
@@ -195,7 +219,12 @@ export function HeroScrollFrames() {
 
                 <div className="absolute inset-0 pointer-events-none z-20">
                     <HeroGhostButtons progress={buttonProgress} isMobile={isMobile} isTablet={isTablet} />
-                    <ScrollStimulants progress={buttonProgress} isMobile={isMobile} isTablet={isTablet} />
+                    <ScrollStimulants 
+                        progress={buttonProgress} 
+                        isMobile={isMobile} 
+                        isTablet={isTablet} 
+                        isReleased={trapState === 'RELEASED'} 
+                    />
                 </div>
             </div>
         </section>
