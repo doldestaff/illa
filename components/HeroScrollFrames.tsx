@@ -68,7 +68,7 @@ export function HeroScrollFrames() {
 
     // --- Render ---
     // Config
-    const MOBILE_HEIGHT_vh = 250
+    const MOBILE_HEIGHT_vh = 140
     const TABLET_HEIGHT_vh = 400
     const DESKTOP_HEIGHT_vh = 500
 
