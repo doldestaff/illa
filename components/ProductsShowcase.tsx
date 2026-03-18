@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import { Wrench, X, Sparkles } from 'lucide-react'
@@ -16,6 +16,8 @@ const marqueeProducts = [...realProducts, ...realProducts]
 
 function ShowcaseMarquee() {
     const [duration, setDuration] = useState(30)
+    const [isHovered, setIsHovered] = useState(false)
+    const marqueeRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
         const updateDuration = () => {
@@ -27,42 +29,56 @@ function ShowcaseMarquee() {
     }, [])
 
     return (
-        <motion.div
-            className="flex gap-8 w-max"
-            animate={{ x: "-50%" }}
-            transition={{ repeat: Infinity, ease: "linear", duration }}
-            whileHover={{ animationPlayState: 'paused' }}
-            style={{ x: 0 }}
-        >
-            {marqueeProducts.map((product, index) => (
-                <div
-                    key={`${product.id}-${index}`}
-                    className={`group relative flex-shrink-0 w-[240px] h-[340px] md:w-[260px] md:h-[370px] lg:w-[280px] lg:h-[400px] rounded-[2.5rem] ${product.color} p-8 flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-illa-pink/20 cursor-pointer`}
-                >
-                    <div className="relative w-full h-[75%] mb-2 mt-2">
-                        <Image
-                            src={product.image}
-                            alt={product.name}
-                            fill
-                            loading="lazy"
-                            className="object-contain drop-shadow-lg group-hover:drop-shadow-2xl transition-all duration-500 scale-[1.2] group-hover:scale-[1.3]"
-                            sizes="280px"
-                        />
+        <>
+            <style dangerouslySetInnerHTML={{ __html: `
+                @keyframes marqueeScroll {
+                    0% { transform: translateX(0); -webkit-transform: translateX(0); }
+                    100% { transform: translateX(-50%); -webkit-transform: translateX(-50%); }
+                }
+            `}} />
+            <div
+                ref={marqueeRef}
+                className="flex gap-8 w-max"
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                style={{
+                    animation: `marqueeScroll ${duration}s linear infinite`,
+                    animationPlayState: isHovered ? 'paused' : 'running',
+                    WebkitAnimation: `marqueeScroll ${duration}s linear infinite`,
+                    WebkitAnimationPlayState: isHovered ? 'paused' : 'running',
+                    willChange: 'transform',
+                }}
+            >
+                {marqueeProducts.map((product, index) => (
+                    <div
+                        key={`${product.id}-${index}`}
+                        className={`group relative flex-shrink-0 w-[240px] h-[340px] md:w-[260px] md:h-[370px] lg:w-[280px] lg:h-[400px] rounded-[2.5rem] ${product.color} p-8 flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-illa-pink/20 cursor-pointer`}
+                    >
+                        <div className="relative w-full h-[75%] mb-2 mt-2">
+                            <Image
+                                src={product.image}
+                                alt={product.name}
+                                fill
+                                loading="lazy"
+                                className="object-contain drop-shadow-lg group-hover:drop-shadow-2xl transition-all duration-500 scale-[1.2] group-hover:scale-[1.3]"
+                                sizes="280px"
+                            />
+                        </div>
+                        <h3 className="font-bold text-xl text-dark mb-1 text-center font-sans tracking-tight">
+                            {product.name}
+                        </h3>
+                        <p className="text-dark/50 text-xs font-medium uppercase tracking-wider">
+                            Premium
+                        </p>
+                        <div className="absolute bottom-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-2 group-hover:translate-y-0">
+                            <span className="bg-white text-dark px-6 py-2 rounded-full text-sm font-bold shadow-lg">
+                                Ver Detalhes
+                            </span>
+                        </div>
                     </div>
-                    <h3 className="font-bold text-xl text-dark mb-1 text-center font-sans tracking-tight">
-                        {product.name}
-                    </h3>
-                    <p className="text-dark/50 text-xs font-medium uppercase tracking-wider">
-                        Premium
-                    </p>
-                    <div className="absolute bottom-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-2 group-hover:translate-y-0">
-                        <span className="bg-white text-dark px-6 py-2 rounded-full text-sm font-bold shadow-lg">
-                            Ver Detalhes
-                        </span>
-                    </div>
-                </div>
-            ))}
-        </motion.div>
+                ))}
+            </div>
+        </>
     )
 }
 

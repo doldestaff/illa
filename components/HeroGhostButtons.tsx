@@ -17,6 +17,7 @@ function ExternalLinkWarningModal({ isOpen, link, onClose }: { isOpen: boolean, 
     const [lastLink, setLastLink] = useState<string | null>(null)
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         if (link) setLastLink(link)
     }, [link])
 

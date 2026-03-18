@@ -101,6 +101,7 @@ export function ScrollStimulants({ progress, isMobile, isReleased }: ScrollStimu
                     }, 1000)
                 }
             } else {
+                // eslint-disable-next-line react-hooks/set-state-in-effect
                 setIsIdle(false)
             }
 

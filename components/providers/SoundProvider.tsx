@@ -41,6 +41,7 @@ export function useSoundSystem() {
 export function SoundProvider({ children }: { children: React.ReactNode }) {
   const audioPools = useRef<Record<SoundKey, HTMLAudioElement[]>>({} as Record<SoundKey, HTMLAudioElement[]>)
   const isEnabled = useRef(true)
+  const isUnlocked = useRef(false)
 
   // Initialize pool on mount
   useEffect(() => {
@@ -67,6 +68,39 @@ export function SoundProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.warn('Audio contextualization not supported or failed', error)
       isEnabled.current = false
+    }
+
+    // iOS Audio Unlock: On the first user interaction (touch/click),
+    // play+pause all audio elements to "warm" them for future programmatic playback.
+    // iOS WebKit requires at least one .play() call from a user gesture context.
+    const unlockAudio = () => {
+      if (isUnlocked.current) return
+      isUnlocked.current = true
+
+      Object.values(audioPools.current).forEach((pool) => {
+        pool.forEach((audio) => {
+          audio.muted = true
+          audio.play().then(() => {
+            audio.pause()
+            audio.muted = false
+            audio.currentTime = 0
+          }).catch(() => {
+            audio.muted = false
+          })
+        })
+      })
+
+      // Clean up — only need to unlock once
+      document.removeEventListener('touchstart', unlockAudio, true)
+      document.removeEventListener('click', unlockAudio, true)
+    }
+
+    document.addEventListener('touchstart', unlockAudio, { capture: true, once: true })
+    document.addEventListener('click', unlockAudio, { capture: true, once: true })
+
+    return () => {
+      document.removeEventListener('touchstart', unlockAudio, true)
+      document.removeEventListener('click', unlockAudio, true)
     }
   }, [])
 

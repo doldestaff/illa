@@ -129,13 +129,44 @@ export function PinnedButtonsParallax() {
 
     const audioRef = useRef<HTMLAudioElement | null>(null)
     const activeCardRef = useRef<number>(-1)
+    const swooshUnlocked = useRef(false)
 
-    // Preload the swoosh audio
+    // Preload the swoosh audio + iOS unlock
     useEffect(() => {
         const audio = new Audio('/audio/session2/swoosh-1.mp3')
         audio.preload = 'auto'
         audio.volume = 0.25
         audioRef.current = audio
+
+        // iOS Audio Unlock: On first user interaction, play+pause the audio (muted)
+        // to unlock it for future programmatic playback from scroll events.
+        const unlockSwoosh = () => {
+            if (swooshUnlocked.current) return
+            swooshUnlocked.current = true
+
+            const a = audioRef.current
+            if (a) {
+                a.muted = true
+                a.play().then(() => {
+                    a.pause()
+                    a.muted = false
+                    a.currentTime = 0
+                }).catch(() => {
+                    a.muted = false
+                })
+            }
+
+            document.removeEventListener('touchstart', unlockSwoosh, true)
+            document.removeEventListener('click', unlockSwoosh, true)
+        }
+
+        document.addEventListener('touchstart', unlockSwoosh, { capture: true, once: true })
+        document.addEventListener('click', unlockSwoosh, { capture: true, once: true })
+
+        return () => {
+            document.removeEventListener('touchstart', unlockSwoosh, true)
+            document.removeEventListener('click', unlockSwoosh, true)
+        }
     }, [])
 
     // Detect tablet (768-1024px) and mobile (<768px) viewports
