@@ -150,8 +150,11 @@ export function PinnedButtonsParallax() {
                 const playPromise = a.play()
                 if (playPromise !== undefined) {
                     playPromise.then(() => {
-                        a.pause()
-                        a.currentTime = 0
+                        // Vital delay: if you pause synchronously in the resolution tick, Safari cancels the unlock!
+                        setTimeout(() => {
+                            a.pause()
+                            a.currentTime = 0
+                        }, 50)
                     }).catch(() => {
                         // Ignore aborts
                     })

@@ -83,8 +83,11 @@ export function SoundProvider({ children }: { children: React.ReactNode }) {
           const playPromise = audio.play()
           if (playPromise !== undefined) {
             playPromise.then(() => {
-              audio.pause()
-              audio.currentTime = 0
+              // Vital delay: if you pause synchronously in the resolution tick, Safari cancels the unlock!
+              setTimeout(() => {
+                audio.pause()
+                audio.currentTime = 0
+              }, 50)
             }).catch(() => {
               // Ignore abort errors
             })
