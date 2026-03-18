@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { HeroGhostButtons } from './HeroGhostButtons'
 import { ScrollStimulants } from './ScrollStimulants'
-import { useMotionValue } from 'framer-motion'
+import { useMotionValue, animate } from 'framer-motion'
 import { HeroEngine } from './hero/HeroEngine'
 import { useLenis } from 'lenis/react'
 
@@ -23,6 +23,10 @@ export function HeroScrollFrames() {
     const prevWidthRef = useRef<number>(0)
     // Force a single re-render after mount to apply frozen height
     const [mountReady, setMountReady] = useState(false)
+
+    // Decoupled Mobile Animation State
+    const [revealState, setRevealState] = useState<'initial' | 'revealing' | 'revealed'>('initial')
+    const mobileProgress = useMotionValue(0)
 
     // Stable Refs
     const buttonProgress = useMotionValue(0)
@@ -65,19 +69,93 @@ export function HeroScrollFrames() {
     }, [])
 
     const handleProgress = (progress: number) => {
-        buttonProgress.set(progress)
+        // Only forward HeroEngine native scroll progress if we are not on mobile.
+        // On mobile, the time-based animation handles updating buttonProgress directly.
+        if (!isMobile) {
+            buttonProgress.set(progress)
+        }
     }
 
+    // --- Mobile Scroll Lock ---
+    useEffect(() => {
+        if (!isMobile) return
+
+        if (revealState === 'initial' || revealState === 'revealing') {
+            document.body.style.overflow = 'hidden'
+            if (lenis) lenis.stop()
+        } else {
+            document.body.style.overflow = ''
+            if (lenis) lenis.start()
+        }
+
+        return () => {
+            document.body.style.overflow = ''
+            if (lenis) lenis.start()
+        }
+    }, [isMobile, revealState, lenis])
+
+    // --- Mobile Cinematic Reveal Trigger ---
+    const triggerReveal = useCallback(() => {
+        if (revealState !== 'initial') return
+        setRevealState('revealing')
+        
+        // Play the pristine time-based cinematic reveal decoupled from touch jitter
+        animate(mobileProgress, 1, {
+            duration: 1.25,
+            ease: [0.25, 0.1, 0.25, 1], // fluid cubic ease-out
+            onUpdate: (v) => {
+                buttonProgress.set(v) // keep ghost buttons synced
+            },
+            onComplete: () => {
+                setRevealState('revealed')
+            }
+        })
+    }, [revealState, mobileProgress, buttonProgress])
+
+    useEffect(() => {
+        if (!isMobile || revealState !== 'initial') return
+
+        let touchStartY = 0
+
+        const onTouchStart = (e: TouchEvent) => {
+            touchStartY = e.touches[0].clientY
+        }
+
+        const onTouchMove = (e: TouchEvent) => {
+            const deltaY = touchStartY - e.touches[0].clientY
+            // Swipe up (deltaY > 0) means we want to scroll down.
+            if (deltaY > 15) {
+                triggerReveal()
+            }
+        }
+
+        const onWheel = (e: WheelEvent) => {
+            if (e.deltaY > 5) {
+                triggerReveal()
+            }
+        }
+
+        window.addEventListener('touchstart', onTouchStart, { passive: true })
+        window.addEventListener('touchmove', onTouchMove, { passive: true })
+        window.addEventListener('wheel', onWheel, { passive: true })
+
+        return () => {
+            window.removeEventListener('touchstart', onTouchStart)
+            window.removeEventListener('touchmove', onTouchMove)
+            window.removeEventListener('wheel', onWheel)
+        }
+    }, [isMobile, revealState, triggerReveal])
+
     // --- Render ---
-    // Config — MOBILE: 180vh for ultra-light, fast animation (down from 350vh)
-    const MOBILE_HEIGHT_vh = 180
+    // Config
+    const MOBILE_HEIGHT_vh = 180 // Not used anymore for mobile scroll since it's locked, but kept for logic
     const TABLET_HEIGHT_vh = 400
     const DESKTOP_HEIGHT_vh = 500
 
     if (isMobile === null || isTablet === null || !mountReady) return (
         <section
             className="relative w-full z-10 bg-[#111]"
-            style={{ height: `${MOBILE_HEIGHT_vh}vh` }}
+            style={{ height: '100vh' }}
         >
             <div
                 className="sticky top-0 w-full overflow-hidden bg-[#111]"
@@ -107,9 +185,11 @@ export function HeroScrollFrames() {
     const manifest = useMobileFrames ? mobileManifest : desktopManifest
 
     // Convert vh config to real layout pixels to ensure exactly proportional scroll depth
-    const sectionStyle = realVhPx > 0 
-        ? { height: `${realVhPx * (SCROLL_HEIGHT_vh / 100)}px` }
-        : { height: `${SCROLL_HEIGHT_vh}vh` }
+    const sectionStyle = isMobile
+        ? { height: '100vh' } // Mobile: Fixed 100vh because animation is time-based, not scroll-driven
+        : (realVhPx > 0 
+            ? { height: `${realVhPx * (SCROLL_HEIGHT_vh / 100)}px` }
+            : { height: `${SCROLL_HEIGHT_vh}vh` })
 
     return (
         <section
@@ -133,6 +213,7 @@ export function HeroScrollFrames() {
                     scrollMode="viewport"
                     scrollSectionHeightVh={SCROLL_HEIGHT_vh}
                     onProgress={handleProgress}
+                    progressValue={isMobile ? mobileProgress : undefined}
                     startIndex={0}
                     debug={typeof window !== 'undefined' && window.location.search.includes('debugHero')}
                     className="z-10"

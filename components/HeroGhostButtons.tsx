@@ -147,8 +147,8 @@ function MobileGhostButton({ btn, i, progress, lenis, positions }: { btn: typeof
                 will-change-transform
             `}
         >
-            <btn.icon size={32} className="text-current drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)] transition-transform group-active:scale-90 duration-200" strokeWidth={2.5} />
-            <span className="text-[10px] drop-shadow-md leading-tight uppercase font-script transition-colors duration-300">{btn.label}</span>
+            <btn.icon size={32} className="text-current transition-transform group-active:scale-90 duration-200" strokeWidth={2.5} />
+            <span className="text-[10px] leading-tight uppercase font-script transition-colors duration-300">{btn.label}</span>
         </motion.a>
     )
 }

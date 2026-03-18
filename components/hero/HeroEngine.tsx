@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect, useState, useCallback } from 'react'
 import { cn } from '@/lib/utils'
+import { MotionValue } from 'framer-motion'
 
 // --- Types ---
 export interface HeroEngineProps {
@@ -23,6 +24,8 @@ export interface HeroEngineProps {
     scrollMode: 'viewport' | 'document'
     // If viewport mode, how tall is the scroll section?
     scrollSectionHeightVh?: number
+    // Drive the engine externally (e.g. time-based animation on mobile)
+    progressValue?: MotionValue<number>
     // Callback for progress (0..1) to drive other animations
     onProgress?: (progress: number) => void
     startIndex?: number
@@ -85,6 +88,7 @@ export function HeroEngine({
     className,
     scrollMode = 'viewport',
     scrollSectionHeightVh = 500,
+    progressValue,
     onProgress,
     startIndex = 0,
     debug = false,
@@ -545,26 +549,31 @@ export function HeroEngine({
         const handleScroll = () => {
             if (!ticking) {
                 window.requestAnimationFrame(() => {
-                    const scrollY = window.scrollY
                     let progress = 0
-
-                    if (scrollMode === 'viewport') {
-                        // DEFINITIVE FIX: Use FROZEN appHeight for scroll progress math.
-                        // On mobile, appHeight is locked at mount and only updates on width changes.
-                        // This ensures the same scrollY always maps to the same progress/frame,
-                        // regardless of URL bar collapse changing the actual viewport height.
-                        const vh = state.current.appHeight || window.innerHeight
-                        const totalH = vh * ((scrollSectionHeightVh || 500) / 100)
-                        const scrollable = totalH - vh
-                        progress = scrollable > 0 ? Math.max(0, Math.min(1, scrollY / scrollable)) : 0
+                    
+                    if (progressValue) {
+                        progress = progressValue.get()
                     } else {
-                        // Document mode — use frozen height for consistency
-                        const docH = Math.max(
-                            document.body.scrollHeight, document.documentElement.scrollHeight
-                        )
-                        const vh = state.current.appHeight || window.innerHeight
-                        const limit = docH - vh
-                        progress = limit > 0 ? Math.max(0, Math.min(1, scrollY / limit)) : 0
+                        const scrollY = window.scrollY
+
+                        if (scrollMode === 'viewport') {
+                            // DEFINITIVE FIX: Use FROZEN appHeight for scroll progress math.
+                            // On mobile, appHeight is locked at mount and only updates on width changes.
+                            // This ensures the same scrollY always maps to the same progress/frame,
+                            // regardless of URL bar collapse changing the actual viewport height.
+                            const vh = state.current.appHeight || window.innerHeight
+                            const totalH = vh * ((scrollSectionHeightVh || 500) / 100)
+                            const scrollable = totalH - vh
+                            progress = scrollable > 0 ? Math.max(0, Math.min(1, scrollY / scrollable)) : 0
+                        } else {
+                            // Document mode — use frozen height for consistency
+                            const docH = Math.max(
+                                document.body.scrollHeight, document.documentElement.scrollHeight
+                            )
+                            const vh = state.current.appHeight || window.innerHeight
+                            const limit = docH - vh
+                            progress = limit > 0 ? Math.max(0, Math.min(1, scrollY / limit)) : 0
+                        }
                     }
 
                     if (onProgress) onProgress(progress)
@@ -587,8 +596,6 @@ export function HeroEngine({
             }
         }
 
-        window.addEventListener('scroll', handleScroll, { passive: true })
-
         // --- Critical Fix for Initial Render ---
         // iOS Fix: defer initial draw via double-rAF to ensure resize handler has set appWidth/Height first
         window.requestAnimationFrame(() => {
@@ -601,12 +608,20 @@ export function HeroEngine({
             })
         })
 
+        let unsubscribe: (() => void) | undefined
+        if (progressValue) {
+            unsubscribe = progressValue.on('change', handleScroll)
+        } else {
+            window.addEventListener('scroll', handleScroll, { passive: true })
+        }
+
         return () => {
+            if (unsubscribe) unsubscribe()
             window.removeEventListener('scroll', handleScroll)
             if (lerpRafId) cancelAnimationFrame(lerpRafId)
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [manifest, scrollMode, scrollSectionHeightVh, startIndex, onProgress])
+    }, [manifest, scrollMode, scrollSectionHeightVh, startIndex, onProgress, progressValue])
 
     // --- 6. Background Preloader ---
     useEffect(() => {
