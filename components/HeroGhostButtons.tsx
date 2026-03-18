@@ -262,26 +262,6 @@ function HeroButtonPopup({ btn, isOpen, onClose, lenis }: {
                             </button>
                         </div>
 
-                        {/* Scroll stimulant arrows — visual brand consistency */}
-                        <div className="flex flex-col items-center pb-5 -mt-1 pointer-events-none gap-0">
-                            {[0, 1, 2].map((i) => (
-                                <motion.div
-                                    key={i}
-                                    animate={{
-                                        opacity: [0.15, 0.7, 0.15],
-                                        y: [6, -6]
-                                    }}
-                                    transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut", delay: i * 0.18 }}
-                                    className="-my-3"
-                                >
-                                    <ChevronUp
-                                        size={36}
-                                        strokeWidth={3.5}
-                                        style={{ color: i === 0 ? '#FFC107' : i === 1 ? '#FF8A65' : '#E5017D' }}
-                                    />
-                                </motion.div>
-                            ))}
-                        </div>
                     </motion.div>
                 </motion.div>
             )}
