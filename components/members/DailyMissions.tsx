@@ -133,6 +133,33 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
 
     const previewMissions = sortedMissions
 
+    // Auto-scroll logic for the horizontal mural
+    const scrollContainerRef = useRef<HTMLDivElement>(null)
+    const [isHovered, setIsHovered] = useState(false)
+
+    useEffect(() => {
+        if (!scrollContainerRef.current || isHovered) return
+
+        const interval = setInterval(() => {
+            const container = scrollContainerRef.current
+            if (!container) return
+
+            // If we've scrolled near the end, rewind to the start
+            if (container.scrollLeft + container.clientWidth >= container.scrollWidth - 50) {
+                container.scrollTo({ left: 0, behavior: 'smooth' })
+            } else {
+                // Determine item width approximately based on the first item
+                const firstItem = container.querySelector('.marquee-item') as HTMLElement
+                if (firstItem) {
+                    // Scroll by one item + gap
+                    container.scrollBy({ left: firstItem.offsetWidth + 20, behavior: 'smooth' })
+                }
+            }
+        }, 3500) // Scroll every 3.5 seconds
+
+        return () => clearInterval(interval)
+    }, [isHovered, missions.length])
+
     return (
         <div className="flex flex-col pt-4 pb-2 relative">
 
@@ -174,8 +201,15 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
             </div>
 
             {/* Unified Native Horizontal Scrolling Preview */}
-            <div className="relative group/mural pb-8 pt-0 w-full max-w-[100vw]">
+            <div 
+                className="relative group/mural pb-8 pt-0 w-full max-w-[100vw]"
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                onTouchStart={() => setIsHovered(true)}
+                onTouchEnd={() => { setTimeout(() => setIsHovered(false), 2000) }}
+            >
                 <div 
+                    ref={scrollContainerRef}
                     className="flex overflow-x-auto snap-x snap-mandatory gap-5 px-4 md:px-8 pb-[120px] pt-[100px] md:pt-[120px] -mt-[40px] md:-mt-[88px] -mb-[88px] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
                     style={{ WebkitOverflowScrolling: 'touch' }}
                 >

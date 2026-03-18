@@ -44,39 +44,36 @@ function ShowcaseMarquee() {
         }
     }, [])
 
-    // iOS Safari bug: percentage-based translate3d(-100%) inside @keyframes
-    // is miscalculated on intrinsic-width (w-max) elements, resulting in 0px movement.
-    // Fix: use a measured pixel value for the translateX target.
-    const keyframes = trackWidth > 0
-        ? `@keyframes marqueeScroll { from { transform: translateX(0); } to { transform: translateX(-${trackWidth}px); } }`
-        : `@keyframes marqueeScroll { from { transform: translateX(0); } to { transform: translateX(-100%); } }`
-
+    // iOS Safari bug: dynamically injected <style> tags with calculated pixel @keyframes
+    // are often ignored or miscalculated on initial layout.
+    // Fix: We use framer-motion explicitly which drives the transform securely on all browsers.
     return (
-        <>
-            <style dangerouslySetInnerHTML={{ __html: keyframes }} />
-            <div
-                className="flex overflow-hidden w-full relative"
-                onMouseEnter={() => {
-                    // Prevent touch devices from getting stuck in paused 'hover' state
-                    if (window.matchMedia('(hover: hover)').matches) {
-                        setIsHovered(true)
-                    }
-                }}
-                onMouseLeave={() => setIsHovered(false)}
-            >
-                {[0, 1].map((trackId) => (
-                    <div
-                        key={trackId}
-                        ref={trackId === 0 ? trackRef : undefined}
-                        className="flex gap-8 shrink-0 pr-8 w-max"
-                        style={{
-                            animation: trackWidth > 0 ? `marqueeScroll ${duration}s linear infinite` : 'none',
-                            animationPlayState: isHovered ? 'paused' : 'running',
-                            WebkitAnimation: trackWidth > 0 ? `marqueeScroll ${duration}s linear infinite` : 'none',
-                            WebkitAnimationPlayState: isHovered ? 'paused' : 'running',
-                            willChange: 'transform',
-                        }}
-                    >
+        <div
+            className="flex overflow-hidden w-full relative"
+            onMouseEnter={() => {
+                if (window.matchMedia('(hover: hover)').matches) {
+                    setIsHovered(true)
+                }
+            }}
+            onMouseLeave={() => setIsHovered(false)}
+            onTouchStart={() => setIsHovered(true)}
+            onTouchEnd={() => { setTimeout(() => setIsHovered(false), 2000) }}
+        >
+            {[0, 1].map((trackId) => (
+                <motion.div
+                    key={trackId}
+                    ref={trackId === 0 ? trackRef : undefined}
+                    className="flex gap-8 shrink-0 pr-8 w-max"
+                    initial={{ x: 0 }}
+                    animate={trackWidth > 0 && !isHovered ? { x: [0, -trackWidth] } : {}}
+                    transition={{
+                        duration: duration,
+                        ease: "linear",
+                        repeat: Infinity,
+                        repeatType: "loop",
+                    }}
+                    style={{ willChange: 'transform' }}
+                >
                         {realProducts.map((product, index) => (
                             <div
                                 key={`track-${trackId}-${product.id}-${index}`}
@@ -105,10 +102,9 @@ function ShowcaseMarquee() {
                                 </div>
                             </div>
                         ))}
-                    </div>
+                    </motion.div>
                 ))}
             </div>
-        </>
     )
 }
 
