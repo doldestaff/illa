@@ -113,27 +113,34 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
     }, [])
 
     useEffect(() => {
-        const supabase = createSupabaseBrowser()
-        const channel = supabase
-            .channel('active_drops_realtime')
-            .on(
-                'postgres_changes',
-                { event: '*', schema: 'public', table: 'active_drops' },
-                () => {
-                    fetchActiveDrop()
-                }
-            )
-            .subscribe()
+        let channel: any
+        let interval: any
 
-        // Poll every 2 minutes (120s) as backup, gated by visibility
-        const interval = setInterval(fetchActiveDrop, 120000)
+        // PERF: Delay websocket connection by 1.5s to free up main thread for initial render
+        const initDelay = setTimeout(() => {
+            const supabase = createSupabaseBrowser()
+            channel = supabase
+                .channel('active_drops_realtime')
+                .on(
+                    'postgres_changes',
+                    { event: '*', schema: 'public', table: 'active_drops' },
+                    () => {
+                        fetchActiveDrop()
+                    }
+                )
+                .subscribe()
 
-        // Initial fetch
-        setTimeout(() => fetchActiveDrop(), 0)
+            // Poll every 2 minutes (120s) as backup, gated by visibility
+            interval = setInterval(fetchActiveDrop, 120000)
+
+            // Initial fetch
+            fetchActiveDrop()
+        }, 1500)
 
         return () => {
-            supabase.removeChannel(channel)
-            clearInterval(interval)
+            clearTimeout(initDelay)
+            if (channel) createSupabaseBrowser().removeChannel(channel)
+            if (interval) clearInterval(interval)
         }
     }, [fetchActiveDrop])
 
@@ -142,38 +149,43 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
         if (progressTracked.current) return
         progressTracked.current = true
 
-        // Fire-and-forget: track visit + profile missions
-        const trackProgress = async (kind: string) => {
-            try {
-                const res = await fetch('/api/missions/progress', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ kind }),
-                })
-                const data = await res.json()
-                if (data.updated && data.completed) {
-                    // Update mission state optimistically
-                    setSnapshot((prev) => ({
-                        ...prev,
-                        missions: prev.missions.map((m) =>
-                            m.kind === kind
-                                ? { ...m, progress: data.target, completed: true }
-                                : m
-                        ),
-                    }))
+        // PERF: Delay analytics/progress background pings by 2 seconds
+        const delayProgressTracking = setTimeout(() => {
+            // Fire-and-forget: track visit + profile missions
+            const trackProgress = async (kind: string) => {
+                try {
+                    const res = await fetch('/api/missions/progress', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ kind }),
+                    })
+                    const data = await res.json()
+                    if (data.updated && data.completed) {
+                        // Update mission state optimistically
+                        setSnapshot((prev) => ({
+                            ...prev,
+                            missions: prev.missions.map((m) =>
+                                m.kind === kind
+                                    ? { ...m, progress: data.target, completed: true }
+                                    : m
+                            ),
+                        }))
+                    }
+                } catch {
+                    // Silent fail — non-critical
                 }
-            } catch {
-                // Silent fail — non-critical
             }
-        }
 
-        trackProgress('visit')
+            trackProgress('visit')
 
-        // Check if profile is complete and track if so
-        const missing = initial.profile.missing_fields || []
-        if (missing.length === 0) {
-            trackProgress('profile')
-        }
+            // Check if profile is complete and track if so
+            const missing = initial.profile.missing_fields || []
+            if (missing.length === 0) {
+                trackProgress('profile')
+            }
+        }, 2000)
+
+        return () => clearTimeout(delayProgressTracking)
     }, [initial.profile.missing_fields])
 
     // ── Reactively hide "Complete seu perfil" CTA after user saves profile ──

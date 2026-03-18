@@ -93,7 +93,7 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
 
                 {/* 3. The "Matter" — PERF: hover uses CSS transition instead of framer-motion variants */}
                 <div
-                    className="relative w-full h-full rounded-[1.8rem] bg-transparent will-change-transform transition-transform duration-300 ease-out group-hover:scale-105 group-hover:-translate-y-[5px] active:scale-105 active:-translate-y-[5px]"
+                    className="relative w-full h-full rounded-[1.8rem] bg-transparent will-change-transform transition-transform duration-300 ease-out md:group-hover:scale-105 md:group-hover:-translate-y-[5px] active:scale-[0.96] select-none"
                     style={{ transform: 'translateZ(0)' }}
                 >
                     {/* Smoky Edge Glow instead of solid shape */}
@@ -107,17 +107,17 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                         alt={mission.title}
                         fill
                         sizes="(max-width: 768px) 100vw, 300px"
-                        className={`absolute inset-0 transition-transform duration-[2s] z-[5] text-transparent ${
+                        className={`absolute inset-0 transition-transform duration-[2s] z-[5] text-transparent select-none ${
                             cardImage.includes('-1') 
-                            ? 'object-contain scale-[1.90] -translate-y-4 group-hover:scale-[2.05]' 
-                            : 'object-cover rounded-[1.8rem] group-hover:scale-[1.05]'
+                            ? 'object-contain scale-[1.90] -translate-y-4 md:group-hover:scale-[2.05]' 
+                            : 'object-cover rounded-[1.8rem] md:group-hover:scale-[1.05]'
                         }`}
                         draggable={false}
                     />
 
                     {/* 2. Soft Ambient Darkness on Hover for Contrast */}
                     <div
-                        className={`absolute inset-0 rounded-[1.8rem] overflow-hidden bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none transition-opacity duration-600 ${canClaim && !cardImage.includes('-1') ? 'group-hover:opacity-100 opacity-0' : 'opacity-0'}`}
+                        className={`absolute inset-0 rounded-[1.8rem] overflow-hidden bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none transition-opacity duration-600 ${canClaim && !cardImage.includes('-1') ? 'md:group-hover:opacity-100 opacity-0' : 'opacity-0'}`}
                     />
 
                     {/* 2.5. Clickable Surface Overlay — native tap detection enables browser tap-slop tolerance */}
@@ -146,7 +146,7 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                                         onClaim(mission.instance_id, rewards ? { xp: rewards.xp, points: rewards.coins } : undefined)
                                     }}
                                     disabled={claiming}
-                                    className="pointer-events-auto relative overflow-hidden flex items-center justify-center gap-1.5 focus:outline-none bg-gradient-to-br from-illa-pink to-rose-600 text-white text-[11px] font-black tracking-widest uppercase px-4 py-2 rounded-full shadow-[0_4px_16px_rgba(229,1,125,0.5)] border border-white/30 transition-transform duration-200 hover:scale-105 active:scale-[0.92] disabled:opacity-70 disabled:cursor-not-allowed group/btn"
+                                    className="pointer-events-auto relative overflow-hidden flex items-center justify-center gap-1.5 focus:outline-none bg-gradient-to-br from-illa-pink to-rose-600 text-white text-[11px] font-black tracking-widest uppercase px-4 py-2 rounded-full shadow-[0_4px_16px_rgba(229,1,125,0.5)] border border-white/30 transition-transform duration-200 md:hover:scale-105 active:scale-[0.85] disabled:opacity-70 disabled:cursor-not-allowed group/btn"
                                 >
                                     <div className="absolute inset-0 bg-white/30 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700 ease-in-out mix-blend-overlay" />
                                     {claiming ? (
@@ -178,7 +178,7 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                     {/* Magical Light Beams — PERF: CSS-only hover effect, no JS */}
                     {!cardImage.includes('-1') && (
                         <div
-                            className="absolute inset-0 rounded-[1.8rem] overflow-hidden pointer-events-none mix-blend-overlay opacity-0 group-hover:opacity-100 transition-opacity duration-800"
+                            className="absolute inset-0 rounded-[1.8rem] overflow-hidden pointer-events-none mix-blend-overlay opacity-0 md:group-hover:opacity-100 transition-opacity duration-800"
                             style={{
                                 background: 'radial-gradient(circle at 50% 0%, rgba(255,255,255,0.4) 0%, transparent 60%)'
                             }}
