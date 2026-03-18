@@ -172,7 +172,7 @@ export function ScrollStimulants({ progress, isMobile, isReleased }: ScrollStimu
                             initial={{ opacity: 0, y: 15 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 15 }}
-                            className="absolute bottom-[calc(42vh-40px)] left-1/2 -translate-x-1/2 z-[100] pointer-events-none flex flex-col items-center gap-0"
+                            className="absolute bottom-[calc(42vh-50px)] left-1/2 -translate-x-1/2 z-[100] pointer-events-none flex flex-col items-center gap-0"
                         >
                             {[0, 1, 2].map((i) => (
                                 <motion.div
