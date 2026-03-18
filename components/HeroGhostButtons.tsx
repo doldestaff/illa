@@ -174,31 +174,32 @@ function MobileButtons({ progress }: { progress: MotionValue<number> }) {
 
     // Extended visibility: fade out happens later [0.05 -> 0.15]
     const scrollHintOpacity = useTransform(progress, [0.05, 0.15], [1, 0])
-    const scrollHintY = useTransform(progress, [0.05, 0.15], [0, 15])
+    const scrollHintY = useTransform(progress, [0.05, 0.15], [0, 20])
 
     return (
-        // iOS Fix: removed [perspective:1000px] — creates a 3D stacking context that crashes iOS GPU
-        <motion.div className="absolute bottom-[10vh] left-0 right-0 z-20 flex justify-center items-center pointer-events-none">
-            <motion.div style={{ opacity: scrollHintOpacity, y: scrollHintY }} className="absolute top-[20px] flex flex-col items-center gap-3 z-30">
-                {/* Longer line (h-12), higher contrast opacity cycle */}
-                <motion.div animate={{ y: [0, 12, 0], opacity: [0.4, 1, 0.4] }} transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }} className="w-[1.5px] h-12 bg-gradient-to-b from-transparent via-white to-transparent shadow-[0_0_12px_rgba(255,255,255,0.9)]" />
-                <p className="text-white/90 uppercase font-black tracking-[0.5em] text-[12px] text-center font-body flex flex-col items-center gap-1 drop-shadow-lg">
-                    <span className="opacity-80 text-[10px]">Descubra a Illa</span>
-                    <span className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]">Deslize</span>
+        <>
+            <motion.div style={{ opacity: scrollHintOpacity, y: scrollHintY }} className="absolute top-[45%] left-0 right-0 -translate-y-1/2 flex flex-col items-center gap-4 z-30 pointer-events-none">
+                <motion.div animate={{ y: [0, 24, 0], opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }} className="w-[2px] h-16 bg-gradient-to-b from-transparent via-white to-transparent shadow-[0_0_15px_rgba(255,255,255,1)]" />
+                <p className="text-white/90 uppercase font-black tracking-[0.6em] text-[13px] text-center font-body flex flex-col items-center gap-2 drop-shadow-xl">
+                    <span className="opacity-90 text-[11px]">Descubra a Illa</span>
+                    <span className="text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.6)] text-[15px] scale-110">Deslize</span>
                 </p>
             </motion.div>
 
-            <div className="relative w-full max-w-[360px] h-[400px] flex justify-center items-center">
-                {/* iOS Fix: aura uses CSS animation instead of framer-motion scale to reduce composite layers */}
-                <motion.div style={{ opacity: auraOpacity }} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] pointer-events-none z-0 flex items-center justify-center">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(255,107,107,0.6)_0%,rgba(255,202,40,0.4)_40%,transparent_75%)] rounded-full" />
-                </motion.div>
+            {/* iOS Fix: removed [perspective:1000px] — creates a 3D stacking context that crashes iOS GPU */}
+            <motion.div className="absolute bottom-[10vh] left-0 right-0 z-20 flex justify-center items-center pointer-events-none">
+                <div className="relative w-full max-w-[360px] h-[400px] flex justify-center items-center">
+                    {/* iOS Fix: aura uses CSS animation instead of framer-motion scale to reduce composite layers */}
+                    <motion.div style={{ opacity: auraOpacity }} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] pointer-events-none z-0 flex items-center justify-center">
+                        <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(255,107,107,0.6)_0%,rgba(255,202,40,0.4)_40%,transparent_75%)] rounded-full" />
+                    </motion.div>
 
-                {buttons.map((btn, i) => (
-                    <MobileGhostButton key={btn.label} btn={btn} i={i} progress={progress} lenis={lenis} positions={positions} />
-                ))}
-            </div>
-        </motion.div>
+                    {buttons.map((btn, i) => (
+                        <MobileGhostButton key={btn.label} btn={btn} i={i} progress={progress} lenis={lenis} positions={positions} />
+                    ))}
+                </div>
+            </motion.div>
+        </>
     )
 }
 

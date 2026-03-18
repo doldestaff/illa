@@ -157,17 +157,17 @@ export function ScrollStimulants({ progress, isMobile, isTablet, isReleased }: S
                 <AnimatePresence>
                     {isIdle && (
                         <motion.div
-                            initial={{ opacity: 0, y: 10 }}
+                            initial={{ opacity: 0, y: 15 }}
                             animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: 10 }}
-                            className="absolute bottom-[20vh] left-1/2 -translate-x-1/2 z-[100] pointer-events-none flex flex-col items-center gap-0"
+                            exit={{ opacity: 0, y: 15 }}
+                            className="absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] pointer-events-none flex flex-col items-center gap-0"
                         >
                             {[0, 1, 2].map((i) => (
                                 <motion.div
                                     key={i}
                                     animate={{ 
                                         opacity: [0.1, 1, 0.1],
-                                        y: [12, -12]
+                                        y: [15, -15]
                                     }}
                                     transition={{ 
                                         duration: 1.5, 
@@ -175,7 +175,7 @@ export function ScrollStimulants({ progress, isMobile, isTablet, isReleased }: S
                                         ease: "easeInOut",
                                         delay: i * 0.2
                                     }}
-                                    className="-my-4"
+                                    className="-my-4 scale-125"
                                 >
                                     <ChevronUp 
                                         size={64} 
