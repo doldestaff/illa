@@ -6,6 +6,7 @@ import { CheckCircle, Sparkles, Loader2 } from 'lucide-react'
 import type { MissionInstance } from '@/lib/gamification-types'
 import GlobalCoin from '@/components/ui/GlobalCoin'
 import { useSoundSystem } from '@/components/providers/SoundProvider'
+import Image from 'next/image'
 
 
 interface MissionCardProps {
@@ -101,16 +102,17 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                     )}
                     
                     {/* 1. Card WebP Image Layer */}
-                    <img
+                    <Image
                         src={cardImage}
                         alt={mission.title}
-                        className={`absolute inset-0 w-full h-full transition-transform duration-[2s] z-[5] text-transparent ${
+                        fill
+                        sizes="(max-width: 768px) 100vw, 300px"
+                        className={`absolute inset-0 transition-transform duration-[2s] z-[5] text-transparent ${
                             cardImage.includes('-1') 
                             ? 'object-contain scale-[1.90] -translate-y-4 group-hover:scale-[2.05]' 
                             : 'object-cover rounded-[1.8rem] group-hover:scale-[1.05]'
                         }`}
                         draggable={false}
-                        loading="lazy"
                     />
 
                     {/* 2. Soft Ambient Darkness on Hover for Contrast */}

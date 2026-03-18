@@ -7,6 +7,7 @@ import type { MissionInstance } from '@/lib/gamification-types'
 import MissionCard, { resolveCardImage } from './MissionCard'
 import { useSyncExternalStore } from 'react'
 import { createPortal } from 'react-dom'
+import Image from 'next/image'
 
 // Idiomatic React 18 client-mount detection (avoids setState-in-effect lint)
 function subscribe() { return () => { } }
@@ -95,11 +96,12 @@ export default function MissionsModal({ isOpen, onClose, missions: rawMissions, 
                                     <div className="relative">
                                         <div className="absolute inset-0 bg-orange-500/30 blur-xl rounded-full animate-pulse" />
                                         <div className="relative w-[72px] h-[72px] flex items-center justify-center">
-                                            {/* eslint-disable-next-line @next/next/no-img-element -- Decorative game icon */}
-                                            <img 
+                                            <Image 
                                                 src="/mission-cards/missions-icon.webp" 
                                                 alt="Missions" 
-                                                className="w-full h-full object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" 
+                                                fill
+                                                sizes="72px"
+                                                className="object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" 
                                                 draggable={false}
                                             />
                                         </div>
