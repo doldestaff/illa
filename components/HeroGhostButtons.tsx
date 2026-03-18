@@ -178,8 +178,8 @@ function MobileButtons({ progress }: { progress: MotionValue<number> }) {
 
     return (
         // iOS Fix: removed [perspective:1000px] — creates a 3D stacking context that crashes iOS GPU
-        <motion.div className="absolute bottom-[2vh] left-0 right-0 z-20 flex justify-center items-center pointer-events-none">
-            <motion.div style={{ opacity: scrollHintOpacity, y: scrollHintY }} className="absolute top-[40px] flex flex-col items-center gap-3 z-30">
+        <motion.div className="absolute bottom-[10vh] left-0 right-0 z-20 flex justify-center items-center pointer-events-none">
+            <motion.div style={{ opacity: scrollHintOpacity, y: scrollHintY }} className="absolute top-[20px] flex flex-col items-center gap-3 z-30">
                 {/* Longer line (h-12), higher contrast opacity cycle */}
                 <motion.div animate={{ y: [0, 12, 0], opacity: [0.4, 1, 0.4] }} transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }} className="w-[1.5px] h-12 bg-gradient-to-b from-transparent via-white to-transparent shadow-[0_0_12px_rgba(255,255,255,0.9)]" />
                 <p className="text-white/90 uppercase font-black tracking-[0.5em] text-[12px] text-center font-body flex flex-col items-center gap-1 drop-shadow-lg">
@@ -188,7 +188,7 @@ function MobileButtons({ progress }: { progress: MotionValue<number> }) {
                 </p>
             </motion.div>
 
-            <div className="relative w-full max-w-[360px] h-[300px] flex justify-center items-center">
+            <div className="relative w-full max-w-[360px] h-[400px] flex justify-center items-center">
                 {/* iOS Fix: aura uses CSS animation instead of framer-motion scale to reduce composite layers */}
                 <motion.div style={{ opacity: auraOpacity }} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] pointer-events-none z-0 flex items-center justify-center">
                     <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(255,107,107,0.6)_0%,rgba(255,202,40,0.4)_40%,transparent_75%)] rounded-full" />

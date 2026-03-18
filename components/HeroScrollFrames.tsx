@@ -161,6 +161,12 @@ export function HeroScrollFrames() {
     const manifest = useMobileFrames ? mobileManifest : desktopManifest
 
     // Convert vh config to real layout pixels to ensure exactly proportional scroll depth
+    const isLocked = trapState === 'IDLE' || trapState === 'PLAYING' || trapState === 'PLAYING_REVERSE'
+
+    // We use pan-down when completed at the top to allow the user to easily swipe down to section 2,
+    // but block the upward scroll (swipe down) so we can catch it with JS for reverse playtime without rubber-banding.
+    const touchActionStyle = isLocked ? 'none' : (trapState === 'COMPLETED' && typeof window !== 'undefined' && window.scrollY <= 0 ? 'pan-down' : 'auto')
+
     const sectionStyle = realVhPx > 0 
         ? { height: `${realVhPx * (SCROLL_HEIGHT_vh / 100)}px` }
         : { height: `${SCROLL_HEIGHT_vh}vh` }
@@ -170,36 +176,37 @@ export function HeroScrollFrames() {
             className="relative w-full z-10 bg-[#111]"
             style={sectionStyle}
         >
-            {/* Cinematic Trap Overlay Component */}
-            {trapState !== 'RELEASED' && (
-                <div
-                    className="absolute inset-0 z-50 pointer-events-auto"
-                    style={{ touchAction: 'none' }}
-                    onWheel={(e) => {
-                        e.preventDefault()
-                        handleTrapInteraction(e.deltaY)
-                    }}
-                    onTouchStart={(e) => {
-                        touchStart.current = e.touches[0].clientY
-                    }}
-                    onTouchMove={(e) => {
-                        e.preventDefault() // Hard prevent native rubber-banding
-                    }}
-                    onTouchEnd={(e) => {
-                        const deltaY = touchStart.current - e.changedTouches[0].clientY
-                        handleTrapInteraction(deltaY)
-                    }}
-                />
-            )}
-
             {/* Sticky container uses 100vh constant.
                 On mobile, 100vh is statically resolved to the maximum viewport size (URL bar hidden).
                 This ensures it NEVER resizes during scroll, completely eliminating image jumping, shifting, 
                 and the recalculation of object-fit centers, while also leaving no black gaps! */}
             <div
                 ref={stickyRef}
-                className="sticky top-0 w-full overflow-hidden bg-[#111]"
-                style={{ height: '100vh' }}
+                className="sticky top-0 w-full overflow-hidden bg-[#111] z-10"
+                style={{ height: '100vh', touchAction: touchActionStyle }}
+                onWheel={(e) => {
+                    if (isLocked) {
+                        e.preventDefault()
+                        handleTrapInteraction(e.deltaY)
+                    } else if (trapState === 'COMPLETED' && e.deltaY < 0 && typeof window !== 'undefined' && window.scrollY <= 0) {
+                        e.preventDefault()
+                        handleTrapInteraction(e.deltaY)
+                    }
+                }}
+                onTouchStart={(e) => {
+                    touchStart.current = e.touches[0].clientY
+                }}
+                onTouchMove={(e) => {
+                    // Handled inherently by touchActionStyle
+                }}
+                onTouchEnd={(e) => {
+                    const deltaY = touchStart.current - e.changedTouches[0].clientY
+                    if (isLocked) {
+                        handleTrapInteraction(deltaY)
+                    } else if (trapState === 'COMPLETED' && deltaY < -20 && typeof window !== 'undefined' && window.scrollY <= 0) {
+                        handleTrapInteraction(deltaY)
+                    }
+                }}
             >
 
                 {/* Unified Engine — inline manifest eliminates fetch waterfall */}
