@@ -64,15 +64,25 @@ export function ScrollStimulants({ progress, isMobile, isTablet, isReleased }: S
         }
 
         if (isMobile) {
-            // Mobile: Only show arrows 1 second after progress reaches 1 (end of animation)
+            // Mobile: Show arrows immediately at progress=0 (IDLE before first swipe)
+            // AND 1 second after progress reaches 1 (end of animation → prompt to section 2)
             const unsubscribe = progress.on('change', (p) => {
-                if (p > 0.999) {
+                if (p < 0.001) {
+                    // Back to start — show arrows again immediately
+                    if (idleTimeoutRef.current) {
+                        clearTimeout(idleTimeoutRef.current)
+                        idleTimeoutRef.current = null
+                    }
+                    setIsIdle(true)
+                } else if (p > 0.999) {
+                    // End of animation — show arrows after 1 second
                     if (!idleTimeoutRef.current) {
                         idleTimeoutRef.current = setTimeout(() => {
                             setIsIdle(true)
                         }, 1000)
                     }
                 } else {
+                    // Mid-animation — hide arrows
                     if (idleTimeoutRef.current) {
                         clearTimeout(idleTimeoutRef.current)
                         idleTimeoutRef.current = null
@@ -81,8 +91,14 @@ export function ScrollStimulants({ progress, isMobile, isTablet, isReleased }: S
                 }
             })
             
-            // Initial check
-            if (progress.get() > 0.999) {
+            // Initial check — show immediately at start (IDLE state)
+            const initialP = progress.get()
+            if (initialP < 0.001) {
+                idleTimeoutRef.current = setTimeout(() => {
+                    setIsIdle(true)
+                    idleTimeoutRef.current = null
+                }, 0)
+            } else if (initialP > 0.999) {
                 if (!idleTimeoutRef.current) {
                     idleTimeoutRef.current = setTimeout(() => {
                         setIsIdle(true)
@@ -160,7 +176,7 @@ export function ScrollStimulants({ progress, isMobile, isTablet, isReleased }: S
                             initial={{ opacity: 0, y: 15 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 15 }}
-                            className="absolute bottom-[calc(3vh+50px)] left-1/2 -translate-x-1/2 z-[100] pointer-events-none flex flex-col items-center gap-0"
+                            className="absolute bottom-[28vh] left-1/2 -translate-x-1/2 z-[100] pointer-events-none flex flex-col items-center gap-0"
                         >
                             {[0, 1, 2].map((i) => (
                                 <motion.div

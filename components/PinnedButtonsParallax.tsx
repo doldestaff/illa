@@ -1,7 +1,8 @@
 'use client'
 
 import { useRef, useState, useEffect, useCallback } from 'react'
-import { Info, Store, MapPin, MessageCircle, ShoppingBag, Instagram, ArrowRight, ArrowUp, ChevronsDown } from 'lucide-react'
+import { Info, Store, MapPin, MessageCircle, ShoppingBag, Instagram, ArrowRight, ArrowUp, ChevronDown } from 'lucide-react'
+
 import { useLenis } from 'lenis/react'
 import { cn } from '@/lib/utils'
 
@@ -523,9 +524,25 @@ export function PinnedButtonsParallax() {
                     </button>
                 </div>
 
-                {/* Dynamic Scroll Tutorial Chevron */}
-                <div id="tutorial-chevron-down" className="absolute bottom-20 left-1/2 -translate-x-1/2 flex items-center justify-center pointer-events-none z-50 transition-opacity duration-[400ms] opacity-0">
-                    <ChevronsDown size={56} opacity={0.8} className="text-illa-pink animate-bounce drop-shadow-[0_4px_16px_rgba(229,1,125,0.5)]" strokeWidth={1.5} />
+                {/* Dynamic Scroll Tutorial Chevrons — matched to hero ScrollStimulantes style */}
+                <div id="tutorial-chevron-down" className="absolute bottom-20 left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none z-50 transition-opacity duration-[400ms] opacity-0 gap-0">
+                    {([0, 1, 2] as const).map((i) => (
+                        <div
+                            key={i}
+                            className="-my-4"
+                            style={{
+                                animation: `scrollChevronPulse 1.5s ease-in-out infinite`,
+                                animationDelay: `${i * 0.22}s`,
+                            }}
+                        >
+                            <ChevronDown
+                                size={52}
+                                strokeWidth={3.5}
+                                className="drop-shadow-[0_0_12px_rgba(229,1,125,0.8)]"
+                                style={{ color: i === 0 ? '#E5017D' : i === 1 ? '#FF8A65' : '#FFC107' }}
+                            />
+                        </div>
+                    ))}
                 </div>
 
                 <style dangerouslySetInnerHTML={{
@@ -535,6 +552,11 @@ export function PinnedButtonsParallax() {
                         20% { opacity: 1; }
                         80% { opacity: 1; }
                         100% { transform: translateY(200%); opacity: 0; }
+                    }
+                    @keyframes scrollChevronPulse {
+                        0%   { opacity: 0.12; transform: translateY(10px); }
+                        50%  { opacity: 1;    transform: translateY(-10px); }
+                        100% { opacity: 0.12; transform: translateY(10px); }
                     }
                 `}} />
             </div>
