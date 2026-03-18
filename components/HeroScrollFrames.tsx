@@ -76,7 +76,7 @@ export function HeroScrollFrames() {
 
     // Scroll Lock for Cinematic Trap
     useEffect(() => {
-        if ((isMobile || isTablet) && trapState !== 'RELEASED') {
+        if ((isMobile || isTablet) && trapState !== 'RELEASED' && trapState !== 'COMPLETED') {
             document.body.style.overflow = 'hidden'
             return () => { document.body.style.overflow = '' }
         }

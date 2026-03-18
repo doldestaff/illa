@@ -1,8 +1,67 @@
 'use client'
 
-import { motion, useTransform, MotionValue } from 'framer-motion'
+import { useState, MouseEvent } from 'react'
+import { motion, useTransform, MotionValue, AnimatePresence } from 'framer-motion'
 import { MessageCircle, MapPin, ShoppingBag, Store } from 'lucide-react'
 import { useLenis } from 'lenis/react'
+
+function ExternalLinkWarningModal({ isOpen, link, onClose }: { isOpen: boolean, link: string | null, onClose: () => void }) {
+    if (!isOpen) return null
+
+    return (
+        <AnimatePresence>
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+                onClick={onClose}
+            >
+                <motion.div
+                    initial={{ scale: 0.9, y: 20, opacity: 0 }}
+                    animate={{ scale: 1, y: 0, opacity: 1 }}
+                    exit={{ scale: 0.9, y: 20, opacity: 0 }}
+                    transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                    className="relative w-full max-w-sm bg-white rounded-[2rem] p-6 sm:p-8 flex flex-col items-center gap-6 shadow-2xl overflow-hidden"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    {/* Decorative Background */}
+                    <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-br from-illa-pink to-pink-400 opacity-20" />
+                    <div className="absolute -top-12 -right-12 w-32 h-32 rounded-full bg-illa-yellow/20 blur-xl" />
+
+                    <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-illa-pink to-pink-500 shadow-[0_8px_16px_rgba(229,1,125,0.4)] flex items-center justify-center text-white mb-2 rotate-3">
+                        <MessageCircle size={32} strokeWidth={2.5} className="drop-shadow-sm" />
+                    </div>
+
+                    <div className="text-center relative z-10">
+                        <h3 className="text-2xl font-black text-slate-800 mb-3 tracking-tight">Saindo do Universo Illa?</h3>
+                        <p className="text-sm font-medium text-slate-500 leading-relaxed px-2">
+                            Você está sendo redirecionado para um link externo. Deseja continuar ou permanecer no site?
+                        </p>
+                    </div>
+
+                    <div className="flex flex-col w-full gap-3 mt-2 relative z-10">
+                        <a
+                            href={link || "#"}
+                            target="_blank"
+                            rel="noreferrer"
+                            onClick={onClose}
+                            className="w-full py-4 bg-illa-pink text-white font-bold rounded-xl text-sm flex items-center justify-center transition-transform hover:scale-[1.02] active:scale-[0.98] shadow-md shadow-illa-pink/30 hover:shadow-illa-pink/50"
+                        >
+                            Sim, continuar para fora
+                        </a>
+                        <button
+                            onClick={onClose}
+                            className="w-full py-4 text-slate-600 font-bold rounded-xl text-sm flex items-center justify-center transition-colors hover:bg-slate-100 active:bg-slate-200"
+                        >
+                            Não, ficar no site
+                        </button>
+                    </div>
+                </motion.div>
+            </motion.div>
+        </AnimatePresence>
+    )
+}
 
 interface HeroGhostButtonsProps {
     progress: MotionValue<number>
@@ -17,7 +76,7 @@ const buttons = [
     { label: 'FRANQUIAS', icon: Store, link: '#' },
 ]
 
-function DesktopGhostButton({ btn, i, total, progress }: { btn: (typeof buttons)[0], i: number, total: number, progress: MotionValue<number> }) {
+function DesktopGhostButton({ btn, i, total, progress, onLinkClick }: { btn: (typeof buttons)[0], i: number, total: number, progress: MotionValue<number>, onLinkClick: (e: MouseEvent<HTMLAnchorElement>, link: string, isAction: boolean) => void }) {
     const step = 1 / total
     const start = step * i
 
@@ -37,6 +96,7 @@ function DesktopGhostButton({ btn, i, total, progress }: { btn: (typeof buttons)
             target={isAction ? undefined : "_blank"}
             rel={isAction ? undefined : "noreferrer"}
             onClick={(e) => {
+                onLinkClick(e, btn.link, isAction)
                 if (btn.label === 'QUEM SOMOS') {
                     e.preventDefault()
                     window.dispatchEvent(new CustomEvent('open-about-modal'))
@@ -73,7 +133,7 @@ function DesktopGhostButton({ btn, i, total, progress }: { btn: (typeof buttons)
     )
 }
 
-function DesktopButtons({ progress }: { progress: MotionValue<number> }) {
+function DesktopButtons({ progress, onLinkClick }: { progress: MotionValue<number>, onLinkClick: (e: MouseEvent<HTMLAnchorElement>, link: string, isAction: boolean) => void }) {
     // Map the raw [0.15, 0.8] range to [0, 1] to preserve sequence animations untouched
     const buttonSequenceProgress = useTransform(progress, [0.15, 0.8], [0, 1])
 
@@ -85,7 +145,7 @@ function DesktopButtons({ progress }: { progress: MotionValue<number> }) {
             <div className="w-full max-w-6xl px-4 pointer-events-auto">
                 <div className="flex justify-center gap-4 items-center">
                     {buttons.map((btn, i) => (
-                        <DesktopGhostButton key={btn.label} btn={btn} i={i} total={buttons.length} progress={buttonSequenceProgress} />
+                        <DesktopGhostButton key={btn.label} btn={btn} i={i} total={buttons.length} progress={buttonSequenceProgress} onLinkClick={onLinkClick} />
                     ))}
                 </div>
             </div>
@@ -95,7 +155,7 @@ function DesktopButtons({ progress }: { progress: MotionValue<number> }) {
 
 // iOS Fix: rotateX/rotateY removed — 3D perspective causes GPU overload on iOS Safari during native scroll
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function MobileGhostButton({ btn, i, progress, lenis, positions }: { btn: typeof buttons[0], i: number, progress: MotionValue<number>, lenis: any, positions: any[] }) {
+function MobileGhostButton({ btn, i, progress, lenis, positions, onLinkClick }: { btn: typeof buttons[0], i: number, progress: MotionValue<number>, lenis: any, positions: any[], onLinkClick: (e: MouseEvent<HTMLAnchorElement>, link: string, isAction: boolean) => void }) {
     const targetX = positions[i].x
     const targetY = positions[i].y
 
@@ -117,6 +177,7 @@ function MobileGhostButton({ btn, i, progress, lenis, positions }: { btn: typeof
             target={isAction ? undefined : "_blank"}
             rel={isAction ? undefined : "noreferrer"}
             onClick={(e) => {
+                onLinkClick(e, btn.link, isAction)
                 if (btn.label === 'QUEM SOMOS') {
                     e.preventDefault()
                     window.dispatchEvent(new CustomEvent('open-about-modal'))
@@ -154,7 +215,7 @@ function MobileGhostButton({ btn, i, progress, lenis, positions }: { btn: typeof
     )
 }
 
-function MobileButtons({ progress }: { progress: MotionValue<number> }) {
+function MobileButtons({ progress, onLinkClick }: { progress: MotionValue<number>, onLinkClick: (e: MouseEvent<HTMLAnchorElement>, link: string, isAction: boolean) => void }) {
     const lenis = useLenis()
 
     const gapX = 82
@@ -178,7 +239,7 @@ function MobileButtons({ progress }: { progress: MotionValue<number> }) {
 
     return (
         <>
-            <motion.div style={{ opacity: scrollHintOpacity, y: scrollHintY }} className="absolute top-[45%] left-0 right-0 -translate-y-1/2 flex flex-col items-center gap-4 z-30 pointer-events-none">
+            <motion.div style={{ opacity: scrollHintOpacity, y: scrollHintY }} className="absolute bottom-[8vh] left-0 right-0 flex flex-col items-center gap-4 z-30 pointer-events-none">
                 <motion.div animate={{ y: [0, 24, 0], opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }} className="w-[2px] h-16 bg-gradient-to-b from-transparent via-white to-transparent shadow-[0_0_15px_rgba(255,255,255,1)]" />
                 <p className="text-white/90 uppercase font-black tracking-[0.6em] text-[13px] text-center font-body flex flex-col items-center gap-2 drop-shadow-xl">
                     <span className="opacity-90 text-[11px]">Descubra a Illa</span>
@@ -195,7 +256,7 @@ function MobileButtons({ progress }: { progress: MotionValue<number> }) {
                     </motion.div>
 
                     {buttons.map((btn, i) => (
-                        <MobileGhostButton key={btn.label} btn={btn} i={i} progress={progress} lenis={lenis} positions={positions} />
+                        <MobileGhostButton key={btn.label} btn={btn} i={i} progress={progress} lenis={lenis} positions={positions} onLinkClick={onLinkClick} />
                     ))}
                 </div>
             </motion.div>
@@ -204,7 +265,7 @@ function MobileButtons({ progress }: { progress: MotionValue<number> }) {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function TabletGhostButton({ btn, i, progress, lenis }: { btn: typeof buttons[0], i: number, progress: MotionValue<number>, lenis: any }) {
+function TabletGhostButton({ btn, i, progress, lenis, onLinkClick }: { btn: typeof buttons[0], i: number, progress: MotionValue<number>, lenis: any, onLinkClick: (e: MouseEvent<HTMLAnchorElement>, link: string, isAction: boolean) => void }) {
     const isLeft = i % 2 === 0
     const isTop = i < 2
 
@@ -229,6 +290,7 @@ function TabletGhostButton({ btn, i, progress, lenis }: { btn: typeof buttons[0]
             target={isAction ? undefined : "_blank"}
             rel={isAction ? undefined : "noreferrer"}
             onClick={(e) => {
+                onLinkClick(e, btn.link, isAction)
                 if (btn.label === 'QUEM SOMOS') {
                     e.preventDefault()
                     window.dispatchEvent(new CustomEvent('open-about-modal'))
@@ -268,7 +330,7 @@ function TabletGhostButton({ btn, i, progress, lenis }: { btn: typeof buttons[0]
     )
 }
 
-function TabletButtons({ progress }: { progress: MotionValue<number> }) {
+function TabletButtons({ progress, onLinkClick }: { progress: MotionValue<number>, onLinkClick: (e: MouseEvent<HTMLAnchorElement>, link: string, isAction: boolean) => void }) {
     const lenis = useLenis()
 
     const fadeOpacity = useTransform(progress, [0.95, 1], [1, 0])
@@ -298,7 +360,7 @@ function TabletButtons({ progress }: { progress: MotionValue<number> }) {
                 </motion.div>
 
                 {buttons.map((btn, i) => (
-                    <TabletGhostButton key={btn.label} btn={btn} i={i} progress={progress} lenis={lenis} />
+                    <TabletGhostButton key={btn.label} btn={btn} i={i} progress={progress} lenis={lenis} onLinkClick={onLinkClick} />
                 ))}
             </motion.div>
         </motion.div>
@@ -306,11 +368,26 @@ function TabletButtons({ progress }: { progress: MotionValue<number> }) {
 }
 
 export function HeroGhostButtons({ progress, isMobile, isTablet }: HeroGhostButtonsProps) {
-    if (isTablet) {
-        return <TabletButtons progress={progress} />
+    const [externalLink, setExternalLink] = useState<string | null>(null)
+    const isModalOpen = externalLink !== null
+
+    const handleLinkClick = (e: MouseEvent<HTMLAnchorElement>, link: string, isAction: boolean) => {
+        if (!isAction && link.startsWith('http')) {
+            e.preventDefault()
+            setExternalLink(link)
+        }
     }
-    if (isMobile) {
-        return <MobileButtons progress={progress} />
-    }
-    return <DesktopButtons progress={progress} />
+
+    const closeWarning = () => setExternalLink(null)
+
+    const renderedButtons = isTablet ? <TabletButtons progress={progress} onLinkClick={handleLinkClick} /> :
+                            isMobile ? <MobileButtons progress={progress} onLinkClick={handleLinkClick} /> :
+                            <DesktopButtons progress={progress} onLinkClick={handleLinkClick} />
+
+    return (
+        <>
+            {renderedButtons}
+            <ExternalLinkWarningModal isOpen={isModalOpen} link={externalLink} onClose={closeWarning} />
+        </>
+    )
 }
