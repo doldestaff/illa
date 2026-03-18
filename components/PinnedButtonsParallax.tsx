@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, useEffect, useCallback } from 'react'
-import { Info, Store, MapPin, MessageCircle, ShoppingBag, Instagram, ArrowRight, ArrowUp, ChevronDown } from 'lucide-react'
+import { Info, Store, MapPin, MessageCircle, ShoppingBag, Instagram, ArrowRight, ArrowUp, ChevronUp } from 'lucide-react'
 
 import { useLenis } from 'lenis/react'
 import { cn } from '@/lib/utils'
@@ -535,7 +535,7 @@ export function PinnedButtonsParallax() {
                                 animationDelay: `${i * 0.22}s`,
                             }}
                         >
-                            <ChevronDown
+                            <ChevronUp
                                 size={52}
                                 strokeWidth={3.5}
                                 className="drop-shadow-[0_0_12px_rgba(229,1,125,0.8)]"
