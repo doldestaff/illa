@@ -131,14 +131,7 @@ export default function VipCard({
                 <div
                     className="relative w-full pt-[95%] sm:pt-[100%] bg-[#0c0514] overflow-hidden"
                 >
-                    <Image 
-                        src="/digital-card/digitalcard-illa.webp?v=update9" 
-                        alt="ILLA Exclusive Digital Card" 
-                        fill 
-                        priority
-                        sizes="(max-width: 768px) 100vw, 400px"
-                        className="absolute inset-0 object-cover object-top pointer-events-none z-0 scale-[1.02] -translate-y-[8%]" 
-                    />
+                    <img src="/digital-card/digitalcard-illa.webp?v=update9" alt="ILLA Exclusive Digital Card" className="absolute inset-0 w-full h-[120%] object-cover object-top pointer-events-none z-0 scale-[1.02] -translate-y-[8%]" />
                 </div>
 
                 <div className="absolute inset-x-0 top-0 bottom-[120px] z-10 flex flex-col pointer-events-none">
@@ -255,9 +248,7 @@ export default function VipCard({
                                                 className="absolute -inset-1 rounded-full border border-dashed border-amber-500/40 opacity-50 pointer-events-none"
                                             />
                                             {avatarUrl ? (
-                                                <div className="w-24 h-24 rounded-full border-2 border-amber-400 shadow-[0_0_30px_rgba(251,191,36,0.3)] relative z-10 overflow-hidden">
-                                                    <Image src={avatarUrl} alt="Avatar" fill sizes="96px" className="object-cover" />
-                                                </div>
+                                                <img src={avatarUrl} alt="Avatar" className="w-24 h-24 rounded-full object-cover border-2 border-amber-400 shadow-[0_0_30px_rgba(251,191,36,0.3)] relative z-10" />
                                             ) : (
                                                 <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#1a0f2e] to-black border-2 border-amber-400 flex items-center justify-center relative z-10 shadow-[0_0_30px_rgba(251,191,36,0.3)]">
                                                     <Crown size={32} className="text-amber-400 drop-shadow-lg" />
