@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, MouseEvent } from 'react'
+import { useState, MouseEvent, useEffect } from 'react'
 import { motion, useTransform, MotionValue, AnimatePresence } from 'framer-motion'
 import { MessageCircle, MapPin, ShoppingBag, Store, X, ArrowRight, ChevronUp } from 'lucide-react'
 import { useLenis } from 'lenis/react'
@@ -130,6 +130,21 @@ function HeroButtonPopup({ btn, isOpen, onClose, lenis }: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     btn: { label: string; icon: React.ElementType; link: string } | null, isOpen: boolean, onClose: () => void, lenis: any
 }) {
+    // Lock scroll when popup opens
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden'
+            if (lenis) lenis.stop()
+        } else {
+            document.body.style.overflow = ''
+            if (lenis) lenis.start()
+        }
+        return () => {
+            document.body.style.overflow = ''
+            if (lenis) lenis.start()
+        }
+    }, [isOpen, lenis])
+
     if (!btn) return null
     const data = buttonPopups[btn.label]
     if (!data) return null

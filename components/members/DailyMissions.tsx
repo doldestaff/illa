@@ -55,8 +55,6 @@ function ContinuousMarquee({ children }: { children: React.ReactNode }) {
         let animationFrameId: number;
         let lastTimestamp = performance.now();
 
-        container.style.scrollSnapType = 'none';
-
         const scrollLoop = (timestamp: number) => {
             const dt = timestamp - lastTimestamp;
             lastTimestamp = timestamp;
@@ -110,7 +108,6 @@ function ContinuousMarquee({ children }: { children: React.ReactNode }) {
     const handlePointerDown = () => {
         isInteractingRef.current = true;
         if (interactTimeoutRef.current) clearTimeout(interactTimeoutRef.current);
-        if (containerRef.current) containerRef.current.style.scrollSnapType = 'x mandatory';
     }
 
     const handlePointerUp = () => {
@@ -118,10 +115,9 @@ function ContinuousMarquee({ children }: { children: React.ReactNode }) {
         interactTimeoutRef.current = setTimeout(() => {
             isInteractingRef.current = false;
             if (containerRef.current) {
-                containerRef.current.style.scrollSnapType = 'none';
                 scrollPosRef.current = containerRef.current.scrollLeft;
             }
-        }, 1500); 
+        }, 800); 
     }
 
     const childrenArray = React.Children.toArray(children);
@@ -141,6 +137,12 @@ function ContinuousMarquee({ children }: { children: React.ReactNode }) {
             onMouseDown={handlePointerDown}
             onMouseUp={handlePointerUp}
             onMouseLeave={handlePointerUp}
+            onScroll={() => {
+                if (!isInteractingRef.current && interactTimeoutRef.current) {
+                    isInteractingRef.current = true;
+                    handlePointerUp(); // reset timeout
+                }
+            }}
         >
             <div ref={contentRef} className="flex shrink-0 gap-5 px-4 md:px-0 relative">
                 {childrenArray}

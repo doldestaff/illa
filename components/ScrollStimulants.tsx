@@ -13,7 +13,7 @@ interface ScrollStimulantsProps {
     isReleased?: boolean
 }
 
-export function ScrollStimulants({ progress, isMobile, isTablet, isReleased }: ScrollStimulantsProps) {
+export function ScrollStimulants({ progress, isMobile, isReleased }: ScrollStimulantsProps) {
     const [isIdle, setIsIdle] = useState(false)
     const idleTimeoutRef = useRef<NodeJS.Timeout | null>(null)
     const lastProgressRef = useRef(0)
@@ -26,8 +26,7 @@ export function ScrollStimulants({ progress, isMobile, isTablet, isReleased }: S
     const barScaleY = useTransform(smoothProgress, [0, 1], [0, 1])
     const barOpacity = useTransform(progress, [0, 0.05, 0.95, 1], [0, 1, 1, 0])
     
-    const [isMouseOverButtons, setIsMouseOverButtons] = useState(false)
-    const [isPastHint, setIsPastHint] = useState(false)
+
 
     useEffect(() => {
         const supabase = createSupabaseBrowser()
@@ -37,18 +36,16 @@ export function ScrollStimulants({ progress, isMobile, isTablet, isReleased }: S
     }, [])
 
     // Sync state for determining if "Descubra ILLA Deslize" has faded out
-    useMotionValueEvent(progress, "change", (latest) => {
-        setIsPastHint(latest > 0.1)
+    useMotionValueEvent(progress, "change", () => {
+        // removed unused state
     })
 
     // Track mouse position to hide desktop toast when hovering near bottom buttons
     useEffect(() => {
         if (isMobile) return
 
-        const handleMouseMove = (e: MouseEvent) => {
-            // Screen area where the buttons usually appear (bottom 25%)
-            const isNearBottom = e.clientY > window.innerHeight * 0.75
-            setIsMouseOverButtons(isNearBottom)
+        const handleMouseMove = () => {
+            // removed unused state
         }
         
         window.addEventListener('mousemove', handleMouseMove)
@@ -58,7 +55,6 @@ export function ScrollStimulants({ progress, isMobile, isTablet, isReleased }: S
     // Idle detection logic
     useEffect(() => {
         if (isReleased) {
-            setIsIdle(false)
             if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current)
             return
         }
@@ -176,7 +172,7 @@ export function ScrollStimulants({ progress, isMobile, isTablet, isReleased }: S
                             initial={{ opacity: 0, y: 15 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 15 }}
-                            className="absolute bottom-[28vh] left-1/2 -translate-x-1/2 z-[100] pointer-events-none flex flex-col items-center gap-0"
+                            className="absolute bottom-[42vh] left-1/2 -translate-x-1/2 z-[100] pointer-events-none flex flex-col items-center gap-0"
                         >
                             {[0, 1, 2].map((i) => (
                                 <motion.div

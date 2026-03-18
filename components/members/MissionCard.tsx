@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import { motion } from 'framer-motion'
 import { CheckCircle, Sparkles, Loader2 } from 'lucide-react'
 import type { MissionInstance } from '@/lib/gamification-types'
@@ -57,7 +57,7 @@ export function resolveCardImage(mission: MissionInstance): string {
 }
 
 export default function MissionCard({ mission, isClaimed, canClaim, claiming, onClaim, onCardClick, rewards }: MissionCardProps) {
-    const { playGlobalClick, playSecondaryClick } = useSoundSystem()
+    const { playGlobalClick } = useSoundSystem()
     const cardImage = resolveCardImage(mission)
     const progressPercent = Math.min(100, Math.max(0, (mission.progress / mission.target) * 100))
     const isCompleted = progressPercent >= 100
@@ -119,9 +119,9 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                     />
 
                     {/* 2.5. Clickable Surface Overlay (Behind Content) */}
-                    <div 
+                    <motion.div 
                         className="absolute inset-0 z-[8] rounded-[1.8rem] cursor-pointer"
-                        onClick={() => {
+                        onTap={() => {
                             if (!isClaimed && onCardClick) {
                                 playGlobalClick()
                                 onCardClick(mission)
