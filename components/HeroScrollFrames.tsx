@@ -23,9 +23,6 @@ export function HeroScrollFrames() {
     const prevWidthRef = useRef<number>(0)
     // Force a single re-render after mount to apply frozen height
     const [mountReady, setMountReady] = useState(false)
-    // Auto-reveal: track whether the first swipe has already triggered
-    const autoRevealFired = useRef(false)
-    const sectionRef = useRef<HTMLElement>(null)
 
     // Stable Refs
     const buttonProgress = useMotionValue(0)
@@ -70,66 +67,6 @@ export function HeroScrollFrames() {
     const handleProgress = (progress: number) => {
         buttonProgress.set(progress)
     }
-
-    // --- MOBILE AUTO-REVEAL: One-swipe cinematic scroll ---
-    // On mobile, the first scroll/touch gesture auto-scrolls through the entire hero section.
-    // This prevents users from confusing the scroll-driven animation with a broken video.
-    const triggerAutoReveal = useCallback(() => {
-        if (autoRevealFired.current) return
-        autoRevealFired.current = true
-
-        const section = sectionRef.current
-        if (!section) return
-
-        // Calculate the scroll target: end of hero section
-        const sectionBottom = section.offsetTop + section.offsetHeight
-        const scrollTarget = sectionBottom
-
-        if (lenis) {
-            lenis.scrollTo(scrollTarget, { duration: 0.9, easing: (t: number) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2 })
-        } else {
-            window.scrollTo({ top: scrollTarget, behavior: 'smooth' })
-        }
-    }, [lenis])
-
-    useEffect(() => {
-        // Only active on mobile
-        if (!isMobile) return
-
-        let touchStartY = 0
-
-        const onTouchStart = (e: TouchEvent) => {
-            if (autoRevealFired.current) return
-            touchStartY = e.touches[0].clientY
-        }
-
-        const onTouchMove = (e: TouchEvent) => {
-            if (autoRevealFired.current) return
-            // Only trigger on downward swipe (delta > 15px to avoid accidental taps)
-            const deltaY = touchStartY - e.touches[0].clientY
-            if (deltaY > 15) {
-                triggerAutoReveal()
-            }
-        }
-
-        // Also catch wheel events (for desktop emulators / trackpads)
-        const onWheel = (e: WheelEvent) => {
-            if (autoRevealFired.current) return
-            if (e.deltaY > 5) {
-                triggerAutoReveal()
-            }
-        }
-
-        window.addEventListener('touchstart', onTouchStart, { passive: true })
-        window.addEventListener('touchmove', onTouchMove, { passive: true })
-        window.addEventListener('wheel', onWheel, { passive: true })
-
-        return () => {
-            window.removeEventListener('touchstart', onTouchStart)
-            window.removeEventListener('touchmove', onTouchMove)
-            window.removeEventListener('wheel', onWheel)
-        }
-    }, [isMobile, triggerAutoReveal])
 
     // --- Render ---
     // Config — MOBILE: 180vh for ultra-light, fast animation (down from 350vh)
@@ -176,7 +113,6 @@ export function HeroScrollFrames() {
 
     return (
         <section
-            ref={sectionRef}
             className="relative w-full z-10 bg-[#111]"
             style={sectionStyle}
         >
