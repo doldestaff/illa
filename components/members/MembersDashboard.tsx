@@ -13,11 +13,7 @@ import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import DashboardHeader from './DashboardHeader'
 import DailyMissions from './DailyMissions'
-import StorePromoCard from './StorePromoCard'
-import VipCard from './VipCard'
-import OnlineCelebrationManager from './OnlineCelebrationManager'
 import DashboardActionGrid from './DashboardActionGrid'
-import ActionModal from './ActionModal'
 import ScrollBg from './MembersScrollBackground'
 import { createSupabaseBrowser } from '@/lib/supabaseClient'
 import { usePushNotifications } from '@/hooks/usePushNotifications'
@@ -53,6 +49,19 @@ const RewardTimeline = dynamic(() => import('./RewardTimeline'), {
 })
 const IllaAmbientBackground = dynamic(() => import('./IllaAmbientBackground'), {
     ssr: false,
+})
+
+const StorePromoCard = dynamic(() => import('./StorePromoCard'), {
+    loading: () => <SectionSkeleton />,
+})
+const VipCard = dynamic(() => import('./VipCard'), {
+    loading: () => <SectionSkeleton />,
+})
+const ActionModal = dynamic(() => import('./ActionModal'), {
+    ssr: false, // Modals should not SSR anyway
+})
+const OnlineCelebrationManager = dynamic(() => import('./OnlineCelebrationManager'), {
+    ssr: false, // Toast managers should not SSR
 })
 
 // Dynamic Modals (Heavy framer motion / interactions)

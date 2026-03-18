@@ -7,39 +7,6 @@ import type { MissionInstance } from '@/lib/gamification-types'
 import GlobalCoin from '@/components/ui/GlobalCoin'
 import { useSoundSystem } from '@/components/providers/SoundProvider'
 
-/**
- * TapOverlay — Zero-latency tap detection.
- *
- * Framer's onTap has gesture-discrimination delay (waits to decide if it's a pan vs tap).
- * This component uses native pointer events to fire the callback instantly
- * on pointerup if movement was < 8px, ensuring single-tap reliability on mobile carousels.
- */
-function TapOverlay({ onTap }: { onTap: () => void }) {
-    const downPos = useRef<{ x: number; y: number } | null>(null)
-
-    const handleDown = useCallback((e: React.PointerEvent) => {
-        downPos.current = { x: e.clientX, y: e.clientY }
-    }, [])
-
-    const handleUp = useCallback((e: React.PointerEvent) => {
-        if (!downPos.current) return
-        const dx = Math.abs(e.clientX - downPos.current.x)
-        const dy = Math.abs(e.clientY - downPos.current.y)
-        downPos.current = null
-        // Only treat as tap if movement was minimal (not a swipe/scroll)
-        if (dx < 8 && dy < 8) {
-            onTap()
-        }
-    }, [onTap])
-
-    return (
-        <div
-            className="absolute inset-0 z-[8] rounded-[1.8rem] cursor-pointer"
-            onPointerDown={handleDown}
-            onPointerUp={handleUp}
-        />
-    )
-}
 
 interface MissionCardProps {
     mission: MissionInstance
@@ -151,13 +118,16 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                         className={`absolute inset-0 rounded-[1.8rem] overflow-hidden bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none transition-opacity duration-600 ${canClaim && !cardImage.includes('-1') ? 'group-hover:opacity-100 opacity-0' : 'opacity-0'}`}
                     />
 
-                    {/* 2.5. Clickable Surface Overlay — native tap detection (zero Framer latency) */}
-                    <TapOverlay onTap={() => {
-                        if (!isClaimed && onCardClick) {
-                            playGlobalClick()
-                            onCardClick(mission)
-                        }
-                    }} />
+                    {/* 2.5. Clickable Surface Overlay — native tap detection enables browser tap-slop tolerance */}
+                    <div 
+                        className="absolute inset-0 z-[8] cursor-pointer rounded-[1.8rem]" 
+                        onClick={() => {
+                            if (!isClaimed && onCardClick) {
+                                playGlobalClick()
+                                onCardClick(mission)
+                            }
+                        }} 
+                    />
 
                     {/* 3. Interactive Content Layer */}
                     <div className="relative z-10 h-full flex flex-col justify-between p-0 pointer-events-none">

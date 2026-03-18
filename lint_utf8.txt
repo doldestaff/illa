@@ -1,0 +1,35 @@
+﻿
+> temp_app@0.1.0 lint
+> eslint
+
+
+C:\DEV\ILLA\illa\app\api\admin\reviews\route.ts
+  5:27  warning  'req' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\DEV\ILLA\illa\components\HeroGhostButtons.tsx
+    5:68  warning  'ChevronUp' is defined but never used                                                           @typescript-eslint/no-unused-vars
+  173:13  warning  Unused eslint-disable directive (no problems were reported from 'react-hooks/exhaustive-deps')
+
+C:\DEV\ILLA\illa\components\HeroScrollFrames.tsx
+   39:15  warning  'h' is assigned a value but never used   @typescript-eslint/no-unused-vars
+   58:19  warning  'rh' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  216:31  warning  'e' is defined but never used            @typescript-eslint/no-unused-vars
+
+C:\DEV\ILLA\illa\components\ProductsShowcase.tsx
+   3:31  warning  'useRef' is defined but never used                    @typescript-eslint/no-unused-vars
+  15:7   warning  'marqueeProducts' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\DEV\ILLA\illa\components\members\MissionHowToPopup.tsx
+  4:10  warning  'X' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\DEV\ILLA\illa\components\members\VipCard.tsx
+  42:5   warning  'onShareCopy' is defined but never used               @typescript-eslint/no-unused-vars
+  42:18  warning  'onViewExclusive' is defined but never used           @typescript-eslint/no-unused-vars
+  50:11  warning  'benefitsTracked' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\DEV\ILLA\illa\components\providers\SoundProvider.tsx
+  50:65  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+Ô£û 13 problems (1 error, 12 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+

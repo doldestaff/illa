@@ -1,12 +1,15 @@
 'use client'
 
 import React, { useState, useCallback, useRef, useEffect } from 'react'
-import type { MissionInstance } from '@/lib/gamification-types'
-import { Sparkles, ArrowRight, CheckCircle2, Star } from 'lucide-react'
+import { Trophy, ChevronRight, Lock, Sparkles, Check, ArrowRight, CheckCircle2, Star } from 'lucide-react'
 import { motion, AnimatePresence, animate } from 'framer-motion'
+import dynamic from 'next/dynamic'
+import type { MissionInstance } from '@/lib/gamification-types'
 import MissionCard, { resolveCardImage } from './MissionCard'
-import MissionsModal from './MissionsModal'
-import MissionHowToPopup from './MissionHowToPopup'
+
+// Lazy load Modals to avoid initial JS execution cost on mobile dashboard
+const MissionsModal = dynamic(() => import('./MissionsModal'), { ssr: false })
+const MissionHowToPopup = dynamic(() => import('./MissionHowToPopup'), { ssr: false })
 import GlobalCoin from '../ui/GlobalCoin'
 import { useSoundSystem } from '@/components/providers/SoundProvider'
 
@@ -38,124 +41,7 @@ function AnimatedCounter({ value, duration = 1.5, delay = 0 }: { value: number, 
     return <span ref={nodeRef}>0</span>;
 }
 
-function ContinuousMarquee({ children }: { children: React.ReactNode }) {
-    const containerRef = useRef<HTMLDivElement>(null)
-    const contentRef = useRef<HTMLDivElement>(null)
-    const rafRef = useRef<number>(0)
-    const scrollPosRef = useRef(0)
-    const isPausedRef = useRef(false)
-    const resumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-    useEffect(() => {
-        const container = containerRef.current
-        const inner = contentRef.current
-        if (!container || !inner) return
-
-        let lastTs = performance.now()
-
-        const loop = (ts: number) => {
-            const dt = Math.min(ts - lastTs, 50)
-            lastTs = ts
-
-            const numOriginals = React.Children.count(children)
-            const els = inner.children
-            if (els.length >= numOriginals * 2 && numOriginals > 0) {
-                const first = els[0] as HTMLElement
-                const clone = els[numOriginals] as HTMLElement
-                const loopWidth = clone.offsetLeft - first.offsetLeft
-
-                if (loopWidth > 0) {
-                    // Counter
-                    const itemW = loopWidth / numOriginals
-                    const idx = Math.floor((container.scrollLeft + container.clientWidth / 2) / itemW) % numOriginals
-                    const counterEl = document.getElementById('marquee-counter-current')
-                    if (counterEl && counterEl.textContent !== String(Math.abs(idx) + 1)) {
-                        counterEl.textContent = String(Math.abs(idx) + 1)
-                    }
-
-                    if (!isPausedRef.current) {
-                        scrollPosRef.current += 0.05 * dt
-                        if (scrollPosRef.current >= loopWidth) scrollPosRef.current -= loopWidth
-                        container.scrollLeft = scrollPosRef.current
-                    } else {
-                        // Seamless loop reset during user interaction
-                        scrollPosRef.current = container.scrollLeft
-                        if (container.scrollLeft >= loopWidth) {
-                            container.scrollLeft -= loopWidth
-                            scrollPosRef.current = container.scrollLeft
-                        }
-                    }
-                }
-            }
-            rafRef.current = requestAnimationFrame(loop)
-        }
-
-        rafRef.current = requestAnimationFrame(loop)
-        return () => cancelAnimationFrame(rafRef.current)
-    }, [children])
-
-    // Touch tracking — distinguish horizontal swipe from tap
-    const touchStartX = useRef(0)
-    const touchStartY = useRef(0)
-    const isSwiping = useRef(false)
-
-    const handleTouchStart = useCallback((e: React.TouchEvent) => {
-        const t = e.touches[0]
-        touchStartX.current = t.clientX
-        touchStartY.current = t.clientY
-        isSwiping.current = false
-        isPausedRef.current = true
-        if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current)
-    }, [])
-
-    const handleTouchMove = useCallback((e: React.TouchEvent) => {
-        const dx = Math.abs(e.touches[0].clientX - touchStartX.current)
-        const dy = Math.abs(e.touches[0].clientY - touchStartY.current)
-        // Mark as swipe if horizontal movement dominates
-        if (dx > 6 && dx > dy * 1.2) {
-            isSwiping.current = true
-        }
-    }, [])
-
-    const handleTouchEnd = useCallback(() => {
-        if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current)
-        resumeTimerRef.current = setTimeout(() => {
-            isPausedRef.current = false
-            if (containerRef.current) {
-                scrollPosRef.current = containerRef.current.scrollLeft
-            }
-        }, 600)
-    }, [])
-
-    const childrenArray = React.Children.toArray(children)
-
-    return (
-        <div
-            ref={containerRef}
-            className="flex overflow-x-auto pb-[120px] pt-[100px] md:pt-[120px] -mt-[40px] md:-mt-[88px] -mb-[88px] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-            style={{
-                willChange: 'scroll-position',
-                WebkitOverflowScrolling: 'touch',
-                transform: 'translateZ(0)',
-                // Crucial: allow events to pass through to children
-                touchAction: 'pan-x',
-            }}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-            onTouchCancel={handleTouchEnd}
-        >
-            <div ref={contentRef} className="flex shrink-0 gap-5 px-4 md:px-0 relative">
-                {childrenArray}
-                {childrenArray.map((child, i) => (
-                    React.isValidElement(child)
-                        ? React.cloneElement(child as React.ReactElement<Record<string, unknown>>, { key: `clone-${i}`, 'aria-hidden': 'true' })
-                        : child
-                ))}
-            </div>
-        </div>
-    )
-}
 
 interface Props {
     missions: MissionInstance[]
@@ -287,9 +173,12 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
                 </div>
             </div>
 
-            {/* Unified Marquee Preview (Continuous Loop) */}
-            <div className="relative group/mural pb-8 pt-0 -mx-4 px-4 w-full max-w-[100vw]">
-                <ContinuousMarquee>
+            {/* Unified Native Horizontal Scrolling Preview */}
+            <div className="relative group/mural pb-8 pt-0 w-full max-w-[100vw]">
+                <div 
+                    className="flex overflow-x-auto snap-x snap-mandatory gap-5 px-4 md:px-8 pb-[120px] pt-[100px] md:pt-[120px] -mt-[40px] md:-mt-[88px] -mb-[88px] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                    style={{ WebkitOverflowScrolling: 'touch' }}
+                >
                     {previewMissions.map((mission, index) => {
                         const isClaimed = claimedIds.has(mission.instance_id) || mission.claimed
                         const isCompleted = mission.progress >= mission.target
@@ -298,7 +187,7 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
                         return (
                             <div
                                 key={`mission-${mission.instance_id}`}
-                                className="marquee-item w-[310px] sm:w-[340px] md:w-[380px] h-[180px] md:h-[220px] shrink-0 snap-center first:pl-2 md:first:pl-0 relative cursor-pointer"
+                                className="marquee-item w-[310px] sm:w-[340px] md:w-[380px] h-[180px] md:h-[220px] shrink-0 snap-center relative cursor-pointer"
                                 style={{
                                     animation: `fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both`,
                                     animationDelay: `${index * 0.1}s` // Native CSS staggering
@@ -316,7 +205,7 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
                             </div>
                         )
                     })}
-                </ContinuousMarquee>
+                </div>
             </div>
 
             {/* Clear Call to Action for Missions Panel */}
