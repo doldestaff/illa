@@ -172,7 +172,7 @@ export function ScrollStimulants({ progress, isMobile, isReleased }: ScrollStimu
                             initial={{ opacity: 0, y: 15 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 15 }}
-                            className="absolute bottom-[calc(42vh-150px)] left-1/2 -translate-x-1/2 z-[100] pointer-events-none flex flex-col items-center gap-0"
+                            className="absolute bottom-[calc(42vh-100px)] left-1/2 -translate-x-1/2 z-[100] pointer-events-none flex flex-col items-center gap-0"
                         >
                             {[0, 1, 2].map((i) => (
                                 <motion.div
@@ -192,8 +192,8 @@ export function ScrollStimulants({ progress, isMobile, isReleased }: ScrollStimu
                                     <ChevronUp 
                                         size={64} 
                                         strokeWidth={4}
-                                        className="drop-shadow-[0_0_16px_rgba(255,193,7,0.8)]"
-                                        style={{ color: '#FFC107' }}
+                                        className="drop-shadow-[0_0_16px_rgba(229,1,125,1)]"
+                                        style={{ color: i === 0 ? '#FFC107' : i === 1 ? '#FF8A65' : '#E5017D' }}
                                     />
                                 </motion.div>
                             ))}
@@ -271,8 +271,8 @@ export function ScrollStimulants({ progress, isMobile, isReleased }: ScrollStimu
                                                 <ChevronDown 
                                                     size={64} 
                                                     strokeWidth={4}
-                                                    className="drop-shadow-[0_0_16px_rgba(255,193,7,0.8)]"
-                                                    style={{ color: '#FFC107' }}
+                                                    className="drop-shadow-[0_0_16px_rgba(229,1,125,0.8)]"
+                                                    style={{ color: i === 0 ? '#E5017D' : i === 1 ? '#FF8A65' : '#FFC107' }}
                                                 />
                                             </motion.div>
                                         ))}
