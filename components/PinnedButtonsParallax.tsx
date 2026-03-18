@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, useEffect, useCallback } from 'react'
-import { Info, Store, MapPin, MessageCircle, ShoppingBag, Instagram, ArrowRight, ArrowUp, ChevronUp } from 'lucide-react'
+import { Info, Store, MapPin, MessageCircle, ShoppingBag, Instagram, ArrowRight, ChevronUp, ChevronDown } from 'lucide-react'
 
 import { useLenis } from 'lenis/react'
 import { cn } from '@/lib/utils'
@@ -477,27 +477,25 @@ export function PinnedButtonsParallax() {
                     </div>
                 </div>
 
-                {/* Mobile Scroll Up Indicator at the very end of the section */}
-                <div id="scroll-up-indicator" className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 pointer-events-none z-50 transition-opacity duration-300 opacity-0 md:hidden">
-                    <button
-                        onClick={(e) => {
-                            e.preventDefault()
-                            const section = containerRef.current
-                            if (section && lenis) {
-                                // Scroll just enough up to activate scrolling reverse flow easily
-                                lenis.scrollTo(section.getBoundingClientRect().top + window.scrollY - 100)
-                            } else {
-                                window.scrollTo({ top: window.scrollY - window.innerHeight * 0.5, behavior: 'smooth' })
-                            }
-                        }}
-                        className="flex flex-col items-center gap-2 group pointer-events-auto filter drop-shadow-[0_4px_12px_rgba(229,1,125,0.4)]"
-                        aria-label="Voltar para cima"
-                    >
-                        <ArrowUp size={36} className="text-illa-pink animate-bounce transition-transform group-hover:-translate-y-1 drop-shadow-md" strokeWidth={2.5} />
-                        <span className="text-illa-pink text-[12px] font-black uppercase tracking-[0.2em] text-center w-max drop-shadow-sm">
-                            Deslize de volta
-                        </span>
-                    </button>
+                {/* Mobile Scroll Stimulant at the end of section (points down = scroll up to go back) */}
+                <div id="scroll-up-indicator" className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none z-50 transition-opacity duration-300 opacity-0 md:hidden gap-0">
+                    {([0, 1, 2] as const).map((i) => (
+                        <div
+                            key={`end-${i}`}
+                            className="-my-4"
+                            style={{
+                                animation: `scrollChevronPulse 1.5s ease-in-out infinite`,
+                                animationDelay: `${i * 0.22}s`,
+                            }}
+                        >
+                            <ChevronDown
+                                size={48}
+                                strokeWidth={3.5}
+                                className="drop-shadow-[0_0_12px_rgba(229,1,125,0.8)]"
+                                style={{ color: i === 0 ? '#E5017D' : i === 1 ? '#FF8A65' : '#FFC107' }}
+                            />
+                        </div>
+                    ))}
                 </div>
 
                 {/* Dynamic Scroll Tutorial Chevrons — matched to hero ScrollStimulantes style */}

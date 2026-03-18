@@ -69,29 +69,30 @@ export const CinematicToastProvider = ({ children }: { children: ReactNode }) =>
 
 
 
-    // Queue Processor
+    // Queue Processor — fixed race condition: timer now starts AFTER toast renders
+    const dismissTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+
     useEffect(() => {
         if (activeToast || isPaused || queue.length === 0) return
 
         const nextToast = queue[0]
-        setTimeout(() => {
-            setActiveToast(nextToast)
-            setQueue(prev => prev.slice(1))
-        }, 0)
-
-        // Play sound
+        setActiveToast(nextToast)
+        setQueue(prev => prev.slice(1))
         playCoinToastShow()
 
-        // Auto dismiss logic
-        const duration = nextToast.priority >= 3 ? 6000 : 4000
-        const timer = setTimeout(() => {
+        // Clear any leftover timer (safety)
+        if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current)
+
+        const duration = nextToast.priority >= 3 ? 5000 : 3500
+        dismissTimerRef.current = setTimeout(() => {
             setActiveToast(null)
-            // Wait a bit before processing next to breathe
             setIsPaused(true)
-            setTimeout(() => setIsPaused(false), 2000)
+            setTimeout(() => setIsPaused(false), 800)
         }, duration)
 
-        return () => clearTimeout(timer)
+        return () => {
+            if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current)
+        }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- playCoinToastShow is a stable ref from context
     }, [queue, activeToast, isPaused])
 
