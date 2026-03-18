@@ -41,86 +41,93 @@ function AnimatedCounter({ value, duration = 1.5, delay = 0 }: { value: number, 
 function ContinuousMarquee({ children }: { children: React.ReactNode }) {
     const containerRef = useRef<HTMLDivElement>(null)
     const contentRef = useRef<HTMLDivElement>(null)
-
-    // Interaction tracking
-    const isInteractingRef = useRef(false)
-    const interactTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+    const rafRef = useRef<number>(0)
     const scrollPosRef = useRef(0)
+    const isPausedRef = useRef(false)
+    const resumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
     useEffect(() => {
-        const container = containerRef.current;
-        const inner = contentRef.current;
-        if (!container || !inner) return;
+        const container = containerRef.current
+        const inner = contentRef.current
+        if (!container || !inner) return
 
-        let animationFrameId: number;
-        let lastTimestamp = performance.now();
+        let lastTs = performance.now()
 
-        const scrollLoop = (timestamp: number) => {
-            const dt = timestamp - lastTimestamp;
-            lastTimestamp = timestamp;
-            const safeDt = Math.min(dt, 50);
+        const loop = (ts: number) => {
+            const dt = Math.min(ts - lastTs, 50)
+            lastTs = ts
 
-            const numOriginals = React.Children.count(children);
-            const childrenElements = inner.children;
-            
-            if (childrenElements.length >= numOriginals * 2 && numOriginals > 0) {
-                const originalFirst = childrenElements[0] as HTMLElement;
-                const cloneFirst = childrenElements[numOriginals] as HTMLElement;
-                const loopWidth = cloneFirst.offsetLeft - originalFirst.offsetLeft;
+            const numOriginals = React.Children.count(children)
+            const els = inner.children
+            if (els.length >= numOriginals * 2 && numOriginals > 0) {
+                const first = els[0] as HTMLElement
+                const clone = els[numOriginals] as HTMLElement
+                const loopWidth = clone.offsetLeft - first.offsetLeft
 
                 if (loopWidth > 0) {
-                    const itemWidth = loopWidth / numOriginals;
-                    const offsetIndex = Math.floor((container.scrollLeft + (container.clientWidth / 2)) / itemWidth);
-                    const activeIdx = Math.abs(offsetIndex) % numOriginals;
-                    
-                    const counterEl = document.getElementById('marquee-counter-current');
-                    if (counterEl && counterEl.textContent !== String(activeIdx + 1)) {
-                        counterEl.textContent = String(activeIdx + 1);
+                    // Counter
+                    const itemW = loopWidth / numOriginals
+                    const idx = Math.floor((container.scrollLeft + container.clientWidth / 2) / itemW) % numOriginals
+                    const counterEl = document.getElementById('marquee-counter-current')
+                    if (counterEl && counterEl.textContent !== String(Math.abs(idx) + 1)) {
+                        counterEl.textContent = String(Math.abs(idx) + 1)
                     }
-                }
 
-                if (!isInteractingRef.current) {
-                    if (loopWidth > 0 && container.scrollWidth > container.clientWidth) {
-                        scrollPosRef.current += 0.05 * safeDt; // 60fps ~ 3px/frame smoothly
-                        
-                        if (scrollPosRef.current >= loopWidth) {
-                            scrollPosRef.current -= loopWidth;
+                    if (!isPausedRef.current) {
+                        scrollPosRef.current += 0.05 * dt
+                        if (scrollPosRef.current >= loopWidth) scrollPosRef.current -= loopWidth
+                        container.scrollLeft = scrollPosRef.current
+                    } else {
+                        // Seamless loop reset during user interaction
+                        scrollPosRef.current = container.scrollLeft
+                        if (container.scrollLeft >= loopWidth) {
+                            container.scrollLeft -= loopWidth
+                            scrollPosRef.current = container.scrollLeft
                         }
-                        
-                        container.scrollLeft = scrollPosRef.current;
-                    }
-                } else {
-                    scrollPosRef.current = container.scrollLeft;
-                    if (loopWidth > 0 && container.scrollLeft >= loopWidth) {
-                        container.scrollLeft -= loopWidth;
-                        scrollPosRef.current = container.scrollLeft;
                     }
                 }
             }
-            
-            animationFrameId = requestAnimationFrame(scrollLoop);
-        };
+            rafRef.current = requestAnimationFrame(loop)
+        }
 
-        animationFrameId = requestAnimationFrame(scrollLoop);
-        return () => cancelAnimationFrame(animationFrameId);
-    }, [children]);
+        rafRef.current = requestAnimationFrame(loop)
+        return () => cancelAnimationFrame(rafRef.current)
+    }, [children])
 
-    const handlePointerDown = () => {
-        isInteractingRef.current = true;
-        if (interactTimeoutRef.current) clearTimeout(interactTimeoutRef.current);
-    }
+    // Touch tracking — distinguish horizontal swipe from tap
+    const touchStartX = useRef(0)
+    const touchStartY = useRef(0)
+    const isSwiping = useRef(false)
 
-    const handlePointerUp = () => {
-        if (interactTimeoutRef.current) clearTimeout(interactTimeoutRef.current);
-        interactTimeoutRef.current = setTimeout(() => {
-            isInteractingRef.current = false;
+    const handleTouchStart = useCallback((e: React.TouchEvent) => {
+        const t = e.touches[0]
+        touchStartX.current = t.clientX
+        touchStartY.current = t.clientY
+        isSwiping.current = false
+        isPausedRef.current = true
+        if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current)
+    }, [])
+
+    const handleTouchMove = useCallback((e: React.TouchEvent) => {
+        const dx = Math.abs(e.touches[0].clientX - touchStartX.current)
+        const dy = Math.abs(e.touches[0].clientY - touchStartY.current)
+        // Mark as swipe if horizontal movement dominates
+        if (dx > 6 && dx > dy * 1.2) {
+            isSwiping.current = true
+        }
+    }, [])
+
+    const handleTouchEnd = useCallback(() => {
+        if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current)
+        resumeTimerRef.current = setTimeout(() => {
+            isPausedRef.current = false
             if (containerRef.current) {
-                scrollPosRef.current = containerRef.current.scrollLeft;
+                scrollPosRef.current = containerRef.current.scrollLeft
             }
-        }, 800); 
-    }
+        }, 600)
+    }, [])
 
-    const childrenArray = React.Children.toArray(children);
+    const childrenArray = React.Children.toArray(children)
 
     return (
         <div
@@ -129,25 +136,21 @@ function ContinuousMarquee({ children }: { children: React.ReactNode }) {
             style={{
                 willChange: 'scroll-position',
                 WebkitOverflowScrolling: 'touch',
-                transform: 'translateZ(0)', 
+                transform: 'translateZ(0)',
+                // Crucial: allow events to pass through to children
+                touchAction: 'pan-x',
             }}
-            onTouchStart={handlePointerDown}
-            onTouchEnd={handlePointerUp}
-            onTouchCancel={handlePointerUp}
-            onMouseDown={handlePointerDown}
-            onMouseUp={handlePointerUp}
-            onMouseLeave={handlePointerUp}
-            onScroll={() => {
-                if (!isInteractingRef.current && interactTimeoutRef.current) {
-                    isInteractingRef.current = true;
-                    handlePointerUp(); // reset timeout
-                }
-            }}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            onTouchCancel={handleTouchEnd}
         >
             <div ref={contentRef} className="flex shrink-0 gap-5 px-4 md:px-0 relative">
                 {childrenArray}
                 {childrenArray.map((child, i) => (
-                    React.isValidElement(child) ? React.cloneElement(child as React.ReactElement<Record<string, unknown>>, { key: `clone-${i}`, 'aria-hidden': "true" }) : child
+                    React.isValidElement(child)
+                        ? React.cloneElement(child as React.ReactElement<Record<string, unknown>>, { key: `clone-${i}`, 'aria-hidden': 'true' })
+                        : child
                 ))}
             </div>
         </div>

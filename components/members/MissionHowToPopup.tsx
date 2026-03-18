@@ -128,7 +128,7 @@ export default function MissionHowToPopup({ isOpen, onClose, missionKind, missio
                             playSecondaryClick()
                             onClose()
                         }}
-                        className="fixed inset-0 z-[200] bg-black/70 backdrop-blur-md"
+                        className="fixed inset-0 z-[200] bg-black/70 backdrop-blur-md pointer-events-auto cursor-pointer"
                     />
 
                     {/* Popup */}
