@@ -38,6 +38,20 @@ interface Manifest {
     frames: string[]
 }
 
+// --- Hardware Sniffing ---
+const getDeviceTier = (): 'low' | 'mid' | 'high' => {
+    if (typeof navigator === 'undefined') return 'mid'
+    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const nav: any = navigator
+    const cores = nav.hardwareConcurrency || 4
+    const memory = nav.deviceMemory || 4 // Missing in iOS Safari usually, defaults to 4
+
+    if (memory <= 2 || cores <= 4) return 'low'
+    if (memory >= 8 && cores >= 8) return 'high'
+    return 'mid'
+}
+
 // --- O(1) LRU Cache using Map insertion order ---
 class FrameCache {
     private cache = new Map<number, ImageBitmap | HTMLImageElement>()
@@ -424,7 +438,12 @@ export function HeroEngine({
             // Draw the nearest frame as a bridge
             const ctx = canvasRef.current?.getContext('2d', { alpha: false, desynchronized: true })
             if (ctx && canvasRef.current) {
-                const dpr = Math.min(window.devicePixelRatio || 1, (state.current.isMobile || state.current.isTablet) ? 1.0 : 1.5)
+                // Downsample on low-end mobiles for cheap interpolation
+                let dpr = Math.min(window.devicePixelRatio || 1, (state.current.isMobile || state.current.isTablet) ? 1.0 : 1.5)
+                if ((state.current.isMobile || state.current.isTablet) && getDeviceTier() === 'low') {
+                    dpr = 0.65 // Massive GPU pixel savings (~58% faster draw)
+                }
+
                 const w = state.current.appWidth
                 const h = state.current.appHeight
                 const targetW = Math.floor(w * dpr)
@@ -433,6 +452,9 @@ export function HeroEngine({
                     canvasRef.current.width = targetW
                     canvasRef.current.height = targetH
                     ctx.scale(dpr, dpr)
+                    // Explicitly allow browser bilinear scaling (not pixelated) since we are downsampling
+                    ctx.imageSmoothingEnabled = true
+                    ctx.imageSmoothingQuality = 'low' // fastest
                 } else {
                     ctx.clearRect(0, 0, w, h)
                 }
@@ -458,7 +480,13 @@ export function HeroEngine({
         if (!ctx) return
 
         // Cap DPR at 1.0 on ANY mobile/tablet to reduce canvas size and GPU fill-rate
-        const dpr = Math.min(window.devicePixelRatio || 1, (state.current.isMobile || state.current.isTablet) ? 1.0 : 1.5)
+        let dpr = Math.min(window.devicePixelRatio || 1, (state.current.isMobile || state.current.isTablet) ? 1.0 : 1.5)
+        
+        // AGGRESSIVE DOWNSAMPLING: Force 0.65 DPR on weak phones
+        if ((state.current.isMobile || state.current.isTablet) && getDeviceTier() === 'low') {
+            dpr = 0.65 
+        }
+
         const w = state.current.appWidth
         const h = state.current.appHeight
         const targetW = Math.floor(w * dpr)
@@ -470,6 +498,9 @@ export function HeroEngine({
             canvas.height = targetH
             // Scale context once after resize
             ctx.scale(dpr, dpr)
+            // Ensure smoothing is fast
+             ctx.imageSmoothingEnabled = true
+             ctx.imageSmoothingQuality = 'low'
         } else {
             // CRITICAL FIX: Clear the canvas before drawing the new frame to prevent WebP alpha/compression artifact buildup (tearing)
             ctx.clearRect(0, 0, w, h)
@@ -636,6 +667,8 @@ export function HeroEngine({
             const totalFrames = state.current.frameCount
             const frameIndices = Array.from({ length: totalFrames }, (_, i) => i)
 
+            const idleDelay = getDeviceTier() === 'low' ? 100 : 50
+
             const loadNextBatch = () => {
                 if (!active) return
 
@@ -650,7 +683,7 @@ export function HeroEngine({
 
                 // If active scrolling is using network, yield slightly
                 if (state.current.inflight.size > 5) {
-                    idleCallbackId = setTimeout(loadNextBatch, 100)
+                    idleCallbackId = setTimeout(loadNextBatch, 150)
                     return
                 }
 
@@ -658,7 +691,7 @@ export function HeroEngine({
                 const batch = missingFrames.slice(0, 6)
                 batch.forEach(i => loadFrame(i, false))
 
-                idleCallbackId = setTimeout(loadNextBatch, 50)
+                idleCallbackId = setTimeout(loadNextBatch, idleDelay)
             }
 
             // Start preloading quickly after initial sequence settles
