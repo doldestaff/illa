@@ -273,13 +273,11 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                                         </div>
                                     ) : profile.avatar_path && localAvatarUrl && !imageError ? (
                                         <>
-                                            <Image
+                                            <img
                                                 key={localAvatarUrl}
                                                 src={localAvatarUrl}
                                                 alt={profile.full_name || 'User'}
-                                                fill
-                                                sizes="(max-width: 768px) 144px, 144px"
-                                                className="object-cover"
+                                                className="w-full h-full object-cover"
                                                 onError={() => setImageError(true)}
                                             />
                                             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm pointer-events-none">
