@@ -1,5 +1,5 @@
 {
-  "frameCount": 78,
+  "frameCount": 71,
   "frames": [
     "/hero/mobile/frames/hero-1-mobile_004.webp",
     "/hero/mobile/frames/hero-1-mobile_005.webp",
@@ -71,13 +71,6 @@
     "/hero/mobile/frames/hero-1-mobile_071.webp",
     "/hero/mobile/frames/hero-1-mobile_072.webp",
     "/hero/mobile/frames/hero-1-mobile_073.webp",
-    "/hero/mobile/frames/hero-1-mobile_074.webp",
-    "/hero/mobile/frames/hero-1-mobile_075.webp",
-    "/hero/mobile/frames/hero-1-mobile_076.webp",
-    "/hero/mobile/frames/hero-1-mobile_077.webp",
-    "/hero/mobile/frames/hero-1-mobile_078.webp",
-    "/hero/mobile/frames/hero-1-mobile_079.webp",
-    "/hero/mobile/frames/hero-1-mobile_080.webp",
-    "/hero/mobile/frames/hero-1-mobile_081.webp"
+    "/hero/mobile/frames/hero-1-mobile_074.webp"
   ]
 }

@@ -82,14 +82,19 @@ export function HeroScrollFrames() {
         }
     }, [isMobile, isTablet, trapState])
 
-    // Re-engage Cinematic Trap if user scrolls back to the very top of the page
+    // Handle Native Scroll Releases and Re-engagements
     useEffect(() => {
-        if ((isMobile || isTablet) && trapState === 'RELEASED') {
-            const handleNativeScroll = () => {
-                if (window.scrollY <= 0) {
-                    setTrapState('COMPLETED')
-                }
+        if (!(isMobile || isTablet)) return
+
+        const handleNativeScroll = () => {
+            if (trapState === 'RELEASED' && window.scrollY <= 0) {
+                setTrapState('COMPLETED')
+            } else if (trapState === 'COMPLETED' && window.scrollY > 0) {
+                setTrapState('RELEASED')
             }
+        }
+
+        if (trapState === 'RELEASED' || trapState === 'COMPLETED') {
             window.addEventListener('scroll', handleNativeScroll, { passive: true })
             handleNativeScroll() // Check instantly
             return () => window.removeEventListener('scroll', handleNativeScroll)
@@ -101,7 +106,7 @@ export function HeroScrollFrames() {
             if (trapState === 'IDLE') {
                 setTrapState('PLAYING')
                 animate(mobileProgress, 1, {
-                    duration: 5.08, // Exactly 122 frames at 24fps
+                    duration: 2.96, // Exactly 71 frames at 24fps
                     ease: 'linear',
                     onComplete: () => setTrapState('COMPLETED')
                 })
@@ -113,7 +118,7 @@ export function HeroScrollFrames() {
             if (trapState === 'COMPLETED') {
                 setTrapState('PLAYING_REVERSE')
                 animate(mobileProgress, 0, {
-                    duration: 5.08,
+                    duration: 2.96,
                     ease: 'linear',
                     onComplete: () => setTrapState('IDLE')
                 })
@@ -163,9 +168,9 @@ export function HeroScrollFrames() {
     // Convert vh config to real layout pixels to ensure exactly proportional scroll depth
     const isLocked = trapState === 'IDLE' || trapState === 'PLAYING' || trapState === 'PLAYING_REVERSE'
 
-    // We use pan-down when completed at the top to allow the user to easily swipe down to section 2,
+    // We use pan-up when completed at the top to allow the user to easily swipe down to section 2,
     // but block the upward scroll (swipe down) so we can catch it with JS for reverse playtime without rubber-banding.
-    const touchActionStyle = isLocked ? 'none' : (trapState === 'COMPLETED' && typeof window !== 'undefined' && window.scrollY <= 0 ? 'pan-down' : 'auto')
+    const touchActionStyle = isLocked ? 'none' : (trapState === 'COMPLETED' && typeof window !== 'undefined' && window.scrollY <= 0 ? 'pan-up' : 'auto')
 
     const sectionStyle = realVhPx > 0 
         ? { height: `${realVhPx * (SCROLL_HEIGHT_vh / 100)}px` }

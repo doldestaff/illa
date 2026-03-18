@@ -63,29 +63,71 @@ export function ScrollStimulants({ progress, isMobile, isTablet, isReleased }: S
             return
         }
 
-        const resetIdleTimer = () => {
-            setIsIdle(false)
-            if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current)
+        if (isMobile) {
+            // Mobile: Only show arrows 1 second after progress reaches 1 (end of animation)
+            const unsubscribe = progress.on('change', (p) => {
+                if (p > 0.999) {
+                    if (!idleTimeoutRef.current) {
+                        idleTimeoutRef.current = setTimeout(() => {
+                            setIsIdle(true)
+                        }, 1000)
+                    }
+                } else {
+                    if (idleTimeoutRef.current) {
+                        clearTimeout(idleTimeoutRef.current)
+                        idleTimeoutRef.current = null
+                    }
+                    setIsIdle(false)
+                }
+            })
             
-            idleTimeoutRef.current = setTimeout(() => {
-                setIsIdle(true)
-            }, 2000) // 2.0 seconds of inactivity triggers the arrows
-        }
-
-        const unsubscribe = progress.on('change', (p) => {
-            if (Math.abs(p - lastProgressRef.current) > 0.001) {
-                resetIdleTimer()
+            // Initial check
+            if (progress.get() > 0.999) {
+                if (!idleTimeoutRef.current) {
+                    idleTimeoutRef.current = setTimeout(() => {
+                        setIsIdle(true)
+                    }, 1000)
+                }
+            } else {
+                setIsIdle(false)
             }
-            lastProgressRef.current = p
-        })
 
-        resetIdleTimer()
+            return () => {
+                unsubscribe()
+                if (idleTimeoutRef.current) {
+                    clearTimeout(idleTimeoutRef.current)
+                    idleTimeoutRef.current = null
+                }
+            }
+        } else {
+            // Desktop/Tablet: Show arrows after 2 seconds of inactivity anywhere
+            const resetIdleTimer = () => {
+                setIsIdle(false)
+                if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current)
+                
+                idleTimeoutRef.current = setTimeout(() => {
+                    setIsIdle(true)
+                }, 2000) // 2.0 seconds of inactivity triggers the arrows
+            }
 
-        return () => {
-            unsubscribe()
-            if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current)
+            const unsubscribe = progress.on('change', (p) => {
+                if (Math.abs(p - lastProgressRef.current) > 0.001) {
+                    resetIdleTimer()
+                }
+                lastProgressRef.current = p
+            })
+
+            resetIdleTimer()
+
+            return () => {
+                unsubscribe()
+                if (idleTimeoutRef.current) {
+                    clearTimeout(idleTimeoutRef.current)
+                    idleTimeoutRef.current = null
+                }
+            }
         }
-    }, [progress, isReleased])
+    }, [progress, isReleased, isMobile])
 
     // Mobile synchronicity: wait for text to fade out between [0.05, 0.15], then fade the bar in.
     const mobileBarOpacity = useTransform(progress, [0, 0.1, 0.15, 0.95, 1], [0, 0, 1, 1, 0])
