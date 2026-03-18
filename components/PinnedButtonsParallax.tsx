@@ -138,33 +138,38 @@ export function PinnedButtonsParallax() {
         audio.volume = 0.25
         audioRef.current = audio
 
-        // iOS Audio Unlock: On first user interaction, play+pause the audio (muted)
+        // iOS Audio Unlock: On first user interaction, play+pause the audio
         // to unlock it for future programmatic playback from scroll events.
+        // MUST NOT be muted during this initial play, or it won't unlock for unmuted plays.
         const unlockSwoosh = () => {
             if (swooshUnlocked.current) return
             swooshUnlocked.current = true
 
             const a = audioRef.current
             if (a) {
-                a.muted = true
-                a.play().then(() => {
-                    a.pause()
-                    a.muted = false
-                    a.currentTime = 0
-                }).catch(() => {
-                    a.muted = false
-                })
+                const playPromise = a.play()
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        a.pause()
+                        a.currentTime = 0
+                    }).catch(() => {
+                        // Ignore aborts
+                    })
+                }
             }
 
             document.removeEventListener('touchstart', unlockSwoosh, true)
+            document.removeEventListener('touchend', unlockSwoosh, true)
             document.removeEventListener('click', unlockSwoosh, true)
         }
 
         document.addEventListener('touchstart', unlockSwoosh, { capture: true, once: true })
+        document.addEventListener('touchend', unlockSwoosh, { capture: true, once: true })
         document.addEventListener('click', unlockSwoosh, { capture: true, once: true })
 
         return () => {
             document.removeEventListener('touchstart', unlockSwoosh, true)
+            document.removeEventListener('touchend', unlockSwoosh, true)
             document.removeEventListener('click', unlockSwoosh, true)
         }
     }, [])

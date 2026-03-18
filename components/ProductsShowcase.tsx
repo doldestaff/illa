@@ -32,14 +32,19 @@ function ShowcaseMarquee() {
         <>
             <style dangerouslySetInnerHTML={{ __html: `
                 @keyframes marqueeScroll {
-                    0% { transform: translateX(0); -webkit-transform: translateX(0); }
-                    100% { transform: translateX(-50%); -webkit-transform: translateX(-50%); }
+                    0% { transform: translate3d(0, 0, 0); -webkit-transform: translate3d(0, 0, 0); }
+                    100% { transform: translate3d(-50%, 0, 0); -webkit-transform: translate3d(-50%, 0, 0); }
                 }
             `}} />
             <div
                 ref={marqueeRef}
                 className="flex gap-8 w-max"
-                onMouseEnter={() => setIsHovered(true)}
+                onMouseEnter={() => {
+                    // Prevent touch devices from getting stuck in paused 'hover' state
+                    if (window.matchMedia('(hover: hover)').matches) {
+                        setIsHovered(true)
+                    }
+                }}
                 onMouseLeave={() => setIsHovered(false)}
                 style={{
                     animation: `marqueeScroll ${duration}s linear infinite`,

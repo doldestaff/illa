@@ -72,34 +72,40 @@ export function SoundProvider({ children }: { children: React.ReactNode }) {
 
     // iOS Audio Unlock: On the first user interaction (touch/click),
     // play+pause all audio elements to "warm" them for future programmatic playback.
-    // iOS WebKit requires at least one .play() call from a user gesture context.
+    // iOS WebKit requires at least one .play() call from a user gesture context, and it MUST NOT be muted.
     const unlockAudio = () => {
       if (isUnlocked.current) return
       isUnlocked.current = true
 
       Object.values(audioPools.current).forEach((pool) => {
         pool.forEach((audio) => {
-          audio.muted = true
-          audio.play().then(() => {
-            audio.pause()
-            audio.muted = false
-            audio.currentTime = 0
-          }).catch(() => {
-            audio.muted = false
-          })
+          // Do NOT use muted=true, as muted autoplay doesn't unlock the audio context.
+          const playPromise = audio.play()
+          if (playPromise !== undefined) {
+            playPromise.then(() => {
+              audio.pause()
+              audio.currentTime = 0
+            }).catch(() => {
+              // Ignore abort errors
+            })
+          }
         })
       })
 
       // Clean up — only need to unlock once
       document.removeEventListener('touchstart', unlockAudio, true)
       document.removeEventListener('click', unlockAudio, true)
+      document.removeEventListener('touchend', unlockAudio, true)
     }
 
+    // Bind to multiple interaction events to ensure it catches the first intentional gesture
     document.addEventListener('touchstart', unlockAudio, { capture: true, once: true })
+    document.addEventListener('touchend', unlockAudio, { capture: true, once: true })
     document.addEventListener('click', unlockAudio, { capture: true, once: true })
 
     return () => {
       document.removeEventListener('touchstart', unlockAudio, true)
+      document.removeEventListener('touchend', unlockAudio, true)
       document.removeEventListener('click', unlockAudio, true)
     }
   }, [])
