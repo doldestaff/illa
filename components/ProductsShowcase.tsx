@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import { Wrench, X, Sparkles } from 'lucide-react'
@@ -15,6 +15,8 @@ const realProducts = Array.from({ length: 10 }, (_, i) => ({
 function ShowcaseMarquee() {
     const [duration, setDuration] = useState(30)
     const [isHovered, setIsHovered] = useState(false)
+    const [trackWidth, setTrackWidth] = useState(0)
+    const trackRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
         const updateDuration = () => {
@@ -25,14 +27,33 @@ function ShowcaseMarquee() {
         return () => window.removeEventListener('resize', updateDuration)
     }, [])
 
+    // Measure actual pixel width of one track for iOS-safe animation
+    useEffect(() => {
+        const measure = () => {
+            if (trackRef.current) {
+                setTrackWidth(trackRef.current.scrollWidth)
+            }
+        }
+        // Measure after fonts and images settle
+        measure()
+        const timer = setTimeout(measure, 500)
+        window.addEventListener('resize', measure)
+        return () => {
+            clearTimeout(timer)
+            window.removeEventListener('resize', measure)
+        }
+    }, [])
+
+    // iOS Safari bug: percentage-based translate3d(-100%) inside @keyframes
+    // is miscalculated on intrinsic-width (w-max) elements, resulting in 0px movement.
+    // Fix: use a measured pixel value for the translateX target.
+    const keyframes = trackWidth > 0
+        ? `@keyframes marqueeScroll { from { transform: translateX(0); } to { transform: translateX(-${trackWidth}px); } }`
+        : `@keyframes marqueeScroll { from { transform: translateX(0); } to { transform: translateX(-100%); } }`
+
     return (
         <>
-            <style dangerouslySetInnerHTML={{ __html: `
-                @keyframes marqueeScroll {
-                    from { transform: translate3d(0, 0, 0); -webkit-transform: translate3d(0, 0, 0); }
-                    to { transform: translate3d(-100%, 0, 0); -webkit-transform: translate3d(-100%, 0, 0); }
-                }
-            `}} />
+            <style dangerouslySetInnerHTML={{ __html: keyframes }} />
             <div
                 className="flex overflow-hidden w-full relative"
                 onMouseEnter={() => {
@@ -46,11 +67,12 @@ function ShowcaseMarquee() {
                 {[0, 1].map((trackId) => (
                     <div
                         key={trackId}
+                        ref={trackId === 0 ? trackRef : undefined}
                         className="flex gap-8 shrink-0 pr-8 w-max"
                         style={{
-                            animation: `marqueeScroll ${duration}s linear infinite`,
+                            animation: trackWidth > 0 ? `marqueeScroll ${duration}s linear infinite` : 'none',
                             animationPlayState: isHovered ? 'paused' : 'running',
-                            WebkitAnimation: `marqueeScroll ${duration}s linear infinite`,
+                            WebkitAnimation: trackWidth > 0 ? `marqueeScroll ${duration}s linear infinite` : 'none',
                             WebkitAnimationPlayState: isHovered ? 'paused' : 'running',
                             willChange: 'transform',
                         }}
@@ -58,7 +80,7 @@ function ShowcaseMarquee() {
                         {realProducts.map((product, index) => (
                             <div
                                 key={`track-${trackId}-${product.id}-${index}`}
-                                className={`group relative flex-shrink-0 w-[240px] h-[340px] md:w-[260px] md:h-[370px] lg:w-[280px] lg:h-[400px] rounded-[2.5rem] ${product.color} p-8 flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-illa-pink/20 cursor-pointer`}
+                                className={`group relative flex-shrink-0 w-[240px] h-[340px] md:w-[260px] md:h-[370px] lg:w-[280px] lg:h-[400px] rounded-[2.5rem] ${product.color} p-8 flex flex-col items-center justify-center transition-all duration-300 md:hover:scale-105 md:hover:shadow-2xl md:hover:shadow-illa-pink/20 cursor-pointer`}
                             >
                                 <div className="relative w-full h-[75%] mb-2 mt-2">
                                     <Image
@@ -66,7 +88,7 @@ function ShowcaseMarquee() {
                                         alt={product.name}
                                         fill
                                         loading="lazy"
-                                        className="object-contain drop-shadow-lg group-hover:drop-shadow-2xl transition-all duration-500 scale-[1.2] group-hover:scale-[1.3]"
+                                        className="object-contain drop-shadow-lg md:group-hover:drop-shadow-2xl transition-all duration-500 scale-[1.2] md:group-hover:scale-[1.3]"
                                         sizes="280px"
                                     />
                                 </div>
@@ -76,7 +98,7 @@ function ShowcaseMarquee() {
                                 <p className="text-dark/50 text-xs font-medium uppercase tracking-wider">
                                     Premium
                                 </p>
-                                <div className="absolute bottom-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-2 group-hover:translate-y-0">
+                                <div className="absolute bottom-8 opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 transform translate-y-2 md:group-hover:translate-y-0">
                                     <span className="bg-white text-dark px-6 py-2 rounded-full text-sm font-bold shadow-lg">
                                         Ver Detalhes
                                     </span>
