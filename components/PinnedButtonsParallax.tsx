@@ -194,30 +194,7 @@ export function PinnedButtonsParallax() {
         const totalCards = cards.length
         const step = 1 / totalCards
         // Mobile: less overlap = clear card separation; tablet/desktop: more cinematic overlap
-        const overlap = isTablet ? 0.35 : isMobile ? 0.15 : 0.6
-
-        // ── Hold-curve for mobile ────────────────────────────────────────────────
-        // Remaps localP so the center window is compressed to a slow crawl,
-        // creating a natural visual pause before the next card enters.
-        const applyHoldCurve = (p: number): number => {
-            if (!isMobile) return p
-            const ENTRY_END = 0.20  // 0..0.20 → fast entry
-            const CENTER_START = 0.20
-            const CENTER_END = 0.80  // 0.20..0.80 → extremely slow hold (long duration)
-            const EXIT_START = 0.80  // 0.80..1 → fast exit
-            if (p <= ENTRY_END) {
-                // Map 0..0.20 → 0..0.35 (slightly compressed entry)
-                return (p / ENTRY_END) * 0.35
-            } else if (p <= CENTER_END) {
-                // Map 0.20..0.80 → 0.35..0.65 (VERY slow — large plateau / hold zone)
-                const t = (p - CENTER_START) / (CENTER_END - CENTER_START)
-                return 0.35 + t * 0.30
-            } else {
-                // Map 0.80..1 → 0.65..1 (slightly compressed exit)
-                const t = (p - EXIT_START) / (1 - EXIT_START)
-                return 0.65 + t * 0.35
-            }
-        }
+        const overlap = isTablet ? 0.35 : isMobile ? 0.25 : 0.6
 
         cardsRef.current.forEach((card, i) => {
             if (!card) return
@@ -231,8 +208,7 @@ export function PinnedButtonsParallax() {
             const start = (i * step) - (i > 0 ? step * overlap : 0)
             const duration = step + step * overlap
 
-            const rawLocalP = Math.max(0, Math.min(1, (progress - start) / duration))
-            const localP = applyHoldCurve(rawLocalP)
+            const localP = Math.max(0, Math.min(1, (progress - start) / duration))
 
             // Fade out the scroll indicator when reaching the end (Goal Gradient Effect)
             if (cache.indicator && i === 0) {
@@ -391,7 +367,7 @@ export function PinnedButtonsParallax() {
     return (
         <section
             ref={containerRef}
-            className={cn('relative w-full bg-white text-dark', isTablet ? 'h-[550vh]' : isMobile ? 'h-[700vh]' : 'h-[400vh]')}
+            className={cn('relative w-full bg-white text-dark', isTablet ? 'h-[400vh]' : isMobile ? 'h-[450vh]' : 'h-[400vh]')}
         >
             <div className="sticky top-0 w-full h-[100vh] min-h-[100dvh] flex items-center justify-center overflow-hidden">
 
