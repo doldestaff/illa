@@ -519,7 +519,14 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
             </div>
 
             {/* 2. Main Content Container */}
-            <div className="relative z-10 w-full max-w-[1536px] mx-auto px-4 md:px-8 lg:px-12 pt-6 pb-20">
+            <div
+                className="relative z-10 w-full max-w-[1536px] mx-auto px-4 md:px-8 lg:px-12 pt-6 pb-20"
+                style={{
+                    paddingBottom: 'max(5rem, env(safe-area-inset-bottom, 0px))',
+                    paddingLeft: 'max(1rem, env(safe-area-inset-left, 0px))',
+                    paddingRight: 'max(1rem, env(safe-area-inset-right, 0px))',
+                }}
+            >
 
                 {/* Responsive Grid Layout */}
                 <div className="flex flex-col md:grid md:grid-cols-12 gap-6 md:gap-8 lg:gap-10">

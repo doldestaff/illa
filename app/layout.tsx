@@ -24,6 +24,17 @@ const pacifico = Pacifico({
 export const metadata: Metadata = {
   title: 'ILLA Sorvetes | Premium & Divertido',
   description: 'Sorvetes artesanais com uma experiência leve, divertida e premium.',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'ILLA',
+  },
+}
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover' as const,
 }
 
 export default function RootLayout({
@@ -34,6 +45,9 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <head>
+        {/* Apple PWA: Touch icon for home screen */}
+        <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+
         {/* PERF: Preload hero first frame — starts downloading before JS even parses */}
         <link
           rel="preload"
