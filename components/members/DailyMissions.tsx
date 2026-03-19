@@ -131,44 +131,19 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
         return 0
     })
 
-    const previewMissions = sortedMissions
+    // 3. Create a dual-duplicated list for a perfect 50% loop
+    const marqueeMissions = [...sortedMissions, ...sortedMissions]
 
-    // Auto-scroll logic for the horizontal mural
-    const scrollContainerRef = useRef<HTMLDivElement>(null)
+    // Auto-scroll logic for the horizontal mural - Simplified to hover state detection
     const [isHovered, setIsHovered] = useState(false)
 
-    useEffect(() => {
-        if (!scrollContainerRef.current || isHovered) return
-
-        const interval = setInterval(() => {
-            const container = scrollContainerRef.current
-            if (!container) return
-
-            // If we've scrolled near the end, rewind to the start
-            if (container.scrollLeft + container.clientWidth >= container.scrollWidth - 50) {
-                container.scrollTo({ left: 0, behavior: 'smooth' })
-            } else {
-                // Determine item width approximately based on the first item
-                const firstItem = container.querySelector('.marquee-item') as HTMLElement
-                if (firstItem) {
-                    // Scroll by one item + gap
-                    container.scrollBy({ left: firstItem.offsetWidth + 20, behavior: 'smooth' })
-                }
-            }
-        }, 3500) // Scroll every 3.5 seconds
-
-        return () => clearInterval(interval)
-    }, [isHovered, missions.length])
-
     return (
-        <div className="flex flex-col pt-4 pb-2 relative">
-
+        <div className="flex flex-col pt-4 pb-2 relative overflow-hidden">
             {/* Header - Interactive & Cinematic */}
             <div
                 onClick={() => setIsModalOpen(true)}
                 className="relative z-10 flex items-center justify-between cursor-pointer group select-none px-4 md:px-0 mb-3"
             >
-
                 <div className="flex items-center gap-3 relative z-10">
                     <div className="relative">
                         <div className="absolute inset-0 bg-orange-500/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -195,50 +170,64 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
 
                 <div className="flex items-center gap-3 relative z-10">
                     <div className="px-4 py-2 rounded-full border backdrop-blur-md bg-[#25252a]/60 border-white/10 text-white/70 shadow-inner group-hover:border-white/20 transition-all duration-300">
-                        <span className="text-sm font-bold tracking-wider"><span id="marquee-counter-current">1</span> <span className="opacity-50">/</span> {previewMissions.length}</span>
+                        <span className="text-sm font-bold tracking-wider">{sortedMissions.filter(m => m.progress >= m.target).length} <span className="opacity-50">/</span> {sortedMissions.length}</span>
                     </div>
                 </div>
             </div>
 
-            {/* Unified Native Horizontal Scrolling Preview */}
+            {/* Seamless Infinite Marquee Container */}
             <div 
-                className="relative group/mural pb-8 pt-0 w-full max-w-[100vw]"
+                className="relative group/mural w-full max-w-[100vw] py-4"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
-                onTouchStart={() => setIsHovered(true)}
-                onTouchEnd={() => { setTimeout(() => setIsHovered(false), 2000) }}
             >
-                <div 
-                    ref={scrollContainerRef}
-                    className="flex overflow-x-auto snap-x snap-mandatory gap-5 px-4 md:px-8 pb-[120px] pt-[100px] md:pt-[120px] -mt-[40px] md:-mt-[88px] -mb-[88px] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-                    style={{ WebkitOverflowScrolling: 'touch' }}
-                >
-                    {previewMissions.map((mission, index) => {
-                        const isClaimed = claimedIds.has(mission.instance_id) || mission.claimed
-                        const isCompleted = mission.progress >= mission.target
-                        const canClaim = isCompleted && !isClaimed
+                {/* Edge Fades for Cinematic Integration */}
+                <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[#0a0a0c] to-transparent z-20 pointer-events-none" />
+                <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#0a0a0c] to-transparent z-20 pointer-events-none" />
 
-                        return (
-                            <div
-                                key={`mission-${mission.instance_id}`}
-                                className="marquee-item w-[310px] sm:w-[340px] md:w-[380px] h-[180px] md:h-[220px] shrink-0 snap-center relative cursor-pointer"
-                                style={{
-                                    animation: `fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both`,
-                                    animationDelay: `${index * 0.1}s` // Native CSS staggering
-                                }}
-                            >
-                                <MissionCard
-                                    mission={mission}
-                                    isClaimed={isClaimed}
-                                    canClaim={canClaim}
-                                    claiming={claimingId === mission.instance_id}
-                                    onClaim={handleClaim}
-                                    onCardClick={(m) => setHowToMission(m)}
-                                    rewards={missionRewards[mission.instance_id]}
-                                />
-                            </div>
-                        )
-                    })}
+                {/* The Marquee wrapper */}
+                <div className="flex overflow-hidden">
+                    <motion.div 
+                        className="flex gap-6 px-4 py-16 -my-16"
+                        animate={{
+                            x: isHovered ? undefined : ["0%", "-50%"]
+                        }}
+                        transition={{
+                            x: {
+                                duration: sortedMissions.length * 10, // Smoother pace
+                                ease: "linear",
+                                repeat: Infinity,
+                            }
+                        }}
+                        style={{
+                            width: "fit-content",
+                            // Use translateX(0) to force GPU acceleration
+                            transform: "translateZ(0)"
+                        }}
+                    >
+                        {marqueeMissions.map((mission, index) => {
+                            const isClaimed = claimedIds.has(mission.instance_id) || mission.claimed
+                            const isCompleted = mission.progress >= mission.target
+                            const canClaim = isCompleted && !isClaimed
+
+                            return (
+                                <div
+                                    key={`marquee-${mission.instance_id}-${index}`}
+                                    className="marquee-item w-[300px] sm:w-[340px] md:w-[380px] h-[180px] md:h-[220px] shrink-0 relative"
+                                >
+                                    <MissionCard
+                                        mission={mission}
+                                        isClaimed={isClaimed}
+                                        canClaim={canClaim}
+                                        claiming={claimingId === mission.instance_id}
+                                        onClaim={handleClaim}
+                                        onCardClick={(m) => setHowToMission(m)}
+                                        rewards={missionRewards[mission.instance_id]}
+                                    />
+                                </div>
+                            )
+                        })}
+                    </motion.div>
                 </div>
             </div>
 
