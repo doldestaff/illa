@@ -5,6 +5,7 @@ import { Plus, Minus, IceCream, RefreshCw, LogOut, BarChart3, Users, Target, Che
 import { createSupabaseBrowser } from '@/lib/supabaseClient'
 import GlobalCoin from '@/components/ui/GlobalCoin'
 import { SURPRISE_DROPS_CATALOG, CATEGORY_LABELS, RARITY_STYLES } from '@/lib/surprise-drops-catalog'
+import AdminPulse from './AdminPulse'
 
 interface UserSorvetes {
     id: string
@@ -45,8 +46,8 @@ export default function AdminDashboard() {
     const [actionLoading, setActionLoading] = useState<string | null>(null)
     const [view, setView] = useState<'table' | 'chart'>('table')
 
-    // === TABS: Sorvetes | Loja | Missões | Saldo | Drops ===
-    const [activeTab, setActiveTab] = useState<'sorvetes' | 'loja' | 'missoes' | 'balance' | 'drops' | 'reviews'>('sorvetes')
+    // === TABS: Pulse | Sorvetes | Loja | Missões | Saldo | Drops | Reviews ===
+    const [activeTab, setActiveTab] = useState<'pulse' | 'sorvetes' | 'loja' | 'missoes' | 'balance' | 'drops' | 'reviews'>('pulse')
 
     // === DATA STATES ===
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -443,6 +444,13 @@ export default function AdminDashboard() {
                             <h1 className="text-lg font-bold">Painel Admin</h1>
                             <div className="flex flex-wrap justify-center md:justify-start gap-2 text-[11px] font-bold tracking-wide">
                                 <button
+                                    onClick={() => setActiveTab('pulse')}
+                                    className={`uppercase transition-colors ${activeTab === 'pulse' ? 'text-white' : 'text-white/40 hover:text-white'}`}
+                                >
+                                    Pulse
+                                </button>
+                                <span className="text-white/20">|</span>
+                                <button
                                     onClick={() => setActiveTab('sorvetes')}
                                     className={`uppercase transition-colors ${activeTab === 'sorvetes' ? 'text-white' : 'text-white/40 hover:text-white'}`}
                                 >
@@ -531,7 +539,12 @@ export default function AdminDashboard() {
             </div>
 
             {/* Content */}
-            <div className="max-w-4xl mx-auto px-4 py-6">
+            <div className={`mx-auto pb-6 ${activeTab === 'pulse' ? 'max-w-6xl px-4 py-8' : 'max-w-4xl px-4 py-6'}`}>
+
+                {/* === PULSE VIEW === */}
+                {activeTab === 'pulse' && (
+                    <AdminPulse />
+                )}
 
                 {/* === SORVETES VIEW === */}
                 {activeTab === 'sorvetes' && (
