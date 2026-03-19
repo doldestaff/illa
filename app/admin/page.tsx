@@ -61,7 +61,7 @@ export default function AdminPage() {
         setError('')
 
         // Admin email whitelist
-        const allowedAdminEmails = ['orkutpirata@gmail.com']
+        const allowedAdminEmails = ['orkutpirata@gmail.com', 'webdigitalxp@gmail.com']
         if (!allowedAdminEmails.includes(email.toLowerCase())) {
             setError('Acesso não autorizado para este email.')
             setLoading(false)

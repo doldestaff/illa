@@ -14,7 +14,10 @@ export async function GET(req: NextRequest) {
         .order('created_at', { ascending: false })
         .limit(200)
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    if (error) {
+        console.error('[admin/reviews] GET error:', error)
+        return NextResponse.json({ error: error.message }, { status: 500 })
+    }
     return NextResponse.json(data)
 }
 
@@ -27,16 +30,25 @@ export async function PATCH(req: NextRequest) {
     if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })
 
     // Use admin client to bypass RLS for mutations
+    console.log(`[admin/reviews] PATCH: Attempting to set approved=${approved} for id=${id}`)
     const adminDb = createSupabaseAdmin()
-    const { error } = await adminDb
+    const { error, data } = await adminDb
         .from('reviews')
         .update({ approved })
         .eq('id', id)
+        .select() // Need .select() to ensure the row is returned / verified
 
     if (error) {
         console.error('[admin/reviews] PATCH error:', error)
         return NextResponse.json({ error: error.message }, { status: 500 })
     }
+    
+    if (!data || data.length === 0) {
+        console.warn(`[admin/reviews] PATCH warning: Row with id=${id} not found or RLS blocked update (using generic client?)`)
+        return NextResponse.json({ error: 'Review não encontrado ou permissão negada.' }, { status: 403 })
+    }
+
+    console.log(`[admin/reviews] PATCH success for id=${id}`)
     return NextResponse.json({ success: true })
 }
 
@@ -50,15 +62,24 @@ export async function DELETE(req: NextRequest) {
     if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })
 
     // Use admin client to bypass RLS for mutations
+    console.log(`[admin/reviews] DELETE: Attempting to delete id=${id}`)
     const adminDb = createSupabaseAdmin()
-    const { error } = await adminDb
+    const { error, data } = await adminDb
         .from('reviews')
         .delete()
         .eq('id', id)
+        .select()
 
     if (error) {
         console.error('[admin/reviews] DELETE error:', error)
         return NextResponse.json({ error: error.message }, { status: 500 })
     }
+
+    if (!data || data.length === 0) {
+        console.warn(`[admin/reviews] DELETE warning: Row with id=${id} not found or RLS blocked delete (using generic client?)`)
+        return NextResponse.json({ error: 'Review não encontrado ou permissão negada.' }, { status: 403 })
+    }
+
+    console.log(`[admin/reviews] DELETE success for id=${id}`)
     return NextResponse.json({ success: true })
 }
