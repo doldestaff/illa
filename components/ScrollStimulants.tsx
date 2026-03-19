@@ -54,7 +54,10 @@ export function ScrollStimulants({ progress, isMobile, isReleased }: ScrollStimu
 
     // Idle detection logic
     useEffect(() => {
-        if (isReleased) {
+        // Only block idle detection if we are TRULY released (e.g. past the hero section on mobile)
+        // On desktop, trapState is always 'RELEASED', so we must check if we are actually at the bottom.
+        const atBottom = lastProgressRef.current >= 0.99
+        if ((isReleased && isMobile && atBottom) || (!isMobile && atBottom)) {
             if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current)
             return
         }
@@ -113,24 +116,33 @@ export function ScrollStimulants({ progress, isMobile, isReleased }: ScrollStimu
                 }
             }
         } else {
-            // Desktop/Tablet: Show arrows after 2 seconds of inactivity anywhere
-            const resetIdleTimer = () => {
+            // Desktop/Tablet: Show arrows after 0.5 seconds of inactivity anywhere
+            // (Unless we are at the bottom of the section)
+            const resetIdleTimer = (p: number) => {
+                // Hide the arrows immediately during scroll
                 setIsIdle(false)
-                if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current)
                 
+                // Don't start the idle timer if we are at the bottom
+                if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current)
+                if (p >= 0.99) return
+
                 idleTimeoutRef.current = setTimeout(() => {
                     setIsIdle(true)
-                }, 2000) // 2.0 seconds of inactivity triggers the arrows
+                }, 500) // 0.5 seconds of inactivity triggers the arrows
             }
 
             const unsubscribe = progress.on('change', (p) => {
-                if (Math.abs(p - lastProgressRef.current) > 0.001) {
-                    resetIdleTimer()
-                }
+                const diff = Math.abs(p - lastProgressRef.current)
                 lastProgressRef.current = p
+                
+                // Hide arrows immediately on ANY movement, restart timer.
+                // We use a small threshold to avoid subpixel layout jitters, but catch real scrolls.
+                if (diff > 0.001 || p >= 0.99) {
+                    resetIdleTimer(p)
+                }
             })
 
-            resetIdleTimer()
+            resetIdleTimer(progress.get())
 
             return () => {
                 unsubscribe()
@@ -245,21 +257,22 @@ export function ScrollStimulants({ progress, isMobile, isReleased }: ScrollStimu
                                 />
                             </motion.div>
 
-                            {/* Idle Warning Overlay - Desktop Arrows */}
+                            {/* Idle Warning Overlay - Desktop Arrows (Identical to Mobile) */}
                             <AnimatePresence>
                                 {isIdle && (
                                     <motion.div
-                                        initial={{ opacity: 0, x: -20 }}
+                                        initial={{ opacity: 0, x: 20 }}
                                         animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: -20 }}
-                                        className="absolute left-full ml-4 md:ml-8 top-1/2 -translate-y-1/2 flex flex-col items-center gap-0"
+                                        exit={{ opacity: 0, x: 20 }}
+                                        transition={{ duration: 0.4, ease: "easeOut" }}
+                                        className="absolute right-[40px] md:right-[60px] top-1/2 -translate-y-1/2 flex flex-col items-center gap-0 pointer-events-none"
                                     >
                                         {[0, 1, 2].map((i) => (
                                             <motion.div
                                                 key={i}
                                                 animate={{ 
                                                     opacity: [0.1, 1, 0.1],
-                                                    y: [-12, 12]
+                                                    y: [15, -15]
                                                 }}
                                                 transition={{ 
                                                     duration: 1.5, 
@@ -267,13 +280,13 @@ export function ScrollStimulants({ progress, isMobile, isReleased }: ScrollStimu
                                                     ease: "easeInOut",
                                                     delay: i * 0.2
                                                 }}
-                                                className="-my-4"
+                                                className="-my-4 scale-125"
                                             >
-                                                <ChevronDown 
+                                                <ChevronUp 
                                                     size={64} 
                                                     strokeWidth={4}
-                                                    className="drop-shadow-[0_0_16px_rgba(229,1,125,0.8)]"
-                                                    style={{ color: i === 0 ? '#E5017D' : i === 1 ? '#FF8A65' : '#FFC107' }}
+                                                    className="drop-shadow-[0_0_16px_rgba(229,1,125,1)]"
+                                                    style={{ color: i === 0 ? '#FFC107' : i === 1 ? '#FF8A65' : '#E5017D' }}
                                                 />
                                             </motion.div>
                                         ))}

@@ -232,8 +232,8 @@ export function PinnedButtonsParallax() {
 
         const totalCards = cards.length
         const step = 1 / totalCards
-        // Mobile: less overlap = clear card separation; tablet/desktop: more cinematic overlap
-        const overlap = isTablet ? 0.35 : isMobile ? 0.25 : 0.6
+        // Mobile: less overlap = clear card separation; tablet/desktop: more cinematic overlap, reduced from 0.6 to 0.45 to improve spacing
+        const overlap = isTablet ? 0.35 : isMobile ? 0.25 : 0.45
 
         cardsRef.current.forEach((card, i) => {
             if (!card) return

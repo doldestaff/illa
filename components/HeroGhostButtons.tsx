@@ -346,7 +346,7 @@ function DesktopButtons({ progress, onLinkClick }: { progress: MotionValue<numbe
     const fadeOpacity = useTransform(progress, [0.98, 1], [1, 0])
 
     return (
-        <motion.div style={{ opacity: fadeOpacity }} className="absolute bottom-8 left-0 right-0 z-20 flex justify-center pointer-events-none transition-all duration-300">
+        <motion.div style={{ opacity: fadeOpacity }} className="absolute bottom-16 md:bottom-20 left-0 right-0 z-20 flex justify-center pointer-events-none transition-all duration-300">
             <div className="w-full max-w-6xl px-4 pointer-events-auto">
                 <div className="flex justify-center gap-4 items-center">
                     {buttons.map((btn, i) => (
