@@ -83,8 +83,15 @@ export default function AdminDashboard() {
             })
             if (res.ok) {
                 setReviews(prev => prev.map(r => r.id === id ? { ...r, approved: !currentApproved } : r))
+            } else {
+                const errData = await res.json().catch(() => ({}))
+                console.error('Toggle review failed:', res.status, errData)
+                alert(`Erro ao ${currentApproved ? 'ocultar' : 'revelar'} review: ${errData.error || res.statusText}`)
             }
-        } catch { /* silent */ } finally {
+        } catch (err) {
+            console.error('Toggle review error:', err)
+            alert('Erro de conexão ao alterar review.')
+        } finally {
             setTogglingReview(null)
         }
     }
@@ -94,8 +101,17 @@ export default function AdminDashboard() {
         setDeletingReview(id)
         try {
             const res = await fetch(`/api/admin/reviews?id=${id}`, { method: 'DELETE' })
-            if (res.ok) setReviews(prev => prev.filter(r => r.id !== id))
-        } catch { /* silent */ } finally {
+            if (res.ok) {
+                setReviews(prev => prev.filter(r => r.id !== id))
+            } else {
+                const errData = await res.json().catch(() => ({}))
+                console.error('Delete review failed:', res.status, errData)
+                alert(`Erro ao excluir review: ${errData.error || res.statusText}`)
+            }
+        } catch (err) {
+            console.error('Delete review error:', err)
+            alert('Erro de conexão ao excluir review.')
+        } finally {
             setDeletingReview(null)
         }
     }

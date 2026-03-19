@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/admin-auth'
+import { createSupabaseAdmin } from '@/lib/supabaseAdmin'
 
 // GET — all reviews including hidden ones
 export async function GET(req: NextRequest) {
@@ -25,13 +26,17 @@ export async function PATCH(req: NextRequest) {
     const { id, approved } = await req.json()
     if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })
 
-    const { supabase } = auth
-    const { error } = await supabase
+    // Use admin client to bypass RLS for mutations
+    const adminDb = createSupabaseAdmin()
+    const { error } = await adminDb
         .from('reviews')
         .update({ approved })
         .eq('id', id)
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    if (error) {
+        console.error('[admin/reviews] PATCH error:', error)
+        return NextResponse.json({ error: error.message }, { status: 500 })
+    }
     return NextResponse.json({ success: true })
 }
 
@@ -44,12 +49,16 @@ export async function DELETE(req: NextRequest) {
     const id = searchParams.get('id')
     if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })
 
-    const { supabase } = auth
-    const { error } = await supabase
+    // Use admin client to bypass RLS for mutations
+    const adminDb = createSupabaseAdmin()
+    const { error } = await adminDb
         .from('reviews')
         .delete()
         .eq('id', id)
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    if (error) {
+        console.error('[admin/reviews] DELETE error:', error)
+        return NextResponse.json({ error: error.message }, { status: 500 })
+    }
     return NextResponse.json({ success: true })
 }

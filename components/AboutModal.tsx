@@ -24,7 +24,7 @@ const slides = [
     {
         id: 4,
         title: "Nossa Missão",
-        text: "Em nossas 3 lojas da fábrica, estão disponíveis todos os nossos produtos e uma vasta linha de coberturas. Fabricar felicidade é o nossa missão. Afinal, mais importante que vender sorvetes é ter o prazer de proporcionar momentos felizes."
+        text: "Em nossas 3 lojas da fábrica, estão disponíveis todos os nossos produtos e uma vasta linha de coberturas. Fabricar felicidade é a nossa missão. Afinal, mais importante que vender sorvetes é ter o prazer de proporcionar momentos felizes."
     }
 ]
 
