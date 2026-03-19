@@ -177,18 +177,18 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
 
             {/* Seamless Infinite Marquee Container */}
             <div 
-                className="relative group/mural w-full max-w-[100vw] py-4"
+                className="relative group/mural w-full max-w-[100vw] py-4 -my-[140px] pointer-events-auto"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
             >
                 {/* Edge Fades for Cinematic Integration */}
-                <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[#0a0a0c] to-transparent z-20 pointer-events-none" />
-                <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#0a0a0c] to-transparent z-20 pointer-events-none" />
+                <div className="absolute left-0 top-[140px] bottom-[140px] w-24 bg-gradient-to-r from-[#0a0a0c] to-transparent z-20 pointer-events-none" />
+                <div className="absolute right-0 top-[140px] bottom-[140px] w-24 bg-gradient-to-l from-[#0a0a0c] to-transparent z-20 pointer-events-none" />
 
-                {/* The Marquee wrapper */}
-                <div className="flex overflow-visible overflow-x-clip">
+                {/* The Marquee wrapper - Now allows native horizontal scrolling */}
+                <div className="flex overflow-x-auto py-[140px] snap-x snap-mandatory scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] touch-pan-x">
                     <motion.div 
-                        className="flex gap-6 px-4 py-24 -my-24"
+                        className="flex gap-6 px-4"
                         animate={{
                             x: isHovered ? undefined : ["0%", "-50%"]
                         }}
