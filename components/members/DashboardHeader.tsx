@@ -28,6 +28,9 @@ interface Props {
     profile: MemberProfile
     avatarUrl: string | null
     sorvetesCount: number
+    profileMissionId?: string
+    isProfileClaimed?: boolean
+    onClaimProfile?: (instanceId: string) => Promise<any>
 }
 
 const SHIMMER_Animation = {
@@ -43,7 +46,14 @@ const SHIMMER_Animation = {
     }
 }
 
-export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: Props) {
+export default function DashboardHeader({ 
+    profile, 
+    avatarUrl, 
+    sorvetesCount,
+    profileMissionId,
+    isProfileClaimed,
+    onClaimProfile 
+}: Props) {
     const router = useRouter()
     const isMobile = useIsMobile()
     const [showInventory, setShowInventory] = useState(false)
@@ -79,7 +89,34 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
             : 0
 
     const missingFields = profile.missing_fields || []
-    const shouldCompleteProfile = missingFields.length > 0
+    const [localHidden, setLocalHidden] = useState(false)
+    const [isClaimingProfile, setIsClaimingProfile] = useState(false)
+
+    const shouldCompleteProfile = missingFields.length > 0 && !isProfileClaimed && !localHidden
+
+    const handleProfileBypass = async () => {
+        if (!profileMissionId || !onClaimProfile) {
+            router.push('/members/profile')
+            return
+        }
+        setIsClaimingProfile(true)
+        try {
+            await fetch('/api/missions/progress', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ kind: 'profile' }),
+            })
+            // Since it's a fixed +50 XP, the backend will compute it if we just claim.
+            const res = await onClaimProfile(profileMissionId)
+            if (res?.success) {
+                setLocalHidden(true)
+            }
+        } catch (e) {
+            router.push('/members/profile')
+        } finally {
+            setIsClaimingProfile(false)
+        }
+    }
 
     const openInventory = (tab: 'sorvetes' | 'drops') => {
         setInventoryTab(tab)
@@ -547,11 +584,21 @@ export default function DashboardHeader({ profile, avatarUrl, sorvetesCount }: P
                                 </div>
                             </div>
                             <button
-                                onClick={() => router.push('/members/profile')}
-                                className="flex items-center justify-center gap-2 text-sm font-black tracking-wide bg-gradient-to-r from-amber-400 to-amber-500 text-amber-950 px-6 py-3 rounded-xl hover:from-amber-300 hover:to-amber-400 hover:scale-105 transition-all shadow-lg shadow-amber-500/30 active:scale-95 w-full md:w-auto relative z-10"
+                                onClick={handleProfileBypass}
+                                disabled={isClaimingProfile}
+                                className="flex items-center justify-center gap-2 text-sm font-black tracking-wide bg-gradient-to-r from-amber-400 to-amber-500 text-amber-950 px-6 py-3 rounded-xl hover:from-amber-300 hover:to-amber-400 hover:scale-105 transition-all shadow-lg shadow-amber-500/30 active:scale-95 w-full md:w-auto relative z-10 disabled:opacity-70 disabled:pointer-events-none"
                             >
-                                Completar Agora
-                                <ChevronRight size={16} strokeWidth={3} />
+                                {isClaimingProfile ? (
+                                    <>
+                                        <Loader2 size={16} strokeWidth={3} className="animate-spin" />
+                                        Completando...
+                                    </>
+                                ) : (
+                                    <>
+                                        Completar Agora
+                                        <ChevronRight size={16} strokeWidth={3} />
+                                    </>
+                                )}
                             </button>
                         </motion.div>
                     )}

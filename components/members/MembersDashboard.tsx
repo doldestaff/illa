@@ -535,7 +535,18 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                     <div className="md:col-span-5 xl:col-span-4 relative">
                         <div className="md:sticky md:top-8 transition-all duration-300">
                             {/* HUD Header (User Stats) */}
-                            <DashboardHeader profile={snapshot.profile} avatarUrl={avatarUrl} sorvetesCount={sorvetesCount} />
+                            <DashboardHeader
+                                profile={snapshot.profile}
+                                avatarUrl={avatarUrl}
+                                sorvetesCount={sorvetesCount}
+                                profileMissionId={
+                                    snapshot.missions.find(m => m.kind === 'profile')?.instance_id
+                                }
+                                isProfileClaimed={
+                                    snapshot.missions.find(m => m.kind === 'profile')?.claimed ?? false
+                                }
+                                onClaimProfile={handleMissionClaim}
+                            />
 
                             {/* Desktop/Tablet Only: Quick Action Links could go here later */}
                             <div className="hidden md:block mt-6 text-center">
