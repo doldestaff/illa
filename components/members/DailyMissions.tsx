@@ -138,7 +138,7 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
     const [isHovered, setIsHovered] = useState(false)
 
     return (
-        <div className="flex flex-col pt-4 pb-2 relative overflow-hidden">
+        <div className="flex flex-col pt-4 pb-2 relative overflow-visible overflow-x-clip">
             {/* Header - Interactive & Cinematic */}
             <div
                 onClick={() => setIsModalOpen(true)}
@@ -186,9 +186,9 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
                 <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#0a0a0c] to-transparent z-20 pointer-events-none" />
 
                 {/* The Marquee wrapper */}
-                <div className="flex overflow-hidden">
+                <div className="flex overflow-visible overflow-x-clip">
                     <motion.div 
-                        className="flex gap-6 px-4 py-16 -my-16"
+                        className="flex gap-6 px-4 py-24 -my-24"
                         animate={{
                             x: isHovered ? undefined : ["0%", "-50%"]
                         }}

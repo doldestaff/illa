@@ -72,7 +72,7 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
         >
             {/* PERF: Fully CSS accelerated rendering, no IntersectionObserver overhead anymore */}
             <div
-                className={`relative w-full group ${isClaimed ? 'opacity-50 grayscale saturate-50' : ''}`}
+                className={`relative w-full group overflow-visible ${isClaimed ? 'opacity-50 grayscale saturate-50' : ''}`}
                 style={{ height: 'calc(100% - 16px)' }}
             >
                 {/* 1. Atmospheric Glow — PERF: CSS-only opacity animation (compositor thread) */}
