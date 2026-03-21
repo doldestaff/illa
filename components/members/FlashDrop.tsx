@@ -105,7 +105,7 @@ export default function FlashDrop({ drop, onClaim }: Props) {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="relative h-full min-h-[280px] w-full bg-[#111116] border border-white/5 rounded-[2.5rem] flex flex-col items-center justify-center px-4 py-6 text-center overflow-hidden shadow-2xl shadow-black/80"
+                        className="relative h-full min-h-[350px] md:min-h-[450px] w-full bg-[#111116] border border-white/5 rounded-[2.5rem] flex flex-col items-center justify-center px-4 py-8 text-center overflow-hidden shadow-2xl shadow-black/80"
                     >
                         {/* 0. Ambient Dark Glow */}
                         <div className="absolute inset-0 bg-gradient-to-br from-[#1a1114] via-[#111116] to-[#111116] opacity-80" />
@@ -152,7 +152,7 @@ export default function FlashDrop({ drop, onClaim }: Props) {
                         ))}
 
                         {/* 3. Cute Bouncy Heart/Radar */}
-                        <div className="relative z-10 flex flex-col flex-1 items-center justify-center gap-4 w-full h-full my-auto">
+                        <div className="relative z-10 flex flex-col items-center justify-center gap-6 w-full h-full">
                             <div className="relative w-24 h-24 flex items-center justify-center">
                                 {/* Soft pulsing rings */}
                                 {[1, 2, 3].map((i) => (

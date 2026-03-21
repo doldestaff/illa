@@ -160,7 +160,7 @@ export default function ActionModal({ isOpen, onClose, title, themeGradient = "f
                             </div>
 
                             {/* Scrollable Content */}
-                            <div className="p-6 overflow-y-auto custom-scrollbar overscroll-contain">
+                            <div className="p-6 overflow-y-auto scrollbar-hide overscroll-contain">
                                 {children}
                             </div>
                         </motion.div>
