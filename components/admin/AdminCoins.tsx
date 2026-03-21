@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Save, RefreshCw, HandCoins, Activity, TrendingUp, AlertTriangle } from 'lucide-react'
+import { Save, RefreshCw, HandCoins, Activity, TrendingUp, AlertTriangle, Weight } from 'lucide-react'
 
 // Define exactly what the coins config looks like
 interface CoinsConfig {
@@ -14,6 +14,10 @@ interface ActionRewards {
     level_up_base: number
     referral: number
     survey_completion: number
+}
+
+interface CoinsPerKgConfig {
+    coins_per_kg: number
 }
 
 export default function AdminCoins() {
@@ -31,6 +35,7 @@ export default function AdminCoins() {
         referral: 100,
         survey_completion: 30
     })
+    const [kgConfig, setKgConfig] = useState<CoinsPerKgConfig>({ coins_per_kg: 100 })
 
     const fetchSettings = async () => {
         try {
@@ -43,6 +48,9 @@ export default function AdminCoins() {
             }
             if (data.action_rewards) {
                 setActionRewards(data.action_rewards)
+            }
+            if (data.coins_per_kg) {
+                setKgConfig(data.coins_per_kg)
             }
         } catch (err) {
             console.error(err)
@@ -72,6 +80,13 @@ export default function AdminCoins() {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ key: 'action_rewards', value: actionRewards })
+            })
+
+            // Save coins per kg config
+            await fetch('/api/admin/settings', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: 'coins_per_kg', value: kgConfig })
             })
 
             alert('Configurações salvas com sucesso!')
@@ -188,6 +203,42 @@ export default function AdminCoins() {
                                     onChange={e => setActionRewards({ ...actionRewards, level_up_base: parseInt(e.target.value) || 0 })}
                                     className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500/50"
                                 />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Moedas por Kg (Scanner) */}
+                    <div className="bg-white/5 border border-white/10 rounded-2xl p-6 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl" />
+                        
+                        <h3 className="text-lg font-bold mb-1 flex items-center gap-2">
+                            <Weight size={18} className="text-emerald-400" />
+                            Moedas por Kg (Scanner)
+                        </h3>
+                        <p className="text-xs text-white/40 mb-6">Quantas moedas o cliente ganha por Kg consumido na loja? Usado pelo illaScanner.</p>
+                        
+                        <div className="space-y-2 max-w-sm">
+                            <label className="text-[10px] font-bold uppercase tracking-wider text-white/60">
+                                1 Kg = X Moedas ILLA
+                            </label>
+                            <div className="relative">
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 font-bold text-sm">🪙</span>
+                                <input
+                                    required
+                                    type="number"
+                                    step="1"
+                                    min="1"
+                                    value={kgConfig.coins_per_kg}
+                                    onChange={e => setKgConfig({ ...kgConfig, coins_per_kg: parseInt(e.target.value) || 0 })}
+                                    className="w-full bg-black/40 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-xl font-black text-emerald-400 focus:outline-none focus:border-emerald-500/50 transition-colors"
+                                />
+                            </div>
+                            <div className="grid grid-cols-4 gap-2 mt-2">
+                                {[50, 100, 150, 200].map(v => (
+                                    <button key={v} type="button" onClick={() => setKgConfig({ coins_per_kg: v })} className={`py-2 rounded-lg text-[10px] font-bold border transition-all ${kgConfig.coins_per_kg === v ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300' : 'bg-black/20 border-white/5 text-white/40 hover:bg-white/5'}`}>
+                                        {v}/kg
+                                    </button>
+                                ))}
                             </div>
                         </div>
                     </div>

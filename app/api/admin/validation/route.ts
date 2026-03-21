@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/admin-auth'
+import { createSupabaseAdmin } from '@/lib/supabaseAdmin'
 
 // GET — List recent validation logs
 export async function GET(request: Request) {
@@ -20,7 +21,7 @@ export async function GET(request: Request) {
     return NextResponse.json(data ?? [])
 }
 
-// POST — Validate a voucher (scan QR code)
+// POST — Validate and CONSUME a voucher (scan QR code)
 export async function POST(request: Request) {
     const auth = await requireAdmin()
     if ('error' in auth) return auth.error
@@ -61,8 +62,40 @@ export async function POST(request: Request) {
             )
         }
 
+        // Use admin client to bypass RLS for mutations
+        const adminDb = createSupabaseAdmin()
+
+        // === MARK THE VOUCHER AS USED ===
+        // Try discount_redemptions first (voucher_type = 'discount')
+        if (voucher_type === 'discount') {
+            const { error: updateErr } = await adminDb
+                .from('discount_redemptions')
+                .update({ status: 'used' })
+                .eq('voucher_code', voucher_code)
+                .eq('user_id', customer_user_id)
+
+            if (updateErr) {
+                console.error('[validation] Failed to mark discount as used:', updateErr)
+                return NextResponse.json({ error: 'Falha ao consumir voucher de desconto.' }, { status: 500 })
+            }
+        }
+
+        // Try sorvetes_free_redemptions (voucher_type = 'sorvete')
+        if (voucher_type === 'sorvete') {
+            const { error: updateErr } = await adminDb
+                .from('sorvetes_free_redemptions')
+                .update({ is_valid: false })
+                .eq('voucher_code', voucher_code)
+                .eq('user_id', customer_user_id)
+
+            if (updateErr) {
+                console.error('[validation] Failed to mark sorvete as used:', updateErr)
+                return NextResponse.json({ error: 'Falha ao consumir voucher de sorvete.' }, { status: 500 })
+            }
+        }
+
         // Log the validation
-        const { data: log, error: logError } = await supabase
+        const { data: log, error: logError } = await adminDb
             .from('redemption_logs')
             .insert({
                 admin_user_id: user.id,

@@ -13,7 +13,7 @@ const actions = [
     },
     {
         id: 'scanner',
-        label: 'Scanner',
+        label: 'Drops',
         icon: Target,
         color: 'from-illa-pink to-rose-500',
     },
