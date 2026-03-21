@@ -144,15 +144,15 @@ export default function ActionModal({ isOpen, onClose, title, themeGradient = "f
                             </div>
 
                             {/* Header */}
-                            <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-white/[0.02]">
-                                <h3 className={`text-xl font-bold tracking-tight ${themeGradient.includes('white') ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]' : `bg-clip-text text-transparent bg-gradient-to-r ${themeGradient}`}`}>
+                            <div className="relative flex items-center justify-between md:justify-center px-6 py-4 border-b border-white/5 bg-white/[0.02]">
+                                <h3 className={`text-xl font-bold tracking-tight text-center ${themeGradient.includes('white') ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]' : `bg-clip-text text-transparent bg-gradient-to-r ${themeGradient}`}`}>
                                     {title}
                                 </h3>
 
                                 {/* Close Button (Larger touch target: 48px) */}
                                 <button
                                     onClick={onClose}
-                                    className="p-3 -mr-3 text-white/40 hover:text-white hover:bg-white/10 rounded-full transition-colors"
+                                    className="p-3 -mr-3 md:mr-0 md:absolute md:right-6 text-white/40 hover:text-white hover:bg-white/10 rounded-full transition-colors"
                                     aria-label="Close"
                                 >
                                     <X size={24} />
@@ -160,7 +160,7 @@ export default function ActionModal({ isOpen, onClose, title, themeGradient = "f
                             </div>
 
                             {/* Scrollable Content */}
-                            <div className="p-6 overflow-y-auto scrollbar-hide overscroll-contain">
+                            <div className="p-6 overflow-y-auto scrollbar-hide overscroll-contain flex flex-col items-center">
                                 {children}
                             </div>
                         </motion.div>
