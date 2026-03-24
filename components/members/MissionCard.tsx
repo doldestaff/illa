@@ -69,7 +69,7 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
         <div
             ref={cardRef}
             className="flex flex-col w-full h-full gap-2 relative"
-            style={{ contain: 'layout style', willChange: 'transform' }}
+            style={{ contain: 'layout style paint', willChange: 'transform' }}
         >
             {/* PERF: Fully CSS accelerated rendering, no IntersectionObserver overhead anymore */}
             <div

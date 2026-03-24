@@ -138,10 +138,7 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
         return (
             <div
                 key={`${keyPrefix}-${mission.instance_id}-${index}`}
-                className={isMobile
-                    ? "w-[280px] h-[220px] shrink-0 relative mt-4"
-                    : "marquee-item w-[300px] sm:w-[340px] md:w-[380px] h-[220px] shrink-0 relative"
-                }
+                className="marquee-item w-[300px] sm:w-[340px] md:w-[380px] h-[180px] md:h-[220px] shrink-0 relative"
             >
                 <MissionCard
                     mission={mission}
@@ -195,7 +192,7 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
             </div>
 
             {/* Seamless Infinite Marquee Container (CSS ONLY - NO JS) */}
-            <div className="relative group/mural w-full max-w-[100vw] py-12 md:py-4 pointer-events-auto">
+            <div className="relative group/mural w-full max-w-[100vw] py-4 pointer-events-auto">
                 {/* Edge Fades for Cinematic Integration */}
                 <div className="absolute left-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-r from-[#0a0a0c] to-transparent z-20 pointer-events-none" />
                 <div className="absolute right-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-l from-[#0a0a0c] to-transparent z-20 pointer-events-none" />
@@ -203,7 +200,7 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
                 {/* The Marquee wrapper - Hardware Accelerated CSS Animation */}
                 <div className="flex overflow-visible py-12 md:py-[140px] -my-12 md:-my-[140px]">
                     <div
-                        className="marquee-track group-hover/mural:[animation-play-state:paused] flex gap-4 md:gap-6 px-4"
+                        className="marquee-track md:group-hover/mural:[animation-play-state:paused] flex gap-4 md:gap-6 px-4"
                         style={{ '--marquee-duration': `${sortedMissions.length * 8}s` } as React.CSSProperties}
                     >
                         {marqueeMissions.map((mission, index) => renderCard(mission, index, 'marquee'))}

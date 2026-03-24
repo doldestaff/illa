@@ -251,7 +251,7 @@ body {
 }
 .marquee-track {
   display: flex;
-  width: fit-content;
+  width: max-content;
   will-change: transform;
   transform: translateZ(0);
   animation: marquee-scroll var(--marquee-duration, 50s) linear infinite;
