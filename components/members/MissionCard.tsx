@@ -69,6 +69,7 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
         <div
             ref={cardRef}
             className="flex flex-col w-full h-full gap-2 relative"
+            style={{ contain: 'layout style paint', willChange: 'transform' }}
         >
             {/* PERF: Fully CSS accelerated rendering, no IntersectionObserver overhead anymore */}
             <div
@@ -135,7 +136,7 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                     <div className="relative z-10 h-full flex flex-col justify-between p-0 pointer-events-none">
                         <div className="flex justify-end p-4">
                             {isClaimed ? (
-                                <div className="flex items-center gap-1.5 text-emerald-800 font-black text-[10px] bg-emerald-100/90 px-3 py-1.5 rounded-full border border-emerald-200 shadow-md backdrop-blur-sm uppercase tracking-wider">
+                                <div className="flex items-center gap-1.5 text-emerald-800 font-black text-[10px] bg-emerald-100/90 px-3 py-1.5 rounded-full border border-emerald-200 shadow-md uppercase tracking-wider">
                                     <CheckCircle size={12} strokeWidth={3} />
                                     <span>Completo</span>
                                 </div>
@@ -160,9 +161,9 @@ export default function MissionCard({ mission, isClaimed, canClaim, claiming, on
                                 </button>
                             ) : null}
                         </div>
-                        {/* Floating Rewards Badge (Bottom Left) */}
+                        {/* Floating Rewards Badge (Bottom Left) — PERF: removed backdrop-blur on mobile */}
                         {rewards && !isClaimed && (
-                            <div className="absolute bottom-[52px] left-[32px] flex items-center gap-2 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 shadow-lg z-20">
+                            <div className="absolute bottom-[52px] left-[32px] flex items-center gap-2 bg-black/70 px-3 py-1.5 rounded-full border border-white/10 shadow-lg z-20">
                                 <span className="text-[10px] font-black tracking-wider text-amber-400">+{rewards.xp} XP</span>
                                 <div className="w-[1px] h-3 bg-white/20" />
                                 <div className="flex items-center gap-0.5 text-amber-200">

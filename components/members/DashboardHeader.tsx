@@ -193,7 +193,7 @@ export default function DashboardHeader({
             <div
                 className="md:sticky md:top-4 z-40 mb-6 md:mb-8"
             >
-                <div className={`relative rounded-[2.5rem] bg-gradient-to-b from-white-[0.08] via-black/40 to-black/80 md:from-white/[0.05] md:via-white/[0.01] md:to-black/80 ${isMobile ? 'backdrop-blur-md' : 'backdrop-blur-[40px]'} border border-white/10 text-white p-6 md:p-10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.4)] ring-1 ring-white/20 group transition-all duration-500 hover:border-white/20`}>
+                <div className={`relative rounded-[2.5rem] bg-gradient-to-b from-white-[0.08] via-black/40 to-black/80 md:from-white/[0.05] md:via-white/[0.01] md:to-black/80 ${isMobile ? '' : 'backdrop-blur-[40px]'} border border-white/10 text-white p-6 md:p-10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.4)] ring-1 ring-white/20 group transition-all duration-500 hover:border-white/20`}>
 
                     {/* Background & Effects Wrapper (Contained) */}
                     <div className="absolute inset-0 overflow-hidden rounded-[2.5rem] pointer-events-none">
@@ -385,26 +385,24 @@ export default function DashboardHeader({
                                 <div className="md:hidden w-full flex flex-col items-center mt-2">
                                     <div className="flex w-full overflow-hidden items-center justify-center gap-1.5 sm:gap-2 mb-6 px-1">
 
-                                        {/* Drops ÔåÆ Ba├║ Gamer */}
-                                        <motion.button
+                                        {/* Drops — PERF: native button, no motion wrapper on mobile */}
+                                        <button
                                             onClick={() => openInventory('drops')}
-                                            whileHover={{ scale: 1.05 }}
-                                            whileTap={{ scale: 0.95 }}
-                                            className="relative flex items-center justify-center gap-1.5 px-3 py-2 rounded-[1rem] bg-white/[0.08] backdrop-blur-md border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.2)] flex-1 min-w-0 group/drops"
+                                            className="relative flex items-center justify-center gap-1.5 px-3 py-2 rounded-[1rem] bg-white/[0.08] border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.2)] flex-1 min-w-0 group/drops active:scale-95 transition-transform duration-150"
                                         >
-                                            <div className="relative z-10 flex items-center justify-center w-6 h-6 shrink-0 rounded-full bg-gradient-to-br from-[#38bdf8] to-[#0284c7] shadow-[0_2px_4px_rgba(56,189,248,0.5)] border border-white/20 group-hover/drops:scale-110 transition-transform duration-300">
-                                                <div className="absolute inset-0 m-auto w-2 h-2 bg-white rounded-full blur-[3px] animate-[pulse_2s_ease-in-out_infinite]" />
+                                            <div className="relative z-10 flex items-center justify-center w-6 h-6 shrink-0 rounded-full bg-gradient-to-br from-[#38bdf8] to-[#0284c7] shadow-[0_2px_4px_rgba(56,189,248,0.5)] border border-white/20 transition-transform duration-300">
                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3 text-white relative z-10 drop-shadow-[0_0_2px_rgba(255,255,255,0.8)]">
                                                     <path d="M4 4h16a2 2 0 0 1 2 2v3H2V6a2 2 0 0 1 2-2z" />
                                                     <path d="M2 11v8a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-8h-9v1a1 1 0 0 1-2 0v-1H2z" />
                                                 </svg>
                                             </div>
                                             <span className="text-xl font-black text-white relative z-10 drop-shadow-sm tabular-nums tracking-tight truncate">{profile.drops || 0}</span>
-                                        </motion.button>
+                                        </button>
 
                                         {/* Moedas (Larger in the middle) */}
-                                        <div className="relative flex items-center justify-center gap-2 px-4 py-2.5 rounded-[1.2rem] bg-white/[0.08] backdrop-blur-md border border-white/10 shadow-[inner_0_1px_1px_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.2)] flex-[1.2] min-w-0 cursor-default group/coins">
-                                            <div className="relative z-10 group-hover/coins:scale-110 transition-transform duration-300 shrink-0 -ml-1">
+                                        {/* Moedas — PERF: removed backdrop-blur on mobile */}
+                                        <div className="relative flex items-center justify-center gap-2 px-4 py-2.5 rounded-[1.2rem] bg-white/[0.08] border border-white/10 shadow-[inner_0_1px_1px_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.2)] flex-[1.2] min-w-0 cursor-default group/coins">
+                                            <div className="relative z-10 transition-transform duration-300 shrink-0 -ml-1">
                                                 <GlobalCoin size="sm" />
                                             </div>
                                             <div className="relative z-10 flex flex-col items-start -space-y-1 overflow-hidden">
@@ -414,18 +412,16 @@ export default function DashboardHeader({
                                         </div>
 
                                         {/* Sorvetes */}
-                                        <motion.button
-                                            key={`sorvete-mobile-${sorvetesCount}`}
+                                        {/* Sorvetes — PERF: native button, no motion wrapper on mobile */}
+                                        <button
                                             onClick={() => openInventory('sorvetes')}
-                                            whileHover={{ scale: 1.05 }}
-                                            whileTap={{ scale: 0.95 }}
-                                            className="relative flex items-center justify-center gap-1.5 px-3 py-2 rounded-[1rem] bg-white/[0.08] backdrop-blur-md border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.2)] flex-1 min-w-0 group/sorvete"
+                                            className="relative flex items-center justify-center gap-1.5 px-3 py-2 rounded-[1rem] bg-white/[0.08] border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.2)] flex-1 min-w-0 group/sorvete active:scale-95 transition-transform duration-150"
                                         >
-                                            <div className="relative z-10 flex items-center justify-center w-6 h-6 shrink-0 rounded-full bg-gradient-to-br from-illa-pink to-[#c40068] shadow-[0_2px_4px_rgba(229,1,125,0.5)] border border-white/20 group-hover/sorvete:scale-110 transition-transform duration-300">
+                                            <div className="relative z-10 flex items-center justify-center w-6 h-6 shrink-0 rounded-full bg-gradient-to-br from-illa-pink to-[#c40068] shadow-[0_2px_4px_rgba(229,1,125,0.5)] border border-white/20 transition-transform duration-300">
                                                 <IceCream size={12} className="text-white drop-shadow-md" strokeWidth={2.5} />
                                             </div>
                                             <span className="text-xl font-black text-white relative z-10 drop-shadow-sm tabular-nums tracking-tight truncate">{sorvetesCount}</span>
-                                        </motion.button>
+                                        </button>
                                     </div>
 
                                     {/* Mobile XP Bar */}
@@ -439,23 +435,21 @@ export default function DashboardHeader({
                                                 {isMaxLevel ? 'Nível máximo!' : `Faltam ${xpToNext} XP`}
                                             </span>
                                         </div>
-                                        <div className="h-6 w-full bg-black/40 rounded-full overflow-hidden border border-white/5 relative backdrop-blur-xl shadow-[inset_0_3px_6px_rgba(0,0,0,0.6)] p-[2px]">
-                                            <motion.div
-                                                initial={{ width: 0 }}
-                                                animate={{ width: `${progressPercent}%` }}
-                                                transition={{ duration: 1.5, ease: "easeOut", type: "spring", bounce: 0.15 }}
-                                                className="h-full relative rounded-full shadow-[0_0_20px_rgba(229,1,125,0.4)] flex items-center min-w-[2%]"
+                                        {/* PERF: CSS transition instead of framer-motion spring for XP bar */}
+                                        <div className="h-6 w-full bg-black/40 rounded-full overflow-hidden border border-white/5 relative shadow-[inset_0_3px_6px_rgba(0,0,0,0.6)] p-[2px]">
+                                            <div
+                                                className="h-full relative rounded-full shadow-[0_0_20px_rgba(229,1,125,0.4)] flex items-center min-w-[2%] transition-[width] duration-1000 ease-out"
+                                                style={{ width: `${progressPercent}%` }}
                                             >
                                                 <div className="absolute inset-0 bg-[length:200%_100%] animate-[shimmer_3s_linear_infinite] rounded-full" style={{ backgroundImage: 'linear-gradient(90deg, #E5017D, #F59E0B, #E5017D)' }} />
                                                 <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/5 to-black/30 mix-blend-overlay rounded-full" />
-                                                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay rounded-full pointer-events-none" />
                                                 {progressPercent > 2 && (
                                                     <div className="absolute inset-y-0 right-0 w-16 flex justify-end items-center pointer-events-none">
                                                         <div className="absolute inset-y-0 right-0 w-full bg-gradient-to-r from-transparent via-amber-500/20 to-amber-200/60 rounded-r-full" />
                                                         <div className="relative h-[calc(100%-2px)] w-2 bg-white rounded-full shadow-[0_0_12px_rgba(255,255,255,1),-3px_0_15px_rgba(245,158,11,1)] mr-[1px] blur-[0.3px]" />
                                                     </div>
                                                 )}
-                                            </motion.div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

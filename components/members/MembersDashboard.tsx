@@ -641,15 +641,15 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
 
                             {/* Wide Modules */}
                             <div className="space-y-6">
-                                <div className="anim-fade-in-up anim-delay-4">
+                                <div className="anim-fade-in-up anim-delay-4 content-auto">
                                     <SecretMenu items={snapshot.secret_menu} />
                                 </div>
 
-                                <div id="recipes" className="anim-fade-in-up anim-delay-5">
+                                <div id="recipes" className="anim-fade-in-up anim-delay-5 content-auto">
                                     <ReceitasCinematicButton />
                                 </div>
 
-                                <div className="anim-fade-in-up anim-delay-6">
+                                <div className="anim-fade-in-up anim-delay-6 content-auto">
                                     <WeeklyLeaderboard
                                         leaderboard={snapshot.leaderboard}
                                         currentUserId={snapshot.profile.id}
@@ -657,7 +657,7 @@ export default function MembersDashboard({ snapshot: initial, avatarUrl }: Props
                                     />
                                 </div>
 
-                                <div className="anim-fade-in-up anim-delay-7">
+                                <div className="anim-fade-in-up anim-delay-7 content-auto">
                                     <BirthdayModule birthday={snapshot.birthday} />
                                 </div>
                             </div>

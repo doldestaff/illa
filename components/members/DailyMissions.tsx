@@ -13,6 +13,13 @@ const MissionHowToPopup = dynamic(() => import('./MissionHowToPopup'), { ssr: fa
 import GlobalCoin from '../ui/GlobalCoin'
 import { useSoundSystem } from '@/components/providers/SoundProvider'
 
+// PERF: Detect mobile once, avoid re-renders on resize
+function useIsMobile() {
+    const [isMobile, setIsMobile] = useState(false)
+    useEffect(() => { setIsMobile(window.innerWidth < 768) }, [])
+    return isMobile
+}
+
 // --- Animated Counter Helper ---
 function AnimatedCounter({ value, duration = 1.5, delay = 0 }: { value: number, duration?: number, delay?: number }) {
     const nodeRef = useRef<HTMLSpanElement>(null);
@@ -21,7 +28,6 @@ function AnimatedCounter({ value, duration = 1.5, delay = 0 }: { value: number, 
         const node = nodeRef.current;
         if (!node) return;
 
-        // Reset to 0 before animating
         node.textContent = '0';
 
         const timeout = setTimeout(() => {
@@ -50,10 +56,11 @@ interface Props {
 }
 
 export default function DailyMissions({ missions: initialMissions, onClaim, onInviteClick }: Props) {
+    const isMobile = useIsMobile()
     const missions = initialMissions
-        .filter((m) => m.kind !== 'profile' && !m.title.toLowerCase().includes('self')) // Remove missions without dedicated images
+        .filter((m) => m.kind !== 'profile' && !m.title.toLowerCase().includes('self'))
         .filter((mission, index, self) => index === self.findIndex((m) => resolveCardImage(m) === resolveCardImage(mission)))
-        .slice(0, 5) // Enforce exactly 5 cards
+        .slice(0, 5)
 
     const [claimingId, setClaimingId] = useState<string | null>(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -85,9 +92,7 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
     const handleClaim = useCallback(async (instanceId: string, customReward?: { xp: number; points: number }) => {
         setClaimingId(instanceId)
         try {
-            // Determine rewards for the animation
             const reward = customReward || missionRewards[instanceId] || { xp: 50, coins: 5 }
-            // Some apis return 'points', some 'coins', ensure we map it right
             const rewardCoins = 'coins' in reward ? reward.coins : ('points' in reward ? reward.points : 0);
             setClaimedReward({ xp: reward.xp, coins: rewardCoins })
 
@@ -96,20 +101,10 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
                 setClaimedIds((prev) => new Set([...prev, instanceId]))
                 setShowPopup(true)
                 
-                // Play sounds for cinematic impact
                 playMissionComplete()
-                
-                // Delay slightly for the reward presentation
-                setTimeout(() => {
-                    playCoinToastShow()
-                }, 400)
-
-                // The "secondary" festive sound
-                setTimeout(() => {
-                    playCoinToastCelebration()
-                }, 1200)
-
-                setTimeout(() => setShowPopup(false), 4500) // Keep open slightly longer for the animation impact
+                setTimeout(() => { playCoinToastShow() }, 400)
+                setTimeout(() => { playCoinToastCelebration() }, 1200)
+                setTimeout(() => setShowPopup(false), 4500)
             }
         } catch (err) {
             console.error('Claim failed:', err)
@@ -121,7 +116,7 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
 
     if (missions.length === 0) return null
 
-    // Determine all missions for the mural - Sort completed and claimed to the end
+    // Sort completed and claimed to the end
     const sortedMissions = [...missions].sort((a, b) => {
         const aCompleted = a.progress >= a.target || a.claimed || claimedIds.has(a.instance_id)
         const bCompleted = b.progress >= b.target || b.claimed || claimedIds.has(b.instance_id)
@@ -131,11 +126,35 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
         return 0
     })
 
-    // 3. Create a dual-duplicated list for a perfect 50% loop
+    // Desktop: duplicated list for CSS marquee 50% loop
     const marqueeMissions = [...sortedMissions, ...sortedMissions]
 
-    // Auto-scroll logic for the horizontal mural - Simplified to hover state detection
-    const [isHovered, setIsHovered] = useState(false)
+    // Shared card renderer
+    const renderCard = (mission: MissionInstance, index: number, keyPrefix: string) => {
+        const isClaimed = claimedIds.has(mission.instance_id) || mission.claimed
+        const isCompleted = mission.progress >= mission.target
+        const canClaim = isCompleted && !isClaimed
+
+        return (
+            <div
+                key={`${keyPrefix}-${mission.instance_id}-${index}`}
+                className={isMobile
+                    ? "w-[280px] h-[180px] shrink-0"
+                    : "marquee-item w-[300px] sm:w-[340px] md:w-[380px] h-[220px] shrink-0 relative"
+                }
+            >
+                <MissionCard
+                    mission={mission}
+                    isClaimed={isClaimed}
+                    canClaim={canClaim}
+                    claiming={claimingId === mission.instance_id}
+                    onClaim={handleClaim}
+                    onCardClick={(m) => setHowToMission(m)}
+                    rewards={missionRewards[mission.instance_id]}
+                />
+            </div>
+        )
+    }
 
     return (
         <div className="flex flex-col pt-4 pb-2 relative overflow-visible overflow-x-clip">
@@ -169,67 +188,40 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
                 </div>
 
                 <div className="flex items-center gap-3 relative z-10">
-                    <div className="px-4 py-2 rounded-full border backdrop-blur-md bg-[#25252a]/60 border-white/10 text-white/70 shadow-inner group-hover:border-white/20 transition-all duration-300">
+                    <div className="px-4 py-2 rounded-full border mobile-no-blur backdrop-blur-md bg-[#25252a]/60 border-white/10 text-white/70 shadow-inner group-hover:border-white/20 transition-all duration-300">
                         <span className="text-sm font-bold tracking-wider">{sortedMissions.filter(m => m.progress >= m.target).length} <span className="opacity-50">/</span> {sortedMissions.length}</span>
                     </div>
                 </div>
             </div>
 
-            {/* Seamless Infinite Marquee Container */}
-            <div 
-                className="relative group/mural w-full max-w-[100vw] py-4 -my-[140px] pointer-events-auto"
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
-            >
-                {/* Edge Fades for Cinematic Integration */}
-                <div className="absolute left-0 top-[140px] bottom-[140px] w-24 bg-gradient-to-r from-[#0a0a0c] to-transparent z-20 pointer-events-none" />
-                <div className="absolute right-0 top-[140px] bottom-[140px] w-24 bg-gradient-to-l from-[#0a0a0c] to-transparent z-20 pointer-events-none" />
+            {/* ─── MOBILE: Native horizontal scroll (zero touch conflict) ─── */}
+            {isMobile ? (
+                <div className="relative w-full py-4">
+                    {/* Edge fades */}
+                    <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-[#0a0a0c] to-transparent z-20 pointer-events-none" />
+                    <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#0a0a0c] to-transparent z-20 pointer-events-none" />
 
-                {/* The Marquee wrapper - Now allows native horizontal scrolling */}
-                <div className="flex overflow-x-auto py-[140px] snap-x snap-mandatory scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] touch-pan-x">
-                    <motion.div 
-                        className="flex gap-6 px-4"
-                        animate={{
-                            x: isHovered ? undefined : ["0%", "-50%"]
-                        }}
-                        transition={{
-                            x: {
-                                duration: sortedMissions.length * 10, // Smoother pace
-                                ease: "linear",
-                                repeat: Infinity,
-                            }
-                        }}
-                        style={{
-                            width: "fit-content",
-                            // Use translateX(0) to force GPU acceleration
-                            transform: "translateZ(0)"
-                        }}
-                    >
-                        {marqueeMissions.map((mission, index) => {
-                            const isClaimed = claimedIds.has(mission.instance_id) || mission.claimed
-                            const isCompleted = mission.progress >= mission.target
-                            const canClaim = isCompleted && !isClaimed
-
-                            return (
-                                <div
-                                    key={`marquee-${mission.instance_id}-${index}`}
-                                    className="marquee-item w-[300px] sm:w-[340px] md:w-[380px] h-[180px] md:h-[220px] shrink-0 relative"
-                                >
-                                    <MissionCard
-                                        mission={mission}
-                                        isClaimed={isClaimed}
-                                        canClaim={canClaim}
-                                        claiming={claimingId === mission.instance_id}
-                                        onClaim={handleClaim}
-                                        onCardClick={(m) => setHowToMission(m)}
-                                        rewards={missionRewards[mission.instance_id]}
-                                    />
-                                </div>
-                            )
-                        })}
-                    </motion.div>
+                    <div className="mobile-missions-scroll">
+                        {sortedMissions.map((mission, index) => renderCard(mission, index, 'mobile'))}
+                    </div>
                 </div>
-            </div>
+            ) : (
+                /* ─── DESKTOP: CSS-only marquee (GPU compositor, no JS animation) ─── */
+                <div className="relative group/mural w-full max-w-[100vw] py-4 -my-[140px] pointer-events-auto">
+                    {/* Edge fades */}
+                    <div className="absolute left-0 top-[140px] bottom-[140px] w-24 bg-gradient-to-r from-[#0a0a0c] to-transparent z-20 pointer-events-none" />
+                    <div className="absolute right-0 top-[140px] bottom-[140px] w-24 bg-gradient-to-l from-[#0a0a0c] to-transparent z-20 pointer-events-none" />
+
+                    <div className="flex py-[140px] overflow-hidden">
+                        <div
+                            className="marquee-track group-hover/mural:[animation-play-state:paused] flex gap-6 px-4"
+                            style={{ '--marquee-duration': `${sortedMissions.length * 10}s` } as React.CSSProperties}
+                        >
+                            {marqueeMissions.map((mission, index) => renderCard(mission, index, 'marquee'))}
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Clear Call to Action for Missions Panel */}
             <div className="px-4 -mt-5 relative z-20 pointer-events-none">

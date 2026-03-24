@@ -249,3 +249,52 @@ body {
     animation-iteration-count: 1 !important;
   }
 }
+
+/* ─── CSS Marquee for Mission Carousel (desktop) ─── */
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-track {
+  display: flex;
+  width: fit-content;
+  will-change: transform;
+  transform: translateZ(0);
+  animation: marquee-scroll var(--marquee-duration, 50s) linear infinite;
+}
+.marquee-track:hover,
+.marquee-track.paused {
+  animation-play-state: paused;
+}
+
+/* ─── Mobile carousel: native touch scroll ─── */
+.mobile-missions-scroll {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  gap: 1rem;
+  padding: 0 1rem;
+}
+.mobile-missions-scroll::-webkit-scrollbar { display: none; }
+.mobile-missions-scroll > * {
+  scroll-snap-align: center;
+  flex-shrink: 0;
+}
+
+/* ─── Kill backdrop-blur on mobile for scroll perf ─── */
+@media (max-width: 768px) {
+  .mobile-no-blur {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
+
+/* ─── Content-visibility auto for below-fold sections ─── */
+.content-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 300px;
+}
