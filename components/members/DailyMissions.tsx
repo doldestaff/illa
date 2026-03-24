@@ -157,7 +157,7 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
     }
 
     return (
-        <div className="flex flex-col pt-4 pb-2 relative overflow-visible overflow-x-clip">
+        <div className="flex flex-col pt-4 pb-2 relative overflow-visible">
             {/* Header - Interactive & Cinematic */}
             <div
                 onClick={() => setIsModalOpen(true)}
@@ -194,34 +194,22 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
                 </div>
             </div>
 
-            {/* ─── MOBILE: Native horizontal scroll (zero touch conflict) ─── */}
-            {isMobile ? (
-                <div className="relative w-full py-4">
-                    {/* Edge fades */}
-                    <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-[#0a0a0c] to-transparent z-20 pointer-events-none" />
-                    <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#0a0a0c] to-transparent z-20 pointer-events-none" />
+            {/* Seamless Infinite Marquee Container (CSS ONLY - NO JS) */}
+            <div className="relative group/mural w-full max-w-[100vw] py-4 pointer-events-auto">
+                {/* Edge Fades for Cinematic Integration */}
+                <div className="absolute left-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-r from-[#0a0a0c] to-transparent z-20 pointer-events-none" />
+                <div className="absolute right-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-l from-[#0a0a0c] to-transparent z-20 pointer-events-none" />
 
-                    <div className="mobile-missions-scroll">
-                        {sortedMissions.map((mission, index) => renderCard(mission, index, 'mobile'))}
+                {/* The Marquee wrapper - Hardware Accelerated CSS Animation */}
+                <div className="flex overflow-visible py-4">
+                    <div
+                        className="marquee-track group-hover/mural:[animation-play-state:paused] flex gap-4 md:gap-6 px-4"
+                        style={{ '--marquee-duration': `${sortedMissions.length * 8}s` } as React.CSSProperties}
+                    >
+                        {marqueeMissions.map((mission, index) => renderCard(mission, index, 'marquee'))}
                     </div>
                 </div>
-            ) : (
-                /* ─── DESKTOP: CSS-only marquee (GPU compositor, no JS animation) ─── */
-                <div className="relative group/mural w-full max-w-[100vw] py-4 -my-[140px] pointer-events-auto">
-                    {/* Edge fades */}
-                    <div className="absolute left-0 top-[140px] bottom-[140px] w-24 bg-gradient-to-r from-[#0a0a0c] to-transparent z-20 pointer-events-none" />
-                    <div className="absolute right-0 top-[140px] bottom-[140px] w-24 bg-gradient-to-l from-[#0a0a0c] to-transparent z-20 pointer-events-none" />
-
-                    <div className="flex py-[140px] overflow-hidden">
-                        <div
-                            className="marquee-track group-hover/mural:[animation-play-state:paused] flex gap-6 px-4"
-                            style={{ '--marquee-duration': `${sortedMissions.length * 10}s` } as React.CSSProperties}
-                        >
-                            {marqueeMissions.map((mission, index) => renderCard(mission, index, 'marquee'))}
-                        </div>
-                    </div>
-                </div>
-            )}
+            </div>
 
             {/* Clear Call to Action for Missions Panel */}
             <div className="px-4 -mt-5 relative z-20 pointer-events-none">

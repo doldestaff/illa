@@ -243,12 +243,6 @@ body {
   }
 }
 
-/* On mobile/tablet: kill all infinite animations to prevent scroll jank */
-@media (max-width: 1024px) {
-  .mobile-no-infinite {
-    animation-iteration-count: 1 !important;
-  }
-}
 
 /* ─── CSS Marquee for Mission Carousel (desktop) ─── */
 @keyframes marquee-scroll {
@@ -267,23 +261,7 @@ body {
   animation-play-state: paused;
 }
 
-/* ─── Mobile carousel: native touch scroll ─── */
-.mobile-missions-scroll {
-  display: flex;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-x;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  gap: 1rem;
-  padding: 0 1rem;
-}
-.mobile-missions-scroll::-webkit-scrollbar { display: none; }
-.mobile-missions-scroll > * {
-  scroll-snap-align: center;
-  flex-shrink: 0;
-}
+
 
 /* ─── Kill backdrop-blur on mobile for scroll perf ─── */
 @media (max-width: 768px) {

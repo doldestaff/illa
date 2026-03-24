@@ -179,8 +179,10 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                 overflow-hidden
                                 pointer-events-auto
                                 relative
-                                max-h-[calc(100vh-2rem)] overflow-y-auto
-                                md:max-h-none md:overflow-visible md:h-auto
+                                max-h-[90vh] md:max-h-none
+                                overflow-y-auto md:overflow-visible
+                                md:h-auto
+                                flex flex-col
                             "
                         >
                             {/* Close Button */}
