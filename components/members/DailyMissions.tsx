@@ -197,10 +197,10 @@ export default function DailyMissions({ missions: initialMissions, onClaim, onIn
                 <div className="absolute left-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-r from-[#0a0a0c] to-transparent z-20 pointer-events-none" />
                 <div className="absolute right-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-l from-[#0a0a0c] to-transparent z-20 pointer-events-none" />
 
-                {/* The Marquee wrapper - Hardware Accelerated CSS Animation */}
-                <div className="flex overflow-visible py-12 md:py-[140px] -my-12 md:-my-[140px]">
+                {/* The Marquee wrapper - Hardware Accelerated CSS Animation + Native Fallback Scroll */}
+                <div className="flex overflow-x-auto py-[140px] -my-[140px] scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] touch-pan-x">
                     <div
-                        className="marquee-track md:group-hover/mural:[animation-play-state:paused] flex gap-4 md:gap-6 px-4"
+                        className="marquee-track group-hover/mural:[animation-play-state:paused] group-active/mural:[animation-play-state:paused] flex gap-4 md:gap-6 px-4"
                         style={{ '--marquee-duration': `${sortedMissions.length * 8}s` } as React.CSSProperties}
                     >
                         {marqueeMissions.map((mission, index) => renderCard(mission, index, 'marquee'))}
